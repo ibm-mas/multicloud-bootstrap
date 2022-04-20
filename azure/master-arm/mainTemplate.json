@@ -226,7 +226,8 @@
       "type": "secureString",
       "metadata": {
         "description": "Password to be used with SMTP server."
-      }
+      },
+      "defaultValue": ""
     },
     "notificattionEmailAddress": {
       "type": "string",
