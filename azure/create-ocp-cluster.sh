@@ -22,8 +22,8 @@ ssh-public-key          = "$SSH_KEY_NAME"
 dnszone                 = "$BASE_DOMAIN"
 dnszone-resource-group  = "$BASE_DOMAIN_RG_NAME"
 pull-secret-file-path   = "$OPENSHIFT_PULL_SECRET_FILE_PATH"
-openshift-username      = "$OPENSHIFT_USER"
-openshift-password      = "$OPENSHIFT_PASSWORD"
+openshift-username      = "$OCP_USERNAME"
+openshift-password      = "$OCP_PASSWORD"
 master-node-count       = "$MASTER_NODE_COUNT"
 worker-node-count       = "$WORKER_NODE_COUNT"
 EOT
@@ -31,4 +31,9 @@ log "==== OCP cluster creation started ===="
 terraform init -input=false
 terraform plan -input=false -out=tfplan
 terraform apply -input=false -auto-approve
+retcode=$?
+if [[ $retcode -ne 0 ]]; then
+    log "OCP cluster creation failed in Terraform step"
+    exit 21
+fi
 log "==== OCP cluster creation completed ===="

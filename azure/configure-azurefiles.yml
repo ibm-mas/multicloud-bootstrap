@@ -1,12 +1,12 @@
 ---
 - name: Create azurefiles storage class and Cluster role
   hosts: localhost
-  gather_facts: no 
+  gather_facts: no
   tasks:
-  #Create storage class 
-  - name: create azure files storage class 
+  #Create storage class
+  - name: create azure files storage class
     kubernetes.core.k8s:
-      definition: 
+      definition:
         apiVersion: storage.k8s.io/v1
         kind: StorageClass
         metadata:
@@ -18,10 +18,10 @@
           storageAccount: "masazfilestorageac"
       wait: yes
 
-  #Create cluster role binding 
-  - name: create azure files storage class 
+  #Create cluster role binding
+  - name: create azure cluster role binding
     kubernetes.core.k8s:
-      definition: 
+      definition:
         apiVersion: rbac.authorization.k8s.io/v1
         kind: ClusterRoleBinding
         metadata:

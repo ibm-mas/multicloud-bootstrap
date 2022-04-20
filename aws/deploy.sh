@@ -14,7 +14,7 @@ export KAFKA_STORAGE_CLASS=gp2
 # IAM variables
 IAM_POLICY_NAME="masocp-policy-${RANDOM_STR}"
 IAM_USER_NAME="masocp-user-${RANDOM_STR}"
-# SLS variables 
+# SLS variables
 export SLS_STORAGE_CLASS=gp2
 # CP4D variables
 export CPD_BLOCK_STORAGE_CLASS=gp2
@@ -170,7 +170,7 @@ EOT
     exit 22
   fi
   set -e
- 
+
   # Backup Terraform configuration
   cd $GIT_REPO_HOME
   rm -rf /tmp/mas-multicloud
@@ -194,7 +194,7 @@ fi
 log "==== Adding ER key details to OCP default pull-secret ===="
 cd /tmp
 # Login to OCP cluster
-oc login -u $OCP_USERNAME -p $OCP_PASSWORD --server=https://api.${CLUSTER_NAME}.${BASE_DOMAIN}:6443
+oc login -u $OCP_USERNAME -p $OCP_PASSWORD --server=https://api.${CLUSTER_NAME}.${BASE_DOMAIN}:6443 --insecure-skip-tls-verify=true
 oc extract secret/pull-secret -n openshift-config --keys=.dockerconfigjson --to=. --confirm
 export encodedEntitlementKey=$(echo cp:$SLS_ENTITLEMENT_KEY | tr -d '\n' | base64 -w0)
 ##export encodedEntitlementKey=$(echo cp:$SLS_ENTITLEMENT_KEY | base64 -w0)
@@ -208,7 +208,7 @@ oc set data secret/pull-secret -n openshift-config --from-file=/tmp/.dockerconfi
 log "==== OCP cluster configuration (Cert Manager and SBO) started ===="
 cd $GIT_REPO_HOME/../ibm/mas_devops/playbooks
 set +e
-ansible-playbook ocp/configure-ocp.yml 
+ansible-playbook ocp/configure-ocp.yml
 if [[ $? -ne 0 ]]; then
   # One reason for this failure is catalog sources not having required state information, so recreate the catalog-operator pod
   # https://bugzilla.redhat.com/show_bug.cgi?id=1807128
@@ -238,7 +238,7 @@ cp $GIT_REPO_HOME/entitlement.lic $MAS_CONFIG_DIR
 
 ## Deploy Amqstreams
 # log "==== Amq streams deployment started ===="
-# ansible-playbook install-amqstream.yml  
+# ansible-playbook install-amqstream.yml
 # log "==== Amq streams deployment completed ===="
 
 # SLS Deployment
@@ -299,7 +299,7 @@ if [[ $DEPLOY_MANAGE == "true" ]]; then
   log "==== MAS Manage deployment started ===="
   ansible-playbook mas/install-app.yml
   log "==== MAS Manage deployment completed ===="
-  
+
   # Configure app to use the DB
   log "==== MAS Manage configure app started ===="
   ansible-playbook mas/configure-app.yml
