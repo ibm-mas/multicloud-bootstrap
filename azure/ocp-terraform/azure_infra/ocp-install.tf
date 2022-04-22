@@ -305,7 +305,7 @@ locals {
 }
 
 resource "azurerm_storage_account" "azure_file_store" {
-  name                     = "masazfilestorageac"
+  name                     = var.storageac_azurefile
   resource_group_name      = local.rg_name
   location                 = var.region
   account_replication_type = "LRS"

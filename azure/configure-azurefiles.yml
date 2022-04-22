@@ -15,7 +15,7 @@
         parameters:
           skuName: Standard_LRS
           location: "{{ lookup('env', 'DEPLOY_REGION') }}"
-          storageAccount: "masazfilestorageac"
+          storageAccount: "{{ lookup('env', 'AZUREFILE_STORAGE_AC') }}"
       wait: yes
 
   #Create cluster role binding 
