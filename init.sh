@@ -336,6 +336,7 @@ if [[ $PRE_VALIDATION == "pass" ]]; then
   ## Installing the collection depending on ENV_TYPE
   if [[ $ENV_TYPE == "dev" ]]; then
         echo "=== Building and Installing Ansible Collection Locally ==="
+        git clone -b master https://github.com/ibm-mas/ansible-devops.git
         cd $GIT_REPO_HOME/../ibm/mas_devops
         ansible-galaxy collection build
         ansible-galaxy collection install ibm-mas_devops-*.tar.gz
