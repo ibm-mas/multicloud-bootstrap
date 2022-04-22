@@ -142,7 +142,11 @@ export SLS_NAMESPACE="ibm-sls-${RANDOM_STR}"
 export SLS_MONGODB_CFG_FILE="${MAS_CONFIG_DIR}/mongo-${MONGODB_NAMESPACE}.yml"
 export SLS_LICENSE_FILE="${MAS_CONFIG_DIR}/entitlement.lic"
 # UDS variables
-export UDS_STORAGE_CLASS=gp2
+if [[ $CLUSTER_TYPE == "aws" ]]; then
+  export UDS_STORAGE_CLASS="gp2"
+elif [[ $CLUSTER_TYPE == "azure" ]]; then
+  export UDS_STORAGE_CLASS="azure-disk"
+fi
 export UDS_CONTACT_EMAIL="uds.support@ibm.com"
 export UDS_CONTACT_FIRSTNAME=Uds
 export UDS_CONTACT_LASTNAME=Support
@@ -150,15 +154,19 @@ export UDS_CONTACT_LASTNAME=Support
 export CPD_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
 export CPD_VERSION=cpd40
 export MAS_CHANNEL=8.7.x
-export CPD_STORAGE_CLASS=ocs-storagecluster-cephfs
+if [[ $CLUSTER_TYPE == "aws" ]]; then
+  export CPD_STORAGE_CLASS="ocs-storagecluster-cephfs"
+elif [[ $CLUSTER_TYPE == "azure" ]]; then
+  export CPD_STORAGE_CLASS="azurefiles-standard"
+fi
 export CPD_NAMESPACE="ibm-common-services"
 export CPD_SERVICES_NAMESPACE="cpd-services-${RANDOM_STR}"
 # DB2WH variables
-export DB2WH_META_STORAGE_CLASS=ocs-storagecluster-cephfs
-export DB2WH_USER_STORAGE_CLASS=ocs-storagecluster-cephfs
-export DB2WH_BACKUP_STORAGE_CLASS=ocs-storagecluster-cephfs
-export DB2WH_LOGS_STORAGE_CLASS=ocs-storagecluster-cephfs
-export DB2WH_TEMP_STORAGE_CLASS=ocs-storagecluster-cephfs
+export DB2WH_META_STORAGE_CLASS=$CPD_STORAGE_CLASS
+export DB2WH_USER_STORAGE_CLASS=$CPD_STORAGE_CLASS
+export DB2WH_BACKUP_STORAGE_CLASS=$CPD_STORAGE_CLASS
+export DB2WH_LOGS_STORAGE_CLASS=$CPD_STORAGE_CLASS
+export DB2WH_TEMP_STORAGE_CLASS=$CPD_STORAGE_CLASS
 export DB2WH_INSTANCE_NAME=db2wh-db01
 export DB2WH_VERSION=11.5.7.0-cn1
 export DB2WH_NAMESPACE="cpd-services-${RANDOM_STR}"
