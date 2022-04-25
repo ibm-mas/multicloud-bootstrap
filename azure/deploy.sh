@@ -14,10 +14,13 @@ export KAFKA_STORAGE_CLASS=managed-premium
 # Service principle variables
 SP_NAME="http://${CLUSTER_NAME}-sp"
 #IAM_USER_NAME="masocp-user-${RANDOM_STR}"
+
 # SLS variables
 export SLS_STORAGE_CLASS=managed-premium
 # BAS variables
 export UDS_STORAGE_CLASS=managed-premium
+#Azurefiles-storageclass variable
+export AZUREFILE_STORAGE_AC="masazfile${RANDOM_STR}"
 
 # Retrieve SSH public key
 #TOKEN=$(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")

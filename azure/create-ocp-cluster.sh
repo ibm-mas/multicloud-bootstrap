@@ -26,6 +26,7 @@ openshift-username      = "$OCP_USERNAME"
 openshift-password      = "$OCP_PASSWORD"
 master-node-count       = "$MASTER_NODE_COUNT"
 worker-node-count       = "$WORKER_NODE_COUNT"
+storageac_azurefile     = "masazfile$RANDOM_STR"
 EOT
 log "==== OCP cluster creation started ===="
 terraform init -input=false
