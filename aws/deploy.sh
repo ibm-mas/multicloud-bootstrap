@@ -293,9 +293,8 @@ fi
 ## Deploy MAS
 log "==== MAS deployment started ===="
 ## Evalute custom annotations to set with reference from aws-product-codes.config
-# product_code_metadata="$(curl http://169.254.169.254/latest/meta-data/product-codes)"
-set -x
-product_code_metadata="vrxqov1ml7fjwasbi7pkw4m3"
+product_code_metadata="$(curl http://169.254.169.254/latest/meta-data/product-codes)"
+
 if [[ -n "$product_code_metadata" ]];then
   log "Product Code: $product_code_metadata"
   aws_product_codes_config_file="$GIT_REPO_HOME/aws/aws-product-codes.config"
@@ -317,7 +316,6 @@ if [[ -n "$product_code_metadata" ]];then
 else
   log "MAS product code not found, skipping custom annotations suite_install"
 fi
-set +x
 ansible-playbook mas/install-suite.yml
 log "==== MAS deployment completed ===="
 
