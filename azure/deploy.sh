@@ -22,6 +22,9 @@ export UDS_STORAGE_CLASS=managed-premium
 #Azurefiles-storageclass variable
 export AZUREFILE_STORAGE_AC="masazfile${RANDOM_STR}"
 
+# CP4D variables
+export CPD_METADB_BLOCK_STORAGE_CLASS=managed-premium
+
 # Retrieve SSH public key
 #TOKEN=$(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
 #SSH_PUB_KEY=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" –v http://169.254.169.254/latest/meta-data/public-keys/0/openssh-key)
