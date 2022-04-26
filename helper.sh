@@ -122,6 +122,8 @@ mark_provisioning_failed() {
     export STATUS_MSG="Missing required parameters when email notification is set to true."
   elif [[ $retcode -eq 27 ]]; then
     export STATUS_MSG="Failure in creating azurefiles storage class."
+  elif [[ $retcode -eq 28 ]]; then
+    export STATUS_MSG="Missing or Invalid Product Code."
   fi
   export MESSAGE_TEXT=NA
   export OPENSHIFT_CLUSTER_CONSOLE_URL=NA
