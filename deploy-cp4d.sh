@@ -2,7 +2,7 @@
 # Script to deploy CP4D and configure it with the MAS instance
 
 # Fail the script if any of the steps fail
-# set -e 
+# set -e
 
 RED='\033[0;31m'
 BLUE='\033[0;36m'
@@ -88,17 +88,17 @@ else
   echoRed "ERROR: Empty or unsupported region provided"
   echo -e "\nSupported regions are $SUPPORTED_REGIONS"
   usage
-fi 
+fi
 
 if [[ (-z $STACK_NAME) ]]; then
   echoRed "ERROR: Parameter 'stack-name' is empty"
   usage
 fi
 
-# Creating and exporting MAS_CONFIG_DIR path 
+# Creating and exporting MAS_CONFIG_DIR path
 export MAS_CONFIG_DIR=/tmp/masconfigdir
 [ -d "$MAS_CONFIG_DIR" ] && rmdir $MAS_CONFIG_DIR
-mkdir -p $MAS_CONFIG_DIR  
+mkdir -p $MAS_CONFIG_DIR
 
 if [[ -z $ER_KEY ]]; then
   echoRed "ERROR: Parameter 'entitlement-key' is empty"
@@ -108,7 +108,7 @@ fi
 if [[ -n $STACK_NAME ]]; then
   # Get MAS instance unique string
   UNIQ_STR=$(aws cloudformation describe-stacks --stack-name $STACK_NAME --region $REGION 2>/dev/null | jq ".Stacks[].Outputs[] | select(.OutputKey == \"ClusterUniqueString\").OutputValue" | tr -d '"')
-  
+
   # Get OpenShift details from the stack if not provided
   if [[ -z $OPENSHIFT_USER ]]; then
     OC_USER=$(aws cloudformation describe-stacks --stack-name $STACK_NAME --region $REGION 2>/dev/null | jq ".Stacks[].Outputs[] | select(.OutputKey == \"OpenShiftUser\").OutputValue" | tr -d '"')
@@ -143,7 +143,7 @@ else
   echoGreen "\nOpenShift Login is successful."
 fi
 
-echoBlue "\n==== Execution started at `date` ===="  
+echoBlue "\n==== Execution started at `date` ===="
 
 export GIT_REPO_HOME=$(pwd)
 export MAS_INSTANCE_ID="mas-${UNIQ_STR}"
@@ -166,7 +166,7 @@ export DB2WH_TEMP_STORAGE_CLASS=ocs-storagecluster-cephfs
 export DB2WH_INSTANCE_NAME=db2wh-db01
 export DB2WH_VERSION=11.5.7.0-cn1
 
-export CPD_BLOCK_STORAGE_CLASS=gp2
+export CPD_METADB_BLOCK_STORAGE_CLASS=gp2
 
 echo
 cd ${GIT_REPO_HOME}/ansible/playbooks
