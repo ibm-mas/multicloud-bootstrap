@@ -145,7 +145,7 @@ export SLS_LICENSE_FILE="${MAS_CONFIG_DIR}/entitlement.lic"
 if [[ $CLUSTER_TYPE == "aws" ]]; then
   export UDS_STORAGE_CLASS="gp2"
 elif [[ $CLUSTER_TYPE == "azure" ]]; then
-  export UDS_STORAGE_CLASS="azure-disk"
+  export UDS_STORAGE_CLASS="managed-premium"
 fi
 export UDS_CONTACT_EMAIL="uds.support@ibm.com"
 export UDS_CONTACT_FIRSTNAME=Uds
