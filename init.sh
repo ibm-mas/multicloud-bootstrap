@@ -143,7 +143,11 @@ export SLS_MONGODB_CFG_FILE="${MAS_CONFIG_DIR}/mongo-${MONGODB_NAMESPACE}.yml"
 export SLS_LICENSE_FILE="${MAS_CONFIG_DIR}/entitlement.lic"
 export SLS_TLS_CERT_LOCAL_FILE_PATH="${GIT_REPO_HOME}/sls.crt"
 # UDS variables
-export UDS_STORAGE_CLASS=gp2
+if [[ $CLUSTER_TYPE == "aws" ]]; then
+  export UDS_STORAGE_CLASS="gp2"
+elif [[ $CLUSTER_TYPE == "azure" ]]; then
+  export UDS_STORAGE_CLASS="managed-premium"
+fi
 export UDS_CONTACT_EMAIL="uds.support@ibm.com"
 export UDS_CONTACT_FIRSTNAME=Uds
 export UDS_CONTACT_LASTNAME=Support
@@ -152,15 +156,19 @@ export UDS_TLS_CERT_LOCAL_FILE_PATH="${GIT_REPO_HOME}/uds.crt"
 export CPD_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
 export CPD_VERSION=cpd40
 export MAS_CHANNEL=8.7.x
-export CPD_STORAGE_CLASS=ocs-storagecluster-cephfs
+if [[ $CLUSTER_TYPE == "aws" ]]; then
+  export CPD_STORAGE_CLASS="ocs-storagecluster-cephfs"
+elif [[ $CLUSTER_TYPE == "azure" ]]; then
+  export CPD_STORAGE_CLASS="azurefiles-standard"
+fi
 export CPD_NAMESPACE="ibm-common-services"
 export CPD_SERVICES_NAMESPACE="cpd-services-${RANDOM_STR}"
 # DB2WH variables
-export DB2WH_META_STORAGE_CLASS=ocs-storagecluster-cephfs
-export DB2WH_USER_STORAGE_CLASS=ocs-storagecluster-cephfs
-export DB2WH_BACKUP_STORAGE_CLASS=ocs-storagecluster-cephfs
-export DB2WH_LOGS_STORAGE_CLASS=ocs-storagecluster-cephfs
-export DB2WH_TEMP_STORAGE_CLASS=ocs-storagecluster-cephfs
+export DB2WH_META_STORAGE_CLASS=$CPD_STORAGE_CLASS
+export DB2WH_USER_STORAGE_CLASS=$CPD_STORAGE_CLASS
+export DB2WH_BACKUP_STORAGE_CLASS=$CPD_STORAGE_CLASS
+export DB2WH_LOGS_STORAGE_CLASS=$CPD_STORAGE_CLASS
+export DB2WH_TEMP_STORAGE_CLASS=$CPD_STORAGE_CLASS
 export DB2WH_INSTANCE_NAME=db2wh-db01
 export DB2WH_VERSION=11.5.7.0-cn1
 export DB2WH_NAMESPACE="cpd-services-${RANDOM_STR}"
@@ -338,8 +346,7 @@ if [[ $PRE_VALIDATION == "pass" ]]; then
   ## Installing the collection depending on ENV_TYPE
   if [[ $ENV_TYPE == "dev" ]]; then
         echo "=== Building and Installing Ansible Collection Locally ==="
-        git clone -b master https://github.com/ibm-mas/ansible-devops.git
-        cd ansible-devops/ibm/mas_devops
+        cd $GIT_REPO_HOME/../ibm/mas_devops
         ansible-galaxy collection build
         ansible-galaxy collection install ibm-mas_devops-*.tar.gz
         echo "=== Ansible Collection built and installed locally Successfully ==="

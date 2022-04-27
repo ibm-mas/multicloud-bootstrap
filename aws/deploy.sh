@@ -14,10 +14,10 @@ export KAFKA_STORAGE_CLASS=gp2
 # IAM variables
 IAM_POLICY_NAME="masocp-policy-${RANDOM_STR}"
 IAM_USER_NAME="masocp-user-${RANDOM_STR}"
-# SLS variables 
+# SLS variables
 export SLS_STORAGE_CLASS=gp2
 # CP4D variables
-export CPD_BLOCK_STORAGE_CLASS=gp2
+export CPD_METADB_BLOCK_STORAGE_CLASS=gp2
 
 # Retrieve SSH public key
 TOKEN=$(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
@@ -32,7 +32,7 @@ log " KAFKA_STORAGE_CLASS: $KAFKA_STORAGE_CLASS"
 log " IAM_POLICY_NAME: $IAM_POLICY_NAME"
 log " IAM_USER_NAME: $IAM_USER_NAME"
 log " SLS_STORAGE_CLASS: $SLS_STORAGE_CLASS"
-log " CPD_BLOCK_STORAGE_CLASS: $CPD_BLOCK_STORAGE_CLASS"
+log " CPD_METADB_BLOCK_STORAGE_CLASS: $CPD_METADB_BLOCK_STORAGE_CLASS"
 log " SSH_PUB_KEY: $SSH_PUB_KEY"
 
 if [[ -f entitlement.lic ]]; then
@@ -170,7 +170,7 @@ EOT
     exit 22
   fi
   set -e
- 
+
   # Backup Terraform configuration
   cd $GIT_REPO_HOME
   rm -rf /tmp/mas-multicloud
@@ -194,7 +194,10 @@ fi
 log "==== Adding ER key details to OCP default pull-secret ===="
 cd /tmp
 # Login to OCP cluster
-oc login -u $OCP_USERNAME -p $OCP_PASSWORD --server=https://api.${CLUSTER_NAME}.${BASE_DOMAIN}:6443 --insecure-skip-tls-verify=true
+
+export OCP_SERVER="$(echo https://api.${CLUSTER_NAME}.${BASE_DOMAIN}:6443)"
+oc login -u $OCP_USERNAME -p $OCP_PASSWORD --server=$OCP_SERVER --insecure-skip-tls-verify=true
+export OCP_TOKEN="$(oc whoami --show-token)"
 oc extract secret/pull-secret -n openshift-config --keys=.dockerconfigjson --to=. --confirm
 export encodedEntitlementKey=$(echo cp:$SLS_ENTITLEMENT_KEY | tr -d '\n' | base64 -w0)
 ##export encodedEntitlementKey=$(echo cp:$SLS_ENTITLEMENT_KEY | base64 -w0)
@@ -208,7 +211,7 @@ oc set data secret/pull-secret -n openshift-config --from-file=/tmp/.dockerconfi
 log "==== OCP cluster configuration (Cert Manager and SBO) started ===="
 cd $GIT_REPO_HOME/../ibm/mas_devops/playbooks
 set +e
-ansible-playbook ocp/configure-ocp.yml 
+ansible-playbook ocp/configure-ocp.yml
 if [[ $? -ne 0 ]]; then
   # One reason for this failure is catalog sources not having required state information, so recreate the catalog-operator pod
   # https://bugzilla.redhat.com/show_bug.cgi?id=1807128
@@ -238,7 +241,7 @@ cp $GIT_REPO_HOME/entitlement.lic $MAS_CONFIG_DIR
 
 ## Deploy Amqstreams
 # log "==== Amq streams deployment started ===="
-# ansible-playbook install-amqstream.yml  
+# ansible-playbook install-amqstream.yml
 # log "==== Amq streams deployment completed ===="
 
 # SLS Deployment
@@ -290,6 +293,30 @@ fi
 
 ## Deploy MAS
 log "==== MAS deployment started ===="
+## Evalute custom annotations to set with reference from aws-product-codes.config
+product_code_metadata="$(curl http://169.254.169.254/latest/meta-data/product-codes)"
+
+if [[ -n "$product_code_metadata" ]];then
+  log "Product Code: $product_code_metadata"
+  aws_product_codes_config_file="$GIT_REPO_HOME/aws/aws-product-codes.config"
+  log "Checking for product type corrosponding to $product_code_metadata from file $aws_product_codes_config_file"
+  if grep -E "^$product_code_metadata:" $aws_product_codes_config_file 1>/dev/null 2>&1;then
+    product_type="$(grep -E "^$product_code_metadata:" $aws_product_codes_config_file | cut -f 3 -d ":")"
+    if [[ $product_type == "byol" ]];then
+      export MAS_ANNOTATIONS="mas.ibm.com/hyperscalerProvider=aws,mas.ibm.com/hyperscalerFormat=byol,mas.ibm.com/hyperscalerChannel=ibm"
+    elif [[ $product_type == "privatepublic" ]];then
+      export MAS_ANNOTATIONS="mas.ibm.com/hyperscalerProvider=aws,mas.ibm.com/hyperscalerFormat=privatepublic,mas.ibm.com/hyperscalerChannel=aws"
+    else
+      log "Invalid product type : $product_type"
+      exit 28
+    fi
+  else
+    log "Product code not found in file $aws_product_codes_config_file"
+    exit 28
+  fi
+else
+  log "MAS product code not found, skipping custom annotations suite_install"
+fi
 ansible-playbook mas/install-suite.yml
 log "==== MAS deployment completed ===="
 
@@ -299,7 +326,7 @@ if [[ $DEPLOY_MANAGE == "true" ]]; then
   log "==== MAS Manage deployment started ===="
   ansible-playbook mas/install-app.yml
   log "==== MAS Manage deployment completed ===="
-  
+
   # Configure app to use the DB
   log "==== MAS Manage configure app started ===="
   ansible-playbook mas/configure-app.yml

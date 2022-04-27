@@ -8,18 +8,23 @@ set -e
 #MASTER_INSTANCE_TYPE="m5.2xlarge"
 #WORKER_INSTANCE_TYPE="m5.4xlarge"
 # Mongo variables
-export MONGODB_STORAGE_CLASS=gp2
+export MONGODB_STORAGE_CLASS=managed-premium
 # Amqstreams variables
-export KAFKA_STORAGE_CLASS=gp2
+export KAFKA_STORAGE_CLASS=managed-premium
 # Service principle variables
 SP_NAME="http://${CLUSTER_NAME}-sp"
 #IAM_USER_NAME="masocp-user-${RANDOM_STR}"
-# SLS variables 
-export SLS_STORAGE_CLASS=gp2
-# BAS variables 
-export BAS_META_STORAGE=gp2
-#Azurefiles-storageclass variable 
+
+# SLS variables
+export SLS_STORAGE_CLASS=managed-premium
+# BAS variables
+export UDS_STORAGE_CLASS=managed-premium
+#Azurefiles-storageclass variable
 export AZUREFILE_STORAGE_AC="masazfile${RANDOM_STR}"
+
+# CP4D variables
+export CPD_METADB_BLOCK_STORAGE_CLASS=managed-premium
+
 # Retrieve SSH public key
 #TOKEN=$(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
 #SSH_PUB_KEY=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" –v http://169.254.169.254/latest/meta-data/public-keys/0/openssh-key)
@@ -33,7 +38,7 @@ log " KAFKA_STORAGE_CLASS: $KAFKA_STORAGE_CLASS"
 log " SP_NAME: $SP_NAME"
 #log " IAM_USER_NAME: $IAM_USER_NAME"
 log " SLS_STORAGE_CLASS: $SLS_STORAGE_CLASS"
-log " BAS_META_STORAGE: $BAS_META_STORAGE"
+log " UDS_STORAGE_CLASS: $UDS_STORAGE_CLASS"
 log " SSH_PUB_KEY: $SSH_PUB_KEY"
 
 ## Download files from S3 bucket
@@ -100,7 +105,7 @@ if [[ $OPENSHIFT_USER_PROVIDE == "false" ]]; then
   #   exit 22
   # fi
   # set -e
- 
+
   # Backup Terraform configuration
   rm -rf /tmp/ansible-devops
   mkdir /tmp/ansible-devops
@@ -122,7 +127,21 @@ else
   log "==== Existing OCP cluster provided, skipping the cluster creation, Bastion host creation and S3 upload of deployment context ===="
 fi
 
-#Run ansible playbook to create azurefiles storage class 
+# Login to OCP cluster
+log "==== Adding ER key details to OCP default pull-secret ===="
+cd /tmp
+export OCP_SERVER="$(echo https://api.${CLUSTER_NAME}.${BASE_DOMAIN}:6443)"
+oc login -u $OCP_USERNAME -p $OCP_PASSWORD --server=$OCP_SERVER --insecure-skip-tls-verify=true
+export OCP_TOKEN="$(oc whoami --show-token)"
+oc extract secret/pull-secret -n openshift-config --keys=.dockerconfigjson --to=. --confirm
+export encodedEntitlementKey=$(echo cp:$SLS_ENTITLEMENT_KEY | tr -d '\n' | base64 -w0)
+##export encodedEntitlementKey=$(echo cp:$SLS_ENTITLEMENT_KEY | base64 -w0)
+export emailAddress=$(cat .dockerconfigjson | jq -r '.auths["cloud.openshift.com"].email')
+jq '.auths |= . + {"cp.icr.io": { "auth" : "$encodedEntitlementKey", "email" : "$emailAddress"}}' .dockerconfigjson >/tmp/dockerconfig.json
+envsubst </tmp/dockerconfig.json >/tmp/.dockerconfigjson
+oc set data secret/pull-secret -n openshift-config --from-file=/tmp/.dockerconfigjson
+
+#Run ansible playbook to create azurefiles storage class
 log "=== Creating azurefiles-standard Storage class on OCP cluster ==="
 cd $GIT_REPO_HOME/azure
 ansible-playbook configure-azurefiles.yml
@@ -130,4 +149,104 @@ retcode=$?
 if [[ $retcode -ne 0 ]]; then
   log "Failed to create azurefiles-standard storageclass"
   exit 27
+fi
+
+## Configure OCP cluster
+log "==== OCP cluster configuration (Cert Manager and SBO) started ===="
+cd $GIT_REPO_HOME/../ibm/mas_devops/playbooks
+set +e
+ansible-playbook ocp/configure-ocp.yml
+if [[ $? -ne 0 ]]; then
+  # One reason for this failure is catalog sources not having required state information, so recreate the catalog-operator pod
+  # https://bugzilla.redhat.com/show_bug.cgi?id=1807128
+  echo "Deleting catalog-operator pod"
+  podname=$(oc get pods -n openshift-operator-lifecycle-manager | grep catalog-operator | awk {'print $1'})
+  oc logs $podname -n openshift-operator-lifecycle-manager
+  oc delete pod $podname -n openshift-operator-lifecycle-manager
+  sleep 10
+  # Retry the step
+  ansible-playbook ocp/configure-ocp.yml
+  retcode=$?
+  if [[ $retcode -ne 0 ]]; then
+    log "Failed while configuring OCP cluster"
+    exit 24
+  fi
+fi
+set -e
+log "==== OCP cluster configuration (Cert Manager and SBO) completed ===="
+
+## Deploy MongoDB
+log "==== MongoDB deployment started ===="
+ansible-playbook dependencies/install-mongodb-ce.yml
+log "==== MongoDB deployment completed ===="
+
+## Copying the entitlement.lic to MAS_CONFIG_DIR
+cp $GIT_REPO_HOME/entitlement.lic $MAS_CONFIG_DIR
+
+## Deploy Amqstreams
+# log "==== Amq streams deployment started ===="
+# ansible-playbook install-amqstream.yml
+# log "==== Amq streams deployment completed ===="
+
+# SLS Deployment
+if [[ (-z $SLS_ENDPOINT_URL) || (-z $SLS_REGISTRATION_KEY) || (-z $SLS_PUB_CERT_URL) ]]; then
+  ## Deploy SLS
+  log "==== SLS deployment started ===="
+  ansible-playbook dependencies/install-sls.yml
+  log "==== SLS deployment completed ===="
+
+else
+  log "=== Using Existing SLS Deployment ==="
+  ansible-playbook dependencies/cfg-sls.yml
+  log "=== Generated SLS Config YAML ==="
+fi
+
+#UDS Deployment
+if [[ (-z $UDS_API_KEY) || (-z $UDS_ENDPOINT_URL) || (-z $UDS_PUB_CERT_URL) ]]; then
+  ## Deploy UDS
+  log "==== UDS deployment started ===="
+  ansible-playbook dependencies/install-uds.yml
+  log "==== UDS deployment completed ===="
+
+else
+  log "=== Using Existing BAS Deployment ==="
+  ansible-playbook dependencies/cfg-bas.yml
+  log "=== Generated BAS Config YAML ==="
+fi
+
+# Deploy CP4D
+if [[ $DEPLOY_CP4D == "true" ]]; then
+  log "==== CP4D deployment started ===="
+  ansible-playbook cp4d/install-services-db2.yml
+  ansible-playbook cp4d/create-db2-instance.yml
+  log "==== CP4D deployment completed ===="
+fi
+
+## Create MAS Workspace
+log "==== MAS Workspace generation started ===="
+ansible-playbook mas/gencfg-workspace.yml
+log "==== MAS Workspace generation completed ===="
+
+if [[ $DEPLOY_MANAGE == "true" ]]; then
+  log "==== Configure JDBC  started ===="
+  ansible-playbook mas/configure-suite-db.yml
+  log "==== Configure JDBC completed ===="
+fi
+
+## Deploy MAS
+log "==== MAS deployment started ===="
+ansible-playbook mas/install-suite.yml
+log "==== MAS deployment completed ===="
+
+## Deploy Manage
+if [[ $DEPLOY_MANAGE == "true" ]]; then
+  # Deploy Manage
+  log "==== MAS Manage deployment started ===="
+  ansible-playbook mas/install-app.yml
+  log "==== MAS Manage deployment completed ===="
+
+  # Configure app to use the DB
+  log "==== MAS Manage configure app started ===="
+  ansible-playbook mas/configure-app.yml
+  log "==== MAS Manage configure app completed ===="
 fi

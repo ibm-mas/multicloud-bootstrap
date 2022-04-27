@@ -33,8 +33,8 @@ terraform init -input=false
 terraform plan -input=false -out=tfplan
 terraform apply -input=false -auto-approve
 retcode=$?
-  if [[ $retcode -ne 0 ]]; then
+if [[ $retcode -ne 0 ]]; then
     log "OCP cluster creation failed in Terraform step"
     exit 21
-  fi
+fi
 log "==== OCP cluster creation completed ===="
