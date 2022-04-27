@@ -215,38 +215,38 @@ else
 fi
 
 # Deploy CP4D
-if [[ $DEPLOY_CP4D == "true" ]]; then
-  log "==== CP4D deployment started ===="
-  ansible-playbook cp4d/install-services-db2.yml
-  ansible-playbook cp4d/create-db2-instance.yml
-  log "==== CP4D deployment completed ===="
-fi
+# if [[ $DEPLOY_CP4D == "true" ]]; then
+#   log "==== CP4D deployment started ===="
+#   ansible-playbook cp4d/install-services-db2.yml
+#   ansible-playbook cp4d/create-db2-instance.yml
+#   log "==== CP4D deployment completed ===="
+# fi
 
-## Create MAS Workspace
-log "==== MAS Workspace generation started ===="
-ansible-playbook mas/gencfg-workspace.yml
-log "==== MAS Workspace generation completed ===="
+# ## Create MAS Workspace
+# log "==== MAS Workspace generation started ===="
+# ansible-playbook mas/gencfg-workspace.yml
+# log "==== MAS Workspace generation completed ===="
 
-if [[ $DEPLOY_MANAGE == "true" ]]; then
-  log "==== Configure JDBC  started ===="
-  ansible-playbook mas/configure-suite-db.yml
-  log "==== Configure JDBC completed ===="
-fi
+# if [[ $DEPLOY_MANAGE == "true" ]]; then
+#   log "==== Configure JDBC  started ===="
+#   ansible-playbook mas/configure-suite-db.yml
+#   log "==== Configure JDBC completed ===="
+# fi
 
-## Deploy MAS
-log "==== MAS deployment started ===="
-ansible-playbook mas/install-suite.yml
-log "==== MAS deployment completed ===="
+# ## Deploy MAS
+# log "==== MAS deployment started ===="
+# ansible-playbook mas/install-suite.yml
+# log "==== MAS deployment completed ===="
 
-## Deploy Manage
-if [[ $DEPLOY_MANAGE == "true" ]]; then
-  # Deploy Manage
-  log "==== MAS Manage deployment started ===="
-  ansible-playbook mas/install-app.yml
-  log "==== MAS Manage deployment completed ===="
+# ## Deploy Manage
+# if [[ $DEPLOY_MANAGE == "true" ]]; then
+#   # Deploy Manage
+#   log "==== MAS Manage deployment started ===="
+#   ansible-playbook mas/install-app.yml
+#   log "==== MAS Manage deployment completed ===="
 
-  # Configure app to use the DB
-  log "==== MAS Manage configure app started ===="
-  ansible-playbook mas/configure-app.yml
-  log "==== MAS Manage configure app completed ===="
-fi
+#   # Configure app to use the DB
+#   log "==== MAS Manage configure app started ===="
+#   ansible-playbook mas/configure-app.yml
+#   log "==== MAS Manage configure app completed ===="
+# fi
