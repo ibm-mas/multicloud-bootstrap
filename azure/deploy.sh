@@ -112,13 +112,13 @@ cat <<EOF > azure-pidslimit.yaml
 apiVersion: machineconfiguration.openshift.io/v1
 kind: ContainerRuntimeConfig
 metadata:
-  name: aws-pidslimit
+  name: azure-pidslimit
 spec:
   containerRuntimeConfig:
     pidsLimit: 231239
   machineConfigPoolSelector:
     matchLabels:
-      node-role.kubernetes.io/worker: ''
+      pools.operator.machineconfiguration.openshift.io/worker: ''
 EOF
 
 oc create -f azure-pidslimit.yaml
