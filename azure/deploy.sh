@@ -105,6 +105,10 @@ if [[ $OPENSHIFT_USER_PROVIDE == "false" ]]; then
   #   exit 22
   # fi
   # set -e
+  
+oc login -u $OCP_USERNAME -p $OCP_PASSWORD --server=https://api.${CLUSTER_NAME}.${BASE_DOMAIN}:6443
+log "==== Adding PID limits to worker nodes ===="
+oc create -f $GIT_REPO_HOME/templates/container-runtime-config.yml
 
   # Backup Terraform configuration
   rm -rf /tmp/ansible-devops

@@ -148,6 +148,10 @@ EOT
   set -e
   log "==== OCP cluster creation completed ===="
 
+oc login -u $OCP_USERNAME -p $OCP_PASSWORD --server=https://api.${CLUSTER_NAME}.${BASE_DOMAIN}:6443
+log "==== Adding PID limits to worker nodes ===="
+oc create -f $GIT_REPO_HOME/templates/container-runtime-config.yml
+
 ## Add ER Key to global pull secret
 #   cd /tmp
 #   # Login to OCP cluster
