@@ -281,37 +281,3 @@ EOF
 #     null_resource.openshift_post_install,
 #   ]
 # }
-
-#Adding code to create a storage account to support Azure files instead of OCS
-resource "null_resource" "oc_command" {
-    provisioner "local-exec" {
-      command = "oc get machineset -n openshift-machine-api -o jsonpath='{.items[0].metadata.labels.machine\\.openshift\\.io/cluster-api-cluster}' >> rgname.txt"
-    }
-	depends_on = [
-     null_resource.install_openshift,
-     null_resource.openshift_post_install,
-   ]
-  
-}
-
-data "local_file" "rg_file" {
-    filename = "rgname.txt"
-  depends_on = [
-    null_resource.oc_command
-  ]
-}
-locals {
-  rg_name= "${data.local_file.rg_file.content}-rg"
-}
-
-resource "azurerm_storage_account" "azure_file_store" {
-  name                     = var.storageac_azurefile
-  resource_group_name      = local.rg_name
-  location                 = var.region
-  account_replication_type = "LRS"
-  account_tier             = "Standard"
-  depends_on = [
-      null_resource.install_openshift,
-     null_resource.openshift_post_install
-  ]
-}

@@ -19,8 +19,6 @@ SP_NAME="http://${CLUSTER_NAME}-sp"
 export SLS_STORAGE_CLASS=managed-premium
 # BAS variables
 export UDS_STORAGE_CLASS=managed-premium
-#Azurefiles-storageclass variable
-export AZUREFILE_STORAGE_AC="masazfile${RANDOM_STR}"
 
 # CP4D variables
 export CPD_METADB_BLOCK_STORAGE_CLASS=managed-premium
@@ -142,14 +140,14 @@ envsubst </tmp/dockerconfig.json >/tmp/.dockerconfigjson
 oc set data secret/pull-secret -n openshift-config --from-file=/tmp/.dockerconfigjson
 
 #Run ansible playbook to create azurefiles storage class
-log "=== Creating azurefiles-standard Storage class on OCP cluster ==="
-cd $GIT_REPO_HOME/azure
-ansible-playbook configure-azurefiles.yml
-retcode=$?
-if [[ $retcode -ne 0 ]]; then
-  log "Failed to create azurefiles-standard storageclass"
-  exit 27
-fi
+# log "=== Creating azurefiles-standard Storage class on OCP cluster ==="
+# cd $GIT_REPO_HOME/azure
+# ansible-playbook configure-azurefiles.yml
+# retcode=$?
+# if [[ $retcode -ne 0 ]]; then
+#   log "Failed to create azurefiles-standard storageclass"
+#   exit 27
+# fi
 
 ## Configure OCP cluster
 log "==== OCP cluster configuration (Cert Manager and SBO) started ===="
