@@ -8,3 +8,4 @@ spec:
   machineConfigPoolSelector:
     matchLabels:
       pools.operator.machineconfiguration.openshift.io/worker: ''
+      
