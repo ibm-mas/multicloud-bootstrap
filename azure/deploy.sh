@@ -105,6 +105,23 @@ if [[ $OPENSHIFT_USER_PROVIDE == "false" ]]; then
   #   exit 22
   # fi
   # set -e
+  
+oc login -u $OCP_USERNAME -p $OCP_PASSWORD --server=https://api.${CLUSTER_NAME}.${BASE_DOMAIN}:6443
+log "==== Adding PID limits to worker nodes ===="
+cat <<EOF > azure-pidslimit.yaml
+apiVersion: machineconfiguration.openshift.io/v1
+kind: ContainerRuntimeConfig
+metadata:
+  name: aws-pidslimit
+spec:
+  containerRuntimeConfig:
+    pidsLimit: 231239
+  machineConfigPoolSelector:
+    matchLabels:
+      node-role.kubernetes.io/worker: ''
+EOF
+
+oc create -f azure-pidslimit.yaml
 
   # Backup Terraform configuration
   rm -rf /tmp/ansible-devops

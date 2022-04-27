@@ -148,6 +148,23 @@ EOT
   set -e
   log "==== OCP cluster creation completed ===="
 
+oc login -u $OCP_USERNAME -p $OCP_PASSWORD --server=https://api.${CLUSTER_NAME}.${BASE_DOMAIN}:6443
+log "==== Adding PID limits to worker nodes ===="
+cat <<EOF > aws-pidslimit.yaml
+apiVersion: machineconfiguration.openshift.io/v1
+kind: ContainerRuntimeConfig
+metadata:
+  name: aws-pidslimit
+spec:
+  containerRuntimeConfig:
+    pidsLimit: 231239
+  machineConfigPoolSelector:
+    matchLabels:
+      pools.operator.machineconfiguration.openshift.io/worker: ''
+EOF
+
+oc create -f aws-pidslimit.yaml
+
 ## Add ER Key to global pull secret
 #   cd /tmp
 #   # Login to OCP cluster
