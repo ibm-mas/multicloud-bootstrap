@@ -139,15 +139,15 @@ jq '.auths |= . + {"cp.icr.io": { "auth" : "$encodedEntitlementKey", "email" : "
 envsubst </tmp/dockerconfig.json >/tmp/.dockerconfigjson
 oc set data secret/pull-secret -n openshift-config --from-file=/tmp/.dockerconfigjson
 
-#Run ansible playbook to create azurefiles storage class
-# log "=== Creating azurefiles-standard Storage class on OCP cluster ==="
-# cd $GIT_REPO_HOME/azure
-# ansible-playbook configure-azurefiles.yml
-# retcode=$?
-# if [[ $retcode -ne 0 ]]; then
-#   log "Failed to create azurefiles-standard storageclass"
-#   exit 27
-# fi
+Run ansible playbook to create azurefiles storage class
+log "=== Creating azurefiles-premium Storage class on OCP cluster ==="
+cd $GIT_REPO_HOME/azure
+./azurefiles-premium.sh
+retcode=$?
+if [[ $retcode -ne 0 ]]; then
+  log "Failed to create azurefiles-premium storageclass"
+  exit 27
+fi
 
 ## Configure OCP cluster
 log "==== OCP cluster configuration (Cert Manager and SBO) started ===="
