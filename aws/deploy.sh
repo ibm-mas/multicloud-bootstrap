@@ -56,13 +56,13 @@ fi
 cd $GIT_REPO_HOME
 if [[ ${UDS_PUB_CERT_URL,,} =~ ^https? ]]; then
   log "Downloading BAS certificate from HTTP URL"
-  wget "$UDS_PUB_CERT_URL" -O bas.crt
+  wget "$UDS_PUB_CERT_URL" -O uds.crt
 elif [[ ${UDS_PUB_CERT_URL,,} =~ ^s3 ]]; then
   log "Downloading BAS certificate from S3 URL"
-  aws s3 cp "$UDS_PUB_CERT_URL" bas.crt
+  aws s3 cp "$UDS_PUB_CERT_URL" uds.crt
 fi
-if [[ -f bas.crt ]]; then
-  chmod 600 bas.crt
+if [[ -f uds.crt ]]; then
+  chmod 600 uds.crt
 fi
 
 ### Read License File & Retrive SLS hostname and host id
@@ -148,6 +148,10 @@ EOT
   set -e
   log "==== OCP cluster creation completed ===="
 
+oc login -u $OCP_USERNAME -p $OCP_PASSWORD --server=https://api.${CLUSTER_NAME}.${BASE_DOMAIN}:6443
+log "==== Adding PID limits to worker nodes ===="
+oc create -f $GIT_REPO_HOME/templates/container-runtime-config.yml
+
 ## Add ER Key to global pull secret
 #   cd /tmp
 #   # Login to OCP cluster
@@ -194,6 +198,7 @@ fi
 log "==== Adding ER key details to OCP default pull-secret ===="
 cd /tmp
 # Login to OCP cluster
+
 export OCP_SERVER="$(echo https://api.${CLUSTER_NAME}.${BASE_DOMAIN}:6443)"
 oc login -u $OCP_USERNAME -p $OCP_PASSWORD --server=$OCP_SERVER --insecure-skip-tls-verify=true
 export OCP_TOKEN="$(oc whoami --show-token)"
@@ -244,7 +249,7 @@ cp $GIT_REPO_HOME/entitlement.lic $MAS_CONFIG_DIR
 # log "==== Amq streams deployment completed ===="
 
 # SLS Deployment
-if [[ (-z $SLS_ENDPOINT_URL) || (-z $SLS_REGISTRATION_KEY) || (-z $SLS_PUB_CERT_URL) ]]
+if [[ (-z $SLSCFG_URL) || (-z $SLS_REGISTRATION_KEY) || (-z $SLS_PUB_CERT_URL) ]]
 then
     ## Deploy SLS
     log "==== SLS deployment started ===="
@@ -253,7 +258,7 @@ then
 
 else
     log "=== Using Existing SLS Deployment ==="
-    ansible-playbook dependencies/cfg-sls.yml
+    ansible-playbook dependencies/gencfg-sls.yml
     log "=== Generated SLS Config YAML ==="
 fi
 
@@ -266,9 +271,9 @@ then
     log "==== UDS deployment completed ===="
 
 else
-    log "=== Using Existing BAS Deployment ==="
-    ansible-playbook dependencies/cfg-bas.yml
-    log "=== Generated BAS Config YAML ==="
+    log "=== Using Existing UDS Deployment ==="
+    ansible-playbook dependencies/gencfg-uds.yml
+    log "=== Generated UDS Config YAML ==="
 fi
 
 # Deploy CP4D
@@ -292,6 +297,30 @@ fi
 
 ## Deploy MAS
 log "==== MAS deployment started ===="
+## Evalute custom annotations to set with reference from aws-product-codes.config
+product_code_metadata="$(curl http://169.254.169.254/latest/meta-data/product-codes)"
+
+if [[ -n "$product_code_metadata" ]];then
+  log "Product Code: $product_code_metadata"
+  aws_product_codes_config_file="$GIT_REPO_HOME/aws/aws-product-codes.config"
+  log "Checking for product type corrosponding to $product_code_metadata from file $aws_product_codes_config_file"
+  if grep -E "^$product_code_metadata:" $aws_product_codes_config_file 1>/dev/null 2>&1;then
+    product_type="$(grep -E "^$product_code_metadata:" $aws_product_codes_config_file | cut -f 3 -d ":")"
+    if [[ $product_type == "byol" ]];then
+      export MAS_ANNOTATIONS="mas.ibm.com/hyperscalerProvider=aws,mas.ibm.com/hyperscalerFormat=byol,mas.ibm.com/hyperscalerChannel=ibm"
+    elif [[ $product_type == "privatepublic" ]];then
+      export MAS_ANNOTATIONS="mas.ibm.com/hyperscalerProvider=aws,mas.ibm.com/hyperscalerFormat=privatepublic,mas.ibm.com/hyperscalerChannel=aws"
+    else
+      log "Invalid product type : $product_type"
+      exit 28
+    fi
+  else
+    log "Product code not found in file $aws_product_codes_config_file"
+    exit 28
+  fi
+else
+  log "MAS product code not found, skipping custom annotations suite_install"
+fi
 ansible-playbook mas/install-suite.yml
 log "==== MAS deployment completed ===="
 

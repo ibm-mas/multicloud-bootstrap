@@ -55,7 +55,7 @@ fi
 # Download BAS certificate
 cd $GIT_REPO_HOME
 if [[ ! -z ${UDS_PUB_CERT_URL} ]]; then
-  azcopy copy "${UDS_PUB_CERT_URL}" "bas.crt"
+  azcopy copy "${UDS_PUB_CERT_URL}" "uds.crt"
 fi
 
 ### Read License File & Retrive SLS hostname and host id
@@ -103,6 +103,10 @@ if [[ $OPENSHIFT_USER_PROVIDE == "false" ]]; then
   #   exit 22
   # fi
   # set -e
+  
+oc login -u $OCP_USERNAME -p $OCP_PASSWORD --server=https://api.${CLUSTER_NAME}.${BASE_DOMAIN}:6443
+log "==== Adding PID limits to worker nodes ===="
+oc create -f $GIT_REPO_HOME/templates/container-runtime-config.yml
 
   # Backup Terraform configuration
   rm -rf /tmp/ansible-devops
