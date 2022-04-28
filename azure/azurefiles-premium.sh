@@ -1,5 +1,5 @@
 #!/bin/bash
-
+# azurefiles-premium storage class created as per : https://github.com/Azure/maximo#azure-files-csi-drivers
 #Create directory for install files
 mkdir /tmp/OCPInstall
 mkdir /tmp/OCPInstall/QuickCluster
