@@ -19,8 +19,6 @@ SP_NAME="http://${CLUSTER_NAME}-sp"
 export SLS_STORAGE_CLASS=managed-premium
 # BAS variables
 export UDS_STORAGE_CLASS=managed-premium
-#Azurefiles-storageclass variable
-export AZUREFILE_STORAGE_AC="masazfile${RANDOM_STR}"
 
 # CP4D variables
 export CPD_METADB_BLOCK_STORAGE_CLASS=managed-premium
@@ -105,7 +103,7 @@ if [[ $OPENSHIFT_USER_PROVIDE == "false" ]]; then
   #   exit 22
   # fi
   # set -e
-  
+
 oc login -u $OCP_USERNAME -p $OCP_PASSWORD --server=https://api.${CLUSTER_NAME}.${BASE_DOMAIN}:6443
 log "==== Adding PID limits to worker nodes ===="
 oc create -f $GIT_REPO_HOME/templates/container-runtime-config.yml
@@ -145,13 +143,13 @@ jq '.auths |= . + {"cp.icr.io": { "auth" : "$encodedEntitlementKey", "email" : "
 envsubst </tmp/dockerconfig.json >/tmp/.dockerconfigjson
 oc set data secret/pull-secret -n openshift-config --from-file=/tmp/.dockerconfigjson
 
-#Run ansible playbook to create azurefiles storage class
-log "=== Creating azurefiles-standard Storage class on OCP cluster ==="
+# Run ansible playbook to create azurefiles storage class
+log "=== Creating azurefiles-premium Storage class on OCP cluster ==="
 cd $GIT_REPO_HOME/azure
-ansible-playbook configure-azurefiles.yml
+./azurefiles-premium.sh
 retcode=$?
 if [[ $retcode -ne 0 ]]; then
-  log "Failed to create azurefiles-standard storageclass"
+  log "Failed to create azurefiles-premium storageclass"
   exit 27
 fi
 
@@ -201,7 +199,7 @@ if [[ (-z $SLS_ENDPOINT_URL) || (-z $SLS_REGISTRATION_KEY) || (-z $SLS_PUB_CERT_
 
 else
   log "=== Using Existing SLS Deployment ==="
-  ansible-playbook dependencies/cfg-sls.yml
+  ansible-playbook dependencies/gencfg-sls.yml
   log "=== Generated SLS Config YAML ==="
 fi
 
@@ -213,9 +211,9 @@ if [[ (-z $UDS_API_KEY) || (-z $UDS_ENDPOINT_URL) || (-z $UDS_PUB_CERT_URL) ]]; 
   log "==== UDS deployment completed ===="
 
 else
-  log "=== Using Existing BAS Deployment ==="
-  ansible-playbook dependencies/cfg-bas.yml
-  log "=== Generated BAS Config YAML ==="
+  log "=== Using Existing UDS Deployment ==="
+  ansible-playbook dependencies/gencfg-uds.yml
+  log "=== Generated UDS Config YAML ==="
 fi
 
 # Deploy CP4D

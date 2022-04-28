@@ -159,7 +159,7 @@ export MAS_CHANNEL=8.7.x
 if [[ $CLUSTER_TYPE == "aws" ]]; then
   export CPD_STORAGE_CLASS="ocs-storagecluster-cephfs"
 elif [[ $CLUSTER_TYPE == "azure" ]]; then
-  export CPD_STORAGE_CLASS="azurefiles-standard"
+  export CPD_STORAGE_CLASS="azurefiles-premium"
 fi
 export CPD_NAMESPACE="ibm-common-services"
 export CPD_SERVICES_NAMESPACE="cpd-services-${RANDOM_STR}"

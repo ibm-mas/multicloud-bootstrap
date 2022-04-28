@@ -82,10 +82,6 @@ variable "bastion_cidr" {
   default = "10.0.3.224/27"
 }
 
-#Storage acc name for azurefiles storage
-variable "storageac_azurefile" {
-  default = "masazfilestorageac"
-}
 # Deploy OCP into single or multi-zone
 variable "single-or-multi-zone" {
   default = "single"
