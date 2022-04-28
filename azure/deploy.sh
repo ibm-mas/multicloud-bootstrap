@@ -4,17 +4,12 @@ set -e
 # This script will initiate the provisioning process of MAS. It will perform following steps,
 
 ## Variables
-#export AWS_DEFAULT_REGION=$DEPLOY_REGION
-#MASTER_INSTANCE_TYPE="m5.2xlarge"
-#WORKER_INSTANCE_TYPE="m5.4xlarge"
 # Mongo variables
 export MONGODB_STORAGE_CLASS=managed-premium
 # Amqstreams variables
 export KAFKA_STORAGE_CLASS=managed-premium
 # Service principle variables
 SP_NAME="http://${CLUSTER_NAME}-sp"
-#IAM_USER_NAME="masocp-user-${RANDOM_STR}"
-
 # SLS variables
 export SLS_STORAGE_CLASS=managed-premium
 # BAS variables
@@ -25,18 +20,10 @@ export AZUREFILE_STORAGE_AC="masazfile${RANDOM_STR}"
 # CP4D variables
 export CPD_METADB_BLOCK_STORAGE_CLASS=managed-premium
 
-# Retrieve SSH public key
-#TOKEN=$(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
-#SSH_PUB_KEY=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" –v http://169.254.169.254/latest/meta-data/public-keys/0/openssh-key)
-
 log "Below are Cloud specific deployment parameters,"
-#log " AWS_DEFAULT_REGION: $AWS_DEFAULT_REGION"
-#log " MASTER_INSTANCE_TYPE: $MASTER_INSTANCE_TYPE"
-#log " WORKER_INSTANCE_TYPE: $WORKER_INSTANCE_TYPE"
 log " MONGODB_STORAGE_CLASS: $MONGODB_STORAGE_CLASS"
 log " KAFKA_STORAGE_CLASS: $KAFKA_STORAGE_CLASS"
 log " SP_NAME: $SP_NAME"
-#log " IAM_USER_NAME: $IAM_USER_NAME"
 log " SLS_STORAGE_CLASS: $SLS_STORAGE_CLASS"
 log " UDS_STORAGE_CLASS: $UDS_STORAGE_CLASS"
 log " SSH_PUB_KEY: $SSH_PUB_KEY"
@@ -71,10 +58,6 @@ log " SLS_HOST_ID: $hostid"
 export SLS_INSTANCE_NAME="$hostname"
 export SLS_LICENSE_ID="$hostid"
 
-# Add unique id as a tag to the resource group
-#az tag create --resource-id /subscriptions/$AZURE_SUBSC_ID/resourcegroups/$RG_NAME --tags clusterUniqueString=$RANDOM_STR
-#log "Tag clusterUniqueString=$RANDOM_STR added to the resource group $RG_NAME"
-
 # Deploy OCP cluster and bastion host
 if [[ $OPENSHIFT_USER_PROVIDE == "false" ]]; then
   cd $GIT_REPO_HOME
@@ -89,26 +72,10 @@ if [[ $OPENSHIFT_USER_PROVIDE == "false" ]]; then
     exit 21
   fi
   set -e
-
-  # # Get the new resource group name created by the OCP installer, bastion host will be created in the same resource group
-  # OCP_CLUSTER_RG_NAME=$(az group list | jq ".[] | select(.location == \"$DEPLOY_REGION\") | select(.name | contains(\"masocp-$RANDOM_STR\")).name" | tr -d '"')
-  # log "New resource group created by OpenShift installer: $OCP_CLUSTER_RG_NAME"
-  # export OCP_CLUSTER_RG_NAME
-
-  # ## Create bastion host
-  # cd $GIT_REPO_HOME/azure
-  # set +e
-  # ./create-bastion-host.sh
-  # retcode=$?
-  # if [[ $retcode -ne 0 ]]; then
-  #   log "Bastion host creation failed in Terraform step"
-  #   exit 22
-  # fi
-  # set -e
-  
-oc login -u $OCP_USERNAME -p $OCP_PASSWORD --server=https://api.${CLUSTER_NAME}.${BASE_DOMAIN}:6443
-log "==== Adding PID limits to worker nodes ===="
-oc create -f $GIT_REPO_HOME/templates/container-runtime-config.yml
+ 
+  oc login -u $OCP_USERNAME -p $OCP_PASSWORD --server=https://api.${CLUSTER_NAME}.${BASE_DOMAIN}:6443
+  log "==== Adding PID limits to worker nodes ===="
+  oc create -f $GIT_REPO_HOME/templates/container-runtime-config.yml
 
   # Backup Terraform configuration
   rm -rf /tmp/ansible-devops
@@ -139,13 +106,12 @@ oc login -u $OCP_USERNAME -p $OCP_PASSWORD --server=$OCP_SERVER --insecure-skip-
 export OCP_TOKEN="$(oc whoami --show-token)"
 oc extract secret/pull-secret -n openshift-config --keys=.dockerconfigjson --to=. --confirm
 export encodedEntitlementKey=$(echo cp:$SLS_ENTITLEMENT_KEY | tr -d '\n' | base64 -w0)
-##export encodedEntitlementKey=$(echo cp:$SLS_ENTITLEMENT_KEY | base64 -w0)
 export emailAddress=$(cat .dockerconfigjson | jq -r '.auths["cloud.openshift.com"].email')
 jq '.auths |= . + {"cp.icr.io": { "auth" : "$encodedEntitlementKey", "email" : "$emailAddress"}}' .dockerconfigjson >/tmp/dockerconfig.json
 envsubst </tmp/dockerconfig.json >/tmp/.dockerconfigjson
 oc set data secret/pull-secret -n openshift-config --from-file=/tmp/.dockerconfigjson
 
-#Run ansible playbook to create azurefiles storage class
+# Run ansible playbook to create azurefiles storage class
 log "=== Creating azurefiles-standard Storage class on OCP cluster ==="
 cd $GIT_REPO_HOME/azure
 ansible-playbook configure-azurefiles.yml
