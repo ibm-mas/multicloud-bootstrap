@@ -1,56 +1,85 @@
 #!/bin/bash
 
-# This script will send email notification using SMTP details
-cd $GIT_REPO_HOME/azure
-SCRIPT_FILE="notify.py"
+# This script will send email notification using AWS SES service
+cd $GIT_REPO_HOME
+MSG_FILE_SRC_DETAILS="aws/notification/email/message-details.json"
+MSG_FILE_SRC_CREDS="aws/notification/email/message-creds.json"
+MSG_FILE="aws/notification/email/message-updated.json"
 
-#if [[ $STATUS == "SUCCESS" ]]; then
+## Raw email using SES
+if [[ $STATUS == "SUCCESS" ]]; then
   # Login to OCP cluster
-#  oc login -u $OPENSHIFT_USER -p $OPENSHIFT_PASSWORD --server=https://api.${CLUSTER_NAME}.${BASE_DOMAIN}:6443
+  oc login -u $OCP_USERNAME -p $OCP_PASSWORD --server=https://api.${CLUSTER_NAME}.${BASE_DOMAIN}:6443
   # Collect email details
-#  certfile="/tmp/${CLUSTER_NAME}-ca.crt"
-#  retrieve_mas_ca_cert $RANDOM_STR $certfile
-#  certcontents=$(cat $certfile | tr '\n' "," | sed "s/,/\\\\\\\n/g")
-#  certcontents=$(echo $certcontents | sed 's/\//\\\//g')
-#  log "$certcontents"
-#    if [[ -z $SLSCFG_URL ]]; then
-#    get_sls_endpoint_url $RANDOM_STR
-#    log " CALL_SLS_URL=$CALL_SLS_URL"
-#  fi
-#  if [[ -z $UDS_ENDPOINT_URL ]]; then
-#    get_bas_endpoint_url $RANDOM_STR
-#    log " CALL_BAS_URL=$CALL_BAS_URL"
-#  fi
-#  get_mas_creds $RANDOM_STR
-#  log " MAS_USER=$MAS_USER"
-#  log " MAS_PASSWORD=$MAS_PASSWORD"
-#fi
-
-# Temp code
-CERT_FILE_NAME="${CLUSTER_NAME}-ca.crt"
-echo "dummy data" >> $certfilename
-log " CERT_FILE_NAME=$CERT_FILE_NAME"
-
-sed -i "s/\[SMTP-HOST\]/$SMTP_HOST/g" $SCRIPT_FILE
-sed -i "s/\[SMTP-PORT\]/$SMTP_PORT/g" $SCRIPT_FILE
-sed -i "s/\[SMTP-USERNAME\]/$SMTP_USERNAME/g" $SCRIPT_FILE
-sed -i "s/\[SMTP-PASSWORD\]/$SMTP_PASSWORD/g" $SCRIPT_FILE
-sed -i "s/\[CERT-FILE\]/$CERT_FILE_NAME/g" $SCRIPT_FILE
-sed -i "s/\[RECEPIENT\]/$RECEPIENT/g" $SCRIPT_FILE
-sed -i "s/\[MESSAGE-TEXT\]/$MESSAGE_TEXT/g" $SCRIPT_FILE
-sed -i "s/\[STATUS\]/$STATUS/g" $SCRIPT_FILE
-sed -i "s/\[REGION\]/$DEPLOY_REGION/g" $SCRIPT_FILE
-sed -i "s/\[UNIQ-STR\]/$RANDOM_STR/g" $SCRIPT_FILE
-sed -i "s/\[OPENSHIFT-CLUSTER-CONSOLE-URL\]/$OPENSHIFT_CLUSTER_CONSOLE_URL/g" $SCRIPT_FILE
-sed -i "s/\[OPENSHIFT-CLUSTER-API-URL\]/$OPENSHIFT_CLUSTER_API_URL/g" $SCRIPT_FILE
-sed -i "s/\[OCP-USER\]/$OPENSHIFT_USER/g" $SCRIPT_FILE
-sed -i "s/\[MAS-URL-INIT-SETUP\]/$MAS_URL_INIT_SETUP/g" $SCRIPT_FILE
-sed -i "s/\[MAS-URL-ADMIN\]/$MAS_URL_ADMIN/g" $SCRIPT_FILE
-sed -i "s/\[MAS-URL-WORKSPACE\]/$MAS_URL_WORKSPACE/g" $SCRIPT_FILE
-sed -i "s/\[MAS-USER\]/$MAS_USER/g" $SCRIPT_FILE
-sed -i "s/\[SLS-ENDPOINT-URL\]/$CALL_SLS_URL/g" $SCRIPT_FILE
-sed -i "s/\[OCP-PASSWORD\]/$OPENSHIFT_PASSWORD/g" $SCRIPT_FILE
-sed -i "s/\[MAS-PASSWORD\]/$MAS_PASSWORD/g" $SCRIPT_FILE
-
-chmod +x $SCRIPT_FILE
-./$SCRIPT_FILE
+  certfile="/tmp/${CLUSTER_NAME}-ca.crt"
+  retrieve_mas_ca_cert $RANDOM_STR $certfile
+  certcontents=$(cat $certfile | tr '\n' "," | sed "s/,/\\\\\\\n/g")
+  certcontents=$(echo $certcontents | sed 's/\//\\\//g')
+  log "$certcontents"
+    if [[ -z $SLSCFG_URL ]]; then
+    get_sls_endpoint_url $RANDOM_STR
+    log " CALL_SLS_URL=$CALL_SLS_URL"
+  fi
+  if [[ -z $UDS_ENDPOINT_URL ]]; then
+    get_bas_endpoint_url $RANDOM_STR
+    log " CALL_BAS_URL=$CALL_BAS_URL"
+  fi
+  get_mas_creds $RANDOM_STR
+  log " MAS_USER=$MAS_USER"
+  log " MAS_PASSWORD=$MAS_PASSWORD"
+fi
+# Get list of senders from SES configuration
+for item in `aws ses list-identities --region $DEPLOY_REGION | jq '.Identities' | grep -v '\[\|\]' | tr -d ' ' | tr -d '"' | tr -d ','`; do
+  aws ses get-identity-verification-attributes --identities $item --region $DEPLOY_REGION | jq ".VerificationAttributes" | grep "Success"
+  if [[ $? -eq 0 ]]; then
+    if [[ -z $RECEPIENT ]]; then
+      RECEPIENT=$item
+      FROM_EMAIL=$item
+    else
+      RECEPIENT=$RECEPIENT,$item
+    fi
+  fi
+done
+if [[ -z $RECEPIENT ]]; then
+    log "No verified email addresses found in the SES service in $DEPLOY_REGION region, no email will be sent"
+else
+    log "Found verified email addresses $RECEPIENT"
+    log "Sending details email"
+    /usr/bin/cp -f $MSG_FILE_SRC_DETAILS $MSG_FILE
+    sed -i "s/\[SENDER\]/$FROM_EMAIL/g" $MSG_FILE
+    sed -i "s/\[RECEIVER\]/$RECEPIENT/g" $MSG_FILE
+    sed -i "s/\[MESSAGE-TEXT\]/$MESSAGE_TEXT/g" $MSG_FILE
+    sed -i "s/\[STATUS\]/$STATUS/g" $MSG_FILE
+    sed -i "s/\[REGION\]/$DEPLOY_REGION/g" $MSG_FILE
+    sed -i "s/\[UNIQ-STR\]/$RANDOM_STR/g" $MSG_FILE
+    sed -i "s/\[OPENSHIFT-CLUSTER-CONSOLE-URL\]/$OPENSHIFT_CLUSTER_CONSOLE_URL/g" $MSG_FILE
+    sed -i "s/\[OPENSHIFT-CLUSTER-API-URL\]/$OPENSHIFT_CLUSTER_API_URL/g" $MSG_FILE
+    sed -i "s/\[OCP-USER\]/$OCP_USERNAME/g" $MSG_FILE
+    sed -i "s/\[OCP-PASSWORD\]/$OCP_PASSWORD/g" $MSG_FILE
+    sed -i "s/\[MAS-URL-INIT-SETUP\]/$MAS_URL_INIT_SETUP/g" $MSG_FILE
+    sed -i "s/\[MAS-URL-ADMIN\]/$MAS_URL_ADMIN/g" $MSG_FILE
+    sed -i "s/\[MAS-URL-WORKSPACE\]/$MAS_URL_WORKSPACE/g" $MSG_FILE
+    sed -i "s/\[MAS-USER\]/$MAS_USER/g" $MSG_FILE
+    sed -i "s/\[MAS-PASSWORD\]/$MAS_PASSWORD/g" $MSG_FILE
+    sed -i "s/\[SLS-ENDPOINT-URL\]/$CALL_SLS_URL/g" $MSG_FILE
+    sed -i "s/\[BAS-ENDPOINT-URL\]/$CALL_BAS_URL/g" $MSG_FILE
+    sed -i "s/\[CA-CERT\]/$certcontents/g" $MSG_FILE
+    log "Sending email using below file ..."
+    cat $MSG_FILE
+    aws ses send-raw-email --cli-binary-format raw-in-base64-out --raw-message file://${MSG_FILE} --region $DEPLOY_REGION
+    log "Sending credentials email"
+    MESSAGE_TEXT=""
+    /usr/bin/cp -f $MSG_FILE_SRC_CREDS $MSG_FILE
+    sed -i "s/\[SENDER\]/$FROM_EMAIL/g" $MSG_FILE
+    sed -i "s/\[RECEIVER\]/$RECEPIENT/g" $MSG_FILE
+    sed -i "s/\[MESSAGE-TEXT\]/$MESSAGE_TEXT/g" $MSG_FILE
+    sed -i "s/\[STATUS\]/$STATUS/g" $MSG_FILE
+    sed -i "s/\[REGION\]/$DEPLOY_REGION/g" $MSG_FILE
+    sed -i "s/\[UNIQ-STR\]/$RANDOM_STR/g" $MSG_FILE
+    sed -i "s/\[OCP-PASSWORD\]/$OCP_PASSWORD/g" $MSG_FILE
+    sed -i "s/\[MAS-PASSWORD\]/$MAS_PASSWORD/g" $MSG_FILE
+    sed -i "s/\[CA-CERT\]/$certcontents/g" $MSG_FILE
+    log "Sending email using below file ..."
+    cat $MSG_FILE
+    aws ses send-raw-email --cli-binary-format raw-in-base64-out --raw-message file://${MSG_FILE} --region $DEPLOY_REGION
+fi
