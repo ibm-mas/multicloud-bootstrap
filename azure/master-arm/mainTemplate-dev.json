@@ -2,6 +2,13 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
+    "location": {
+      "type": "string",
+      "metadata": {
+        "description": "Azure region where bootnode and OpenShift cluster resources to be deployed"
+      },
+      "defaultValue": "[resourceGroup().location]"
+    },
     "offeringType": {
       "type": "string",
       "metadata": {
@@ -244,10 +251,7 @@
     "seller_image_version": "masocp-bootnode-20220311",
     "compute_gallery_externalid": "[concat('/subscriptions/', variables('seller_subscription_id'), '/resourceGroups/', variables('seller_resource_group'), '/providers/Microsoft.Compute/galleries/', variables('seller_compute_gallery_name'))]",
     "projectName": "[substring(uniqueString(resourceGroup().id, deployment().name), 0, 6)]",
-    "location": "[resourceGroup().location]",
     "rgName": "[resourceGroup().name]",
-    "adminUsername": "azureuser",
-    "vmSize": "Standard_D2s_v3",
     "vNetName": "[concat(variables('projectName'), '-vnet')]",
     "vNetAddressPrefixes": "10.0.0.0/16",
     "vNetSubnetName": "default",
@@ -263,16 +267,14 @@
     "ownerRoleAssignmentId": "[guid(subscription().id, variables('ownerRoleDefinitionId'),variables('managedIdentityId'))]",
     "ownerRoleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '8e3af657-a8ff-443c-a75c-2fe8c4bcb635')]",
     "storageBlobRoleAssignmentId": "[guid(subscription().id, variables('storageBlobRoleDefinitionId'),variables('managedIdentityId'))]",
-    "storageBlobRoleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'ba92f5b4-2d11-453d-a403-e96b0029c9fe')]",
-    "readerRoleAssignmentId": "[guid(subscription().id, variables('readerRoleDefinitionId'),variables('managedIdentityId'))]",
-    "readerRoleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'acdd72a7-3385-48ef-bd42-f606fba81ae7')]"
+    "storageBlobRoleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'ba92f5b4-2d11-453d-a403-e96b0029c9fe')]"
   },
   "resources": [
     {
       "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
       "name": "[variables('managedIdentityName')]",
       "apiVersion": "2018-11-30",
-      "location": "[variables('location')]"
+      "location": "[parameters('location')]"
     },
     {
       "type": "Microsoft.Authorization/roleAssignments",
@@ -301,7 +303,7 @@
       "type": "Microsoft.Network/networkSecurityGroups",
       "apiVersion": "2020-05-01",
       "name": "[variables('networkSecurityGroupName')]",
-      "location": "[variables('location')]",
+      "location": "[parameters('location')]",
       "properties": {
         "securityRules": [
           {
@@ -325,7 +327,7 @@
       "type": "Microsoft.Network/publicIPAddresses",
       "apiVersion": "2020-05-01",
       "name": "[variables('publicIPAddressName')]",
-      "location": "[variables('location')]",
+      "location": "[parameters('location')]",
       "properties": {
         "publicIPAllocationMethod": "Dynamic"
       },
@@ -338,7 +340,7 @@
       "type": "Microsoft.Network/networkSecurityGroups",
       "apiVersion": "2020-05-01",
       "name": "[variables('networkSecurityGroupName2')]",
-      "location": "[variables('location')]",
+      "location": "[parameters('location')]",
       "properties": {
         "securityRules": [
           {
@@ -361,7 +363,7 @@
       "type": "Microsoft.Network/virtualNetworks",
       "apiVersion": "2020-05-01",
       "name": "[variables('vNetName')]",
-      "location": "[variables('location')]",
+      "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName2'))]"
       ],
@@ -388,7 +390,7 @@
       "type": "Microsoft.Network/networkInterfaces",
       "apiVersion": "2020-05-01",
       "name": "[variables('networkInterfaceName')]",
-      "location": "[variables('location')]",
+      "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIPAddressName'))]",
         "[resourceId('Microsoft.Network/virtualNetworks', variables('vNetName'))]",
@@ -415,7 +417,7 @@
       "type": "Microsoft.Compute/virtualMachines",
       "apiVersion": "2018-06-01",
       "name": "[variables('vmName')]",
-      "location": "[variables('location')]",
+      "location": "[parameters('location')]",
       "identity": {
         "type": "userAssigned",
         "userAssignedIdentities": {
@@ -427,17 +429,17 @@
       ],
       "properties": {
         "hardwareProfile": {
-          "vmSize": "[variables('vmSize')]"
+          "vmSize": "Standard_D2s_v3"
         },
         "osProfile": {
           "computerName": "[variables('vmName')]",
-          "adminUsername": "[variables('adminUsername')]",
+          "adminUsername": "azureuser",
           "linuxConfiguration": {
             "disablePasswordAuthentication": true,
             "ssh": {
               "publicKeys": [
                 {
-                  "path": "[concat('/home/', variables('adminUsername'), '/.ssh/authorized_keys')]",
+                  "path": "[concat('/home/azureuser', '/.ssh/authorized_keys')]",
                   "keyData": "[parameters('sshPublicKey')]"
                 }
               ]
@@ -465,9 +467,9 @@
           "apiVersion": "2015-06-15",
           "type": "extensions",
           "name": "config-app",
-          "location": "[variables('location')]",
+          "location": "[parameters('location')]",
           "dependsOn": [
-            "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
+            "[resourceId('Microsoft.Compute/virtualMachines', variables('vmName'))]"
           ],
           "tags": {
             "displayName": "config-app"
@@ -478,7 +480,7 @@
             "typeHandlerVersion": "2.0",
             "autoUpgradeMinorVersion": true,
             "protectedSettings": {
-              "commandToExecute": "[concat('sleep 120;', 'ssh-keyscan github.ibm.com >> ~/.ssh/known_hosts;', 'cd /root;', 'git clone https://github.com/ibm-mas/ansible-devops.git;', 'cd ansible-devops;', 'rm -rf multicloud-bootstrap 1>/dev/null 2>&1;', 'git clone -b main https://github.com/ibm-mas/multicloud-bootstrap.git;', 'cd multicloud-bootstrap;', 'find . -type f -name \"*.sh\" -exec chmod +x {} \\;;', './init-async.sh azure ''', parameters('offeringType'), ''' ''', variables('location'), ''' null ''', parameters('clusterSize'), ''' ''', variables('projectName'), ''' ''', parameters('publicDomain'), ''' ''', parameters('publicDomainResourceGroup'), ''' ''', parameters('sshPublicKey'), ''' null ''', parameters('entitledRegistryKey'), ''' ''', parameters('openShiftPullSecret'), ''' ''', parameters('masLicenseUrl'), ''' ''', parameters('slsEndpointUrl'), ''' ''', parameters('slsRegistrationKey'), ''' ''', parameters('slsPublicCertificateUrl'), ''' ''', parameters('basEndpointUrl'), ''' ''', parameters('basAPIKey'), ''' ''', parameters('basPublicCertificateUrl'), ''' ''', parameters('masManageDBUser'), ''' ''', parameters('masManageDBPassword'), ''' ''', parameters('masManageDBJdbcUrl'), ''' ''', parameters('masManageDBCertificateUrl'), ''' ''', parameters('importDemoData'), ''' ''', parameters('openShiftClusterApiUrl'), ''' ''', parameters('openShiftUser'), ''' ''', parameters('openShiftPassword'), ''' ''', variables('rgName'), ''' ''', parameters('notificattionEmailAddress'), ''' ''', parameters('smtpHost'), ''' ''', parameters('smtpPort'), ''' ''', parameters('smtpUsername'), ''' ''', parameters('smtpPassword'), ''' ''', parameters('azureServicePrincipalClientId'), ''' ''', parameters('azureServicePrincipalClientSecret'), ''' ''', variables('seller_subscription_id'), ''' ''', variables('seller_resource_group'), ''' ''', variables('seller_compute_gallery_name'), ''' ''', variables('seller_image_version'), ''' ''', parameters('emailNotification'), ''' dev ''', ''' > mas-provisioning.log 2>&1;')]"
+              "commandToExecute": "[concat('sleep 120;', 'ssh-keyscan github.ibm.com >> ~/.ssh/known_hosts;', 'cd /root;', 'git clone https://github.com/ibm-mas/ansible-devops.git;', 'cd ansible-devops;', 'rm -rf multicloud-bootstrap 1>/dev/null 2>&1;', 'git clone -b main https://github.com/ibm-mas/multicloud-bootstrap.git;', 'cd multicloud-bootstrap;', 'find . -type f -name \"*.sh\" -exec chmod +x {} \\;;', './init-async.sh azure ''', parameters('offeringType'), ''' ''', parameters('location'), ''' null ''', parameters('clusterSize'), ''' ''', variables('projectName'), ''' ''', parameters('publicDomain'), ''' ''', parameters('publicDomainResourceGroup'), ''' ''', parameters('sshPublicKey'), ''' null ''', parameters('entitledRegistryKey'), ''' ''', parameters('openShiftPullSecret'), ''' ''', parameters('masLicenseUrl'), ''' ''', parameters('slsEndpointUrl'), ''' ''', parameters('slsRegistrationKey'), ''' ''', parameters('slsPublicCertificateUrl'), ''' ''', parameters('basEndpointUrl'), ''' ''', parameters('basAPIKey'), ''' ''', parameters('basPublicCertificateUrl'), ''' ''', parameters('masManageDBUser'), ''' ''', parameters('masManageDBPassword'), ''' ''', parameters('masManageDBJdbcUrl'), ''' ''', parameters('masManageDBCertificateUrl'), ''' ''', parameters('importDemoData'), ''' ''', parameters('openShiftClusterApiUrl'), ''' ''', parameters('openShiftUser'), ''' ''', parameters('openShiftPassword'), ''' ''', variables('rgName'), ''' ''', parameters('notificattionEmailAddress'), ''' ''', parameters('smtpHost'), ''' ''', parameters('smtpPort'), ''' ''', parameters('smtpUsername'), ''' ''', parameters('smtpPassword'), ''' ''', parameters('azureServicePrincipalClientId'), ''' ''', parameters('azureServicePrincipalClientSecret'), ''' ''', variables('seller_subscription_id'), ''' ''', variables('seller_resource_group'), ''' ''', variables('seller_compute_gallery_name'), ''' ''', variables('seller_image_version'), ''' ''', parameters('emailNotification'), ''' dev ''', ''' > mas-provisioning.log 2>&1;')]"
             }
           }
         }
@@ -488,7 +490,7 @@
       "type": "Microsoft.Storage/storageAccounts",
       "apiVersion": "2021-04-01",
       "name": "[variables('storageaccountName')]",
-      "location": "[variables('location')]",
+      "location": "[parameters('location')]",
       "sku": {
         "name": "Standard_LRS"
       },
