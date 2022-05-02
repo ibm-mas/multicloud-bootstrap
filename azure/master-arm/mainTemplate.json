@@ -249,7 +249,6 @@
     "seller_resource_group": "EdgeTest",
     "seller_compute_gallery_name": "mas_image_gallery",
     "seller_image_version": "masocp-bootnode-20220311",
-    "compute_gallery_externalid": "[concat('/subscriptions/', variables('seller_subscription_id'), '/resourceGroups/', variables('seller_resource_group'), '/providers/Microsoft.Compute/galleries/', variables('seller_compute_gallery_name'))]",
     "projectName": "[substring(uniqueString(resourceGroup().id, deployment().name), 0, 6)]",
     "rgName": "[resourceGroup().name]",
     "vNetName": "[concat(variables('projectName'), '-vnet')]",
