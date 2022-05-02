@@ -67,7 +67,7 @@
       },
       "defaultValue": ""
     },
-    "openShiftPassword": {
+    "openShiftPwd": {
       "type": "secureString",
       "metadata": {
         "description": "Enter the password of the existing cluster account."
@@ -192,7 +192,7 @@
     },
     "azureServicePrincipalClientSecret": {
       "type": "secureString",
-      "defaultValue": "749047dc-327b-4615-b510-51d3685ab70f",
+      "defaultValue": "",
       "metadata": {
         "description": "Azure service principal client secret."
       }
@@ -448,7 +448,7 @@
         },
         "storageProfile": {
           "imageReference": {
-            "id": "[concat(variables('compute_gallery_externalid'), '/images/', variables('seller_image_version'))]"
+            "id": "[resourceId('Microsoft.Compute/galleries/images/versions', variables('seller_compute_gallery_name'), variables('seller_image_version'), 'latest')]"
           },
           "osDisk": {
             "createOption": "fromImage"
@@ -528,19 +528,19 @@
     "openShiftConsoleUrl": {
       "type": "string",
       "condition": "[equals(parameters('openShiftClusterApiUrl'), '')]",
-      "value": "[concat('https://console-openshift-console.apps.masocp-', variables('projectName'), '.', parameters('publicDomain'))]"
+      "value": "[uri(concat('https://console-openshift-console.apps.masocp-', variables('projectName'), '.', parameters('publicDomain')), '')]"
     },
     "openShiftApiUrl": {
       "type": "string",
       "condition": "[equals(parameters('openShiftClusterApiUrl'), '')]",
-      "value": "[concat('https://api.masocp-', variables('projectName'), '.', parameters('publicDomain'))]"
+      "value": "[uri(concat('https://api.masocp-', variables('projectName'), '.', parameters('publicDomain')), '')]"
     },
     "openShiftUser": {
       "type": "string",
       "condition": "[equals(parameters('openShiftClusterApiUrl'), '')]",
       "value": "masocpuser"
     },
-    "openShiftPassword": {
+    "openShiftPwd": {
       "type": "string",
       "condition": "[equals(parameters('openShiftClusterApiUrl'), '')]",
       "value": "[concat('masocp', variables('projectName'), 'pass')]"
@@ -548,32 +548,32 @@
     "masInitialSetupUrl": {
       "type": "string",
       "condition": "[equals(parameters('openShiftClusterApiUrl'), '')]",
-      "value": "[concat('https://admin.mas-', variables('projectName'), '.apps.masocp-', variables('projectName'), '.', parameters('publicDomain'), '/initialsetup')]"
+      "value": "[uri(concat('https://admin.mas-', variables('projectName'), '.apps.masocp-', variables('projectName'), '.', parameters('publicDomain'), '/initialsetup'), '')]"
     },
     "masInitialSetupUrlLogin": {
       "type": "string",
       "condition": "[not(equals(parameters('openShiftClusterApiUrl'), ''))]",
-      "value": "[concat('https://admin.mas-', variables('projectName'), '.apps.', last(split(parameters('openShiftClusterApiUrl'),'api.')), '/initialsetup')]"
+      "value": "[uri(concat('https://admin.mas-', variables('projectName'), '.apps.', last(split(parameters('openShiftClusterApiUrl'),'api.')), '/initialsetup'), '')]"
     },
     "masAdminUrl": {
       "type": "string",
       "condition": "[equals(parameters('openShiftClusterApiUrl'), '')]",
-      "value": "[concat('https://admin.mas-', variables('projectName'), '.apps.masocp-', variables('projectName'), '.', parameters('publicDomain'))]"
+      "value": "[uri(concat('https://admin.mas-', variables('projectName'), '.apps.masocp-', variables('projectName'), '.', parameters('publicDomain')), '')]"
     },
     "masAdminUrlLogin": {
       "type": "string",
       "condition": "[not(equals(parameters('openShiftClusterApiUrl'), ''))]",
-      "value": "[concat('https://admin.mas-', variables('projectName'), '.apps.', last(split(parameters('openShiftClusterApiUrl'),'api.')))]"
+      "value": "[uri(concat('https://admin.mas-', variables('projectName'), '.apps.', last(split(parameters('openShiftClusterApiUrl'),'api.'))), '')]"
     },
     "masWorkspaceUrl": {
       "type": "string",
       "condition": "[equals(parameters('openShiftClusterApiUrl'), '')]",
-      "value": "[concat('https://wsmasocp.home.mas-', variables('projectName'), '.apps.masocp-', variables('projectName'), '.', parameters('publicDomain'))]"
+      "value": "[uri(concat('https://wsmasocp.home.mas-', variables('projectName'), '.apps.masocp-', variables('projectName'), '.', parameters('publicDomain')), '')]"
     },
     "masWorkspaceUrlLogin": {
       "type": "string",
       "condition": "[not(equals(parameters('openShiftClusterApiUrl'), ''))]",
-      "value": "[concat('https://wsmasocp.home.mas-', variables('projectName'), '.apps.', last(split(parameters('openShiftClusterApiUrl'),'api.')))]"
+      "value": "[uri(concat('https://wsmasocp.home.mas-', variables('projectName'), '.apps.', last(split(parameters('openShiftClusterApiUrl'),'api.'))), '')]"
     },
     "masCredentials": {
       "type": "string",
