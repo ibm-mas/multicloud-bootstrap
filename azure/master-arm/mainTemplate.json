@@ -256,7 +256,6 @@
     "vNetSubnetName": "default",
     "vNetSubnetAddressPrefix": "10.0.0.0/24",
     "vmName": "[concat('masocp-', variables('projectName'), '-bootnode-vm')]",
-    "imageRef": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', variables('rgName'), '/providers/Microsoft.Compute/galleries/', variables('seller_compute_gallery_name'),'/images/', variables('seller_image_version'),'latest')]",
     "publicIPAddressName": "[concat(variables('projectName'), '-ip')]",
     "networkInterfaceName": "[concat(variables('projectName'), '-nic')]",
     "networkSecurityGroupName": "[concat(variables('projectName'), '-nsg')]",
@@ -448,7 +447,7 @@
         },
         "storageProfile": {
           "imageReference": {
-            "id": "[reference(variables('imageRef'))]"
+            "id": "[resourceId('Microsoft.Compute/galleries/images/versions', variables('seller_compute_gallery_name'), variables('seller_image_version'), 'latest')]"
           },
           "osDisk": {
             "createOption": "fromImage"
