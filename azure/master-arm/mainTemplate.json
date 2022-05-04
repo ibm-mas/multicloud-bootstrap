@@ -9,6 +9,20 @@
       },
       "defaultValue": "[resourceGroup().location]"
     },
+    "adminUserName": {
+      "type": "string",
+      "metadata": {
+        "description": "Admin Username"
+      },
+      "defaultValue": "azureuser"
+    },
+    "vmSize": {
+      "type": "string",
+      "metadata": {
+        "description": "VM size"
+      },
+      "defaultValue": "Standard_D2s_v3"
+    },
     "offeringType": {
       "type": "string",
       "metadata": {
@@ -428,11 +442,11 @@
       ],
       "properties": {
         "hardwareProfile": {
-          "vmSize": "Standard_D2s_v3"
+          "vmSize": "[parameters('vmSize')]"
         },
         "osProfile": {
           "computerName": "[variables('vmName')]",
-          "adminUsername": "azureuser",
+          "adminUsername": "[parameters('adminUserName')]",
           "linuxConfiguration": {
             "disablePasswordAuthentication": true,
             "ssh": {
