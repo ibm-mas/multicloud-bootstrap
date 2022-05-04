@@ -67,7 +67,7 @@
       },
       "defaultValue": ""
     },
-    "openShiftPassword": {
+    "openShiftPwd": {
       "type": "secureString",
       "metadata": {
         "description": "Enter the password of the existing cluster account."
@@ -192,7 +192,7 @@
     },
     "azureServicePrincipalClientSecret": {
       "type": "secureString",
-      "defaultValue": "749047dc-327b-4615-b510-51d3685ab70f",
+      "defaultValue": "",
       "metadata": {
         "description": "Azure service principal client secret."
       }
@@ -249,7 +249,6 @@
     "seller_resource_group": "EdgeTest",
     "seller_compute_gallery_name": "mas_image_gallery",
     "seller_image_version": "masocp-bootnode-20220311",
-    "compute_gallery_externalid": "[concat('/subscriptions/', variables('seller_subscription_id'), '/resourceGroups/', variables('seller_resource_group'), '/providers/Microsoft.Compute/galleries/', variables('seller_compute_gallery_name'))]",
     "projectName": "[substring(uniqueString(resourceGroup().id, deployment().name), 0, 6)]",
     "rgName": "[resourceGroup().name]",
     "vNetName": "[concat(variables('projectName'), '-vnet')]",
@@ -448,7 +447,7 @@
         },
         "storageProfile": {
           "imageReference": {
-            "id": "[concat(variables('compute_gallery_externalid'), '/images/', variables('seller_image_version'))]"
+            "id": "[resourceId('Microsoft.Compute/galleries/images/versions', variables('seller_compute_gallery_name'), variables('seller_image_version'), 'latest')]"
           },
           "osDisk": {
             "createOption": "fromImage"
@@ -480,7 +479,7 @@
             "typeHandlerVersion": "2.0",
             "autoUpgradeMinorVersion": true,
             "protectedSettings": {
-              "commandToExecute": "[concat('sleep 120;', 'ssh-keyscan github.ibm.com >> ~/.ssh/known_hosts;', 'cd /root;', 'git clone https://github.com/ibm-mas/ansible-devops.git;', 'cd ansible-devops;', 'rm -rf multicloud-bootstrap 1>/dev/null 2>&1;', 'git clone -b main https://github.com/ibm-mas/multicloud-bootstrap.git;', 'cd multicloud-bootstrap;', 'find . -type f -name \"*.sh\" -exec chmod +x {} \\;;', './init-async.sh azure ''', parameters('offeringType'), ''' ''', parameters('location'), ''' null ''', parameters('clusterSize'), ''' ''', variables('projectName'), ''' ''', parameters('publicDomain'), ''' ''', parameters('publicDomainResourceGroup'), ''' ''', parameters('sshPublicKey'), ''' null ''', parameters('entitledRegistryKey'), ''' ''', parameters('openShiftPullSecret'), ''' ''', parameters('masLicenseUrl'), ''' ''', parameters('slsEndpointUrl'), ''' ''', parameters('slsRegistrationKey'), ''' ''', parameters('slsPublicCertificateUrl'), ''' ''', parameters('basEndpointUrl'), ''' ''', parameters('basAPIKey'), ''' ''', parameters('basPublicCertificateUrl'), ''' ''', parameters('masManageDBUser'), ''' ''', parameters('masManageDBPassword'), ''' ''', parameters('masManageDBJdbcUrl'), ''' ''', parameters('masManageDBCertificateUrl'), ''' ''', parameters('importDemoData'), ''' ''', parameters('openShiftClusterApiUrl'), ''' ''', parameters('openShiftUser'), ''' ''', parameters('openShiftPassword'), ''' ''', variables('rgName'), ''' ''', parameters('notificattionEmailAddress'), ''' ''', parameters('smtpHost'), ''' ''', parameters('smtpPort'), ''' ''', parameters('smtpUsername'), ''' ''', parameters('smtpPassword'), ''' ''', parameters('azureServicePrincipalClientId'), ''' ''', parameters('azureServicePrincipalClientSecret'), ''' ''', variables('seller_subscription_id'), ''' ''', variables('seller_resource_group'), ''' ''', variables('seller_compute_gallery_name'), ''' ''', variables('seller_image_version'), ''' ''', parameters('emailNotification'), ''' dev ''', ''' > mas-provisioning.log 2>&1;')]"
+              "commandToExecute": "[concat('sleep 120;', 'ssh-keyscan github.ibm.com >> ~/.ssh/known_hosts;', 'cd /root;', 'git clone https://github.com/ibm-mas/ansible-devops.git;', 'cd ansible-devops;', 'rm -rf multicloud-bootstrap 1>/dev/null 2>&1;', 'git clone -b main https://github.com/ibm-mas/multicloud-bootstrap.git;', 'cd multicloud-bootstrap;', 'find . -type f -name \"*.sh\" -exec chmod +x {} \\;;', './init-async.sh azure ''', parameters('offeringType'), ''' ''', parameters('location'), ''' null ''', parameters('clusterSize'), ''' ''', variables('projectName'), ''' ''', parameters('publicDomain'), ''' ''', parameters('publicDomainResourceGroup'), ''' ''', parameters('sshPublicKey'), ''' null ''', parameters('entitledRegistryKey'), ''' ''', parameters('openShiftPullSecret'), ''' ''', parameters('masLicenseUrl'), ''' ''', parameters('slsEndpointUrl'), ''' ''', parameters('slsRegistrationKey'), ''' ''', parameters('slsPublicCertificateUrl'), ''' ''', parameters('basEndpointUrl'), ''' ''', parameters('basAPIKey'), ''' ''', parameters('basPublicCertificateUrl'), ''' ''', parameters('masManageDBUser'), ''' ''', parameters('masManageDBPassword'), ''' ''', parameters('masManageDBJdbcUrl'), ''' ''', parameters('masManageDBCertificateUrl'), ''' ''', parameters('importDemoData'), ''' ''', parameters('openShiftClusterApiUrl'), ''' ''', parameters('openShiftUser'), ''' ''', parameters('openShiftPwd'), ''' ''', variables('rgName'), ''' ''', parameters('notificattionEmailAddress'), ''' ''', parameters('smtpHost'), ''' ''', parameters('smtpPort'), ''' ''', parameters('smtpUsername'), ''' ''', parameters('smtpPassword'), ''' ''', parameters('azureServicePrincipalClientId'), ''' ''', parameters('azureServicePrincipalClientSecret'), ''' ''', variables('seller_subscription_id'), ''' ''', variables('seller_resource_group'), ''' ''', variables('seller_compute_gallery_name'), ''' ''', variables('seller_image_version'), ''' ''', parameters('emailNotification'), ''' dev ''', ''' > mas-provisioning.log 2>&1;')]"
             }
           }
         }
@@ -528,19 +527,19 @@
     "openShiftConsoleUrl": {
       "type": "string",
       "condition": "[equals(parameters('openShiftClusterApiUrl'), '')]",
-      "value": "[concat('https://console-openshift-console.apps.masocp-', variables('projectName'), '.', parameters('publicDomain'))]"
+      "value": "[uri(concat('https://console-openshift-console.apps.masocp-', variables('projectName'), '.', parameters('publicDomain')), '')]"
     },
     "openShiftApiUrl": {
       "type": "string",
       "condition": "[equals(parameters('openShiftClusterApiUrl'), '')]",
-      "value": "[concat('https://api.masocp-', variables('projectName'), '.', parameters('publicDomain'))]"
+      "value": "[uri(concat('https://api.masocp-', variables('projectName'), '.', parameters('publicDomain')), '')]"
     },
     "openShiftUser": {
       "type": "string",
       "condition": "[equals(parameters('openShiftClusterApiUrl'), '')]",
       "value": "masocpuser"
     },
-    "openShiftPassword": {
+    "openShiftPwd": {
       "type": "string",
       "condition": "[equals(parameters('openShiftClusterApiUrl'), '')]",
       "value": "[concat('masocp', variables('projectName'), 'pass')]"
@@ -548,32 +547,32 @@
     "masInitialSetupUrl": {
       "type": "string",
       "condition": "[equals(parameters('openShiftClusterApiUrl'), '')]",
-      "value": "[concat('https://admin.mas-', variables('projectName'), '.apps.masocp-', variables('projectName'), '.', parameters('publicDomain'), '/initialsetup')]"
+      "value": "[uri(concat('https://admin.mas-', variables('projectName'), '.apps.masocp-', variables('projectName'), '.', parameters('publicDomain'), '/initialsetup'), '')]"
     },
     "masInitialSetupUrlLogin": {
       "type": "string",
       "condition": "[not(equals(parameters('openShiftClusterApiUrl'), ''))]",
-      "value": "[concat('https://admin.mas-', variables('projectName'), '.apps.', last(split(parameters('openShiftClusterApiUrl'),'api.')), '/initialsetup')]"
+      "value": "[uri(concat('https://admin.mas-', variables('projectName'), '.apps.', last(split(parameters('openShiftClusterApiUrl'),'api.')), '/initialsetup'), '')]"
     },
     "masAdminUrl": {
       "type": "string",
       "condition": "[equals(parameters('openShiftClusterApiUrl'), '')]",
-      "value": "[concat('https://admin.mas-', variables('projectName'), '.apps.masocp-', variables('projectName'), '.', parameters('publicDomain'))]"
+      "value": "[uri(concat('https://admin.mas-', variables('projectName'), '.apps.masocp-', variables('projectName'), '.', parameters('publicDomain')), '')]"
     },
     "masAdminUrlLogin": {
       "type": "string",
       "condition": "[not(equals(parameters('openShiftClusterApiUrl'), ''))]",
-      "value": "[concat('https://admin.mas-', variables('projectName'), '.apps.', last(split(parameters('openShiftClusterApiUrl'),'api.')))]"
+      "value": "[uri(concat('https://admin.mas-', variables('projectName'), '.apps.', last(split(parameters('openShiftClusterApiUrl'),'api.'))), '')]"
     },
     "masWorkspaceUrl": {
       "type": "string",
       "condition": "[equals(parameters('openShiftClusterApiUrl'), '')]",
-      "value": "[concat('https://wsmasocp.home.mas-', variables('projectName'), '.apps.masocp-', variables('projectName'), '.', parameters('publicDomain'))]"
+      "value": "[uri(concat('https://wsmasocp.home.mas-', variables('projectName'), '.apps.masocp-', variables('projectName'), '.', parameters('publicDomain')), '')]"
     },
     "masWorkspaceUrlLogin": {
       "type": "string",
       "condition": "[not(equals(parameters('openShiftClusterApiUrl'), ''))]",
-      "value": "[concat('https://wsmasocp.home.mas-', variables('projectName'), '.apps.', last(split(parameters('openShiftClusterApiUrl'),'api.')))]"
+      "value": "[uri(concat('https://wsmasocp.home.mas-', variables('projectName'), '.apps.', last(split(parameters('openShiftClusterApiUrl'),'api.'))), '')]"
     },
     "masCredentials": {
       "type": "string",
