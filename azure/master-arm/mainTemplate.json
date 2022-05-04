@@ -255,6 +255,8 @@
     "vNetAddressPrefixes": "10.0.0.0/16",
     "vNetSubnetName": "default",
     "vNetSubnetAddressPrefix": "10.0.0.0/24",
+    "logAnalyticsWorkspace": "[concat('masocp-', variables('projectName'), '-logAnalyticsWorkspace')]",
+    "logAnalyticsWorkspaceId": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('logAnalyticsWorkspace'))]",
     "vmName": "[concat('masocp-', variables('projectName'), '-bootnode-vm')]",
     "publicIPAddressName": "[concat(variables('projectName'), '-ip')]",
     "networkInterfaceName": "[concat(variables('projectName'), '-nic')]",
@@ -413,6 +415,68 @@
       }
     },
     {
+      "type": "Microsoft.OperationalInsights/workspaces",
+      "apiVersion": "2021-06-01",
+      "name": "[variables('logAnalyticsWorkspace')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "sku": {
+          "name": "pergb2018"
+        },
+        "features": {
+          "enableLogAccessUsingOnlyResourcePermissions": true
+        },
+        "workspaceCapping": {
+          "dailyQuotaGb": -1
+        },
+        "publicNetworkAccessForIngestion": "Enabled",
+        "publicNetworkAccessForQuery": "Enabled"
+      },
+      "resources": [
+        {
+          "apiVersion": "2020-08-01",
+          "type": "dataSources",
+          "name": "BootNode-Logs",
+          "dependsOn": [
+            "[concat('Microsoft.OperationalInsights/workspaces/', '/', variables('logAnalyticsWorkspace'))]"
+          ],
+          "kind": "CustomLog",
+          "properties": {
+            "customLogName": "masProvisioningLogs",
+            "description": "This collects azure deployment logs i.e. custom logs inside log analytics workspace",
+            "inputs": [
+              {
+                "location": {
+                  "fileSystemLocations": {
+                    "linuxFileTypeLogPaths": [ "/root/ansible-devops/multicloud-bootstrap/mas-provisioning.log" ]
+                  }
+                },
+                "recordDelimiter": {
+                  "regexDelimiter": {
+                    "pattern": "\\n",
+                    "matchIndex": 0,
+                    "numberdGroup": null
+                  }
+                }
+              }
+            ],
+            "extractions": [
+              {
+                "extractionName": "TimeGenerated",
+                "extractionType": "DateTime",
+                "extractionProperties": {
+                  "dateTimeExtraction": {
+                    "regex": null,
+                    "joinStringRegex": null
+                  }
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
       "type": "Microsoft.Compute/virtualMachines",
       "apiVersion": "2018-06-01",
       "name": "[variables('vmName')]",
@@ -484,6 +548,44 @@
           }
         }
       ]
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "apiVersion": "2021-11-01",
+      "name": "[concat(variables('vmName'),'/', 'DependencyAgentLinux')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
+      ],
+      "properties": {
+        "publisher": "Microsoft.Azure.Monitoring.DependencyAgent",
+        "type": "DependencyAgentLinux",
+        "typeHandlerVersion": "9.5",
+        "autoUpgradeMinorVersion": true
+      }
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "apiVersion": "2021-11-01",
+      "name": "[concat(variables('vmName'),'/', 'OMSExtension')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'))]",
+        "[concat('Microsoft.OperationalInsights/workspaces/', variables('logAnalyticsWorkspace'))]"
+      ],
+      "properties": {
+        "publisher": "Microsoft.EnterpriseCloud.Monitoring",
+        "type": "OmsAgentForLinux",
+        "typeHandlerVersion": "1.4",
+        "autoUpgradeMinorVersion": true,
+        "settings": {
+          "workspaceId": "[reference(variables('logAnalyticsWorkspaceId'), '2021-06-01').customerId]",
+          "stopOnMultipleConnections": true
+        },
+        "protectedSettings": {
+          "workspaceKey": "[listKeys(variables('logAnalyticsWorkspaceId'), '2021-06-01').primarySharedKey]"
+        }
+      }
     },
     {
       "type": "Microsoft.Storage/storageAccounts",
