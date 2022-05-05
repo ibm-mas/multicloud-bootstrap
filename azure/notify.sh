@@ -6,20 +6,20 @@ SCRIPT_FILE="notify.py"
 
 if [[ $STATUS == "SUCCESS" ]]; then
   # Login to OCP cluster
-  oc login -u $OPENSHIFT_USER -p $OPENSHIFT_PASSWORD --server=https://api.${CLUSTER_NAME}.${BASE_DOMAIN}:6443
+  oc login -u $OCP_USERNAME -p $OCP_PASSWORD --server=https://api.${CLUSTER_NAME}.${BASE_DOMAIN}:6443
   # Collect email details
   certfile="${CLUSTER_NAME}-ca.crt"
   retrieve_mas_ca_cert $RANDOM_STR $certfile
   certcontents=$(cat $certfile | tr '\n' "," | sed "s/,/\\\\\\\n/g")
   certcontents=$(echo $certcontents | sed 's/\//\\\//g')
   log "$certcontents"
-    if [[ -z $SLS_ENDPOINT_URL ]]; then
+  if [[ -z $SLS_ENDPOINT_URL ]]; then
     get_sls_endpoint_url $RANDOM_STR
     log " CALL_SLS_URL=$CALL_SLS_URL"
   fi
   if [[ -z $UDS_ENDPOINT_URL ]]; then
-    get_bas_endpoint_url $RANDOM_STR
-    log " CALL_BAS_URL=$CALL_BAS_URL"
+    get_uds_endpoint_url $RANDOM_STR
+    log " CALL_UDS_URL=$CALL_UDS_URL"
   fi
   get_mas_creds $RANDOM_STR
   log " MAS_USER=$MAS_USER"
@@ -38,14 +38,15 @@ sed -i "s/\[REGION\]/$DEPLOY_REGION/g" $SCRIPT_FILE
 sed -i "s/\[UNIQ-STR\]/$RANDOM_STR/g" $SCRIPT_FILE
 sed -i "s/\[OPENSHIFT-CLUSTER-CONSOLE-URL\]/$OPENSHIFT_CLUSTER_CONSOLE_URL/g" $SCRIPT_FILE
 sed -i "s/\[OPENSHIFT-CLUSTER-API-URL\]/$OPENSHIFT_CLUSTER_API_URL/g" $SCRIPT_FILE
-sed -i "s/\[OCP-USER\]/$OPENSHIFT_USER/g" $SCRIPT_FILE
+sed -i "s/\[OCP-USER\]/$OCP_USERNAME/g" $SCRIPT_FILE
 sed -i "s/\[MAS-URL-INIT-SETUP\]/$MAS_URL_INIT_SETUP/g" $SCRIPT_FILE
 sed -i "s/\[MAS-URL-ADMIN\]/$MAS_URL_ADMIN/g" $SCRIPT_FILE
 sed -i "s/\[MAS-URL-WORKSPACE\]/$MAS_URL_WORKSPACE/g" $SCRIPT_FILE
 sed -i "s/\[MAS-USER\]/$MAS_USER/g" $SCRIPT_FILE
 sed -i "s/\[SLS-ENDPOINT-URL\]/$CALL_SLS_URL/g" $SCRIPT_FILE
-sed -i "s/\[OCP-PASSWORD\]/$OPENSHIFT_PASSWORD/g" $SCRIPT_FILE
+sed -i "s/\[OCP-PASSWORD\]/$OCP_PASSWORD/g" $SCRIPT_FILE
 sed -i "s/\[MAS-PASSWORD\]/$MAS_PASSWORD/g" $SCRIPT_FILE
 
 chmod +x $SCRIPT_FILE
+echo "SCRIPT_FILE=$SCRIPT_FILE"
 ./$SCRIPT_FILE
