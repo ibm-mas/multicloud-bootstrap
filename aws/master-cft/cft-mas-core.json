@@ -104,16 +104,16 @@
             "Description": "Enter the HTTP or S3 location of the service's public certificate that you retrieved from the 'ca.crt' file in the 'mas-*-sls-cfg' secret in the MAS core namespace.",
             "Type": "String"
         },
-        "BASEndpointUrl": {
-            "Description": "Enter the endpoint URL that you retrieved from the 'bas-endpoint' OpenShift route in the cluster namespace where BAS is installed.",
+        "UDSEndpointUrl": {
+            "Description": "Enter the endpoint URL that you retrieved from the 'uds-endpoint' OpenShift route in the ibm-common-services namespace.",
             "Type": "String"
         },
-        "BASAPIKey": {
-            "Description": "Enter the service's API key that you retrieved from the 'bas-api-key' secret in the BAS namespace.",
+        "UDSAPIKey": {
+            "Description": "Enter the service's API key that you retrieved from the 'uds-api-key' secret in the ibm-common-services namespace.",
             "Type": "String"
         },
-        "BASPublicCertificateUrl": {
-            "Description": "Enter the HTTP or S3 location of the service's public certificate that you retrieved from the 'ca-bundle.pem' file in the 'mas-*-bas-cfg' secret in the MAS core namespace.",
+        "UDSPublicCertificateUrl": {
+            "Description": "Enter the HTTP or S3 location of the service's public certificate that you retrieved from the 'ca-bundle.pem' file in the 'mas-*-uds-cfg' secret in the MAS core namespace.",
             "Type": "String"
         },
         "EmailNotification": {
@@ -199,12 +199,12 @@
                 },
                 {
                     "Label": {
-                        "default": "Existing Behavior Analytics Service connection details (leave this section empty to create a new BAS instance)"
+                        "default": "Existing User Data Services connection details (leave this section empty to create a new UDS instance)"
                     },
                     "Parameters": [
-                        "BASEndpointUrl",
-                        "BASAPIKey",
-                        "BASPublicCertificateUrl"
+                        "UDSEndpointUrl",
+                        "UDSAPIKey",
+                        "UDSPublicCertificateUrl"
                     ]
                 },
                 {
@@ -834,15 +834,15 @@
                                 },
                                 "' '",
                                 {
-                                    "Ref": "BASEndpointUrl"
+                                    "Ref": "UDSEndpointUrl"
                                 },
                                 "' '",
                                 {
-                                    "Ref": "BASAPIKey"
+                                    "Ref": "UDSAPIKey"
                                 },
                                 "' '",
                                 {
-                                    "Ref": "BASPublicCertificateUrl"
+                                    "Ref": "UDSPublicCertificateUrl"
                                 },
                                 "' '",
                                 {
