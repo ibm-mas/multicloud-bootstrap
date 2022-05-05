@@ -75,6 +75,16 @@ if [[ (-n $RG_NAME) && (-n $UNIQUE_STR) ]]; then
   usage
 fi
 
+# Get subscription Id
+SUB_ID=$(az account show | jq ".id" | tr -d '"')
+echo "SUB_ID: $SUB_ID"
+
+# Check if Subscription ID is retreived, if not, it might be the login issue
+if [[ -z $SUB_ID ]]; then
+  echoRed "ERROR: Could not retrieve subscription id, make sure you are logged in using 'az login' command."
+  exit 1
+fi
+
 # Check if bootnode resource group exists
 if [[ -n $RG_NAME ]]; then
   set +e
@@ -85,10 +95,6 @@ if [[ -n $RG_NAME ]]; then
   fi
   set -e
 fi
-
-# Get subscription Id
-SUB_ID=$(az account show | jq ".id" | tr -d '"')
-echo "SUB_ID: $SUB_ID"
 
 ## Delete OCP cluster resource group
 echoBlue "Trying to delete OCP cluster resource group"

@@ -75,6 +75,8 @@ log " SLS_HOST_ID: $hostid"
 #SLS Instance name
 export SLS_INSTANCE_NAME="$hostname"
 export SLS_LICENSE_ID="$hostid"
+log " SLS_INSTANCE_NAME=$SLS_INSTANCE_NAME"
+log " SLS_LICENSE_ID=$SLS_LICENSE_ID"
 
 ## IAM
 # Create IAM policy
@@ -248,10 +250,10 @@ cp $GIT_REPO_HOME/entitlement.lic $MAS_CONFIG_DIR
 # ansible-playbook install-amqstream.yml
 # log "==== Amq streams deployment completed ===="
 
-# SLS Deployment
+## Deploy SLS
 if [[ (-z $SLSCFG_URL) || (-z $SLS_REGISTRATION_KEY) || (-z $SLS_PUB_CERT_URL) ]]
 then
-    ## Deploy SLS
+    # Deploy SLS
     log "==== SLS deployment started ===="
     ansible-playbook dependencies/install-sls.yml
     log "==== SLS deployment completed ===="
@@ -262,10 +264,10 @@ else
     log "=== Generated SLS Config YAML ==="
 fi
 
-#UDS Deployment
+## Deploy UDS
 if [[ (-z $UDS_API_KEY) || (-z $UDS_ENDPOINT_URL) || (-z $UDS_PUB_CERT_URL) ]]
 then
-    ## Deploy UDS
+    # Deploy UDS
     log "==== UDS deployment started ===="
     ansible-playbook dependencies/install-uds.yml
     log "==== UDS deployment completed ===="
@@ -276,7 +278,7 @@ else
     log "=== Generated UDS Config YAML ==="
 fi
 
-# Deploy CP4D
+## Deploy CP4D
 if [[ $DEPLOY_CP4D == "true" ]]; then
   log "==== CP4D deployment started ===="
   ansible-playbook cp4d/install-services-db2.yml

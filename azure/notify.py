@@ -33,7 +33,7 @@ message_creds.attach(MIMEText(body_creds, "plain"))
 
 filename = "[CERT-FILE]"  # In same directory as script
 
-# Open PDF file in binary mode
+# Open file in binary mode
 with open(filename, "rb") as attachment:
     # Add file as application/octet-stream
     # Email client can usually download this automatically as attachment
