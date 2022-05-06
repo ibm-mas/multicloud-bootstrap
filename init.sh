@@ -105,6 +105,9 @@ if [[ $OFFERING_TYPE == "MAS Core + Cloud Pak for Data" ]]; then
 elif [[ $OFFERING_TYPE == "MAS Core + Manage (no Cloud Pak for Data)" ]]; then
   export DEPLOY_CP4D="false"
   export DEPLOY_MANAGE="true"
+elif [[ $OFFERING_TYPE == "MAS Core + Cloud Pak for Data + Manage" ]]; then
+  export DEPLOY_CP4D="true"
+  export DEPLOY_MANAGE="true"
 else
   log "ERROR: Incorrect value for OFFERING_TYPE - $OFFERING_TYPE"
   PRE_VALIDATION=fail
