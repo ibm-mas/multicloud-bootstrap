@@ -163,7 +163,7 @@ cp $GIT_REPO_HOME/entitlement.lic $MAS_CONFIG_DIR
 if [[ (-z $SLS_ENDPOINT_URL) || (-z $SLS_REGISTRATION_KEY) || (-z $SLS_PUB_CERT_URL) ]]; then
   ## Deploy SLS
   log "==== SLS deployment started ===="
-  export ROLE_NAME=sls_install && ansible-playbook ibm.mas_devops.run_role
+  export ROLE_NAME=sls && ansible-playbook ibm.mas_devops.run_role
   export ROLE_NAME=gencfg_sls && ansible-playbook ibm.mas_devops.run_role
   log "==== SLS deployment completed ===="
 
