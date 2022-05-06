@@ -44,7 +44,7 @@ get_mas_creds() {
       log "OCP secret mas-${uniqstr}-credentials-superuser found"
       found="true"
     fi
-    sleep 60
+    sleep 6
     username=$(oc get secret mas-${uniqstr}-credentials-superuser -n mas-mas-${uniqstr}-core -o json | grep "\"username\"" | cut -d ':' -f 2 | tr -d " ,\"" | base64 -d)
     password=$(oc get secret mas-${uniqstr}-credentials-superuser -n mas-mas-${uniqstr}-core -o json | grep "\"password\"" | cut -d ':' -f 2 | tr -d " ,\"" | base64 -d)
   done
@@ -62,7 +62,7 @@ get_mas_creds() {
 
 get_sls_endpoint_url() {
   uniqstr=$1
-  export CALL_SLS_URL="https://$(oc get route ${SLS_INSTANCE_NAME} -n ibm-sls-${uniqstr} | grep "sls" | awk {'print $2'})"
+  export CALL_SLS_URL="https:\/\/$(oc get route ${SLS_INSTANCE_NAME} -n ibm-sls-${uniqstr} | grep "sls" | awk {'print $2'})"
 }
 
 get_sls_registration_key() {
@@ -70,12 +70,12 @@ get_sls_registration_key() {
 
 }
 
-get_bas_endpoint_url() {
+get_uds_endpoint_url() {
   uniqstr=$1
-  export CALL_BAS_URL="https:\/\/$(oc get route bas-endpoint -n ibm-bas-${uniqstr} | grep "bas" | awk {'print $2'})"
+  export CALL_UDS_URL="https:\/\/$(oc get route uds-endpoint -n ibm-common-services | grep "uds" | awk {'print $2'})"
 }
 
-get_bas_api_key() {
+get_uds_api_key() {
   uniqstr=$1
 
 }

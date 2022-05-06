@@ -54,6 +54,8 @@ log " SLS_HOST_ID: $hostid"
 # SLS Instance name
 export SLS_INSTANCE_NAME="$hostname"
 export SLS_LICENSE_ID="$hostid"
+log " SLS_INSTANCE_NAME=$SLS_INSTANCE_NAME"
+log " SLS_LICENSE_ID=$SLS_LICENSE_ID"
 
 # Deploy OCP cluster and bastion host
 if [[ $OPENSHIFT_USER_PROVIDE == "false" ]]; then
@@ -175,9 +177,9 @@ else
   log "=== Generated SLS Config YAML ==="
 fi
 
-#UDS Deployment
+# Deploy UDS
 if [[ (-z $UDS_API_KEY) || (-z $UDS_ENDPOINT_URL) || (-z $UDS_PUB_CERT_URL) ]]; then
-  ## Deploy UDS
+  # Deploy UDS
   log "==== UDS deployment started ===="
   export ROLE_NAME=uds_install
   ansible-playbook run_role.yml

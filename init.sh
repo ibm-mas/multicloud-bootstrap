@@ -54,8 +54,8 @@ export -f retrieve_mas_ca_cert
 export -f mark_provisioning_failed
 export -f get_sls_endpoint_url
 export -f get_sls_registration_key
-export -f get_bas_endpoint_url
-export -f get_bas_api_key
+export -f get_uds_endpoint_url
+export -f get_uds_api_key
 
 ## Configure CloudWatch agent
 if [[ $CLUSTER_TYPE == "aws" ]]; then
@@ -256,7 +256,7 @@ log " EMAIL_NOTIFICATION: $EMAIL_NOTIFICATION"
 log " HOME: $HOME"
 log " GIT_REPO_HOME: $GIT_REPO_HOME"
 log " CLUSTER_NAME: $CLUSTER_NAME"
-log " OPENSHIFT_USER: $OPENSHIFT_USER"
+log " OCP_USERNAME: $OCP_USERNAME"
 log " OPENSHIFT_PULL_SECRET_FILE_PATH: $OPENSHIFT_PULL_SECRET_FILE_PATH"
 log " MASTER_NODE_COUNT: $MASTER_NODE_COUNT"
 log " WORKER_NODE_COUNT: $WORKER_NODE_COUNT"
