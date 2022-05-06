@@ -124,8 +124,9 @@ fi
 log "==== OCP cluster configuration (Cert Manager and SBO) started ===="
 cd $GIT_REPO_HOME/../ibm/mas_devops/playbooks
 set +e
-export ROLE_NAME=ocp_setup_mas_deps
-ansible-playbook run_role.yml
+export ROLE_NAME=ocp_setup_ibm_catalogs && ansible-playbook ibm.mas_devops.run_role
+export ROLE_NAME=ocp_setup_common_services && ansible-playbook ibm.mas_devops.run_role
+export ROLE_NAME=ocp_setup_mas_deps && ansible-playbook ibm.mas_devops.run_role
 if [[ $? -ne 0 ]]; then
   # One reason for this failure is catalog sources not having required state information, so recreate the catalog-operator pod
   # https://bugzilla.redhat.com/show_bug.cgi?id=1807128
@@ -135,8 +136,7 @@ if [[ $? -ne 0 ]]; then
   oc delete pod $podname -n openshift-operator-lifecycle-manager
   sleep 10
   # Retry the step
-  export ROLE_NAME=ocp_setup_mas_deps
-  ansible-playbook run_role.yml
+  export ROLE_NAME=ocp_setup_mas_deps && ansible-playbook ibm.mas_devops.run_role
   retcode=$?
   if [[ $retcode -ne 0 ]]; then
     log "Failed while configuring OCP cluster"
@@ -148,8 +148,7 @@ log "==== OCP cluster configuration (Cert Manager and SBO) completed ===="
 
 ## Deploy MongoDB
 log "==== MongoDB deployment started ===="
-export ROLE_NAME=mongodb
-ansible-playbook run_role.yml
+export ROLE_NAME=mongodb && ansible-playbook ibm.mas_devops.run_role
 log "==== MongoDB deployment completed ===="
 
 ## Copying the entitlement.lic to MAS_CONFIG_DIR
@@ -164,16 +163,13 @@ cp $GIT_REPO_HOME/entitlement.lic $MAS_CONFIG_DIR
 if [[ (-z $SLS_ENDPOINT_URL) || (-z $SLS_REGISTRATION_KEY) || (-z $SLS_PUB_CERT_URL) ]]; then
   ## Deploy SLS
   log "==== SLS deployment started ===="
-  export ROLE_NAME=sls_install
-  ansible-playbook run_role.yml
-  export ROLE_NAME=gencfg_sls
-  ansible-playbook run_role.yml
+  export ROLE_NAME=sls_install && ansible-playbook ibm.mas_devops.run_role
+  export ROLE_NAME=gencfg_sls && ansible-playbook ibm.mas_devops.run_role
   log "==== SLS deployment completed ===="
 
 else
   log "=== Using Existing SLS Deployment ==="
-  export ROLE_NAME=gencfg_sls
-  ansible-playbook run_role.yml
+  export ROLE_NAME=gencfg_sls && ansible-playbook ibm.mas_devops.run_role
   log "=== Generated SLS Config YAML ==="
 fi
 
@@ -181,69 +177,53 @@ fi
 if [[ (-z $UDS_API_KEY) || (-z $UDS_ENDPOINT_URL) || (-z $UDS_PUB_CERT_URL) ]]; then
   # Deploy UDS
   log "==== UDS deployment started ===="
-  export ROLE_NAME=uds_install
-  ansible-playbook run_role.yml
-  export ROLE_NAME=gencfg_uds
-  ansible-playbook run_role.yml
+  export ROLE_NAME=uds_install && ansible-playbook ibm.mas_devops.run_role
+  export ROLE_NAME=gencfg_uds && ansible-playbook ibm.mas_devops.run_role
   log "==== UDS deployment completed ===="
 
 else
   log "=== Using Existing UDS Deployment ==="
-  export ROLE_NAME=gencfg_uds
-  ansible-playbook run_role.yml
+  export ROLE_NAME=gencfg_uds && ansible-playbook ibm.mas_devops.run_role
   log "=== Generated UDS Config YAML ==="
 fi
 
 # Deploy CP4D
 if [[ $DEPLOY_CP4D == "true" ]]; then
   log "==== CP4D deployment started ===="
-  export ROLE_NAME=cp4d_install
-  ansible-playbook run_role.yml
-
-  export ROLE_NAME=cp4d_install_services
-  ansible-playbook run_role.yml
-
-  export ROLE_NAME=cp4d_db2wh
-  ansible-playbook run_role.yml
+  export ROLE_NAME=cp4d_install && ansible-playbook ibm.mas_devops.run_role
+  export ROLE_NAME=cp4d_install_services && ansible-playbook ibm.mas_devops.run_role
+  export ROLE_NAME=cp4d_db2wh && ansible-playbook ibm.mas_devops.run_role
   log "==== CP4D deployment completed ===="
 fi
 
 ## Create MAS Workspace
 log "==== MAS Workspace generation started ===="
-export ROLE_NAME=gencfg_workspace
-ansible-playbook run_role.yml
+export ROLE_NAME=gencfg_workspace && ansible-playbook ibm.mas_devops.run_role
 log "==== MAS Workspace generation completed ===="
 
 if [[ $DEPLOY_MANAGE == "true" ]]; then
   log "==== Configure JDBC  started ===="
-  export ROLE_NAME=gencfg_jdbc
-  ansible-playbook run_role.yml
+  export ROLE_NAME=gencfg_jdbc && ansible-playbook ibm.mas_devops.run_role
   log "==== Configure JDBC completed ===="
 fi
 
 ## Deploy MAS
 log "==== MAS deployment started ===="
-export ROLE_NAME=suite_dns
-ansible-playbook run_role.yml
-export ROLE_NAME=suite_install
-ansible-playbook run_role.yml
-export ROLE_NAME=suite_config
-ansible-playbook run_role.yml
-export ROLE_NAME=suite_verify
-ansible-playbook run_role.yml
+export ROLE_NAME=suite_dns && ansible-playbook ibm.mas_devops.run_role
+export ROLE_NAME=suite_install && ansible-playbook ibm.mas_devops.run_role
+export ROLE_NAME=suite_config && ansible-playbook ibm.mas_devops.run_role
+export ROLE_NAME=suite_verify && ansible-playbook ibm.mas_devops.run_role
 log "==== MAS deployment completed ===="
 
 ## Deploy Manage
 if [[ $DEPLOY_MANAGE == "true" ]]; then
   # Deploy Manage
   log "==== MAS Manage deployment started ===="
-  export ROLE_NAME=suite_app_install
-  ansible-playbook run_role.yml
+  export ROLE_NAME=suite_app_install && ansible-playbook ibm.mas_devops.run_role
   log "==== MAS Manage deployment completed ===="
 
   # Configure app to use the DB
   log "==== MAS Manage configure app started ===="
-  export ROLE_NAME=suite_app_configure
-  ansible-playbook run_role.yml
+  export ROLE_NAME=suite_app_configure && ansible-playbook ibm.mas_devops.run_role
   log "==== MAS Manage configure app completed ===="
 fi

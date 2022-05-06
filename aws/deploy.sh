@@ -217,6 +217,8 @@ oc set data secret/pull-secret -n openshift-config --from-file=/tmp/.dockerconfi
 log "==== OCP cluster configuration (Cert Manager and SBO) started ===="
 cd $GIT_REPO_HOME/../ibm/mas_devops/playbooks
 set +e
+export ROLE_NAME=ocp_setup_ibm_catalogs && ansible-playbook ibm.mas_devops.run_role
+export ROLE_NAME=ocp_setup_common_services && ansible-playbook ibm.mas_devops.run_role
 export ROLE_NAME=ocp_setup_mas_deps && ansible-playbook ibm.mas_devops.run_role
 if [[ $? -ne 0 ]]; then
   # One reason for this failure is catalog sources not having required state information, so recreate the catalog-operator pod
