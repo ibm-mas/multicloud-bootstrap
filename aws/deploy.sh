@@ -286,7 +286,7 @@ fi
 if [[ $DEPLOY_CP4D == "true" ]]; then
   log "==== CP4D deployment started ===="
   export ROLE_NAME=cp4d_install && ansible-playbook ibm.mas_devops.run_role
-  export ROLE_NAME=cp4d_install_services && ansible-playbook ibm.mas_devops.run_role --extra-vars "cpd_services=[db2wh, dmc]"
+  export ROLE_NAME=cp4d_install_services && ansible-playbook ibm.mas_devops.run_role --extra-vars='{"cpd_services": [db2wh, dmc]}'
   export ROLE_NAME=cp4d_db2wh && ansible-playbook ibm.mas_devops.run_role
   log "==== CP4D deployment completed ===="
 fi
