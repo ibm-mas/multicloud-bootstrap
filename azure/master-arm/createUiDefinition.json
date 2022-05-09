@@ -12,22 +12,21 @@
                 "name": "offeringType",
                 "type": "Microsoft.Common.DropDown",
                 "label": "Offering type",
-                "defaultValue": "MAS Core + CP4D",
+                "defaultValue": "MAS Core + Cloud Pak for Data",
                 "toolTip": "Type of MAS offering.",
                 "constraints": {
                     "allowedValues": [
                         {
-                            "label": "MAS Core + CP4D",
-                            "value": "MAS Core + CP4D"
+                            "label": "MAS Core + Cloud Pak for Data",
+                            "value": "MAS Core + Cloud Pak for Data"
                         },
                         {
-                            "label": "MAS Core + Manage (no CP4D)",
-                            "value": "MAS Core + Manage (no CP4D)"
+                            "label": "MAS Core + Manage (no Cloud Pak for Data)",
+                            "value": "MAS Core + Manage (no Cloud Pak for Data)"
                         }
                     ],
                     "required": true
                 },
-                "options": {},
                 "visible": true
             },
             {
@@ -35,10 +34,24 @@
                 "type": "Microsoft.Common.TextBox",
                 "label": "Public domain",
                 "defaultValue": "",
-                "toolTip": "Public hosted zone to use. e.g. mas4aws.myorg.com (Applicable only if a new OCP cluster is being created)",
-                "constraints": {},
-                "options": {
-                    "required": true
+                "toolTip": "Public hosted zone to use. e.g. mydomain.myorg.com (Applicable only if a new OCP cluster is being created)",
+                "constraints": {
+                    "required": true,
+                    "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
+                    "validationMessage": "Contain letters, numbers and special characters only."
+                },
+                "visible": true
+            },
+            {
+                "name": "publicDomainResourceGroup",
+                "type": "Microsoft.Common.TextBox",
+                "label": "Public domain resource group",
+                "defaultValue": "",
+                "toolTip": "Provide the name of the resource group where public App Service domain is created (Applicable only if a new OCP cluster is being created)",
+                "constraints": {
+                    "required": true,
+                    "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
+                    "validationMessage": "Contain letters, numbers and special characters only."
                 },
                 "visible": true
             },
@@ -48,9 +61,10 @@
                 "label": "Bootnode NSG Ingress CIDR IP range",
                 "defaultValue": "",
                 "toolTip": "Please set CIDR to x.x.x.x/32 to allow one specific IP address access, 0.0.0.0/0 to allow all IP addresses access, or another CIDR range to access Bootnode over SSH.",
-                "constraints": {},
-                "options": {
-                    "required": true
+                "constraints": {
+                    "required": true,
+                    "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
+                    "validationMessage": "Contain letters, numbers and special characters only."
                 },
                 "visible": true
             },
@@ -58,7 +72,7 @@
                 "name": "clusterSize",
                 "type": "Microsoft.Common.DropDown",
                 "label": "Cluster size",
-                "defaultValue": "MAS Core + CP4D",
+                "defaultValue": "small",
                 "toolTip": "OCP cluster size. (small-3M,3W,3S medium-3M,5W,3S large-5M,7W,3S) (M-m5.2xlarge W-m5.4xlarge S-m5.4xlarge)",
                 "constraints": {
                     "allowedValues": [
@@ -75,32 +89,80 @@
                             "value": "large"
                         }
                     ],
-                    "required": true
+                    "required": true                
                 },
-                "options": {},
+                "visible": true
+            },
+            {
+                "name": "openShiftClusterApiUrl",
+                "type": "Microsoft.Common.TextBox",
+                "label": "OpenShift cluster API URL",
+                "defaultValue": "",
+                "toolTip": "Existing OCP cluster URL in the format https://api.[clustername].[domain]. Do not specify port number, 6443 will be used. e.g. https://api.masocp-joalae.mydomain.myorg.com",
+                "constraints": {
+                    "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
+                    "validationMessage": "Contain letters, numbers and special characters only."
+                },
+                "visible": true
+            },
+            {
+                "name": "openShiftUser",
+                "type": "Microsoft.Common.TextBox",
+                "label": "OpenShift user",
+                "defaultValue": "",
+                "toolTip": "Username to access existing OCP cluster.",
+                "constraints": {
+                    "required": "[not(empty(basics('openShiftClusterApiUrl')))]",
+                    "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
+                    "validationMessage": "Contain letters, numbers and special characters only."
+                },
+                "visible": true
+            },
+            {
+                "name": "openShiftPwd",
+                "type": "Microsoft.Common.PasswordBox",
+                "label": {
+                    "password": "Openshift password",
+                    "confirmPassword": "Confirm Openshift password"
+                },
+                "toolTip": "Password to access existing OCP cluster.",
+                "options": {
+                    "hideConfirmation": true
+                },
+                "constraints": {
+                    "required": "[not(empty(basics('openShiftClusterApiUrl')))]"
+                },
                 "visible": true
             },
             {
                 "name": "entitledRegistryKey",
-                "type": "Microsoft.Common.TextBox",
-                "label": "Entitled registry key",
-                "defaultValue": "",
+                "type": "Microsoft.Common.PasswordBox",
+                "label": {
+                    "password": "Entitled registry key",
+                    "confirmPassword": "Confirm Entitled registry key"
+                },
                 "toolTip": "Entitled registry key.",
-                "constraints": {},
-                "options": {
+                "constraints": {
                     "required": true
+                },
+                "options": {
+                    "hideConfirmation": true
                 },
                 "visible": true
             },
             {
                 "name": "openShiftPullSecret",
-                "type": "Microsoft.Common.TextBox",
-                "label": "OpenShift pull secret",
-                "defaultValue": "",
+                "type": "Microsoft.Common.PasswordBox",
+                "label": {
+                    "password": "OpenShift pull secret",
+                    "confirmPassword": "Confirm OpenShift pull secret"
+                },
                 "toolTip": "OpenShift Pull secret to download operator images. JSON string can be pasted as is.",
-                "constraints": {},
-                "options": {
+                "constraints": {
                     "required": true
+                },
+                "options": {
+                    "hideConfirmation": true
                 },
                 "visible": true
             },
@@ -110,9 +172,10 @@
                 "label": "MAS license URL",
                 "defaultValue": "",
                 "toolTip": "Blob SAS Url URL of MAS license file. e.g. https://masocpstgaccount.blob.core.windows.net/masocpcontainer/entitlement.lic?<blob-sas-token> (Applicable only for BYOL product)",
-                "constraints": {},
-                "options": {
-                    "required": true
+                "constraints": {
+                    "required": true,
+                    "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
+                    "validationMessage": "Contain letters, numbers and special characters only."
                 },
                 "visible": true
             },
@@ -122,21 +185,25 @@
                 "label": "MAS Manage DB user",
                 "defaultValue": "",
                 "toolTip": "User name for the database to be configured with MAS Manage app. (Applicable only if OfferingType is 'MAS Core + Manage') e.g. db2inst1",
-                "constraints": {},
-                "options": {
-                    "required": false
+                "constraints": {
+                    "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
+                    "validationMessage": "Contain letters, numbers and special characters only."
                 },
                 "visible": true
             },
             {
                 "name": "masManageDBPassword",
-                "type": "Microsoft.Common.TextBox",
-                "label": "MAS Manage DB password",
-                "defaultValue": "",
+                "type": "Microsoft.Common.PasswordBox",
+                "label": {
+                    "password": "MAS manage DB password",
+                    "confirmPassword": "Confirm MAS manage DB password"
+                },
                 "toolTip": "Password for the database to be configured with MAS Manage app. (Applicable only if OfferingType is 'MAS Core + Manage')",
-                "constraints": {},
                 "options": {
-                    "required": false
+                    "hideConfirmation": true
+                },
+                "constraints": {
+                    "required": "[not(empty(basics('masManageDBUser')))]"
                 },
                 "visible": true
             },
@@ -146,9 +213,10 @@
                 "label": "MAS Manage DB JDBC URL",
                 "defaultValue": "",
                 "toolTip": "JDBC URL for the database to be configured with MAS Manage app. (Applicable only if OfferingType is 'MAS Core + Manage') e.g. jdbc:db2://1.2.3.4:50051/FTMDB:sslConnection=true;",
-                "constraints": {},
-                "options": {
-                    "required": false
+                "constraints": {
+                    "required": "[not(empty(basics('masManageDBUser')))]",
+                    "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
+                    "validationMessage": "Contain letters, numbers and special characters only."
                 },
                 "visible": true
             },
@@ -158,9 +226,10 @@
                 "label": "MAS Manage DB certificate URL",
                 "defaultValue": "",
                 "toolTip": "HTTP or S3 URL of database public certificate file. (Applicable only if OfferingType is 'MAS Core + Manage') e.g. s3://masocp-license/db-certificate.crt",
-                "constraints": {},
-                "options": {
-                    "required": false
+                "constraints": {
+                    "required": "[not(empty(basics('masManageDBUser')))]",
+                    "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
+                    "validationMessage": "Contain letters, numbers and special characters only."
                 },
                 "visible": true
             },
@@ -181,9 +250,8 @@
                             "value": "false"
                         }
                     ],
-                    "required": false
+                    "required": true               
                 },
-                "options": {},
                 "visible": true
             },
             {
@@ -192,9 +260,10 @@
                 "label": "SSH public key",
                 "defaultValue": "",
                 "toolTip": "Specifies the SSH rsa public key file as a string. Use \"ssh-keygen -t rsa -b 2048\" to generate your SSH key pairs.",
-                "constraints": {},
-                "options": {
-                    "required": true
+                "constraints": {
+                    "required": true,
+                    "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
+                    "validationMessage": "Contain letters, numbers and special characters only."
                 },
                 "visible": true
             },
@@ -204,9 +273,9 @@
                 "label": "SLS endpoint URL",
                 "defaultValue": "",
                 "toolTip": "SLS endpoint URL. Must be accessible to the deployment. It can be retrieved from the OCP route named 'sls-*' in the namespace where SLS is deployed.",
-                "constraints": {},
-                "options": {
-                    "required": false
+                "constraints": {
+                    "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
+                    "validationMessage": "Contain letters, numbers and special characters only."
                 },
                 "visible": true
             },
@@ -216,9 +285,10 @@
                 "label": "SLS registration key",
                 "defaultValue": "",
                 "toolTip": "SLS registration key, normally available as a key 'status.registrationKey' in 'License Service' instance YAML in the SLS deployed namespace.",
-                "constraints": {},
-                "options": {
-                    "required": false
+                "constraints": {
+                    "required": "[not(empty(basics('slsEndpointUrl')))]",
+                    "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
+                    "validationMessage": "Contain letters, numbers and special characters only."
                 },
                 "visible": true
             },
@@ -228,87 +298,205 @@
                 "label": "SLS public certificate URL",
                 "defaultValue": "",
                 "toolTip": "Blob SAS Url URL of SLS public certificate file. e.g. https://masocpstgaccount.blob.core.windows.net/masocpcontainer/sls.crt?<blob-sas-token>",
-                "constraints": {},
-                "options": {
-                    "required": false
+                "constraints": {
+                    "required": "[not(empty(basics('slsEndpointUrl')))]",
+                    "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
+                    "validationMessage": "Contain letters, numbers and special characters only."
                 },
                 "visible": true
             },
             {
-                "name": "basEndpointUrl",
+                "name": "udsEndpointUrl",
                 "type": "Microsoft.Common.TextBox",
-                "label": "BAS endpoint URL",
+                "label": "UDS endpoint URL",
                 "defaultValue": "",
-                "toolTip": "BAS endpoint URL. Must be accessible to the deployment. It can be retrieved from the OCP route named 'bas-endpoint' in the namespace where BAS is deployed.",
-                "constraints": {},
-                "options": {
-                    "required": false
+                "toolTip": "UDS endpoint URL. Must be accessible to the deployment. It can be retrieved from the OCP route named 'uds-endpoint' in the namespace where UDS is deployed.",
+                "constraints": {
+                    "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
+                    "validationMessage": "Contain letters, numbers and special characters only."
                 },
                 "visible": true
             },
             {
-                "name": "basAPIKey",
+                "name": "udsAPIKey",
                 "type": "Microsoft.Common.TextBox",
-                "label": "BAS API key",
+                "label": "UDS API key",
                 "defaultValue": "",
-                "toolTip": "BAS API key, normally available in OCP secret 'bas-api-key' in the BAS deployed namespace.",
-                "constraints": {},
-                "options": {
-                    "required": false
+                "toolTip": "UDS API key, normally available in OCP secret 'uds-api-key' in the UDS deployed namespace.",
+                "constraints": {
+                    "required": "[not(empty(basics('udsEndpointUrl')))]",
+                    "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
+                    "validationMessage": "Contain letters, numbers and special characters only."
                 },
                 "visible": true
             },
             {
-                "name": "basPublicCertificateUrl",
+                "name": "udsPublicCertificateUrl",
                 "type": "Microsoft.Common.TextBox",
-                "label": "BAS public certificate URL",
+                "label": "UDS public certificate URL",
                 "defaultValue": "",
-                "toolTip": "Blob SAS Url URL of BAS public certificate file. e.g. https://masocpstgaccount.blob.core.windows.net/masocpcontainer/bas.crt?<blob-sas-token>",
-                "constraints": {},
-                "options": {
-                    "required": false
+                "toolTip": "Blob SAS Url URL of UDS public certificate file. e.g. https://masocpstgaccount.blob.core.windows.net/masocpcontainer/uds.crt?<blob-sas-token>",
+                "constraints": {
+                    "required": "[not(empty(basics('udsEndpointUrl')))]",
+                    "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
+                    "validationMessage": "Contain letters, numbers and special characters only."
                 },
                 "visible": true
             },
             {
-                "name": "openshiftClusterApiUrl",
+                "name": "azureServicePrincipalClientId",
                 "type": "Microsoft.Common.TextBox",
-                "label": "OpenShift cluster API URL",
+                "label": "Azure service principal client Id",
                 "defaultValue": "",
-                "toolTip": "Existing OCP cluster URL in the format https://api.[clustername].[domain]. Do not specify port number, 6443 will be used. e.g. https://api.masocp-joalae.mas4aws.com",
-                "constraints": {},
-                "options": {
+                "toolTip": "Azure service principal client Id.",
+                "constraints": {
+                    "required": true,
+                    "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
+                    "validationMessage": "Contain letters, numbers and special characters only."
+                },
+                "visible": true
+            },
+            {
+                "name": "azureServicePrincipalClientSecret",
+                "type": "Microsoft.Common.PasswordBox",
+                "label": {
+                    "password": "Azure service principal client secret",
+                    "confirmPassword": "Confirm Azure service principal client secret"
+                },
+                "toolTip": "Azure service principal client secret.",
+                "constraints": {
                     "required": true
                 },
-                "visible": true
-            },
-            {
-                "name": "openShiftUser",
-                "type": "Microsoft.Common.TextBox",
-                "label": "OpenShift user",
-                "defaultValue": "",
-                "toolTip": "Username to access existing OCP cluster.",
-                "constraints": {},
                 "options": {
-                    "required": true
+                    "hideConfirmation": true
                 },
                 "visible": true
             },
             {
-                "name": "openShiftPassword",
+                "name": "emailNotification",
+                "type": "Microsoft.Common.DropDown",
+                "label": "Email Notification",
+                "defaultValue": "false",
+                "toolTip": "Indicate whether you want to receive emails that contain the connection details and credentials for the Suite.",
+                "constraints": {
+                    "allowedValues": [
+                        {
+                            "label": "true",
+                            "value": "true"
+                        },
+                        {
+                            "label": "false",
+                            "value": "false"
+                        }
+                    ],
+                    "required": true                
+                },
+                "visible": true
+            },
+            {
+                "name": "smtpHost",
                 "type": "Microsoft.Common.TextBox",
-                "label": "OpenShift password",
+                "label": "SMTP host",
                 "defaultValue": "",
-                "toolTip": "Password to access existing OCP cluster.",
-                "constraints": {},
+                "toolTip": "Hostname of IP address of the SMTP server.",
+                "constraints": {
+                    "required": "[equals('true', basics('emailNotification'))]",
+                    "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
+                    "validationMessage": "Contain letters, numbers and special characters only."
+                },
+                "visible": true
+            },
+            {
+                "name": "smtpPort",
+                "type": "Microsoft.Common.TextBox",
+                "label": "SMTP port",
+                "defaultValue": "",
+                "toolTip": "Port of the SMTP server.",
+                "constraints": {
+                    "required": "[equals('true', basics('emailNotification'))]",
+                    "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
+                    "validationMessage": "Contain letters, numbers and special characters only."
+                },
+                "visible": true
+            },
+            {
+                "name": "smtpUsername",
+                "type": "Microsoft.Common.TextBox",
+                "label": "SMTP username",
+                "defaultValue": "",
+                "toolTip": "Username to be used with SMTP server.",
+                "constraints": {
+                    "required": "[equals('true', basics('emailNotification'))]",
+                    "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
+                    "validationMessage": "Contain letters, numbers and special characters only."
+                },
+                "visible": true
+            },
+            {
+                "name": "smtpPassword",
+                "type": "Microsoft.Common.PasswordBox",
+                "label": {
+                    "password": "SMTP password",
+                    "confirmPassword": "Confirm SMTP password"
+                },
+                "toolTip": "Password to be used with SMTP server.",
                 "options": {
-                    "required": true
+                    "hideConfirmation": true
+                },
+                "constraints": {
+                    "required": "[equals('true', basics('emailNotification'))]"
+                },
+                "visible": true
+            },
+            {
+                "name": "notificattionEmailAddress",
+                "type": "Microsoft.Common.TextBox",
+                "label": "Notification Email Address",
+                "defaultValue": "",
+                "toolTip": "Email address to send email to. If empty, no email will be sent.",
+                "constraints": {
+                    "required": "[equals('true', basics('emailNotification'))]",
+                    "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
+                    "validationMessage": "Contain letters, numbers and special characters only."
                 },
                 "visible": true
             }
         ],
         "steps": [],
-        "outputs": {},
-        "resourceTypes": []
+        "outputs": {
+            "location": "[location()]",
+            "offeringType": "[basics('offeringType')]",
+            "publicDomain": "[basics('publicDomain')]",
+            "publicDomainResourceGroup": "[basics('publicDomainResourceGroup')]",
+            "bootnodeSGIngressCidrIp": "[basics('bootnodeSGIngressCidrIp')]",
+            "clusterSize": "[basics('clusterSize')]",
+            "openShiftClusterApiUrl": "[basics('openShiftClusterApiUrl')]",
+            "openShiftUser": "[basics('openShiftUser')]",
+            "openShiftPwd": "[basics('openShiftPwd')]",
+            "entitledRegistryKey": "[basics('entitledRegistryKey')]",
+            "openShiftPullSecret": "[basics('openShiftPullSecret')]",
+            "masLicenseUrl": "[basics('masLicenseUrl')]",
+            "masManageDBUser": "[basics('masManageDBUser')]",
+            "masManageDBPassword": "[basics('masManageDBPassword')]",
+            "masManageDBJdbcUrl": "[basics('masManageDBJdbcUrl')]",
+            "masManageDBCertificateUrl": "[basics('masManageDBCertificateUrl')]",
+            "importDemoData": "[basics('importDemoData')]",
+            "sshPublicKey": "[basics('sshPublicKey')]",
+            "slsEndpointUrl": "[basics('slsEndpointUrl')]",
+            "slsRegistrationKey": "[basics('slsRegistrationKey')]",
+            "slsPublicCertificateUrl": "[basics('slsPublicCertificateUrl')]",
+            "udsEndpointUrl": "[basics('udsEndpointUrl')]",
+            "udsAPIKey": "[basics('udsAPIKey')]",
+            "udsPublicCertificateUrl": "[basics('udsPublicCertificateUrl')]",
+            "azureServicePrincipalClientId": "[basics('azureServicePrincipalClientId')]",
+            "azureServicePrincipalClientSecret": "[basics('azureServicePrincipalClientSecret')]",
+            "emailNotification": "[basics('emailNotification')]",
+            "smtpHost": "[basics('smtpHost')]",
+            "smtpPort": "[basics('smtpPort')]",
+            "smtpUsername": "[basics('smtpUsername')]",
+            "smtpPassword": "[basics('smtpPassword')]",
+            "notificattionEmailAddress": "[basics('notificattionEmailAddress')]"
+            
+        }
     }
 }

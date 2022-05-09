@@ -26,6 +26,20 @@ if [[ $STATUS == "SUCCESS" ]]; then
   log " MAS_PASSWORD=$MAS_PASSWORD"
 fi
 
+# Process recepient list
+if [[ -n $RECEPIENT ]]; then
+	for i in $(echo "$RECEPIENT" | tr "," "\n")
+	do
+	  echo $i
+	  if [[ $emaillist == "" ]]; then
+		emaillist="'$i'"
+	  else
+		emaillist="${emaillist},'$i'"
+	  fi
+	done
+fi
+echo "Email list = $emaillist"
+
 sed -i "s/\[SMTP-HOST\]/$SMTP_HOST/g" $SCRIPT_FILE
 sed -i "s/\[SMTP-PORT\]/$SMTP_PORT/g" $SCRIPT_FILE
 sed -i "s/\[SMTP-USERNAME\]/$SMTP_USERNAME/g" $SCRIPT_FILE
