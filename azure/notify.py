@@ -8,7 +8,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
 subject_details = "MAS Provisioning Notification (contains an attachment)"
-body_details = "[MESSAGE-TEXT]\n\nMAS provisioning status: [STATUS]\nRegion: [REGION]\nUnique String: [UNIQ-STR]\nOpenShift Cluster URL: [OPENSHIFT-CLUSTER-CONSOLE-URL]\nOpenShift API URL: [OPENSHIFT-CLUSTER-API-URL]\nOpenShift User: [OCP-USER]\nSLS Endpoint URL:\nBAS Endpoint URL: \nMAS Initial Setup URL: [MAS-URL-INIT-SETUP]\nMAS Admin URL: [MAS-URL-ADMIN]\nMAS Workspace URL: [MAS-URL-WORKSPACE]\n"
+body_details = "[MESSAGE-TEXT]\n\nMAS provisioning status: [STATUS]#[STATUS-MESSAGE]\nRegion: [REGION]\nUnique String: [UNIQ-STR]\nOpenShift Cluster URL: [OPENSHIFT-CLUSTER-CONSOLE-URL]\nOpenShift API URL: [OPENSHIFT-CLUSTER-API-URL]\nOpenShift User: [OCP-USER]\nSLS Endpoint URL:\nBAS Endpoint URL: \nMAS Initial Setup URL: [MAS-URL-INIT-SETUP]\nMAS Admin URL: [MAS-URL-ADMIN]\nMAS Workspace URL: [MAS-URL-WORKSPACE]\n"
 subject_creds = "MAS Provisioning Notification (contains credentials)"
 body_creds = "MAS provisioning status: [STATUS]\nRegion: [REGION]\nUnique String: [UNIQ-STR]\nOpenShift Password: [OCP-PASSWORD]\nMAS Password: [MAS-PASSWORD]"
 sender_email = "noreply@maximo.ibm.com"
