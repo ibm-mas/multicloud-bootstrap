@@ -17,7 +17,8 @@ IAM_USER_NAME="masocp-user-${RANDOM_STR}"
 # SLS variables
 export SLS_STORAGE_CLASS=gp2
 # CP4D variables
-export CPD_METADB_BLOCK_STORAGE_CLASS=gp2
+export CPD_METADATA_STORAGE_CLASS=gp2
+export CPD_SERVICE_STORAGE_CLASS="ocs-storagecluster-cephfs"
 
 # Retrieve SSH public key
 TOKEN=$(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
@@ -217,9 +218,10 @@ oc set data secret/pull-secret -n openshift-config --from-file=/tmp/.dockerconfi
 log "==== OCP cluster configuration (Cert Manager and SBO) started ===="
 cd $GIT_REPO_HOME/../ibm/mas_devops/playbooks
 set +e
-export ROLE_NAME=ocp_setup_ibm_catalogs && ansible-playbook ibm.mas_devops.run_role
-export ROLE_NAME=ocp_setup_common_services && ansible-playbook ibm.mas_devops.run_role
-export ROLE_NAME=ocp_setup_mas_deps && ansible-playbook ibm.mas_devops.run_role
+export ROLE_NAME=ibm_catalogs && ansible-playbook ibm.mas_devops.run_role
+export ROLE_NAME=common_services && ansible-playbook ibm.mas_devops.run_role
+export ROLE_NAME=cert_manager && ansible-playbook ibm.mas_devops.run_role
+export ROLE_NAME=sbo && ansible-playbook ibm.mas_devops.run_role
 if [[ $? -ne 0 ]]; then
   # One reason for this failure is catalog sources not having required state information, so recreate the catalog-operator pod
   # https://bugzilla.redhat.com/show_bug.cgi?id=1807128
@@ -229,7 +231,10 @@ if [[ $? -ne 0 ]]; then
   oc delete pod $podname -n openshift-operator-lifecycle-manager
   sleep 10
   # Retry the step
-  export ROLE_NAME=ocp_setup_mas_deps && ansible-playbook ibm.mas_devops.run_role
+  export ROLE_NAME=ibm_catalogs && ansible-playbook ibm.mas_devops.run_role
+  export ROLE_NAME=common_services && ansible-playbook ibm.mas_devops.run_role
+  export ROLE_NAME=cert_manager && ansible-playbook ibm.mas_devops.run_role
+  export ROLE_NAME=sbo && ansible-playbook ibm.mas_devops.run_role
   retcode=$?
   if [[ $retcode -ne 0 ]]; then
     log "Failed while configuring OCP cluster"
@@ -258,12 +263,11 @@ then
     # Deploy SLS
     log "==== SLS deployment started ===="
     export ROLE_NAME=sls && ansible-playbook ibm.mas_devops.run_role
-    export ROLE_NAME=gencfg_sls && ansible-playbook ibm.mas_devops.run_role
     log "==== SLS deployment completed ===="
 
 else
     log "=== Using Existing SLS Deployment ==="
-    export ROLE_NAME=gencfg_sls && ansible-playbook ibm.mas_devops.run_role
+    export ROLE_NAME=sls && ansible-playbook ibm.mas_devops.run_role
     log "=== Generated SLS Config YAML ==="
 fi
 
@@ -272,22 +276,20 @@ if [[ (-z $UDS_API_KEY) || (-z $UDS_ENDPOINT_URL) || (-z $UDS_PUB_CERT_URL) ]]
 then
     # Deploy UDS
     log "==== UDS deployment started ===="
-    export ROLE_NAME=uds_install && ansible-playbook ibm.mas_devops.run_role
-    export ROLE_NAME=gencfg_uds && ansible-playbook ibm.mas_devops.run_role
+    export ROLE_NAME=uds && ansible-playbook ibm.mas_devops.run_role
     log "==== UDS deployment completed ===="
 
 else
     log "=== Using Existing UDS Deployment ==="
-    export ROLE_NAME=gencfg_uds && ansible-playbook ibm.mas_devops.run_role
+    export ROLE_NAME=uds && ansible-playbook ibm.mas_devops.run_role
     log "=== Generated UDS Config YAML ==="
 fi
 
 ## Deploy CP4D
 if [[ $DEPLOY_CP4D == "true" ]]; then
   log "==== CP4D deployment started ===="
-  export ROLE_NAME=cp4d_install && ansible-playbook ibm.mas_devops.run_role
-  export ROLE_NAME=cp4d_install_services && ansible-playbook ibm.mas_devops.run_role --extra-vars='{"cpd_services": [db2wh, dmc]}'
-  export ROLE_NAME=cp4d_db2wh && ansible-playbook ibm.mas_devops.run_role
+  export ROLE_NAME=cp4d && ansible-playbook ibm.mas_devops.run_role
+  export ROLE_NAME=db2 && ansible-playbook ibm.mas_devops.run_role
   log "==== CP4D deployment completed ===="
 fi
 
@@ -343,6 +345,6 @@ if [[ $DEPLOY_MANAGE == "true" ]]; then
 
   # Configure app to use the DB
   log "==== MAS Manage configure app started ===="
-  export ROLE_NAME=suite_app_configure && ansible-playbook ibm.mas_devops.run_role
+  export ROLE_NAME=suite_app_config && ansible-playbook ibm.mas_devops.run_role
   log "==== MAS Manage configure app completed ===="
 fi

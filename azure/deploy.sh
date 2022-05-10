@@ -15,7 +15,8 @@ export SLS_STORAGE_CLASS=managed-premium
 # BAS variables
 export UDS_STORAGE_CLASS=managed-premium
 # CP4D variables
-export CPD_METADB_BLOCK_STORAGE_CLASS=managed-premium
+export CPD_METADATA_STORAGE_CLASS=managed-premium
+export CPD_SERVICE_STORAGE_CLASS=azurefiles-premium
 
 log "Below are Cloud specific deployment parameters,"
 log " MONGODB_STORAGE_CLASS: $MONGODB_STORAGE_CLASS"
@@ -196,8 +197,7 @@ fi
 # Deploy CP4D
 if [[ $DEPLOY_CP4D == "true" ]]; then
   log "==== CP4D deployment started ===="
-  export ROLE_NAME=cp4d_install && ansible-playbook ibm.mas_devops.run_role
-  export ROLE_NAME=cp4d_install_services && ansible-playbook ibm.mas_devops.run_role --extra-vars='{"cpd_services": [db2wh, dmc]}'
+  export ROLE_NAME=cp4d && ansible-playbook ibm.mas_devops.run_role
   export ROLE_NAME=db2 && ansible-playbook ibm.mas_devops.run_role
   log "==== CP4D deployment completed ===="
 fi
