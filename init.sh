@@ -133,8 +133,8 @@ export MAS_INSTANCE_ID="mas-${RANDOM_STR}"
 export MAS_CONFIG_DIR=/var/tmp/masconfigdir
 export MONGODB_NAMESPACE="mongoce-${RANDOM_STR}"
 # Amqstreams variables
-export KAFKA_NAMESPACE=amq-streams
-export KAFKA_CLUSTER_NAME=test
+export KAFKA_NAMESPACE="amq-streams-${RANDOM_STR}"
+export KAFKA_CLUSTER_NAME=maskafka
 export KAFKA_CLUSTER_SIZE=small
 export KAFKA_USER_NAME=masuser
 # SLS variables

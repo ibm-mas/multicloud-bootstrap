@@ -253,9 +253,9 @@ log "==== MongoDB deployment completed ===="
 cp $GIT_REPO_HOME/entitlement.lic $MAS_CONFIG_DIR
 
 ## Deploy Amqstreams
-# log "==== Amq streams deployment started ===="
-# ansible-playbook install-amqstream.yml
-# log "==== Amq streams deployment completed ===="
+log "==== Amq streams deployment started ===="
+export ROLE_NAME=amqstreams && ansible-playbook ibm.mas_devops.run_role
+log "==== Amq streams deployment completed ===="
 
 ## Deploy SLS
 if [[ (-z $SLSCFG_URL) || (-z $SLS_REGISTRATION_KEY) || (-z $SLS_PUB_CERT_URL) ]]
