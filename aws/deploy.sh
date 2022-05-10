@@ -254,7 +254,7 @@ cp $GIT_REPO_HOME/entitlement.lic $MAS_CONFIG_DIR
 
 ## Deploy Amqstreams
 log "==== Amq streams deployment started ===="
-export ROLE_NAME=amqstreams && ansible-playbook ibm.mas_devops.run_role
+export ROLE_NAME=kafka && ansible-playbook ibm.mas_devops.run_role
 log "==== Amq streams deployment completed ===="
 
 ## Deploy SLS
