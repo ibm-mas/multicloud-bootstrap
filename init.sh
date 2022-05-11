@@ -188,6 +188,7 @@ export MAS_APP_ID=manage
 export MAS_APPWS_JDBC_BINDING="workspace-application"
 export MAS_JDBC_CERT_LOCAL_FILE=$GIT_REPO_HOME/db.crt
 export MAS_CLOUD_AUTOMATION_VERSION=1.0
+export MAS_DEVOPS_COLLECTION_VERSION=10.0.0
 
 RESP_CODE=0
 
@@ -358,14 +359,12 @@ if [[ $PRE_VALIDATION == "pass" ]]; then
         ansible-galaxy collection install ibm-mas_devops-*.tar.gz
         echo "=== Ansible Collection built and installed locally Successfully ==="
   else
-        echo "=== Get the version from galaxy.yml ==="
-        cd $GIT_REPO_HOME/../ibm/mas_devops
-        export MAS_DEVOPS_COLLECTION_VERSION=$(grep -i '^version:' ./galaxy.yml | awk '{print $2}')
+        #echo "=== Get the version from galaxy.yml ==="
+        #cd $GIT_REPO_HOME/../ibm/mas_devops
         echo "MAS_DEVOPS_COLLECTION_VERSION=$MAS_DEVOPS_COLLECTION_VERSION"
         log "==== Installing Ansible Collection ===="
         ansible-galaxy collection install ibm.mas_devops:==${MAS_DEVOPS_COLLECTION_VERSION}
         log "==== Installed Ansible Collection Successfully ===="
-
   fi
 
   cd $GIT_REPO_HOME
