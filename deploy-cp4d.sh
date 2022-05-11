@@ -153,28 +153,42 @@ export MAS_WORKSPACE_ID="wsmasocp"
 export CPD_ENTITLEMENT_KEY=${ER_KEY}
 export CPD_VERSION=cpd40
 export MAS_CHANNEL=8.7.x
-export CPD_STORAGE_CLASS=ocs-storagecluster-cephfs
-export CPD_NAMESPACE="ibm-common-services"
+export CPD_PRIMARY_STORAGE_CLASS="ocs-storagecluster-cephfs"
+export CPD_OPERATORS_NAMESPACE="ibm-cpd-operators-${UNIQ_STR}"
+export CPD_INSTANCE_NAMESPACE="ibm-cpd-${UNIQ_STR}"
 export CPD_SERVICES_NAMESPACE="cpd-services-${UNIQ_STR}"
 
 # DB2WH variables
-export DB2WH_META_STORAGE_CLASS=ocs-storagecluster-cephfs
-export DB2WH_USER_STORAGE_CLASS=ocs-storagecluster-cephfs
-export DB2WH_BACKUP_STORAGE_CLASS=ocs-storagecluster-cephfs
-export DB2WH_LOGS_STORAGE_CLASS=ocs-storagecluster-cephfs
-export DB2WH_TEMP_STORAGE_CLASS=ocs-storagecluster-cephfs
-export DB2WH_INSTANCE_NAME=db2wh-db01
-export DB2WH_VERSION=11.5.7.0-cn1
+export DB2_META_STORAGE_CLASS=${CPD_PRIMARY_STORAGE_CLASS}
+export DB2_DATA_STORAGE_CLASS=${CPD_PRIMARY_STORAGE_CLASS}
+export DB2_BACKUP_STORAGE_CLASS=${CPD_PRIMARY_STORAGE_CLASS}
+export DB2_LOGS_STORAGE_CLASS=${CPD_PRIMARY_STORAGE_CLASS}
+export DB2_TEMP_STORAGE_CLASS=${CPD_PRIMARY_STORAGE_CLASS}
+export DB2_INSTANCE_NAME=db2wh-db01
+export DB2_VERSION=11.5.7.0-cn2
 
-export CPD_METADB_BLOCK_STORAGE_CLASS=gp2
+export ENTITLEMENT_KEY=${ER_KEY}
+export HOME=/root
+
+
+export CPD_METADATA_STORAGE_CLASS=gp2
+export CPD_SERVICE_STORAGE_CLASS=ocs-storagecluster-cephfs
 
 echo
-cd ${GIT_REPO_HOME}/ansible/playbooks
+echoBlue "==== Getting the version from galaxy.yml ===="
+# Assuming the current script file is in azure sub-directory
+cd $GIT_REPO_HOME/../../ibm/mas_devops
+export MAS_DEVOPS_COLLECTION_VERSION=$(grep -i '^version:' ./galaxy.yml | awk '{print $2}')
+echoBlue "MAS_DEVOPS_COLLECTION_VERSION=$MAS_DEVOPS_COLLECTION_VERSION"
+echoBlue "==== Installing Ansible Collection ===="
+ansible-galaxy collection install ibm.mas_devops:==${MAS_DEVOPS_COLLECTION_VERSION}
+echoBlue "==== Installed Ansible Collection Successfully ===="
 
 # Deploy CP4D
 echoBlue "====  CP4D deployment started    ===="
 echo
-ansible-playbook install-cp4d.yml
+export ROLE_NAME=cp4d && ansible-playbook ibm.mas_devops.run_role
+export ROLE_NAME=db2 && ansible-playbook ibm.mas_devops.run_role
 echo
 echoBlue "====  CP4D deployment completed  ===="
 echo
@@ -182,9 +196,11 @@ echo
 # Configure MAS to use CP4D
 echoBlue "==== MAS configuration started   ===="
 echo
-ansible-playbook configure-suite.yml
+export ROLE_NAME=suite_config && ansible-playbook ibm.mas_devops.run_role
+export ROLE_NAME=suite_verify && ansible-playbook ibm.mas_devops.run_role
 echo
 echoBlue "==== MAS configuration completed ===="
 echo
 echoBlue "==== Execution completed at `date` ====\n"
+echo
 echo
