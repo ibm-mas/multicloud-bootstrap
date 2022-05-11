@@ -174,15 +174,15 @@ export HOME=/root
 export CPD_METADATA_STORAGE_CLASS=gp2
 export CPD_SERVICE_STORAGE_CLASS=ocs-storagecluster-cephfs
 
-echo
-echoBlue "==== Getting the version from galaxy.yml ===="
-# Assuming the current script file is in azure sub-directory
-cd $GIT_REPO_HOME/../../ibm/mas_devops
-export MAS_DEVOPS_COLLECTION_VERSION=$(grep -i '^version:' ./galaxy.yml | awk '{print $2}')
-echoBlue "MAS_DEVOPS_COLLECTION_VERSION=$MAS_DEVOPS_COLLECTION_VERSION"
-echoBlue "==== Installing Ansible Collection ===="
-ansible-galaxy collection install ibm.mas_devops:==${MAS_DEVOPS_COLLECTION_VERSION}
-echoBlue "==== Installed Ansible Collection Successfully ===="
+# echo
+# echoBlue "==== Getting the version from galaxy.yml ===="
+# # Assuming the current script file is in azure sub-directory
+# cd $GIT_REPO_HOME/../../ibm/mas_devops
+# export MAS_DEVOPS_COLLECTION_VERSION=$(grep -i '^version:' ./galaxy.yml | awk '{print $2}')
+# echoBlue "MAS_DEVOPS_COLLECTION_VERSION=$MAS_DEVOPS_COLLECTION_VERSION"
+# echoBlue "==== Installing Ansible Collection ===="
+# ansible-galaxy collection install ibm.mas_devops:==${MAS_DEVOPS_COLLECTION_VERSION}
+# echoBlue "==== Installed Ansible Collection Successfully ===="
 
 # Deploy CP4D
 echoBlue "====  CP4D deployment started    ===="
