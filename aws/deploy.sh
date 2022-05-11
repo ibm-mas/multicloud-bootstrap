@@ -17,7 +17,8 @@ IAM_USER_NAME="masocp-user-${RANDOM_STR}"
 # SLS variables
 export SLS_STORAGE_CLASS=gp2
 # CP4D variables
-export CPD_METADB_BLOCK_STORAGE_CLASS=gp2
+export CPD_METADATA_STORAGE_CLASS=gp2
+export CPD_SERVICE_STORAGE_CLASS="ocs-storagecluster-cephfs"
 
 # Retrieve SSH public key
 TOKEN=$(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
@@ -217,7 +218,10 @@ oc set data secret/pull-secret -n openshift-config --from-file=/tmp/.dockerconfi
 log "==== OCP cluster configuration (Cert Manager and SBO) started ===="
 cd $GIT_REPO_HOME/../ibm/mas_devops/playbooks
 set +e
-ansible-playbook ocp/configure-ocp.yml
+export ROLE_NAME=ibm_catalogs && ansible-playbook ibm.mas_devops.run_role
+export ROLE_NAME=common_services && ansible-playbook ibm.mas_devops.run_role
+export ROLE_NAME=cert_manager && ansible-playbook ibm.mas_devops.run_role
+export ROLE_NAME=sbo && ansible-playbook ibm.mas_devops.run_role
 if [[ $? -ne 0 ]]; then
   # One reason for this failure is catalog sources not having required state information, so recreate the catalog-operator pod
   # https://bugzilla.redhat.com/show_bug.cgi?id=1807128
@@ -227,7 +231,10 @@ if [[ $? -ne 0 ]]; then
   oc delete pod $podname -n openshift-operator-lifecycle-manager
   sleep 10
   # Retry the step
-  ansible-playbook ocp/configure-ocp.yml
+  export ROLE_NAME=ibm_catalogs && ansible-playbook ibm.mas_devops.run_role
+  export ROLE_NAME=common_services && ansible-playbook ibm.mas_devops.run_role
+  export ROLE_NAME=cert_manager && ansible-playbook ibm.mas_devops.run_role
+  export ROLE_NAME=sbo && ansible-playbook ibm.mas_devops.run_role
   retcode=$?
   if [[ $retcode -ne 0 ]]; then
     log "Failed while configuring OCP cluster"
@@ -239,28 +246,28 @@ log "==== OCP cluster configuration (Cert Manager and SBO) completed ===="
 
 ## Deploy MongoDB
 log "==== MongoDB deployment started ===="
-ansible-playbook dependencies/install-mongodb-ce.yml
+export ROLE_NAME=mongodb && ansible-playbook ibm.mas_devops.run_role
 log "==== MongoDB deployment completed ===="
 
 ## Copying the entitlement.lic to MAS_CONFIG_DIR
 cp $GIT_REPO_HOME/entitlement.lic $MAS_CONFIG_DIR
 
 ## Deploy Amqstreams
-# log "==== Amq streams deployment started ===="
-# ansible-playbook install-amqstream.yml
-# log "==== Amq streams deployment completed ===="
+#log "==== Amq streams deployment started ===="
+#export ROLE_NAME=kafka && ansible-playbook ibm.mas_devops.run_role
+#log "==== Amq streams deployment completed ===="
 
 ## Deploy SLS
 if [[ (-z $SLSCFG_URL) || (-z $SLS_REGISTRATION_KEY) || (-z $SLS_PUB_CERT_URL) ]]
 then
     # Deploy SLS
     log "==== SLS deployment started ===="
-    ansible-playbook dependencies/install-sls.yml
+    export ROLE_NAME=sls && ansible-playbook ibm.mas_devops.run_role
     log "==== SLS deployment completed ===="
 
 else
     log "=== Using Existing SLS Deployment ==="
-    ansible-playbook dependencies/gencfg-sls.yml
+    export ROLE_NAME=sls && ansible-playbook ibm.mas_devops.run_role
     log "=== Generated SLS Config YAML ==="
 fi
 
@@ -269,31 +276,31 @@ if [[ (-z $UDS_API_KEY) || (-z $UDS_ENDPOINT_URL) || (-z $UDS_PUB_CERT_URL) ]]
 then
     # Deploy UDS
     log "==== UDS deployment started ===="
-    ansible-playbook dependencies/install-uds.yml
+    export ROLE_NAME=uds && ansible-playbook ibm.mas_devops.run_role
     log "==== UDS deployment completed ===="
 
 else
     log "=== Using Existing UDS Deployment ==="
-    ansible-playbook dependencies/gencfg-uds.yml
+    export ROLE_NAME=uds && ansible-playbook ibm.mas_devops.run_role
     log "=== Generated UDS Config YAML ==="
 fi
 
 ## Deploy CP4D
 if [[ $DEPLOY_CP4D == "true" ]]; then
   log "==== CP4D deployment started ===="
-  ansible-playbook cp4d/install-services-db2.yml
-  ansible-playbook cp4d/create-db2-instance.yml
+  export ROLE_NAME=cp4d && ansible-playbook ibm.mas_devops.run_role
+  export ROLE_NAME=db2 && ansible-playbook ibm.mas_devops.run_role
   log "==== CP4D deployment completed ===="
 fi
 
 ## Create MAS Workspace
 log "==== MAS Workspace generation started ===="
-ansible-playbook mas/gencfg-workspace.yml
+export ROLE_NAME=gencfg_workspace && ansible-playbook ibm.mas_devops.run_role
 log "==== MAS Workspace generation completed ===="
 
 if [[ $DEPLOY_MANAGE == "true" ]]; then
   log "==== Configure JDBC  started ===="
-  ansible-playbook mas/configure-suite-db.yml
+  export ROLE_NAME=gencfg_jdbc && ansible-playbook ibm.mas_devops.run_role
   log "==== Configure JDBC completed ===="
 fi
 
@@ -304,37 +311,44 @@ product_code_metadata="$(curl http://169.254.169.254/latest/meta-data/product-co
 
 if [[ -n "$product_code_metadata" ]];then
   log "Product Code: $product_code_metadata"
-  aws_product_codes_config_file="$GIT_REPO_HOME/aws/aws-product-codes.config"
-  log "Checking for product type corrosponding to $product_code_metadata from file $aws_product_codes_config_file"
-  if grep -E "^$product_code_metadata:" $aws_product_codes_config_file 1>/dev/null 2>&1;then
-    product_type="$(grep -E "^$product_code_metadata:" $aws_product_codes_config_file | cut -f 3 -d ":")"
-    if [[ $product_type == "byol" ]];then
-      export MAS_ANNOTATIONS="mas.ibm.com/hyperscalerProvider=aws,mas.ibm.com/hyperscalerFormat=byol,mas.ibm.com/hyperscalerChannel=ibm"
-    elif [[ $product_type == "privatepublic" ]];then
-      export MAS_ANNOTATIONS="mas.ibm.com/hyperscalerProvider=aws,mas.ibm.com/hyperscalerFormat=privatepublic,mas.ibm.com/hyperscalerChannel=aws"
+  if echo "$product_code_metadata" | grep -Ei '404\s+-\s+Not\s+Found' 1>/dev/null 2>&1; then
+     log "MAS product code not found in metadata, skipping custom annotations for Suite CR"
+  else
+    aws_product_codes_config_file="$GIT_REPO_HOME/aws/aws-product-codes.config"
+    log "Checking for product type corrosponding to $product_code_metadata from file $aws_product_codes_config_file"
+    if grep -E "^$product_code_metadata:" $aws_product_codes_config_file 1>/dev/null 2>&1;then
+      product_type="$(grep -E "^$product_code_metadata:" $aws_product_codes_config_file | cut -f 3 -d ":")"
+      if [[ $product_type == "byol" ]];then
+        export MAS_ANNOTATIONS="mas.ibm.com/hyperscalerProvider=aws,mas.ibm.com/hyperscalerFormat=byol,mas.ibm.com/hyperscalerChannel=ibm"
+      elif [[ $product_type == "privatepublic" ]];then
+        export MAS_ANNOTATIONS="mas.ibm.com/hyperscalerProvider=aws,mas.ibm.com/hyperscalerFormat=privatepublic,mas.ibm.com/hyperscalerChannel=aws"
+      else
+        log "Invalid product type : $product_type"
+        exit 28
+      fi
     else
-      log "Invalid product type : $product_type"
+      log "Product code not found in file $aws_product_codes_config_file"
       exit 28
     fi
-  else
-    log "Product code not found in file $aws_product_codes_config_file"
-    exit 28
   fi
 else
-  log "MAS product code not found, skipping custom annotations suite_install"
+  log "MAS product code not found, skipping custom annotations for Suite CR"
 fi
-ansible-playbook mas/install-suite.yml
+export ROLE_NAME=suite_dns && ansible-playbook ibm.mas_devops.run_role
+export ROLE_NAME=suite_install && ansible-playbook ibm.mas_devops.run_role
+export ROLE_NAME=suite_config && ansible-playbook ibm.mas_devops.run_role
+export ROLE_NAME=suite_verify && ansible-playbook ibm.mas_devops.run_role
 log "==== MAS deployment completed ===="
 
 ## Deploy Manage
 if [[ $DEPLOY_MANAGE == "true" ]]; then
   # Deploy Manage
   log "==== MAS Manage deployment started ===="
-  ansible-playbook mas/install-app.yml
+  export ROLE_NAME=suite_app_install && ansible-playbook ibm.mas_devops.run_role
   log "==== MAS Manage deployment completed ===="
 
   # Configure app to use the DB
   log "==== MAS Manage configure app started ===="
-  ansible-playbook mas/configure-app.yml
+  export ROLE_NAME=suite_app_config && ansible-playbook ibm.mas_devops.run_role
   log "==== MAS Manage configure app completed ===="
 fi
