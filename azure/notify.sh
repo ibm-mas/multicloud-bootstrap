@@ -26,6 +26,20 @@ if [[ $STATUS == "SUCCESS" ]]; then
   log " MAS_PASSWORD=$MAS_PASSWORD"
 fi
 
+# Process recepient list
+if [[ -n $RECEPIENT ]]; then
+	for i in $(echo "$RECEPIENT" | tr "," "\n")
+	do
+	  echo $i
+	  if [[ $emaillist == "" ]]; then
+		emaillist="'$i'"
+	  else
+		emaillist="${emaillist},'$i'"
+	  fi
+	done
+fi
+echo "Email list = $emaillist"
+
 sed -i "s/\[SMTP-HOST\]/$SMTP_HOST/g" $SCRIPT_FILE
 sed -i "s/\[SMTP-PORT\]/$SMTP_PORT/g" $SCRIPT_FILE
 sed -i "s/\[SMTP-USERNAME\]/$SMTP_USERNAME/g" $SCRIPT_FILE
@@ -34,6 +48,7 @@ sed -i "s/\[CERT-FILE\]/$certfile/g" $SCRIPT_FILE
 sed -i "s/\[RECEPIENT\]/$RECEPIENT/g" $SCRIPT_FILE
 sed -i "s/\[MESSAGE-TEXT\]/$MESSAGE_TEXT/g" $SCRIPT_FILE
 sed -i "s/\[STATUS\]/$STATUS/g" $SCRIPT_FILE
+sed -i "s/\[STATUS-MESSAGE\]/$STATUS_MSG/g" $SCRIPT_FILE
 sed -i "s/\[REGION\]/$DEPLOY_REGION/g" $SCRIPT_FILE
 sed -i "s/\[UNIQ-STR\]/$RANDOM_STR/g" $SCRIPT_FILE
 sed -i "s/\[OPENSHIFT-CLUSTER-CONSOLE-URL\]/$OPENSHIFT_CLUSTER_CONSOLE_URL/g" $SCRIPT_FILE
