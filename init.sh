@@ -367,6 +367,7 @@ if [[ $PRE_VALIDATION == "pass" ]]; then
           log "==== Installing Ansible Collection ===="
           ansible-galaxy collection install ibm.mas_devops:==${MAS_DEVOPS_COLLECTION_VERSION}
           log "==== Installed Ansible Collection Successfully ===="
+        fi  
   fi
 
   cd $GIT_REPO_HOME
