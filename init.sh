@@ -160,7 +160,7 @@ export CPD_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
 export CPD_VERSION=cpd40
 export MAS_CHANNEL=8.7.x
 if [[ $CLUSTER_TYPE == "aws" ]]; then
-  export CPD_PRIMARY_STORAGE_CLASS="ocs-storagecluster-cephfs"
+  export CPD_PRIMARY_STORAGE_CLASS="aws-efs-csi"
 elif [[ $CLUSTER_TYPE == "azure" ]]; then
   export CPD_PRIMARY_STORAGE_CLASS="azurefiles-premium"
 fi
