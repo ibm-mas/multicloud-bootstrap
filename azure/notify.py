@@ -17,12 +17,12 @@ recipients = [[RECEPIENT]]
 # Create a multipart message and set headers
 message_details = MIMEMultipart()
 message_details["From"] = sender_email
-message_details["To"] = recipients
+message_details["To"] = ", ".join(recipients)
 message_details["Subject"] = subject_details
 
 message_creds = MIMEMultipart()
 message_creds["From"] = sender_email
-message_creds["To"] = recipients
+message_creds["To"] = ", ".join(recipients)
 message_creds["Subject"] = subject_creds
 
 # Add body to email

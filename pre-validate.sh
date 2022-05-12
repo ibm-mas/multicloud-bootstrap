@@ -127,21 +127,21 @@ else
     fi
 fi
 
-# Check if all the existing BAS inputs are provided
+# Check if all the existing UDS inputs are provided
 if [[ (-z $UDS_API_KEY) && (-z $UDS_ENDPOINT_URL) && (-z $UDS_PUB_CERT_URL) ]]; then
-    log "=== New BAS Will be deployed ==="
+    log "=== New UDS Will be deployed ==="
 else
     if [ -z "$UDS_API_KEY" ]; then
-        log "ERROR: BAS API Key is not specified"
+        log "ERROR: UDS API Key is not specified"
         SCRIPT_STATUS=16
     elif [ -z "$UDS_ENDPOINT_URL" ]; then
-        log "ERROR: BAS Endpoint URL is not specified"
+        log "ERROR: UDS Endpoint URL is not specified"
         SCRIPT_STATUS=16
     elif [ -z "$UDS_PUB_CERT_URL" ]; then
-        log "ERROR: BAS Public Cerificate URL is not specified"
+        log "ERROR: UDS Public Cerificate URL is not specified"
         SCRIPT_STATUS=16
     else
-        log "=== Using existing BAS deployment inputs ==="
+        log "=== Using existing UDS deployment inputs ==="
     fi
 fi
 

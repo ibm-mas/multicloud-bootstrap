@@ -45,7 +45,7 @@ sed -i "s/\[SMTP-PORT\]/$SMTP_PORT/g" $SCRIPT_FILE
 sed -i "s/\[SMTP-USERNAME\]/$SMTP_USERNAME/g" $SCRIPT_FILE
 sed -i "s/\[SMTP-PASSWORD\]/$SMTP_PASSWORD/g" $SCRIPT_FILE
 sed -i "s/\[CERT-FILE\]/$certfile/g" $SCRIPT_FILE
-sed -i "s/\[RECEPIENT\]/$RECEPIENT/g" $SCRIPT_FILE
+sed -i "s/\[RECEPIENT\]/$emaillist/g" $SCRIPT_FILE
 sed -i "s/\[MESSAGE-TEXT\]/$MESSAGE_TEXT/g" $SCRIPT_FILE
 sed -i "s/\[STATUS\]/$STATUS/g" $SCRIPT_FILE
 sed -i "s/\[STATUS-MESSAGE\]/$STATUS_MSG/g" $SCRIPT_FILE
