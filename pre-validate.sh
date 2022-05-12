@@ -110,10 +110,10 @@ if [[ $DEPLOY_MANAGE == "true" ]]; then
 fi
 
 # Check if all the existing SLS inputs are provided
-if [[ (-z $SLSCFG_URL) && (-z $SLS_REGISTRATION_KEY) && (-z $SLS_PUB_CERT_URL) ]]; then
+if [[ (-z $SLS_URL) && (-z $SLS_REGISTRATION_KEY) && (-z $SLS_PUB_CERT_URL) ]]; then
     log "=== New SLS Will be deployed ==="
 else
-    if [ -z "$SLSCFG_URL" ]; then
+    if [ -z "$SLS_URL" ]; then
         log "ERROR: SLS Endpoint URL is not specified"
         SCRIPT_STATUS=15
     elif [ -z "$SLS_REGISTRATION_KEY" ]; then
