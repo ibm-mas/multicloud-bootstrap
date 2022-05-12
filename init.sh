@@ -401,14 +401,15 @@ if [[ $PRE_VALIDATION == "pass" ]]; then
   fi
 fi
 
+log " STATUS=$STATUS"
+log " STATUS_MSG=$STATUS_MSG"
+
 cd $GIT_REPO_HOME/$CLUSTER_TYPE
 if [[ $CLUSTER_TYPE == "aws" ]]; then
   # Complete the template deployment
   cd $GIT_REPO_HOME/$CLUSTER_TYPE
   # Complete the CFT stack creation successfully
   log "Sending completion signal to CloudFormation stack."
-  log " STATUS=$STATUS"
-  log " STATUS_MSG=$STATUS_MSG"
   curl -k -X PUT -H 'Content-Type:' --data-binary "{\"Status\":\"SUCCESS\",\"Reason\":\"MAS deployment complete\",\"UniqueId\":\"ID-$CLUSTER_TYPE-$CLUSTER_SIZE-$CLUSTER_NAME\",\"Data\":\"${STATUS}#${STATUS_MSG}\"}" "$DEPLOY_WAIT_HANDLE"
 fi
 
