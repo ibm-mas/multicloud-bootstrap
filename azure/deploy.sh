@@ -48,12 +48,9 @@ fi
 ## Read License File & Retrive SLS hostname and host id
 line=$(head -n 1 entitlement.lic)
 set -- $line
-hostname=$2
 hostid=$3
-log " SLS_HOSTNAME: $hostname"
 log " SLS_HOST_ID: $hostid"
 # SLS Instance name
-export SLS_INSTANCE_NAME="$hostname"
 export SLS_LICENSE_ID="$hostid"
 log " SLS_INSTANCE_NAME=$SLS_INSTANCE_NAME"
 log " SLS_LICENSE_ID=$SLS_LICENSE_ID"
