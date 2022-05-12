@@ -7,6 +7,8 @@ from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
+print("Status:", sys.argv[1])
+
 subject_details = "MAS Provisioning Notification (contains an attachment)"
 body_details = "[MESSAGE-TEXT]\n\nMAS provisioning status: [STATUS]#[STATUS-MESSAGE]\nRegion: [REGION]\nUnique String: [UNIQ-STR]\nOpenShift Cluster URL: [OPENSHIFT-CLUSTER-CONSOLE-URL]\nOpenShift API URL: [OPENSHIFT-CLUSTER-API-URL]\nOpenShift User: [OCP-USER]\nSLS Endpoint URL:\nBAS Endpoint URL: \nMAS Initial Setup URL: [MAS-URL-INIT-SETUP]\nMAS Admin URL: [MAS-URL-ADMIN]\nMAS Workspace URL: [MAS-URL-WORKSPACE]\n"
 subject_creds = "MAS Provisioning Notification (contains credentials)"
@@ -54,7 +56,8 @@ try:
    smtpObj = smtplib.SMTP("[SMTP-HOST]", [SMTP-PORT])
    smtpObj.login("[SMTP-USERNAME]", "[SMTP-PASSWORD]")
    smtpObj.sendmail(sender_email, recipients, text_details)
-   smtpObj.sendmail(sender_email, recipients, text_creds)
+   if (sys.argv[1] == "SUCCESS"):
+      smtpObj.sendmail(sender_email, recipients, text_creds)
    print("Successfully sent email")
 except SMTPException:
    print("Error: unable to send email")
