@@ -165,7 +165,7 @@ cp $GIT_REPO_HOME/entitlement.lic $MAS_CONFIG_DIR
 # log "==== Amq streams deployment completed ===="
 
 # SLS Deployment
-if [[ (-z $SLS_ENDPOINT_URL) || (-z $SLS_REGISTRATION_KEY) || (-z $SLS_PUB_CERT_URL) ]]; then
+if [[ (-z $SLS_URL) || (-z $SLS_REGISTRATION_KEY) || (-z $SLS_PUB_CERT_URL) ]]; then
   ## Deploy SLS
   log "==== SLS deployment started ===="
   # sls and gencfg_sls are combined in common sls role
@@ -174,7 +174,7 @@ if [[ (-z $SLS_ENDPOINT_URL) || (-z $SLS_REGISTRATION_KEY) || (-z $SLS_PUB_CERT_
 
 else
   log "=== Using Existing SLS Deployment ==="  #
-  # works when SLSCFG_URL is set, handled in same sls role
+  # works when SLS_URL is set, handled in same sls role
   export ROLE_NAME=sls && ansible-playbook ibm.mas_devops.run_role
   log "=== Generated SLS Config YAML ==="
 fi
