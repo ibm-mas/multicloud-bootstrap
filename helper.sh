@@ -101,7 +101,7 @@ mark_provisioning_failed() {
   elif [[ $retcode -eq 15 ]]; then
     export STATUS_MSG="Please provide all the inputs to use existing SLS."
   elif [[ $retcode -eq 16 ]]; then
-    export STATUS_MSG="Please provide all the inputs to use existing BAS."
+    export STATUS_MSG="Please provide all the inputs to use existing UDS."
   elif [[ $retcode -eq 17 ]]; then
     export STATUS_MSG="Please provide OCP pull secret."
   elif [[ $retcode -eq 18 ]]; then
