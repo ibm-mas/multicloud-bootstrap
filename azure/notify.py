@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import email, smtplib, ssl
+import email, smtplib, ssl, sys
 
 from email import encoders
 from email.mime.base import MIMEBase
