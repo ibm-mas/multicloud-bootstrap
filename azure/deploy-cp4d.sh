@@ -13,7 +13,7 @@ NC='\033[0m'
 usage() {
   echo
   echo "Usage: "
-  echo "  $ deploy-cp4d.sh -s stack-name -r region-code -e entitlement-key"
+  echo "  $ deploy-cp4d.sh -r bootnode-resource-group -e entitlement-key"
   echo
   echo "Optional:"
   echo "  -u  openshift-user"
@@ -22,7 +22,7 @@ usage() {
   echo "Provide the parameters 'openshift-user' and 'openshift-password' if the OpenShift user and password has been changed."
   echo
   echo "For example, "
-  echo "  $ deploy-cp4d.sh -s mas-cp4d -r us-east-1 -e asdFHJKsdUd....P,ii2SdWOjak -u masocpuser -p masocpuserpass"
+  echo "  $ deploy-cp4d.sh -r mas-deployment-rg -e asdFHJKsdUd....P,ii2SdWOjak -u masocpuser -p masocpuserpass"
   echo
   exit 1
 }
@@ -44,13 +44,10 @@ if [[ $# -eq 0 ]]; then
   echoRed "No arguments provided with $0. Exiting..."
   usage
 else
-  while getopts 's:r:e:u:p:?h' c; do
+  while getopts 'r:e:u:p:?h' c; do
     case $c in
-    s)
-      STACK_NAME=$OPTARG
-      ;;
     r)
-      REGION=$OPTARG
+      RG_NAME=$OPTARG
       ;;
     e)
       ER_KEY=$OPTARG
@@ -69,30 +66,34 @@ else
 fi
 
 echoBlue "\n:: Script Inputs ::\n"
-echo "  Stack name = $STACK_NAME"
-echo "  Region = $REGION"
+echo "  Resource group = $RG_NAME"
 echo "  Entitlement key = $ER_KEY"
 echo "  OpenShift user = $OPENSHIFT_USER"
 echo "  OpenShift password = $OPENSHIFT_PASSWORD"
 echo -e "\n"
 
 # Check for supported region
-if [[ -z $REGION ]]; then
-  echoRed "ERROR: Parameter 'region-code' not provided"
-  usage
-fi
-SUPPORTED_REGIONS="us-east-1;us-east-2;us-west-2;ca-central-1;eu-north-1;eu-south-1;eu-west-1;eu-west-2;eu-west-3;eu-central-1;ap-northeast-1;ap-northeast-2;ap-northeast-3;ap-south-1;ap-southeast-1;ap-southeast-2;sa-east-1"
-if [[ ${SUPPORTED_REGIONS,,} =~ $REGION ]]; then
-  echoGreen "Supported region is provided.\n"
-else
-  echoRed "ERROR: Empty or unsupported region provided"
-  echo -e "\nSupported regions are $SUPPORTED_REGIONS"
+if [[ -z $RG_NAME ]]; then
+  echoRed "ERROR: Parameter 'bootnode-resource-group' not provided"
   usage
 fi
 
-if [[ (-z $STACK_NAME) ]]; then
-  echoRed "ERROR: Parameter 'stack-name' is empty"
-  usage
+# Get subscription Id
+SUB_ID=$(az account show | jq ".id" | tr -d '"')
+
+# Check if Subscription ID is retreived, if not, it might be the login issue
+if [[ -z $SUB_ID ]]; then
+  echoRed "ERROR: Could not retrieve subscription id, make sure you are logged in using 'az login' command."
+  exit 1
+fi
+
+# Check if bootnode resource group exists
+if [[ -n $RG_NAME ]]; then
+  output=$(az group exists -n $RG_NAME)
+  if [[ $output == "false" ]]; then
+    echoRed "ERROR: Bootnode resource group $RG_NAME does not exist"
+    exit 1
+  fi
 fi
 
 # Creating and exporting MAS_CONFIG_DIR path
@@ -105,24 +106,24 @@ if [[ -z $ER_KEY ]]; then
   usage
 fi
 
-if [[ -n $STACK_NAME ]]; then
-  # Get MAS instance unique string
-  UNIQ_STR=$(aws cloudformation describe-stacks --stack-name $STACK_NAME --region $REGION 2>/dev/null | jq ".Stacks[].Outputs[] | select(.OutputKey == \"ClusterUniqueString\").OutputValue" | tr -d '"')
+if [[ -n $RG_NAME ]]; then
+  # Get the cluster unique string
+  UNIQ_STR=$(az deployment group list --resource-group $RG_NAME | jq ".[] | select(.properties.outputs.clusterUniqueString.value != null).properties.outputs.clusterUniqueString.value" | tr -d '"')
 
   # Get OpenShift details from the stack if not provided
   if [[ -z $OPENSHIFT_USER ]]; then
-    OC_USER=$(aws cloudformation describe-stacks --stack-name $STACK_NAME --region $REGION 2>/dev/null | jq ".Stacks[].Outputs[] | select(.OutputKey == \"OpenShiftUser\").OutputValue" | tr -d '"')
+    OC_USER=$(az deployment group list --resource-group $RG_NAME | jq ".[] | select(.properties.outputs.openShiftUser.value != null).properties.outputs.openShiftUser.value" | tr -d '"')
   elif [[ -n OPENSHIFT_USER ]]; then
     OC_USER=$OPENSHIFT_USER
   fi
 
   if [[ -z $OPENSHIFT_PASSWORD ]]; then
-    OC_PASSWORD=$(aws cloudformation describe-stacks --stack-name $STACK_NAME --region $REGION 2>/dev/null | jq ".Stacks[].Outputs[] | select(.OutputKey == \"OpenShiftPassword\").OutputValue" | tr -d '"')
+    OC_PASSWORD=$(az deployment group list --resource-group $RG_NAME | jq ".[] | select(.properties.outputs.openShiftPwd.value != null).properties.outputs.openShiftPwd.value" | tr -d '"')
   elif [[ -n OPENSHIFT_PASSWORD ]]; then
     OC_PASSWORD=$OPENSHIFT_PASSWORD
   fi
 
-  OC_API=$(aws cloudformation describe-stacks --stack-name $STACK_NAME --region $REGION 2>/dev/null | jq ".Stacks[].Outputs[] | select(.OutputKey == \"OpenShiftApiUrl\").OutputValue" | tr -d '"')
+  OC_API=$(az deployment group list --resource-group $RG_NAME | jq ".[] | select(.properties.outputs.openShiftApiUrl.value != null).properties.outputs.openShiftApiUrl.value" | tr -d '"' | sed "s/.com/.com:6443/g")
 
 fi
 
@@ -133,26 +134,28 @@ echo "  OpenShift API URL     : $OC_API"
 
 # Login to OCP cluster
 echo -e "\nTrying to log into OpenShift\n"
-oc login -u ${OC_USER} -p ${OC_PASSWORD} --server=${OC_API}
+oc login -u ${OC_USER} -p ${OC_PASSWORD} --server=${OC_API} --insecure-skip-tls-verify=true
 
 status=$(oc whoami 2>&1)
 if [[ $? -gt 0 ]]; then
   echoRed "OpenShift Login failed. Exiting...\n"
-  exit 1;
+  exit 1
 else
   echoGreen "\nOpenShift Login is successful."
 fi
 
-echoBlue "\n==== Execution started at `date` ===="
+echoBlue "\n==== Execution started at $(date) ===="
 
 export MAS_INSTANCE_ID="mas-${UNIQ_STR}"
 export MAS_WORKSPACE_ID="wsmasocp"
+export MAS_WORKSPACE_NAME="wsmasocp"
+export MAS_CONFIG_SCOPE="wsapp"
 
 # CP4D variables
 export CPD_ENTITLEMENT_KEY=${ER_KEY}
 export CPD_VERSION=cpd40
 export MAS_CHANNEL=8.7.x
-export CPD_PRIMARY_STORAGE_CLASS="ocs-storagecluster-cephfs"
+export CPD_PRIMARY_STORAGE_CLASS="azurefiles-premium"
 export CPD_OPERATORS_NAMESPACE="ibm-cpd-operators-${UNIQ_STR}"
 export CPD_INSTANCE_NAMESPACE="ibm-cpd-${UNIQ_STR}"
 export CPD_SERVICES_NAMESPACE="cpd-services-${UNIQ_STR}"
@@ -165,13 +168,10 @@ export DB2_LOGS_STORAGE_CLASS=${CPD_PRIMARY_STORAGE_CLASS}
 export DB2_TEMP_STORAGE_CLASS=${CPD_PRIMARY_STORAGE_CLASS}
 export DB2_INSTANCE_NAME=db2wh-db01
 export DB2_VERSION=11.5.7.0-cn2
-
 export ENTITLEMENT_KEY=${ER_KEY}
-export HOME=/root
 
-
-export CPD_METADATA_STORAGE_CLASS=gp2
-export CPD_SERVICE_STORAGE_CLASS=ocs-storagecluster-cephfs
+export CPD_METADATA_STORAGE_CLASS=managed-premium
+export CPD_SERVICE_STORAGE_CLASS=azurefiles-premium
 
 echo
 echoBlue "==== Installing Ansible Collection ===="
@@ -198,6 +198,6 @@ export ROLE_NAME=suite_verify && ansible-playbook ibm.mas_devops.run_role
 echo
 echoBlue "==== MAS configuration completed ===="
 echo
-echoBlue "==== Execution completed at `date` ====\n"
+echoBlue "==== Execution completed at $(date) ====\n"
 echo
 echo
