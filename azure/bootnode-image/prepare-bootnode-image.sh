@@ -32,8 +32,8 @@ yum update -y
 
 ## Install pre-reqs
 yum install git httpd-tools java python36 unzip wget zip -y
-ln -s /usr/bin/python3 /usr/bin/python
-ln -s /usr/bin/pip3 /usr/bin/pip
+ln -s --force /usr/bin/python3 /usr/bin/python
+ln -s --force /usr/bin/pip3 /usr/bin/pip
 pip install pyyaml
 pip install jaydebeapi
 
@@ -88,7 +88,7 @@ ansible-galaxy collection install community.kubernetes
 # Get the ansible devops colection
 if [[ $ANSIBLE_COLLECTION_VERSION != "" ]]; then
     echo "Installing the ansible collection version $ANSIBLE_COLLECTION_VERSION from Ansible Galaxy"
-    ansible-galaxy collection install ibm.mas_devops:==${ANSIBLE_COLLECTION_VERSION}
+    ansible-galaxy collection install --force ibm.mas_devops:==${ANSIBLE_COLLECTION_VERSION}
 else
     if [[ $ANSIBLE_COLLECTION_BRANCH == "" ]]; then
       echo "No ANSIBLE_COLLECTION_BRANCH is provided, using the 'master' branch"
@@ -100,7 +100,7 @@ else
     git clone -b $ANSIBLE_COLLECTION_BRANCH https://github.com/ibm-mas/ansible-devops.git
     cd ansible-devops/ibm/mas_devops
     ansible-galaxy collection build
-    ansible-galaxy collection install ibm-mas_devops-*.tar.gz
+    ansible-galaxy collection install --force ibm-mas_devops-*.tar.gz
     rm -rf ansible-devops ibm-mas_devops-*.tar.gz
     rm -rf ansible-devops
 fi
@@ -110,11 +110,11 @@ cd /root
 rm -rf ansible-devops
 mkdir -p ansible-devops
 cd ansible-devops
-if [[ $BOOTSTRAP_AUTOMATION_VERSION == "" ]]; then
-  echo "No BOOTSTRAP_AUTOMATION_VERSION is provided, using the 'main' branch"
-  BOOTSTRAP_AUTOMATION_VERSION="main"
+if [[ $BOOTSTRAP_AUTOMATION_TAG_OR_BRANCH == "" ]]; then
+  echo "No BOOTSTRAP_AUTOMATION_TAG_OR_BRANCH is provided, using the 'main' branch"
+  BOOTSTRAP_AUTOMATION_TAG_OR_BRANCH="main"
 fi
-git clone -b $BOOTSTRAP_AUTOMATION_VERSION https://github.com/ibm-mas/multicloud-bootstrap.git
+git clone -b $BOOTSTRAP_AUTOMATION_TAG_OR_BRANCH https://github.com/ibm-mas/multicloud-bootstrap.git
 cd multicloud-bootstrap
 rm -rf aws azure/bootnode-image azure/master-arm
 find . -type f -name "*.sh" -exec chmod +x {} \;
@@ -125,7 +125,5 @@ history -c
 
 # Remove the SSH keys
 rm -rf /home/ec2-user/.ssh/authorized_keys /root/.ssh/authorized_keys
-
-# Get the bootstrap code and Ansible collection installed
 
 echo "Bootnode preparation completed"
