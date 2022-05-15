@@ -119,7 +119,7 @@ cd multicloud-bootstrap
 rm -rf aws azure/bootnode-image azure/master-arm
 find . -type f -name "*.sh" -exec chmod +x {} \;
 
-# Clear command history
+# Clear bash history
 echo "" > /home/azureuser/.bash_history
 history -c
 
