@@ -27,11 +27,14 @@ echo "ANSIBLE_COLLECTION_VERSION=$ANSIBLE_COLLECTION_VERSION"
 echo "ANSIBLE_COLLECTION_BRANCH=$ANSIBLE_COLLECTION_BRANCH"
 echo "BOOTSTRAP_AUTOMATION_TAG_OR_BRANCH=$BOOTSTRAP_AUTOMATION_TAG_OR_BRANCH"
 
+# Remove unnecessary packages
+dnf -y remove polkit
+
 # Update all packages to latest
-yum update -y
+dnf update -y
 
 ## Install pre-reqs
-yum install git httpd-tools java python36 unzip wget zip -y
+dnf install git httpd-tools java python36 unzip wget zip -y
 ln -s --force /usr/bin/python3 /usr/bin/python
 ln -s --force /usr/bin/pip3 /usr/bin/pip
 pip install pyyaml
@@ -60,7 +63,7 @@ chmod +x jq
 mv jq /usr/local/bin
 
 # Install podman
-yum module install -y container-tools
+dnf module install -y container-tools
 
 ## Download Openshift CLI and move to /usr/local/bin
 wget "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.8.11/openshift-client-linux-4.8.11.tar.gz"
