@@ -129,4 +129,7 @@ history -c
 # Remove the SSH keys
 rm -rf /home/ec2-user/.ssh/authorized_keys /root/.ssh/authorized_keys
 
+# Deprovision the VM
+waagent -deprovision+user -force
+
 echo "Bootnode preparation completed"
