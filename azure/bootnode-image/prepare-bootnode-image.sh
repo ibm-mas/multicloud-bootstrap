@@ -39,6 +39,7 @@ ln -s --force /usr/bin/python3 /usr/bin/python
 ln -s --force /usr/bin/pip3 /usr/bin/pip
 pip install pyyaml
 pip install jaydebeapi
+pip install jmespath
 
 # Install Azure cli
 rpm --import https://packages.microsoft.com/keys/microsoft.asc
