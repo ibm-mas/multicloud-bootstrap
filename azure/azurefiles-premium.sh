@@ -22,7 +22,7 @@ oc create configmap azure-cred-file --from-literal=path="/etc/kubernetes/cloud.c
 
 driver_version=v1.12.0
 echo "Driver version " $driver_version
-curl -skSL https://raw.githubusercontent.com/kubernetes-sigs/azurefile-csi-driver/$driver_version/deploy/install-driver.sh | bash -s $driver_version --
+./install-driver.sh $driver_version
 
 #Deploy premium Storage Class
 envsubst < azurefiles-premium.yaml | tee azurefiles-premium.yaml
