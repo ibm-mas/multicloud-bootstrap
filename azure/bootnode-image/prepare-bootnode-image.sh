@@ -72,7 +72,6 @@ tar -xvf openshift-client-linux-4.8.11.tar.gz
 chmod u+x oc kubectl
 mv oc /usr/local/bin
 mv kubectl /usr/local/bin
-oc version
 rm -rf openshift-client-linux-4.8.11.tar.gz
 
 ## Install terraform
@@ -81,7 +80,6 @@ echo $TERRAFORM_VER
 wget https://releases.hashicorp.com/terraform/${TERRAFORM_VER}/terraform_${TERRAFORM_VER}_linux_amd64.zip
 unzip terraform_${TERRAFORM_VER}_linux_amd64.zip
 mv terraform /usr/local/bin/
-terraform version
 rm -rf terraform_${TERRAFORM_VER}_linux_amd64.zip
 
 ## Install Ansible
