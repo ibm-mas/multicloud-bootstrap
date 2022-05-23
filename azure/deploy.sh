@@ -110,7 +110,7 @@ oc set data secret/pull-secret -n openshift-config --from-file=/tmp/.dockerconfi
 
 # Run ansible playbook to create azurefiles storage class
 log "=== Creating azurefiles-premium Storage class on OCP cluster ==="
-cd $GIT_REPO_HOME/azure
+cd $GIT_REPO_HOME/azure/azurefiles
 ./azurefiles-premium.sh
 retcode=$?
 if [[ $retcode -ne 0 ]]; then
