@@ -881,8 +881,7 @@
                                     "Ref": "EmailNotification"
                                 },
                                 "' \"prod\" ",
-                                "2>&1 | tee mas-provisioning.log; ",
-                                "shutdown -P \"+1\""
+                                "2>&1 | tee mas-provisioning.log; "
                             ]
                         ]
                     }

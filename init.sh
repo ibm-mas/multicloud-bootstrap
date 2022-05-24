@@ -118,7 +118,7 @@ fi
 export GIT_REPO_HOME=$(pwd)
 export CLUSTER_NAME="masocp-${RANDOM_STR}"
 export OCP_USERNAME="masocpuser"
-export OCP_PASSWORD=masocp${RANDOM_STR}pass
+export OCP_PASSWORD="mas${RANDOM_STR:3:3}`date +%H%M%S`${RANDOM_STR:0:3}"
 export OPENSHIFT_PULL_SECRET_FILE_PATH=${GIT_REPO_HOME}/pull-secret.json
 export MASTER_NODE_COUNT="3"
 export WORKER_NODE_COUNT="3"
@@ -353,22 +353,24 @@ if [[ $PRE_VALIDATION == "pass" ]]; then
   chmod 600 $OPENSHIFT_PULL_SECRET_FILE_PATH
 
   ## Installing the collection depending on ENV_TYPE
-  if [[ $ENV_TYPE == "dev" ]]; then
-        echo "=== Building and Installing Ansible Collection Locally ==="
+  if [[ $CLUSTER_TYPE == "aws" ]]; then
+    if [[ $ENV_TYPE == "dev" ]]; then
+      echo "=== Building and Installing Ansible Collection Locally ==="
+      cd $GIT_REPO_HOME/../ibm/mas_devops
+      ansible-galaxy collection build
+      ansible-galaxy collection install ibm-mas_devops-*.tar.gz
+      echo "=== Ansible Collection built and installed locally Successfully ==="
+    else
+      if [[ -z $MAS_DEVOPS_COLLECTION_VERSION  ]]; then
+        echo "=== Get the version from galaxy.yml ==="
         cd $GIT_REPO_HOME/../ibm/mas_devops
-        ansible-galaxy collection build
-        ansible-galaxy collection install ibm-mas_devops-*.tar.gz
-        echo "=== Ansible Collection built and installed locally Successfully ==="
-  else
-        if [[ -z $MAS_DEVOPS_COLLECTION_VERSION  ]]; then
-          echo "=== Get the version from galaxy.yml ==="
-          cd $GIT_REPO_HOME/../ibm/mas_devops
-        else
-          echo "MAS_DEVOPS_COLLECTION_VERSION=$MAS_DEVOPS_COLLECTION_VERSION"
-          log "==== Installing Ansible Collection ===="
-          ansible-galaxy collection install ibm.mas_devops:==${MAS_DEVOPS_COLLECTION_VERSION}
-          log "==== Installed Ansible Collection Successfully ===="
-        fi  
+      else
+        echo "MAS_DEVOPS_COLLECTION_VERSION=$MAS_DEVOPS_COLLECTION_VERSION"
+        log "==== Installing Ansible Collection ===="
+        ansible-galaxy collection install ibm.mas_devops:==${MAS_DEVOPS_COLLECTION_VERSION}
+        log "==== Installed Ansible Collection Successfully ===="
+      fi  
+    fi
   fi
 
   cd $GIT_REPO_HOME
@@ -432,4 +434,6 @@ elif [[ $CLUSTER_TYPE == "azure" ]]; then
   # Upload the log file to blob storage
   az storage blob upload --account-name ${STORAGE_ACNT_NAME} --container-name masocpcontainer --name ocp-cluster-provisioning-deployment-context/mas-provisioning.log --file $GIT_REPO_HOME/mas-provisioning.log --auth-mode login
 fi
+log "Shutting down VM in a minute"
+shutdown -P "+1"
 exit $RESP_CODE

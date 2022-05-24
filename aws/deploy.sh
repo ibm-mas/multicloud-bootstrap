@@ -249,10 +249,12 @@ log "==== MongoDB deployment completed ===="
 ## Copying the entitlement.lic to MAS_CONFIG_DIR
 cp $GIT_REPO_HOME/entitlement.lic $MAS_CONFIG_DIR
 
-## Deploy Amqstreams
-#log "==== Amq streams deployment started ===="
-#export ROLE_NAME=kafka && ansible-playbook ibm.mas_devops.run_role
-#log "==== Amq streams deployment completed ===="
+if [[ $DEPLOY_MANAGE == "true" &&  $DEPLOY_CP4D == "true" ]]; then
+  ## Deploy Amqstreams
+  log "==== Amq streams deployment started ===="
+  export ROLE_NAME=kafka && ansible-playbook ibm.mas_devops.run_role
+  log "==== Amq streams deployment completed ===="
+fi
 
 ## Deploy SLS
 if [[ (-z $SLS_URL) || (-z $SLS_REGISTRATION_KEY) || (-z $SLS_PUB_CERT_URL) ]]

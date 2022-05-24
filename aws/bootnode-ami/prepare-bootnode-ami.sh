@@ -1,15 +1,17 @@
 #!/bin/bash
 
 # This script should be executed on the Red Hat 8 instance before creating AMI from it.
-# The created AMI will be used to create Bootnode instance for MAS provisioning.
+# The created AMI will be used to create Bootnode instance for MAS provisioning.# Remove unnecessary packages# Update all packages to latest
+# Remove unnecessary packages
+dnf -y remove polkit
 
 # Update all packages to latest
-yum update -y
+dnf update -y
 
 ## Install pre-reqs
-yum install git httpd-tools java python36 unzip wget zip -y
-ln -s /usr/bin/python3 /usr/bin/python
-ln -s /usr/bin/pip3 /usr/bin/pip
+dnf install git httpd-tools java python36 unzip wget zip -y
+ln -s --force /usr/bin/python3 /usr/bin/python
+ln -s --force /usr/bin/pip3 /usr/bin/pip
 pip install awscli --upgrade --user
 pip install pyyaml
 pip install jaydebeapi
@@ -27,7 +29,7 @@ chmod +x jq
 mv jq /usr/local/bin
 
 # Install podman
-yum module install -y container-tools
+dnf module install -y container-tools
 
 ## Download Openshift CLI and move to /usr/local/bin
 wget "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.8.11/openshift-client-linux-4.8.11.tar.gz"
