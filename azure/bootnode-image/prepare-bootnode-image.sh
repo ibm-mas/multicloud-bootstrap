@@ -16,7 +16,6 @@
 #     Specific branch is normally used when testing the changes from your feature branch.
 #     Specific tag is normally used when the bootstrap code is locked for a specific release.
 #     
-sudo su - 
 set -e
 
 ANSIBLE_COLLECTION_VERSION=$1
