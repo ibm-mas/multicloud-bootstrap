@@ -76,7 +76,7 @@
                         "defaultValue": "",
                         "toolTip": "Public hosted zone to use. e.g. mydomain.myorg.com (Applicable only if a new OCP cluster is being created)",
                         "constraints": {
-                            "required": "[not(empty(steps('ExistingInfrastructure').openShiftClusterApiUrl))]",
+                            "required": "[empty(steps('ExistingInfrastructure').openShiftClusterApiUrl)]",
                             "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
                             "validationMessage": "Contain letters, numbers and special characters only."
                         },
@@ -89,7 +89,7 @@
                         "defaultValue": "",
                         "toolTip": "Provide the name of the resource group where public App Service domain is created (Applicable only if a new OCP cluster is being created)",
                         "constraints": {
-                            "required": "[not(empty(steps('ExistingInfrastructure').openShiftClusterApiUrl))]",
+                            "required": "[empty(steps('ExistingInfrastructure').openShiftClusterApiUrl)]",
                             "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
                             "validationMessage": "Contain letters, numbers and special characters only."
                         },
@@ -166,7 +166,7 @@
                         },
                         "toolTip": "OpenShift Pull secret to download operator images. JSON string can be pasted as is.",
                         "constraints": {
-                            "required": "[not(empty(steps('ExistingInfrastructure').openShiftClusterApiUrl))]"
+                            "required": "[empty(steps('ExistingInfrastructure').openShiftClusterApiUrl)]"
                         },
                         "options": {
                             "hideConfirmation": false
