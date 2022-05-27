@@ -9,6 +9,26 @@
       },
       "defaultValue": "[resourceGroup().location]"
     },
+    "adminUserName": {
+      "type": "string",
+      "metadata": {
+        "description": "adminUserName"
+      },
+      "defaultValue": "azureuser",
+      "allowedValues": [
+        "azureuser"
+      ]
+    },
+    "vmSize": {
+      "type": "string",
+      "metadata": {
+        "description": "vmSize."
+      },
+      "defaultValue": "Standard_D2s_v3",
+      "allowedValues": [
+        "Standard_D2s_v3"
+             ]
+    },
     "offeringType": {
       "type": "string",
       "metadata": {
@@ -248,7 +268,7 @@
     "seller_subscription_id": "b2ca5467-2502-4b05-b78e-744604c6531d",
     "seller_resource_group": "EdgeTest",
     "seller_compute_gallery_name": "mas_image_gallery",
-    "seller_image_version": "masocp-bootnode-20220513",
+    "seller_image_version": "masocp-bootnode-20220521",
     "projectName": "[substring(uniqueString(resourceGroup().id, deployment().name), 0, 6)]",
     "rgName": "[resourceGroup().name]",
     "vNetName": "[concat(variables('projectName'), '-vnet')]",
@@ -438,7 +458,7 @@
           "type": "dataSources",
           "name": "BootNode-Logs",
           "dependsOn": [
-            "[concat('Microsoft.OperationalInsights/workspaces/', '/', variables('logAnalyticsWorkspace'))]"
+            "[resourceId('Microsoft.OperationalInsights/workspaces', variables('logAnalyticsWorkspace'))]"
           ],
           "kind": "CustomLog",
           "properties": {
@@ -490,13 +510,18 @@
       "dependsOn": [
         "[resourceId('Microsoft.Network/networkInterfaces', variables('networkInterfaceName'))]"
       ],
+      "plan": {
+          "name": "ibm-maximo-vm-offer-byol",
+          "publisher": "ibm-usa-ny-armonk-hq-6275750-ibmcloud-asperia",
+          "product": "ibm-maximo-vm-offer"
+          },
       "properties": {
         "hardwareProfile": {
-          "vmSize": "Standard_D2s_v3"
+          "vmSize": "[parameters('vmSize')]"
         },
         "osProfile": {
           "computerName": "[variables('vmName')]",
-          "adminUsername": "azureuser",
+          "adminUsername": "[parameters('adminUserName')]",
           "linuxConfiguration": {
             "disablePasswordAuthentication": true,
             "ssh": {
@@ -511,8 +536,11 @@
         },
         "storageProfile": {
           "imageReference": {
-            "id": "[resourceId('Microsoft.Compute/galleries/images/versions', variables('seller_compute_gallery_name'), variables('seller_image_version'), 'latest')]"
-          },
+                "offer": "ibm-maximo-vm-offer",
+                "publisher": "ibm-usa-ny-armonk-hq-6275750-ibmcloud-asperia",
+                "sku": "ibm-maximo-vm-offer-byol",
+                "version": "latest"
+            },
           "osDisk": {
             "createOption": "fromImage"
           }
@@ -555,7 +583,7 @@
       "name": "[concat(variables('vmName'),'/', 'DependencyAgentLinux')]",
       "location": "[parameters('location')]",
       "dependsOn": [
-        "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
+        "[resourceId('Microsoft.Compute/virtualMachines', variables('vmName'))]"
       ],
       "properties": {
         "publisher": "Microsoft.Azure.Monitoring.DependencyAgent",
@@ -570,8 +598,8 @@
       "name": "[concat(variables('vmName'),'/', 'OMSExtension')]",
       "location": "[parameters('location')]",
       "dependsOn": [
-        "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'))]",
-        "[concat('Microsoft.OperationalInsights/workspaces/', variables('logAnalyticsWorkspace'))]"
+        "[resourceId('Microsoft.Compute/virtualMachines', variables('vmName'))]",
+        "[resourceId('Microsoft.OperationalInsights/workspaces', variables('logAnalyticsWorkspace'))]"
       ],
       "properties": {
         "publisher": "Microsoft.EnterpriseCloud.Monitoring",
