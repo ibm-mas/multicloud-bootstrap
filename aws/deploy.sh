@@ -20,6 +20,14 @@ export SLS_STORAGE_CLASS=gp2
 export CPD_METADATA_STORAGE_CLASS=gp2
 export CPD_SERVICE_STORAGE_CLASS="ocs-storagecluster-cephfs"
 
+# MAS Dev Variables
+export MAS_ICR_CPOPEN=wiotp-docker-local.artifactory.swg-devops.com/cpopen
+export MAS_CATALOG_SOURCE=ibm-mas-operators
+export MAS_CHANNEL=m4dev88
+export MAS_ICR_CP=wiotp-docker-local.artifactory.swg-devops.com
+export MAS_ENTITLEMENT_USERNAME=y9ft6g866@nomail.relay.ibm.com
+export MAS_ENTITLEMENT_KEY=AKCp8k8EFPUEEfWPtMcWVHu6QJxQsX4EDnkztEMpgKeYNTHjWar4ruqDZkuKNLuggaMLfB17i
+
 # Retrieve SSH public key
 TOKEN=$(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
 SSH_PUB_KEY=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" â€“v http://169.254.169.254/latest/meta-data/public-keys/0/openssh-key)
