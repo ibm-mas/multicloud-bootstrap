@@ -9,6 +9,26 @@
       },
       "defaultValue": "[resourceGroup().location]"
     },
+    "adminUserName": {
+      "type": "string",
+      "metadata": {
+        "description": "adminUserName"
+      },
+      "defaultValue": "azureuser",
+      "allowedValues": [
+        "azureuser"
+      ]
+    },
+    "vmSize": {
+      "type": "string",
+      "metadata": {
+        "description": "vmSize."
+      },
+      "defaultValue": "Standard_D2s_v3",
+      "allowedValues": [
+        "Standard_D2s_v3"
+             ]
+    },
     "offeringType": {
       "type": "string",
       "metadata": {
@@ -438,7 +458,7 @@
           "type": "dataSources",
           "name": "BootNode-Logs",
           "dependsOn": [
-            "[concat('Microsoft.OperationalInsights/workspaces/', '/', variables('logAnalyticsWorkspace'))]"
+            "[resourceId('Microsoft.OperationalInsights/workspaces', variables('logAnalyticsWorkspace'))]"
           ],
           "kind": "CustomLog",
           "properties": {
@@ -492,11 +512,11 @@
       ],
       "properties": {
         "hardwareProfile": {
-          "vmSize": "Standard_D2s_v3"
+          "vmSize": "[parameters('vmSize')]"
         },
         "osProfile": {
           "computerName": "[variables('vmName')]",
-          "adminUsername": "azureuser",
+          "adminUsername": "[parameters('adminUserName')]",
           "linuxConfiguration": {
             "disablePasswordAuthentication": true,
             "ssh": {
@@ -555,7 +575,7 @@
       "name": "[concat(variables('vmName'),'/', 'DependencyAgentLinux')]",
       "location": "[parameters('location')]",
       "dependsOn": [
-        "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
+        "[resourceId('Microsoft.Compute/virtualMachines', variables('vmName'))]"
       ],
       "properties": {
         "publisher": "Microsoft.Azure.Monitoring.DependencyAgent",
@@ -570,8 +590,8 @@
       "name": "[concat(variables('vmName'),'/', 'OMSExtension')]",
       "location": "[parameters('location')]",
       "dependsOn": [
-        "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'))]",
-        "[concat('Microsoft.OperationalInsights/workspaces/', variables('logAnalyticsWorkspace'))]"
+        "[resourceId('Microsoft.Compute/virtualMachines', variables('vmName'))]",
+        "[resourceId('Microsoft.OperationalInsights/workspaces', variables('logAnalyticsWorkspace'))]"
       ],
       "properties": {
         "publisher": "Microsoft.EnterpriseCloud.Monitoring",
