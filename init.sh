@@ -341,9 +341,6 @@ if [[ $PRE_VALIDATION == "pass" ]]; then
   else
     ## No input from user. Generate Cluster Name, Username, and Password.
     log "Debug: No cluster details or insufficient data provided. Proceed to create new OCP cluster later"
-    export CLUSTER_NAME="masocp-${RANDOM_STR}"
-    export OCP_USERNAME="masocpuser"
-    export OCP_PASSWORD=masocp${RANDOM_STR}pass
     export OPENSHIFT_USER_PROVIDE="false"
   fi
   log " OPENSHIFT_USER_PROVIDE=$OPENSHIFT_USER_PROVIDE"
