@@ -1,448 +1,1213 @@
-#!/bin/bash
-#
-# This is the init script that will call the individual Cloud specific script
-#
-
-## Inputs
-export CLUSTER_TYPE=$1
-export OFFERING_TYPE=$2
-export DEPLOY_REGION=$3
-export ACCOUNT_ID=$4
-export CLUSTER_SIZE=$5
-export RANDOM_STR=$6
-export BASE_DOMAIN=$7
-export BASE_DOMAIN_RG_NAME=$8
-export SSH_KEY_NAME=$9
-export DEPLOY_WAIT_HANDLE=${10}
-export SLS_ENTITLEMENT_KEY=${11}
-export OCP_PULL_SECRET=${12}
-export MAS_LICENSE_URL=${13}
-export SLS_URL=${14}
-export SLS_REGISTRATION_KEY=${15}
-export SLS_PUB_CERT_URL=${16}
-export UDS_ENDPOINT_URL=${17}
-export UDS_API_KEY=${18}
-export UDS_PUB_CERT_URL=${19}
-export MAS_JDBC_USER=${20}
-export MAS_JDBC_PASSWORD=${21}
-export MAS_JDBC_URL=${22}
-export MAS_JDBC_CERT_URL=${23}
-export MAS_DB_IMPORT_DEMO_DATA=${24}
-export EXS_OCP_URL=${25}
-export EXS_OCP_USER=${26}
-export EXS_OCP_PWD=${27}
-export RG_NAME=${28}
-export RECEPIENT=${29}
-export SMTP_HOST=${30}
-export SMTP_PORT=${31}
-export SMTP_USERNAME=${32}
-export SMTP_PASSWORD=${33}
-export AZURE_SP_CLIENT_ID=${34}
-export AZURE_SP_CLIENT_PWD=${35}
-export SELLER_SUBSCRIPTION_ID=${36}
-export SELLER_RESOURCE_GROUP=${37}
-export SELLER_COMPUTE_GALLERY=${38}
-export SELLER_IMAGE_VERSION=${39}
-export EMAIL_NOTIFICATION=${40}
-export ENV_TYPE=${41}
-
-
-#local check - shajsyed
-export ARTIFACTORY_USERNAME=shajsyed@in.ibm.com
-export ARTIFACTORY_APIKEY=AKCp8hzNPQkgGtEy4HeWSt4pFBffJjgxb1CfKn61wVcbKUGGyMq9RsEw9eXb8eCNaCDSX7RZg
-export MAS_ICR_CP=wiotp-docker-local.artifactory.swg-devops.com
-export MAS_ICR_CPOPEN=wiotp-docker-local.artifactory.swg-devops.com
-export MAS_ENTITLEMENT_USERNAME=shajsyed@in.ibm.com
-export MAS_ENTITLEMENT_KEY=$ARTIFACTORY_APIKEY
-
-
-
-# Load helper functions
-. helper.sh
-export -f log
-export -f get_mas_creds
-export -f retrieve_mas_ca_cert
-export -f mark_provisioning_failed
-export -f get_sls_endpoint_url
-export -f get_sls_registration_key
-export -f get_uds_endpoint_url
-export -f get_uds_api_key
-
-## Configure CloudWatch agent
-if [[ $CLUSTER_TYPE == "aws" ]]; then
-  log "Configuring CloudWatch logs agent"
-  # TODO Temporary code to install CloudWatch agent. Later this will be done in AMI, and remove the code
-  #-----------------------------------------
-  cd /tmp
-  wget https://s3.amazonaws.com/amazoncloudwatch-agent/redhat/amd64/latest/amazon-cloudwatch-agent.rpm
-  rpm -U ./amazon-cloudwatch-agent.rpm
-  #-----------------------------------------
-  # Create CloudWatch agent config file
-  mkdir -p /opt/aws/amazon-cloudwatch-agent/bin
-  cat <<EOT >> /opt/aws/amazon-cloudwatch-agent/bin/config.json
 {
-  "agent": {
-    "run_as_user": "root"
-  },
-  "logs": {
-    "logs_collected": {
-      "files": {
-        "collect_list": [{
-          "file_path": "/root/ansible-devops/multicloud-bootstrap/mas-provisioning.log",
-          "log_group_name": "/ibm/mas/masocp-${RANDOM_STR}",
-          "log_stream_name": "mas-provisioning-logs"
-        }]
-      }
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "Template to create Bootnode used for deploying MAS on OpenShift",
+    "Parameters": {
+        "OfferingType": {
+            "Description": "Select your preferred Suite offering type.",
+            "Type": "String",
+            "Default": "MAS Core + Cloud Pak for Data",
+            "MinLength": "1",
+            "AllowedValues": [
+                "MAS Core + Cloud Pak for Data",
+                "MAS Core + Manage (no Cloud Pak for Data)"
+            ]
+        },
+        "PublicHostedZone": {
+            "Description": "Select the public hosted zone that you created in the AWS Route 53 service, for example: mas4aws.myorg.com",
+            "Type": "AWS::Route53::HostedZone::Id"
+        },
+        "BootnodeSGIngressCidrIp": {
+            "Description": "Use CIDR notation to enter the IP addresses that can access the bootnode. For example, 192.12.33.3/32. To allow access from all IP addresses, enter 0.0.0.0/0.",
+            "Type": "String",
+            "MinLength": "1"
+        },
+        "ClusterSize": {
+            "Description": "Select your preferred cluster size. All master nodes (M) are m5.2xlarge Amazon EC2 instances. All worker nodes (W) are m5.4xlarge instances. Choose from: small (3M, 3W, total memory: 288GB), medium (3M, 5W, total memory: 416GB), or large (5M, 7W, total memory: 608GB).",
+            "Type": "String",
+            "Default": "small",
+            "MinLength": "1",
+            "AllowedValues": [
+                "small",
+                "medium",
+                "large"
+            ]
+        },
+        "OpenShiftClusterApiUrl": {
+            "Description": "Enter the cluster's URL in the format https://api.<cluster_name>.<domain_name>. Do not specify the port number. For example,https://api.masocp.joalae.mas4aws.com",
+            "Type": "String"
+        },
+        "OpenShiftUser": {
+            "Description": "Enter the username of the existing cluster account.",
+            "Type": "String"
+        },
+        "OpenShiftPassword": {
+            "Description": "Enter the password of the existing cluster account.",
+            "Type": "String",
+            "NoEcho": true
+        },
+        "EntitledRegistryKey": {
+            "Description": "Enter the registry key that you downloaded from the IBM Container Library.",
+            "Type": "String",
+            "NoEcho": true,
+            "MinLength": "1"
+        },
+        "OpenShiftPullSecret": {
+            "Description": "Enter the JSON text from the pull secret file that you downloaded from the Red Hat Hybrid Cloud Console.",
+            "Type": "String",
+            "NoEcho": true,
+            "MinLength": "1"
+        },
+        "MASLicenseUrl": {
+            "Description": "Enter the HTTP or S3 location of your Suite license key file, for example: s3://masocp-license/entitlement.lic",
+            "Type": "String",
+            "MinLength": "1"
+        },
+        "MASManageDBUser": {
+            "Description": "Enter the username that the Maximo Manage application uses to connect to the database.",
+            "Type": "String"
+        },
+        "MASManageDBPassword": {
+            "Description": "Enter the password that the Maximo Manage application uses to connect to the database.",
+            "Type": "String",
+            "NoEcho": true
+        },
+        "MASManageDBJdbcUrl": {
+            "Description": "Enter the URL location of the database that the Maximo Manage application connects to, for example: jdbc:db2://1.2.3.4:50051/FTMDB:sslConnection=true;",
+            "Type": "String"
+        },
+        "MASManageDBCertificateUrl": {
+            "Description": "Enter the HTTP or S3 location of the database's public certificate, for example: s3://masocp-license/db-certificate.crt",
+            "Type": "String"
+        },
+        "ImportDemoData": {
+            "Description": "Indicate whether you want to import demo data into the database. This might be useful for development or test environments.",
+            "Default": false,
+            "Type": "String",
+            "AllowedValues": [
+                true,
+                false
+            ]
+        },
+        "SSHKey": {
+            "Type": "AWS::EC2::KeyPair::KeyName",
+            "Description": "Select the public SSH key that you uploaded to the Amazon EC2 service."
+        },
+        "SLSEndpointUrl": {
+            "Description": "Enter the endpoint URL that you retrieved from the 'sls-*' OpenShift route in the cluster namespace where SLS is installed.",
+            "Type": "String"
+        },
+        "SLSRegistrationKey": {
+            "Description": "Enter the 'status.registrationKey' value that you retrieved from the LicenseService YAML file in the SLS namespace.",
+            "Type": "String"
+        },
+        "SLSPublicCertificateUrl": {
+            "Description": "Enter the HTTP or S3 location of the service's public certificate that you retrieved from the 'ca.crt' file in the 'mas-*-sls-cfg' secret in the MAS core namespace.",
+            "Type": "String"
+        },
+        "UDSEndpointUrl": {
+            "Description": "Enter the endpoint URL that you retrieved from the 'uds-endpoint' OpenShift route in the ibm-common-services namespace.",
+            "Type": "String"
+        },
+        "UDSAPIKey": {
+            "Description": "Enter the service's API key that you retrieved from the 'uds-api-key' secret in the ibm-common-services namespace.",
+            "Type": "String"
+        },
+        "UDSPublicCertificateUrl": {
+            "Description": "Enter the HTTP or S3 location of the service's public certificate that you retrieved from the 'ca-bundle.pem' file in the 'mas-*-uds-cfg' secret in the MAS core namespace.",
+            "Type": "String"
+        },
+        "EmailNotification": {
+            "Description": "Indicate whether you want to receive emails that contain the connection details and credentials for the Suite. These emails are sent only to the verified email addresses that you configured in the Amazon SES service.",
+            "Default": false,
+            "Type": "String",
+            "AllowedValues": [
+                true,
+                false
+            ]
+        }
+    },
+    "Metadata": {
+        "AWS::CloudFormation::Interface": {
+            "ParameterGroups": [
+                {
+                    "Label": {
+                        "default": "Maximo Application Suite offering type"
+                    },
+                    "Parameters": [
+                        "OfferingType"
+                    ]
+                },
+                {
+                    "Label": {
+                        "default": "Existing OpenShift cluster connection details (complete this section only if you want to reuse an existing cluster)"
+                    },
+                    "Parameters": [
+                        "OpenShiftClusterApiUrl",
+                        "OpenShiftUser",
+                        "OpenShiftPassword"
+                    ]
+                },
+                {
+                    "Label": {
+                        "default": "New OpenShift cluster configuration details (complete this section only if you want to create a new cluster)"
+                    },
+                    "Parameters": [
+                        "PublicHostedZone",
+                        "ClusterSize"
+                    ]
+                },
+                {
+                    "Label": {
+                        "default": "Cluster and bootnode access (you must complete this section)"
+                    },
+                    "Parameters": [
+                        "SSHKey",
+                        "BootnodeSGIngressCidrIp"
+                    ]
+                },
+                {
+                    "Label": {
+                        "default": "Keys and licenses (you must complete this section)"
+                    },
+                    "Parameters": [
+                        "EntitledRegistryKey",
+                        "OpenShiftPullSecret",
+                        "MASLicenseUrl"
+                    ]
+                },
+                {
+                    "Label": {
+                        "default": "Maximo Manage database configuration (complete this section only if you chose the 'MAS + Manage' offering type)"
+                    },
+                    "Parameters": [
+                        "MASManageDBUser",
+                        "MASManageDBPassword",
+                        "MASManageDBJdbcUrl",
+                        "MASManageDBCertificateUrl",
+                        "ImportDemoData"
+                    ]
+                },
+                {
+                    "Label": {
+                        "default": "Existing Suite License Service connection details (leave this section empty to create a new SLS instance)"
+                    },
+                    "Parameters": [
+                        "SLSEndpointUrl",
+                        "SLSRegistrationKey",
+                        "SLSPublicCertificateUrl"
+                    ]
+                },
+                {
+                    "Label": {
+                        "default": "Existing User Data Services connection details (leave this section empty to create a new UDS instance)"
+                    },
+                    "Parameters": [
+                        "UDSEndpointUrl",
+                        "UDSAPIKey",
+                        "UDSPublicCertificateUrl"
+                    ]
+                },
+                {
+                    "Label": {
+                        "default": "Email notification"
+                    },
+                    "Parameters": [
+                        "EmailNotification"
+                    ]
+                }
+            ]
+        }
+    },
+    "Mappings": {
+        "RegionMap": {
+            "us-east-1": {
+                "HVM64": "ami-088484ab34cd9622d"
+            },
+            "us-east-2": {
+                "HVM64": "ami-0bd8d1e6a386638bf"
+            },
+            "us-west-2": {
+                "HVM64": "ami-067f0b34ab041764b"
+            },
+            "ca-central-1": {
+                "HVM64": "ami-0b169be60da52e1da"
+            },
+            "eu-north-1": {
+                "HVM64": "ami-00a91b9e0a538b0c6"
+            },
+            "eu-south-1": {
+                "HVM64": "ami-06c78840eda1c6464"
+            },
+            "eu-west-1": {
+                "HVM64": "ami-0f0d0911d82fea2d7"
+            },
+            "eu-west-2": {
+                "HVM64": "ami-07c5733dbc5af0b56"
+            },
+            "eu-west-3": {
+                "HVM64": "ami-0a0881f78a66f4baa"
+            },
+            "eu-central-1": {
+                "HVM64": "ami-0d23a3144777b775b"
+            },
+            "ap-northeast-1": {
+                "HVM64": "ami-00d99b966acbc651d"
+            },
+            "ap-northeast-2": {
+                "HVM64": "ami-0b56bf3a0cb67e0dd"
+            },
+            "ap-northeast-3": {
+                "HVM64": "ami-0b7cc5652ef8a1b78"
+            },
+            "ap-south-1": {
+                "HVM64": "ami-072bf189b8257f1dc"
+            },
+            "ap-southeast-1": {
+                "HVM64": "ami-010eb4be18aaf6e84"
+            },
+            "ap-southeast-2": {
+                "HVM64": "ami-0609dbe8a16e2b6d2"
+            },
+            "sa-east-1": {
+                "HVM64": "ami-0cde511b6667f71bf"
+            }
+        }
+    },
+    "Conditions": {
+        "NoExistingOCPCluster": {
+            "Fn::Equals": [
+                {
+                    "Ref": "OpenShiftClusterApiUrl"
+                },
+                ""
+            ]
+        },
+        "ExistingOCPCluster": {
+            "Fn::Not": [
+                {
+                    "Fn::Equals": [
+                        {
+                            "Ref": "OpenShiftClusterApiUrl"
+                        },
+                        ""
+                    ]
+                }
+            ]
+        }
+    },
+    "Resources": {
+        "DeployWaitConditionHandle": {
+            "Type": "AWS::CloudFormation::WaitConditionHandle"
+        },
+        "DeploymentRole": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "RoleName": {
+                    "Fn::Join": [
+                        "-",
+                        [
+                            "masocp-deploy-role",
+                            {
+                                "Fn::GetAtt": [
+                                    "CallLambdaRandomizer",
+                                    "Lower_RandomString"
+                                ]
+                            }
+                        ]
+                    ]
+                },
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": [
+                                    "ec2.amazonaws.com"
+                                ]
+                            },
+                            "Action": [
+                                "sts:AssumeRole"
+                            ]
+                        }
+                    ]
+                },
+                "Policies": [
+                    {
+                        "PolicyName": "EmbeddedInlinePolicy1",
+                        "PolicyDocument": {
+                            "Version": "2012-10-17",
+                            "Statement": [
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "iam:CreatePolicy",
+                                        "iam:CreateUser",
+                                        "iam:AttachUserPolicy",
+                                        "iam:CreateAccessKey",
+                                        "s3:GetObject",
+                                        "s3:PutObject",
+                                        "s3:DeleteObject",
+                                        "s3:DeleteBucket",
+                                        "ses:SendEmail",
+                                        "ses:SendRawEmail"
+                                    ],
+                                    "Resource": [
+                                        {
+                                            "Fn::Join": [
+                                                ":",
+                                                [
+                                                    "arn",
+                                                    "aws",
+                                                    "iam",
+                                                    "",
+                                                    {
+                                                        "Ref": "AWS::AccountId"
+                                                    },
+                                                    "user/*"
+                                                ]
+                                            ]
+                                        },
+                                        {
+                                            "Fn::Join": [
+                                                ":",
+                                                [
+                                                    "arn",
+                                                    "aws",
+                                                    "iam",
+                                                    "",
+                                                    {
+                                                        "Ref": "AWS::AccountId"
+                                                    },
+                                                    "policy/*"
+                                                ]
+                                            ]
+                                        },
+                                        {
+                                            "Fn::Join": [
+                                                ":",
+                                                [
+                                                    "arn",
+                                                    "aws",
+                                                    "s3",
+                                                    "",
+                                                    "",
+                                                    "*/*"
+                                                ]
+                                            ]
+                                        },
+                                        {
+                                            "Fn::Join": [
+                                                ":",
+                                                [
+                                                    "arn",
+                                                    "aws",
+                                                    "ses",
+                                                    "*",
+                                                    {
+                                                        "Ref": "AWS::AccountId"
+                                                    },
+                                                    "configuration-set/*"
+                                                ]
+                                            ]
+                                        },
+                                        {
+                                            "Fn::Join": [
+                                                ":",
+                                                [
+                                                    "arn",
+                                                    "aws",
+                                                    "ses",
+                                                    "*",
+                                                    {
+                                                        "Ref": "AWS::AccountId"
+                                                    },
+                                                    "identity/*"
+                                                ]
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "PolicyName": "EmbeddedInlinePolicy2",
+                        "PolicyDocument": {
+                            "Version": "2012-10-17",
+                            "Statement": [
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "ses:ListIdentities",
+                                        "route53:ListHostedZones",
+                                        "ses:GetIdentityVerificationAttributes",
+                                        "logs:CreateLogGroup",
+                                        "logs:CreateLogStream",
+                                        "logs:PutLogEvents",
+                                        "logs:DescribeLogStreams"
+                                    ],
+                                    "Resource": "*"
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "Path": "/"
+            }
+        },
+        "DeploymentRoleProfile": {
+            "Type": "AWS::IAM::InstanceProfile",
+            "Properties": {
+                "InstanceProfileName": {
+                    "Fn::Join": [
+                        "-",
+                        [
+                            "masocp-deploy-instance-profile",
+                            {
+                                "Fn::GetAtt": [
+                                    "CallLambdaRandomizer",
+                                    "Lower_RandomString"
+                                ]
+                            }
+                        ]
+                    ]
+                },
+                "Path": "/",
+                "Roles": [
+                    {
+                        "Ref": "DeploymentRole"
+                    }
+                ]
+            }
+        },
+        "LambdaRole": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "RoleName": {
+                    "Fn::Join": [
+                        "-",
+                        [
+                            "masocp-lambda-role",
+                            {
+                                "Ref": "AWS::Region"
+                            },
+                            {
+                                "Ref": "AWS::StackName"
+                            }
+                        ]
+                    ]
+                },
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": [
+                                    "lambda.amazonaws.com"
+                                ]
+                            },
+                            "Action": [
+                                "sts:AssumeRole"
+                            ]
+                        }
+                    ]
+                },
+                "Policies": [
+                    {
+                        "PolicyName": "EmbeddedInlinePolicy2",
+                        "PolicyDocument": {
+                            "Version": "2012-10-17",
+                            "Statement": [
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "logs:CreateLogStream",
+                                        "logs:PutLogEvents",
+                                        "logs:CreateLogGroup",
+                                        "route53:GetHostedZone",
+                                        "ec2:DescribeVpcs",
+                                        "ec2:DescribeSubnets"
+                                    ],
+                                    "Resource": "*"
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "Path": "/"
+            }
+        },
+        "LambdaFunctionRandomizer": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+                "Handler": "index.lambda_handler",
+                "Role": {
+                    "Fn::GetAtt": [
+                        "LambdaRole",
+                        "Arn"
+                    ]
+                },
+                "Runtime": "python3.7",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "RandomizerLambda"
+                    }
+                ],
+                "Code": {
+                    "ZipFile": "import boto3\nimport random\nimport string\nimport cfnresponse\ndef lambda_handler(event, context):\n    responseData = {}\n    try:\n        string_characters = string.ascii_letters + string.digits\n        number_characters = string.digits\n        responseData['RandomString']  = ''.join(random.choice(string_characters) for i in range(int(event[\"ResourceProperties\"][\"length\"])))\n        responseData['RandomNumber']  = ''.join(random.choice(number_characters) for i in range(int(event[\"ResourceProperties\"][\"length\"])))\n        responseData['Lower_RandomString'] = responseData['RandomString'].lower()\n        responseData['UpperRandomString'] = responseData['RandomString'].upper()\n        cfnresponse.send(event, context, cfnresponse.SUCCESS, responseData, \"CustomResourcePhysicalID\")\n    except Exception as e:\n        print(\"Exception Error : \" + str(e))\n        cfnresponse.send(event, context, cfnresponse.FAILED, responseData, \"CustomResourcePhysicalID\")\n"
+                }
+            }
+        },
+        "CallLambdaRandomizer": {
+            "Type": "Custom::CallLambdaRandomizer",
+            "Properties": {
+                "ServiceToken": {
+                    "Fn::GetAtt": [
+                        "LambdaFunctionRandomizer",
+                        "Arn"
+                    ]
+                },
+                "length": 6
+            }
+        },
+        "LambdaFunctionGetHostedZoneName": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+                "Handler": "index.lambda_handler",
+                "Role": {
+                    "Fn::GetAtt": [
+                        "LambdaRole",
+                        "Arn"
+                    ]
+                },
+                "Runtime": "python3.7",
+                "Code": {
+                    "ZipFile": "import boto3\nimport string\nimport cfnresponse\ndef lambda_handler(event, context):\n    responseData = {}\n    try:\n        route53_client = boto3.client('route53', region_name=event[\"ResourceProperties\"][\"Region\"])\n        response = route53_client.get_hosted_zone(Id=event[\"ResourceProperties\"][\"ZoneId\"])\n        responseData['ZoneName'] = response['HostedZone']['Name'][:-1]\n        cfnresponse.send(event, context, cfnresponse.SUCCESS, responseData, \"CustomResourcePhysicalID\")\n    except Exception as e:\n        print(\"Exception Error : \" + str(e))\n        cfnresponse.send(event, context, cfnresponse.FAILED, responseData, \"CustomResourcePhysicalID\")\n"
+                }
+            }
+        },
+        "CallLambdaGetHostedZoneName": {
+            "Type": "Custom::CallLambdaGetHostedZoneName",
+            "Properties": {
+                "ServiceToken": {
+                    "Fn::GetAtt": [
+                        "LambdaFunctionGetHostedZoneName",
+                        "Arn"
+                    ]
+                },
+                "ZoneId": {
+                    "Ref": "PublicHostedZone"
+                },
+                "Region": {
+                    "Ref": "AWS::Region"
+                }
+            }
+        },
+        "DeploymentConfigBucket": {
+            "Type": "AWS::S3::Bucket",
+            "Properties": {
+                "BucketName": {
+                    "Fn::Join": [
+                        "-",
+                        [
+                            "masocp",
+                            {
+                                "Fn::GetAtt": [
+                                    "CallLambdaRandomizer",
+                                    "Lower_RandomString"
+                                ]
+                            },
+                            "bucket",
+                            {
+                                "Ref": "AWS::Region"
+                            }
+                        ]
+                    ]
+                },
+                "AccessControl": "BucketOwnerFullControl",
+                "BucketEncryption": {
+                    "ServerSideEncryptionConfiguration": [
+                        {
+                            "ServerSideEncryptionByDefault": {
+                                "SSEAlgorithm": "AES256"
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        "LambdaFunctionGetSubnetForBootnode": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+                "Handler": "index.lambda_handler",
+                "Role": {
+                    "Fn::GetAtt": [
+                        "LambdaRole",
+                        "Arn"
+                    ]
+                },
+                "Runtime": "python3.7",
+                "Code": {
+                    "ZipFile": "import boto3\nimport string\nimport cfnresponse\ndef lambda_handler(event, context):\n    responseData = {}\n    try:\n        ec2_client = boto3.client('ec2', region_name=event[\"ResourceProperties\"][\"Region\"])\n        response = ec2_client.describe_vpcs()\n        for vpc_response in response['Vpcs']:\n          vpc_id = vpc_response['VpcId']\n          is_default = vpc_response['IsDefault']\n          if is_default == True:\n            default_vpc_id = vpc_id\n            break\n        response = ec2_client.describe_subnets()\n        for subnet_response in response['Subnets']:\n          subnet_id = subnet_response['SubnetId']\n          subnet_vpc_id = subnet_response['VpcId']\n          az_id = subnet_response['AvailabilityZoneId']\n          if subnet_vpc_id == default_vpc_id:\n            if \"az1\" in az_id:\n              responseData['DefaultVPCId'] = subnet_vpc_id\n              responseData['DefaultVPCAz1SubnetId'] = subnet_id\n        cfnresponse.send(event, context, cfnresponse.SUCCESS, responseData, \"CustomResourcePhysicalID\")\n    except Exception as e:\n        print(\"Exception Error : \" + str(e))\n        cfnresponse.send(event, context, cfnresponse.FAILED, responseData, \"CustomResourcePhysicalID\")\n"
+                }
+            }
+        },
+        "CallLambdaFunctionGetSubnetForBootnode": {
+            "Type": "Custom::CallLambdaFunctionGetSubnetForBootnode",
+            "Properties": {
+                "ServiceToken": {
+                    "Fn::GetAtt": [
+                        "LambdaFunctionGetSubnetForBootnode",
+                        "Arn"
+                    ]
+                },
+                "Region": {
+                    "Ref": "AWS::Region"
+                }
+            }
+        },
+        "BootnodeSecurityGroup": {
+            "Type": "AWS::EC2::SecurityGroup",
+            "Properties": {
+                "GroupDescription": "Security Group for Bootnode",
+                "SecurityGroupIngress": [
+                    {
+                        "IpProtocol": "icmp",
+                        "FromPort": 0,
+                        "ToPort": 0,
+                        "CidrIp": {
+                            "Ref": "BootnodeSGIngressCidrIp"
+                        }
+                    },
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": 22,
+                        "ToPort": 22,
+                        "CidrIp": {
+                            "Ref": "BootnodeSGIngressCidrIp"
+                        }
+                    }
+                ],
+                "SecurityGroupEgress": [
+                    {
+                        "IpProtocol": "-1",
+                        "CidrIp": "0.0.0.0/0"
+                    }
+                ],
+                "VpcId": {
+                    "Fn::GetAtt": [
+                        "CallLambdaFunctionGetSubnetForBootnode",
+                        "DefaultVPCId"
+                    ]
+                },
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": {
+                            "Fn::Join": [
+                                "-",
+                                [
+                                    "masocp-bootnode-sg",
+                                    {
+                                        "Fn::GetAtt": [
+                                            "CallLambdaRandomizer",
+                                            "Lower_RandomString"
+                                        ]
+                                    }
+                                ]
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        "Bootnode": {
+            "Type": "AWS::EC2::Instance",
+            "Properties": {
+                "SubnetId": {
+                    "Fn::GetAtt": [
+                        "CallLambdaFunctionGetSubnetForBootnode",
+                        "DefaultVPCAz1SubnetId"
+                    ]
+                },
+                "ImageId": {
+                    "Fn::FindInMap": [
+                        "RegionMap",
+                        {
+                            "Ref": "AWS::Region"
+                        },
+                        "HVM64"
+                    ]
+                },
+                "InstanceType": "t3.micro",
+                "KeyName": {
+                    "Ref": "SSHKey"
+                },
+                "SecurityGroupIds": [
+                    {
+                        "Ref": "BootnodeSecurityGroup"
+                    }
+                ],
+                "IamInstanceProfile": {
+                    "Ref": "DeploymentRoleProfile"
+                },
+                "UserData": {
+                    "Fn::Base64": {
+                        "Fn::Join": [
+                            "",
+                            [
+                                "#!/bin/bash\n",
+                                "# Initiate the provisioning process\n",
+                                "ssh-keyscan github.com >> ~/.ssh/known_hosts;",
+                                "cd /root;",
+                                "git clone https://github.com/ibm-mas/ansible-devops.git;",
+                                "cd ansible-devops;",
+                                "rm -rf multicloud-bootstrap 1>/dev/null 2>&1;",
+                                "git clone -b poc_test_channel8.8 https://github.com/ibm-mas/multicloud-bootstrap.git;",
+                                "cd multicloud-bootstrap;",
+                                "find . -type f -name \"*.sh\" -exec chmod +x {} \\;;",
+                                "./init.sh \"aws\" \"",
+                                {
+                                    "Ref": "OfferingType"
+                                },
+                                "\" \"",
+                                {
+                                    "Ref": "AWS::Region"
+                                },
+                                "\" \"",
+                                {
+                                    "Ref": "AWS::AccountId"
+                                },
+                                "\" \"",
+                                {
+                                    "Ref": "ClusterSize"
+                                },
+                                "\" \"",
+                                {
+                                    "Fn::GetAtt": [
+                                        "CallLambdaRandomizer",
+                                        "Lower_RandomString"
+                                    ]
+                                },
+                                "\" \"",
+                                {
+                                    "Fn::GetAtt": [
+                                        "CallLambdaGetHostedZoneName",
+                                        "ZoneName"
+                                    ]
+                                },
+                                "\" \"\" \"",
+                                {
+                                    "Ref": "SSHKey"
+                                },
+                                "\" \"",
+                                {
+                                    "Ref": "DeployWaitConditionHandle"
+                                },
+                                "\" \"",
+                                {
+                                    "Ref": "EntitledRegistryKey"
+                                },
+                                "\" ",
+                                "'",
+                                {
+                                    "Ref": "OpenShiftPullSecret"
+                                },
+                                "' '",
+                                {
+                                    "Ref": "MASLicenseUrl"
+                                },
+                                "' '",
+                                {
+                                    "Ref": "SLSEndpointUrl"
+                                },
+                                "' '",
+                                {
+                                    "Ref": "SLSRegistrationKey"
+                                },
+                                "' '",
+                                {
+                                    "Ref": "SLSPublicCertificateUrl"
+                                },
+                                "' '",
+                                {
+                                    "Ref": "UDSEndpointUrl"
+                                },
+                                "' '",
+                                {
+                                    "Ref": "UDSAPIKey"
+                                },
+                                "' '",
+                                {
+                                    "Ref": "UDSPublicCertificateUrl"
+                                },
+                                "' '",
+                                {
+                                    "Ref": "MASManageDBUser"
+                                },
+                                "' '",
+                                {
+                                    "Ref": "MASManageDBPassword"
+                                },
+                                "' '",
+                                {
+                                    "Ref": "MASManageDBJdbcUrl"
+                                },
+                                "' '",
+                                {
+                                    "Ref": "MASManageDBCertificateUrl"
+                                },
+                                "' '",
+                                {
+                                    "Ref": "ImportDemoData"
+                                },
+                                "' '",
+                                {
+                                    "Ref": "OpenShiftClusterApiUrl"
+                                },
+                                "' '",
+                                {
+                                    "Ref": "OpenShiftUser"
+                                },
+                                "' '",
+                                {
+                                    "Ref": "OpenShiftPassword"
+                                },
+                                "' '' '' '' '' '' '' '' '' '' '' '' '' '",
+                                {
+                                    "Ref": "EmailNotification"
+                                },
+                                "' \"dev\" ",
+                                "2>&1 | tee mas-provisioning.log; "
+                            ]
+                        ]
+                    }
+                },
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": {
+                            "Fn::Join": [
+                                "-",
+                                [
+                                    "masocp",
+                                    {
+                                        "Fn::GetAtt": [
+                                            "CallLambdaRandomizer",
+                                            "Lower_RandomString"
+                                        ]
+                                    },
+                                    "bootnode"
+                                ]
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        "DeployWaitCondition": {
+            "Type": "AWS::CloudFormation::WaitCondition",
+            "DependsOn": "Bootnode",
+            "Properties": {
+                "Handle": {
+                    "Ref": "DeployWaitConditionHandle"
+                },
+                "Timeout": 36000
+            }
+        }
+    },
+    "Outputs": {
+        "MASCloudAutomationVersion": {
+            "Description": "Version of the MAS automated deployment on Cloud",
+            "Value": "1.0"
+        },
+        "ClusterUniqueString": {
+            "Description": "Unique string that is part of cluster resoutce names",
+            "Value": {
+                "Fn::GetAtt": [
+                    "CallLambdaRandomizer",
+                    "Lower_RandomString"
+                ]
+            }
+        },
+        "OpenShiftConsoleUrl": {
+            "Description": "Url to login to OpenShift console",
+            "Condition": "NoExistingOCPCluster",
+            "Value": {
+                "Fn::Join": [
+                    "",
+                    [
+                        "https://console-openshift-console.apps.masocp-",
+                        {
+                            "Fn::GetAtt": [
+                                "CallLambdaRandomizer",
+                                "Lower_RandomString"
+                            ]
+                        },
+                        ".",
+                        {
+                            "Fn::GetAtt": [
+                                "CallLambdaGetHostedZoneName",
+                                "ZoneName"
+                            ]
+                        }
+                    ]
+                ]
+            }
+        },
+        "OpenShiftApiUrl": {
+            "Description": "Url to login to OpenShift Api",
+            "Condition": "NoExistingOCPCluster",
+            "Value": {
+                "Fn::Join": [
+                    "",
+                    [
+                        "https://api.masocp-",
+                        {
+                            "Fn::GetAtt": [
+                                "CallLambdaRandomizer",
+                                "Lower_RandomString"
+                            ]
+                        },
+                        ".",
+                        {
+                            "Fn::GetAtt": [
+                                "CallLambdaGetHostedZoneName",
+                                "ZoneName"
+                            ]
+                        },
+                        ":6443"
+                    ]
+                ]
+            }
+        },
+        "OpenShiftUser": {
+            "Description": "Username to login to OpenShift console",
+            "Condition": "NoExistingOCPCluster",
+            "Value": "masocpuser"
+        },
+        "OpenShiftPassword": {
+            "Description": "Username to login to OpenShift console",
+            "Condition": "NoExistingOCPCluster",
+            "Value": {
+                "Fn::Join": [
+                    "",
+                    [
+                        "masocp",
+                        {
+                            "Fn::GetAtt": [
+                                "CallLambdaRandomizer",
+                                "Lower_RandomString"
+                            ]
+                        },
+                        "pass"
+                    ]
+                ]
+            }
+        },
+        "MASInitialSetupUrl": {
+            "Description": "Url to perform MAS initial setup, make sure you have imported the MAS public certificate into the browser",
+            "Condition": "NoExistingOCPCluster",
+            "Value": {
+                "Fn::Join": [
+                    "",
+                    [
+                        "https://admin.mas-",
+                        {
+                            "Fn::GetAtt": [
+                                "CallLambdaRandomizer",
+                                "Lower_RandomString"
+                            ]
+                        },
+                        ".apps.masocp-",
+                        {
+                            "Fn::GetAtt": [
+                                "CallLambdaRandomizer",
+                                "Lower_RandomString"
+                            ]
+                        },
+                        ".",
+                        {
+                            "Fn::GetAtt": [
+                                "CallLambdaGetHostedZoneName",
+                                "ZoneName"
+                            ]
+                        },
+                        "/initialsetup"
+                    ]
+                ]
+            }
+        },
+        "MASInitialSetupUrlLogin": {
+            "Description": "Url to perform MAS initial setup, make sure you have imported the MAS public certificate into the browser",
+            "Condition": "ExistingOCPCluster",
+            "Value": {
+                "Fn::Join": [
+                    "",
+                    [
+                        "https://admin.mas-",
+                        {
+                            "Fn::GetAtt": [
+                                "CallLambdaRandomizer",
+                                "Lower_RandomString"
+                            ]
+                        },
+                        ".apps.",
+                        {
+                            "Fn::Select": [
+                                "1",
+                                {
+                                    "Fn::Split": [
+                                        "api.",
+                                        {"Ref": "OpenShiftClusterApiUrl"}
+                                    ]
+                                }
+                            ]
+                        },
+                        "/initialsetup"
+                    ]
+                ]
+            }
+        },
+        "MASAdminUrl": {
+            "Description": "Url to login to MAS Admin UI, make sure you have imported the MAS public certificate into the browser",
+            "Condition": "NoExistingOCPCluster",
+            "Value": {
+                "Fn::Join": [
+                    "",
+                    [
+                        "https://admin.mas-",
+                        {
+                            "Fn::GetAtt": [
+                                "CallLambdaRandomizer",
+                                "Lower_RandomString"
+                            ]
+                        },
+                        ".apps.masocp-",
+                        {
+                            "Fn::GetAtt": [
+                                "CallLambdaRandomizer",
+                                "Lower_RandomString"
+                            ]
+                        },
+                        ".",
+                        {
+                            "Fn::GetAtt": [
+                                "CallLambdaGetHostedZoneName",
+                                "ZoneName"
+                            ]
+                        }
+                    ]
+                ]
+            }
+        },
+        "MASAdminUrlLogin": {
+            "Description": "Url to login to MAS Admin UI, make sure you have imported the MAS public certificate into the browser",
+            "Condition": "ExistingOCPCluster",
+            "Value": {
+                "Fn::Join": [
+                    "",
+                    [
+                        "https://admin.mas-",
+                        {
+                            "Fn::GetAtt": [
+                                "CallLambdaRandomizer",
+                                "Lower_RandomString"
+                            ]
+                        },
+                        ".apps.",
+                        {
+                            "Fn::Select": [
+                                "1",
+                                {
+                                    "Fn::Split": [
+                                        "api.",
+                                        {"Ref": "OpenShiftClusterApiUrl"}
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                ]
+            }
+        },
+        "MASWorkspaceUrl": {
+            "Description": "Url to login to MAS Workspace, make sure you have imported the MAS public certificate into the browser",
+            "Condition": "NoExistingOCPCluster",
+            "Value": {
+                "Fn::Join": [
+                    "",
+                    [
+                        "https://wsmasocp.home.mas-",
+                        {
+                            "Fn::GetAtt": [
+                                "CallLambdaRandomizer",
+                                "Lower_RandomString"
+                            ]
+                        },
+                        ".apps.masocp-",
+                        {
+                            "Fn::GetAtt": [
+                                "CallLambdaRandomizer",
+                                "Lower_RandomString"
+                            ]
+                        },
+                        ".",
+                        {
+                            "Fn::GetAtt": [
+                                "CallLambdaGetHostedZoneName",
+                                "ZoneName"
+                            ]
+                        }
+                    ]
+                ]
+            }
+        },
+        "MASWorkspaceUrlLogin": {
+            "Description": "Url to login to MAS Workspace, make sure you have imported the MAS public certificate into the browser",
+            "Condition": "ExistingOCPCluster",
+            "Value": {
+                "Fn::Join": [
+                    "",
+                    [
+                        "https://wsmasocp.home.mas-",
+                        {
+                            "Fn::GetAtt": [
+                                "CallLambdaRandomizer",
+                                "Lower_RandomString"
+                            ]
+                        },
+                        ".apps.",
+                        {
+                            "Fn::Select": [
+                                "1",
+                                {
+                                    "Fn::Split": [
+                                        "api.",
+                                        {"Ref": "OpenShiftClusterApiUrl"}
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                ]
+            }
+        },
+        "MASCredentials": {
+            "Description": "Username and password to login to MAS UI",
+            "Value": "<Get it from OCP secret 'mas-[uniqstr]-credentials-superuser' in namespace 'mas-mas-[uniqstr]-core'>"
+        },
+        "DeploymentStatus": {
+            "Description": "Status of the deployment. Value will be a JSON string in the format {\"[signal-unique-id]\":\"SUCCESS/FAILURE#[message]\"}.",
+            "Value": {
+                "Fn::GetAtt": [
+                    "DeployWaitCondition",
+                    "Data"
+                ]
+            }
+        }
     }
-  }
 }
-EOT
-  # Start CloudWatch agent service
-  /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/bin/config.json -s
-  sleep 60
-  cd -
-fi
-
-# Check for input parameters
-if [[ (-z $CLUSTER_TYPE) || (-z $DEPLOY_REGION) || (-z $ACCOUNT_ID) || (-z $CLUSTER_SIZE) \
-   || (-z $RANDOM_STR) || (-z $BASE_DOMAIN) || (-z $SSH_KEY_NAME) || (-z $DEPLOY_WAIT_HANDLE) ]]; then
-  log "ERROR: Required parameter not specified, please provide all the required inputs to the script."
-  PRE_VALIDATION=fail
-fi
-
-if [[ $OFFERING_TYPE == "MAS Core + Cloud Pak for Data" ]]; then
-  export DEPLOY_CP4D="true"
-  export DEPLOY_MANAGE="false"
-elif [[ $OFFERING_TYPE == "MAS Core + Manage (no Cloud Pak for Data)" ]]; then
-  export DEPLOY_CP4D="false"
-  export DEPLOY_MANAGE="true"
-elif [[ $OFFERING_TYPE == "MAS Core + Cloud Pak for Data + Manage" ]]; then
-  export DEPLOY_CP4D="true"
-  export DEPLOY_MANAGE="true"
-else
-  log "ERROR: Incorrect value for OFFERING_TYPE - $OFFERING_TYPE"
-  PRE_VALIDATION=fail
-fi
-
-## Variables
-# OCP variables
-export GIT_REPO_HOME=$(pwd)
-export CLUSTER_NAME="masocp-${RANDOM_STR}"
-export OCP_USERNAME="masocpuser"
-export OCP_PASSWORD="mas${RANDOM_STR:3:3}`date +%H%M%S`${RANDOM_STR:0:3}"
-export OPENSHIFT_PULL_SECRET_FILE_PATH=${GIT_REPO_HOME}/pull-secret.json
-export MASTER_NODE_COUNT="3"
-export WORKER_NODE_COUNT="3"
-export AZ_MODE="multi_zone"
-export MAS_IMAGE_TEST_DOWNLOAD="cp.icr.io/cp/mas/admin-dashboard:5.1.27"
-export BACKUP_FILE_NAME="terraform-backup-${CLUSTER_NAME}.zip"
-if [[ $CLUSTER_TYPE == "aws" ]]; then
-  export DEPLOYMENT_CONTEXT_UPLOAD_PATH="s3://masocp-${RANDOM_STR}-bucket-${DEPLOY_REGION}/ocp-cluster-provisioning-deployment-context/"
-elif [[ $CLUSTER_TYPE == "azure" ]]; then
-  export DEPLOYMENT_CONTEXT_UPLOAD_PATH="ocp-cluster-provisioning-deployment-context/${BACKUP_FILE_NAME}"
-  export STORAGE_ACNT_NAME="masocp${RANDOM_STR}stgaccount"
-fi
-# Mongo variables
-export MAS_INSTANCE_ID="mas-${RANDOM_STR}"
-export MAS_CONFIG_DIR=/var/tmp/masconfigdir
-export MONGODB_NAMESPACE="mongoce-${RANDOM_STR}"
-# Amqstreams variables
-export KAFKA_NAMESPACE="amq-streams-${RANDOM_STR}"
-export KAFKA_CLUSTER_NAME=maskafka
-export KAFKA_CLUSTER_SIZE=small
-export KAFKA_USER_NAME=masuser
-# SLS variables
-export SLS_NAMESPACE="ibm-sls-${RANDOM_STR}"
-export SLS_MONGODB_CFG_FILE="${MAS_CONFIG_DIR}/mongo-${MONGODB_NAMESPACE}.yml"
-export SLS_LICENSE_FILE="${MAS_CONFIG_DIR}/entitlement.lic"
-export SLS_TLS_CERT_LOCAL_FILE_PATH="${GIT_REPO_HOME}/sls.crt"
-export SLS_INSTANCE_NAME="masocp-${RANDOM_STR}"
-# UDS variables
-if [[ $CLUSTER_TYPE == "aws" ]]; then
-  export UDS_STORAGE_CLASS="gp2"
-elif [[ $CLUSTER_TYPE == "azure" ]]; then
-  export UDS_STORAGE_CLASS="managed-premium"
-fi
-export UDS_CONTACT_EMAIL="uds.support@ibm.com"
-export UDS_CONTACT_FIRSTNAME=Uds
-export UDS_CONTACT_LASTNAME=Support
-export UDS_TLS_CERT_LOCAL_FILE_PATH="${GIT_REPO_HOME}/uds.crt"
-# CP4D variables
-export CPD_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
-export CPD_VERSION=cpd40
-export MAS_CHANNEL=m5dev88
-
-if [[ $CLUSTER_TYPE == "aws" ]]; then
-  export CPD_PRIMARY_STORAGE_CLASS="ocs-storagecluster-cephfs"
-elif [[ $CLUSTER_TYPE == "azure" ]]; then
-  export CPD_PRIMARY_STORAGE_CLASS="azurefiles-premium"
-fi
-export CPD_OPERATORS_NAMESPACE="ibm-cpd-operators-${RANDOM_STR}"
-export CPD_INSTANCE_NAMESPACE="ibm-cpd-${RANDOM_STR}"
-#CPD_SERVICES_NAMESPACE is used in roles - cp4d, cp4dv3_install, cp4dv3_install_services and suite_dns 
-export CPD_SERVICES_NAMESPACE="cpd-services-${RANDOM_STR}"
-# DB2WH variables
-export DB2_META_STORAGE_CLASS=$CPD_PRIMARY_STORAGE_CLASS
-export DB2_DATA_STORAGE_CLASS=$CPD_PRIMARY_STORAGE_CLASS
-export DB2_BACKUP_STORAGE_CLASS=$CPD_PRIMARY_STORAGE_CLASS
-export DB2_LOGS_STORAGE_CLASS=$CPD_PRIMARY_STORAGE_CLASS
-export DB2_TEMP_STORAGE_CLASS=$CPD_PRIMARY_STORAGE_CLASS
-export DB2_INSTANCE_NAME=db2wh-db01
-export DB2_VERSION=11.5.7.0-cn2
-export ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
-# not reqd its hardcoded as db2_namespace: db2u
-#export DB2WH_NAMESPACE="cpd-services-${RANDOM_STR}"
-# MAS variables
-#export MAS_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
-export MAS_WORKSPACE_ID="wsmasocp"
-export MAS_WORKSPACE_NAME="wsmasocp"
-export MAS_CONFIG_SCOPE="wsapp"
-export MAS_APP_ID=manage
-export MAS_APPWS_JDBC_BINDING="workspace-application"
-export MAS_JDBC_CERT_LOCAL_FILE=$GIT_REPO_HOME/db.crt
-export MAS_CLOUD_AUTOMATION_VERSION=1.0
-export MAS_DEVOPS_COLLECTION_VERSION=10.0.4
-
-RESP_CODE=0
-
-# Export env variables which are not set by default during userdata execution
-export HOME=/root
-
-# Decide clutser size
-case $CLUSTER_SIZE in
-  small)
-    log "Using small size cluster"
-    export MASTER_NODE_COUNT="3"
-    export WORKER_NODE_COUNT="3"
-    ;;
-  medium)
-    log "Using medium size cluster"
-    export MASTER_NODE_COUNT="3"
-    export WORKER_NODE_COUNT="5"
-    ;;
-  large)
-    log "Using large size cluster"
-    export MASTER_NODE_COUNT="5"
-    export WORKER_NODE_COUNT="7"
-    ;;
-  *)
-    log "Using default small size cluster"
-    export MASTER_NODE_COUNT="3"
-    export WORKER_NODE_COUNT="3"
-    ;;
-esac
-
-# Log the variable values
-log "Below are common deployment parameters,"
-log " CLUSTER_TYPE: $CLUSTER_TYPE"
-log " OFFERING_TYPE: $OFFERING_TYPE"
-log " DEPLOY_REGION: $DEPLOY_REGION"
-log " ACCOUNT_ID: $ACCOUNT_ID"
-log " CLUSTER_SIZE: $CLUSTER_SIZE"
-log " RANDOM_STR: $RANDOM_STR"
-log " BASE_DOMAIN: $BASE_DOMAIN"
-log " BASE_DOMAIN_RG_NAME: $BASE_DOMAIN_RG_NAME"
-log " SSH_KEY_NAME: $SSH_KEY_NAME"
-log " DEPLOY_WAIT_HANDLE: $DEPLOY_WAIT_HANDLE"
-log " SLS_ENTITLEMENT_KEY: $SLS_ENTITLEMENT_KEY"
-log " OCP_PULL_SECRET: $OCP_PULL_SECRET"
-log " DEPLOY_CP4D: $DEPLOY_CP4D"
-log " DEPLOY_MANAGE: $DEPLOY_MANAGE"
-log " MAS_LICENSE_URL: $MAS_LICENSE_URL"
-log " SLS_URL: $SLS_URL"
-log " SLS_REGISTRATION_KEY: $SLS_REGISTRATION_KEY"
-log " SLS_PUB_CERT_URL: $SLS_PUB_CERT_URL"
-log " UDS_ENDPOINT_URL: $UDS_ENDPOINT_URL"
-log " UDS_API_KEY: $UDS_API_KEY"
-log " UDS_PUB_CERT_URL: $UDS_PUB_CERT_URL"
-log " MAS_JDBC_USER: $MAS_JDBC_USER"
-log " MAS_JDBC_URL: $MAS_JDBC_URL"
-log " MAS_JDBC_CERT_URL: $MAS_JDBC_CERT_URL"
-log " MAS_DB_IMPORT_DEMO_DATA: $MAS_DB_IMPORT_DEMO_DATA"
-log " EXS_OCP_URL: $EXS_OCP_URL"
-log " EXS_OCP_USER: $EXS_OCP_USER"
-log " RG_NAME=$RG_NAME"
-log " RECEPIENT=$RECEPIENT"
-log " SMTP_HOST=$SMTP_HOST"
-log " SMTP_PORT=$SMTP_PORT"
-log " SMTP_USERNAME=$SMTP_USERNAME"
-log " SMTP_PASSWORD=$SMTP_PASSWORD"
-log " AZURE_SP_CLIENT_ID=$AZURE_SP_CLIENT_ID"
-log " SELLER_SUBSCRIPTION_ID=$SELLER_SUBSCRIPTION_ID"
-log " SELLER_RESOURCE_GROUP=$SELLER_RESOURCE_GROUP"
-log " SELLER_COMPUTE_GALLERY=$SELLER_COMPUTE_GALLERY"
-log " SELLER_IMAGE_VERSION=$SELLER_IMAGE_VERSION"
-log " EMAIL_NOTIFICATION: $EMAIL_NOTIFICATION"
-
-log " HOME: $HOME"
-log " GIT_REPO_HOME: $GIT_REPO_HOME"
-log " CLUSTER_NAME: $CLUSTER_NAME"
-log " OCP_USERNAME: $OCP_USERNAME"
-log " OPENSHIFT_PULL_SECRET_FILE_PATH: $OPENSHIFT_PULL_SECRET_FILE_PATH"
-log " MASTER_NODE_COUNT: $MASTER_NODE_COUNT"
-log " WORKER_NODE_COUNT: $WORKER_NODE_COUNT"
-log " AZ_MODE: $AZ_MODE"
-log " MAS_IMAGE_TEST_DOWNLOAD: $MAS_IMAGE_TEST_DOWNLOAD"
-log " BACKUP_FILE_NAME: $BACKUP_FILE_NAME"
-log " DEPLOYMENT_CONTEXT_UPLOAD_PATH: $DEPLOYMENT_CONTEXT_UPLOAD_PATH"
-log " STORAGE_ACNT_NAME: $STORAGE_ACNT_NAME"
-log " MAS_INSTANCE_ID: $MAS_INSTANCE_ID"
-log " MAS_CONFIG_DIR: $MAS_CONFIG_DIR"
-log " KAFKA_NAMESPACE: $KAFKA_NAMESPACE"
-log " KAFKA_CLUSTER_NAME: $KAFKA_CLUSTER_NAME"
-log " KAFKA_CLUSTER_SIZE: $KAFKA_CLUSTER_SIZE"
-log " KAFKA_USER_NAME: $KAFKA_USER_NAME"
-log " UDS_STORAGE_CLASS: $UDS_STORAGE_CLASS"
-log " UDS_CONTACT_EMAIL: $UDS_CONTACT_EMAIL"
-log " UDS_CONTACT_FIRSTNAME: $UDS_CONTACT_FIRSTNAME"
-log " UDS_CONTACT_LASTNAME: $UDS_CONTACT_LASTNAME"
-log " CPD_PRIMARY_STORAGE_CLASS: $CPD_PRIMARY_STORAGE_CLASS"
-log " MAS_APP_ID: $MAS_APP_ID"
-log " MAS_WORKSPACE_ID: $MAS_WORKSPACE_ID"
-log " MAS_JDBC_CERT_LOCAL_FILE: $MAS_JDBC_CERT_LOCAL_FILE"
-
-# Get deployment options
-export DEPLOY_CP4D=$(echo $DEPLOY_CP4D | cut -d '=' -f 2)
-export DEPLOY_MANAGE=$(echo $DEPLOY_MANAGE | cut -d '=' -f 2)
-log " DEPLOY_CP4D: $DEPLOY_CP4D"
-log " DEPLOY_MANAGE: $DEPLOY_MANAGE"
-
-if [[ $CLUSTER_TYPE == "azure" ]]; then
-  # Perform az login for accessing blob storage
-  az login --identity
-  az resource list -n masocp-${RANDOM_STR}-bootnode-vm
-
-  # Get subscription ID, tenant ID
-  export AZURE_SUBSC_ID=`az account list | jq -r '.[].id'`
-  log " AZURE_SUBSC_ID: $AZURE_SUBSC_ID"
-  export AZURE_TENANT_ID=`az account list | jq -r '.[].tenantId'`
-  log " AZURE_TENANT_ID: $AZURE_TENANT_ID"
-fi
-
-# Perform prevalidation checks
-log "===== PRE-VALIDATION STARTED ====="
-./pre-validate.sh
-retcode=$?
-log "Pre validation return code is $retcode"
-if [[ $retcode -ne 0 ]]; then
-  log "Prevalidation checks failed"
-  PRE_VALIDATION=fail
-  mark_provisioning_failed $retcode
-else
-  log "Prevalidation checks successful"
-  PRE_VALIDATION=pass
-fi
-log "===== PRE-VALIDATION COMPLETED ($PRE_VALIDATION) ====="
-
-# Perform the MAS deployment only if pre-validation checks are passed
-if [[ $PRE_VALIDATION == "pass" ]]; then
-  ## If user provided input of Openshift API url along with creds, then use the provided details for deployment of other components like CP4D, MAS etc.
-  ## Otherwise, proceed with new cluster creation.
-  if [[ -n $EXS_OCP_URL && -n $EXS_OCP_USER && -n $EXS_OCP_PWD ]]; then
-    log "Openshift cluster details provided"
-    # https://api.masocp-cluster.mas4aws.com/
-    # https://api.ftmpsl-ocp-dev3.cp.fyre.ibm.com:6443/
-
-    log "Debug: before: CLUSTER_NAME: $CLUSTER_NAME  BASE_DOMAIN: $BASE_DOMAIN"
-    split_ocp_api_url $EXS_OCP_URL
-    log "Debug: after: CLUSTER_NAME: $CLUSTER_NAME  BASE_DOMAIN: $BASE_DOMAIN"
-    # echo $BASE_DOMAIN
-    export OCP_USERNAME=$EXS_OCP_USER
-    export OCP_PASSWORD=$EXS_OCP_PWD
-    export OPENSHIFT_USER_PROVIDE="true"
-  else
-    ## No input from user. Generate Cluster Name, Username, and Password.
-    log "Debug: No cluster details or insufficient data provided. Proceed to create new OCP cluster later"
-    export OPENSHIFT_USER_PROVIDE="false"
-  fi
-  log " OPENSHIFT_USER_PROVIDE=$OPENSHIFT_USER_PROVIDE"
-
-  # Create Red Hat pull secret
-  echo "$OCP_PULL_SECRET" > $OPENSHIFT_PULL_SECRET_FILE_PATH
-  chmod 600 $OPENSHIFT_PULL_SECRET_FILE_PATH
-
-  ## Installing the collection depending on ENV_TYPE
-  if [[ $CLUSTER_TYPE == "aws" ]]; then
-    if [[ $ENV_TYPE == "dev" ]]; then
-      echo "=== Building and Installing Ansible Collection Locally ==="
-      cd $GIT_REPO_HOME/../ibm/mas_devops
-      ansible-galaxy collection build
-      ansible-galaxy collection install ibm-mas_devops-*.tar.gz
-      echo "=== Ansible Collection built and installed locally Successfully ==="
-    else
-      if [[ -z $MAS_DEVOPS_COLLECTION_VERSION  ]]; then
-        echo "=== Get the version from galaxy.yml ==="
-        cd $GIT_REPO_HOME/../ibm/mas_devops
-      else
-        echo "MAS_DEVOPS_COLLECTION_VERSION=$MAS_DEVOPS_COLLECTION_VERSION"
-        log "==== Installing Ansible Collection ===="
-        ansible-galaxy collection install ibm.mas_devops:==${MAS_DEVOPS_COLLECTION_VERSION}
-        log "==== Installed Ansible Collection Successfully ===="
-      fi  
-    fi
-  fi
-
-  cd $GIT_REPO_HOME
-
-  # Create MAS_CONFIG_DIR directory
-  mkdir -p $MAS_CONFIG_DIR
-  chmod 700 $MAS_CONFIG_DIR
-
-  # Call cloud specific script
-  chmod +x $CLUSTER_TYPE/*.sh
-  log "===== PROVISIONING STARTED ====="
-  log "Calling cloud specific automation ..."
-  cd $CLUSTER_TYPE
-  ./deploy.sh
-  retcode=$?
-  log "Deployment return code is $retcode"
-  if [[ $retcode -eq 0 ]]; then
-    log "Deployment successful"
-    log "===== PROVISIONING COMPLETED ====="
-    export STATUS=SUCCESS
-    export STATUS_MSG="MAS deployment completed successfully."
-    export MESSAGE_TEXT="Please import the attached certificate into the browser to access MAS UI."
-    export OPENSHIFT_CLUSTER_CONSOLE_URL="https:\/\/console-openshift-console.apps.${CLUSTER_NAME}.${BASE_DOMAIN}"
-    export OPENSHIFT_CLUSTER_API_URL="https:\/\/api.${CLUSTER_NAME}.${BASE_DOMAIN}:6443"
-    export OPENSHIFT_CLUSTER_API_URL="https:\/\/api.${CLUSTER_NAME}.${BASE_DOMAIN}:6443"
-    export MAS_URL_INIT_SETUP="https:\/\/admin.mas-${RANDOM_STR}.apps.${CLUSTER_NAME}.${BASE_DOMAIN}\/initialsetup"
-    export MAS_URL_ADMIN="https:\/\/admin.mas-${RANDOM_STR}.apps.${CLUSTER_NAME}.${BASE_DOMAIN}"
-    export MAS_URL_WORKSPACE="https:\/\/$MAS_WORKSPACE_ID.home.mas-${RANDOM_STR}.apps.${CLUSTER_NAME}.${BASE_DOMAIN}"
-    RESP_CODE=0
-  else
-    mark_provisioning_failed $retcode
-  fi
-fi
-
-log " STATUS=$STATUS"
-log " STATUS_MSG=$STATUS_MSG"
-
-cd $GIT_REPO_HOME/$CLUSTER_TYPE
-if [[ $CLUSTER_TYPE == "aws" ]]; then
-  # Complete the template deployment
-  cd $GIT_REPO_HOME/$CLUSTER_TYPE
-  # Complete the CFT stack creation successfully
-  log "Sending completion signal to CloudFormation stack."
-  curl -k -X PUT -H 'Content-Type:' --data-binary "{\"Status\":\"SUCCESS\",\"Reason\":\"MAS deployment complete\",\"UniqueId\":\"ID-$CLUSTER_TYPE-$CLUSTER_SIZE-$CLUSTER_NAME\",\"Data\":\"${STATUS}#${STATUS_MSG}\"}" "$DEPLOY_WAIT_HANDLE"
-fi
-
-# Send email notification
-if [[ $EMAIL_NOTIFICATION == "true" ]]; then
-  sleep 30
-  log "Buyer has explicitly opted for email notification, sending notification"
-  ./notify.sh
-else
-  log "Buyer chose to not send email notification"
-fi
-
-# Upload log file to object store
-if [[ $CLUSTER_TYPE == "aws" ]]; then
-  # Upload the log file to s3
-  aws s3 cp $GIT_REPO_HOME/mas-provisioning.log $DEPLOYMENT_CONTEXT_UPLOAD_PATH
-elif [[ $CLUSTER_TYPE == "azure" ]]; then
-  # Upload the log file to blob storage
-  az storage blob upload --account-name ${STORAGE_ACNT_NAME} --container-name masocpcontainer --name ocp-cluster-provisioning-deployment-context/mas-provisioning.log --file $GIT_REPO_HOME/mas-provisioning.log --auth-mode login
-fi
-log "Shutting down VM in a minute"
-shutdown -P "+1"
-exit $RESP_CODE
