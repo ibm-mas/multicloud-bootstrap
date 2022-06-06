@@ -46,6 +46,17 @@ export SELLER_IMAGE_VERSION=${39}
 export EMAIL_NOTIFICATION=${40}
 export ENV_TYPE=${41}
 
+
+#local check - shajsyed
+export ARTIFACTORY_USERNAME=shajsyed@in.ibm.com
+export ARTIFACTORY_APIKEY=AKCp8hzNPQkgGtEy4HeWSt4pFBffJjgxb1CfKn61wVcbKUGGyMq9RsEw9eXb8eCNaCDSX7RZg
+export MAS_ICR_CP=wiotp-docker-local.artifactory.swg-devops.com
+export MAS_ICR_CPOPEN=wiotp-docker-local.artifactory.swg-devops.com
+export MAS_ENTITLEMENT_USERNAME=shajsyed@in.ibm.com
+export MAS_ENTITLEMENT_KEY=$ARTIFACTORY_APIKEY
+
+
+
 # Load helper functions
 . helper.sh
 export -f log
@@ -160,6 +171,7 @@ export UDS_TLS_CERT_LOCAL_FILE_PATH="${GIT_REPO_HOME}/uds.crt"
 export CPD_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
 export CPD_VERSION=cpd40
 export MAS_CHANNEL=m5dev88
+
 if [[ $CLUSTER_TYPE == "aws" ]]; then
   export CPD_PRIMARY_STORAGE_CLASS="ocs-storagecluster-cephfs"
 elif [[ $CLUSTER_TYPE == "azure" ]]; then
