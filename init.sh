@@ -47,13 +47,6 @@ export EMAIL_NOTIFICATION=${40}
 export ENV_TYPE=${41}
 
 
-#local check - shajsyed
-export ARTIFACTORY_USERNAME=shajsyed@in.ibm.com
-export ARTIFACTORY_APIKEY=AKCp8hzNPQkgGtEy4HeWSt4pFBffJjgxb1CfKn61wVcbKUGGyMq9RsEw9eXb8eCNaCDSX7RZg
-export MAS_ICR_CP=wiotp-docker-local.artifactory.swg-devops.com
-export MAS_ICR_CPOPEN=wiotp-docker-local.artifactory.swg-devops.com
-export MAS_ENTITLEMENT_USERNAME=shajsyed@in.ibm.com
-export MAS_ENTITLEMENT_KEY=$ARTIFACTORY_APIKEY
 
 
 
