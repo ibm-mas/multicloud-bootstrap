@@ -44,11 +44,16 @@ export SELLER_RESOURCE_GROUP=${37}
 export SELLER_COMPUTE_GALLERY=${38}
 export SELLER_IMAGE_VERSION=${39}
 export EMAIL_NOTIFICATION=${40}
-export ENV_TYPE=${41}
+export ENV_TYPE=${42}
+export ARTIFACTORY_APIKEY=${41}
 
 
-
-
+export ARTIFACTORY_USERNAME=shajsyed@in.ibm.com
+export MAS_ICR_CP=wiotp-docker-local.artifactory.swg-devops.com
+export MAS_ICR_CPOPEN=wiotp-docker-local.artifactory.swg-devops.com
+export MAS_ENTITLEMENT_USERNAME=shajsyed@in.ibm.com
+export MAS_ENTITLEMENT_KEY=$ARTIFACTORY_APIKEY
+export MAS_CATALOG_SOURCE=ibm-mas-operators
 
 # Load helper functions
 . helper.sh
