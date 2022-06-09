@@ -213,7 +213,8 @@ oc set data secret/pull-secret -n openshift-config --from-file=/tmp/.dockerconfi
 
 
 ## Configure OCP cluster
-log "==== OCP cluster configuration (Cert Manager and SBO) started ===="
+log "==== OCP cluster configuration (Cert Manager and 
+) started ===="
 cd $GIT_REPO_HOME/../ibm/mas_devops/playbooks
 set +e
 export ROLE_NAME=ibm_catalogs && ansible-playbook ibm.mas_devops.run_role
@@ -233,7 +234,7 @@ if [[ $? -ne 0 ]]; then
   export ROLE_NAME=ibm_catalogs && ansible-playbook ibm.mas_devops.run_role
   export ROLE_NAME=common_services && ansible-playbook ibm.mas_devops.run_role
   export ROLE_NAME=cert_manager && ansible-playbook ibm.mas_devops.run_role
-  export ROLE_NAME=sbo && ansible-playbook ibm.mas_devops.run_role
+  #export ROLE_NAME=sbo && ansible-playbook ibm.mas_devops.run_role
   retcode=$?
   if [[ $retcode -ne 0 ]]; then
     log "Failed while configuring OCP cluster"
