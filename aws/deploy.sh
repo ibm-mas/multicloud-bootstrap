@@ -36,6 +36,7 @@ log " SLS_STORAGE_CLASS: $SLS_STORAGE_CLASS"
 log " CPD_METADB_BLOCK_STORAGE_CLASS: $CPD_METADB_BLOCK_STORAGE_CLASS"
 log " SSH_PUB_KEY: $SSH_PUB_KEY"
 log " MAS_ENTITLEMENT_KEY: $MAS_ENTITLEMENT_KEY"
+
 if [[ -f entitlement.lic ]]; then
   chmod 600 entitlement.lic
 fi
@@ -218,7 +219,7 @@ set +e
 export ROLE_NAME=ibm_catalogs && ansible-playbook ibm.mas_devops.run_role
 export ROLE_NAME=common_services && ansible-playbook ibm.mas_devops.run_role
 export ROLE_NAME=cert_manager && ansible-playbook ibm.mas_devops.run_role
-#export ROLE_NAME=sbo && ansible-playbook ibm.mas_devops.run_role 
+export ROLE_NAME=sbo && ansible-playbook ibm.mas_devops.run_role 
 #-8.8 not required
 if [[ $? -ne 0 ]]; then
   # One reason for this failure is catalog sources not having required state information, so recreate the catalog-operator pod
