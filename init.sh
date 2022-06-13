@@ -44,7 +44,16 @@ export SELLER_RESOURCE_GROUP=${37}
 export SELLER_COMPUTE_GALLERY=${38}
 export SELLER_IMAGE_VERSION=${39}
 export EMAIL_NOTIFICATION=${40}
-export ENV_TYPE=${41}
+export Existingvpcid=${41}
+export Existingmastersubnet1id=${42}
+export Existingmastersubnet2id=${43}
+export Existingmastersubnet3id=${44}
+export Existingworkersubnet1id=${45}
+export Existingworkersubnet2id=${46}
+export Existingworkersubnet3id=${47}
+
+
+export ENV_TYPE=${48}
 
 # Load helper functions
 . helper.sh
@@ -261,7 +270,13 @@ log " SELLER_RESOURCE_GROUP=$SELLER_RESOURCE_GROUP"
 log " SELLER_COMPUTE_GALLERY=$SELLER_COMPUTE_GALLERY"
 log " SELLER_IMAGE_VERSION=$SELLER_IMAGE_VERSION"
 log " EMAIL_NOTIFICATION: $EMAIL_NOTIFICATION"
-
+log " Existingvpcid=$Existingvpcid"
+log " Existingmastersubnet1id=$Existingmastersubnet1id"
+log " Existingmastersubnet2id=$Existingmastersubnet2id"
+log " Existingmastersubnet3id=$Existingmastersubnet3id"
+log " Existingworkersubnet1id=$Existingworkersubnet1id"
+log " Existingworkersubnet2id=$Existingworkersubnet2id"
+log " Existingworkersubnet3id=$Existingworkersubnet3id""
 log " HOME: $HOME"
 log " GIT_REPO_HOME: $GIT_REPO_HOME"
 log " CLUSTER_NAME: $CLUSTER_NAME"
