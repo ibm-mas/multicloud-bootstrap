@@ -162,6 +162,7 @@
                 "route53:ListTagsForResource",
                 "route53:UpdateHostedZoneComment",
                 "s3:*",
+                "secretsmanager:CreateSecret",
                 "servicequotas:ListAWSDefaultServiceQuotas",
                 "servicequotas:ListServiceQuotas",
                 "ses:SendEmail",
