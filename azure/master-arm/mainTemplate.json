@@ -676,16 +676,6 @@
       "condition": "[equals(parameters('openShiftClusterApiUrl'), '')]",
       "value": "[uri(concat('https://api.masocp-', variables('projectName'), '.', parameters('publicDomain')), '')]"
     },
-    "openShiftUser": {
-      "type": "string",
-      "condition": "[equals(parameters('openShiftClusterApiUrl'), '')]",
-      "value": "masocpuser"
-    },
-    "openShiftPwd": {
-      "type": "string",
-      "condition": "[equals(parameters('openShiftClusterApiUrl'), '')]",
-      "value": "[concat('masocp', variables('projectName'), 'pass')]"
-    },
     "masInitialSetupUrl": {
       "type": "string",
       "condition": "[equals(parameters('openShiftClusterApiUrl'), '')]",
@@ -715,10 +705,6 @@
       "type": "string",
       "condition": "[not(equals(parameters('openShiftClusterApiUrl'), ''))]",
       "value": "[uri(concat('https://wsmasocp.home.mas-', variables('projectName'), '.apps.', last(split(parameters('openShiftClusterApiUrl'),'api.'))), '')]"
-    },
-    "masCredentials": {
-      "type": "string",
-      "value": "<Get it from OCP secret 'mas-[uniqstr]-credentials-superuser' in namespace 'mas-mas-[uniqstr]-core'>"
     }
   }
 }
