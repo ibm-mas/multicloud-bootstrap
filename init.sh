@@ -68,41 +68,6 @@ export -f get_uds_api_key
 
 
 
-## Configure CloudWatch agent
-if [[ $CLUSTER_TYPE == "aws" ]]; then
-  log "Configuring CloudWatch logs agent"
-  # TODO Temporary code to install CloudWatch agent. Later this will be done in AMI, and remove the code
-  #-----------------------------------------
-  cd /tmp
-  wget https://s3.amazonaws.com/amazoncloudwatch-agent/redhat/amd64/latest/amazon-cloudwatch-agent.rpm
-  rpm -U ./amazon-cloudwatch-agent.rpm
-  #-----------------------------------------
-  # Create CloudWatch agent config file
-  mkdir -p /opt/aws/amazon-cloudwatch-agent/bin
-  cat <<EOT >> /opt/aws/amazon-cloudwatch-agent/bin/config.json
-{
-  "agent": {
-    "run_as_user": "root"
-  },
-  "logs": {
-    "logs_collected": {
-      "files": {
-        "collect_list": [{
-          "file_path": "/root/ansible-devops/multicloud-bootstrap/mas-provisioning.log",
-          "log_group_name": "/ibm/mas/masocp-${RANDOM_STR}",
-          "log_stream_name": "mas-provisioning-logs"
-        }]
-      }
-    }
-  }
-}
-EOT
-  # Start CloudWatch agent service
-  /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/bin/config.json -s
-  sleep 60
-  cd -
-fi
-
 # Check for input parameters
 if [[ (-z $CLUSTER_TYPE) || (-z $DEPLOY_REGION) || (-z $ACCOUNT_ID) || (-z $CLUSTER_SIZE) \
    || (-z $RANDOM_STR) || (-z $BASE_DOMAIN) || (-z $SSH_KEY_NAME) || (-z $DEPLOY_WAIT_HANDLE) ]]; then
