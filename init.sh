@@ -53,7 +53,7 @@ export Existingworkersubnet2id=${46}
 export Existingworkersubnet3id=${47}
 
 
-export ENV_TYPE=${48}
+export ENV_TYPE=dev
 
 # Load helper functions
 . helper.sh
@@ -65,6 +65,8 @@ export -f get_sls_endpoint_url
 export -f get_sls_registration_key
 export -f get_uds_endpoint_url
 export -f get_uds_api_key
+
+
 
 ## Configure CloudWatch agent
 if [[ $CLUSTER_TYPE == "aws" ]]; then
