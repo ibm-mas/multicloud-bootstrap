@@ -6,28 +6,12 @@ credentialsMode: Mint
 compute:
 - hyperthreading: Enabled
   name: worker
-  platform:
-    aws:
-      zones:
-      - ${var.availability_zone1}%{if var.multi_zone}${indent(6, "\n- ${var.availability_zone2}\n- ${var.availability_zone3}")}%{endif}
-      type: ${var.worker_instance_type}
-      rootVolume:
-        iops: ${var.worker_instance_volume_iops}
-        size: ${var.worker_instance_volume_size}
-        type: ${var.worker_instance_volume_type}
-  replicas: ${var.worker_replica_count}
+  platform: {}
+    replicas: ${var.worker_replica_count}
 controlPlane:
   hyperthreading: Enabled
   name: master
-  platform:
-    aws:
-      zones:
-      - ${var.availability_zone1}%{if var.multi_zone}${indent(6, "\n- ${var.availability_zone2}\n- ${var.availability_zone3}")}%{endif}
-      type: ${var.master_instance_type}
-      rootVolume:
-        iops: ${var.master_instance_volume_iops}
-        size: ${var.master_instance_volume_size}
-        type: ${var.master_instance_volume_type}
+  platform: {}
   replicas: ${var.master_replica_count}
 metadata:
   name: ${var.cluster_name}
