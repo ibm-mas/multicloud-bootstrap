@@ -29,4 +29,4 @@ elif [[ $CLUSTER_TYPE == "azure" ]]; then
   log "Secret created in Azure Key Vault"
 fi
 # Delete the secrets file
-#rm -rf $SECRETFILE
+rm -rf $SECRETFILE
