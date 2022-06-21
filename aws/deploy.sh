@@ -140,6 +140,8 @@ master_subnet3_id               = "$Existingmastersubnet3id"
 worker_subnet1_id               = "$Existingworkersubnet1id"
 worker_subnet2_id               = "$Existingworkersubnet2id"
 worker_subnet3_id               = "$Existingworkersubnet3id"
+multi_zone                      = true
+private_cluster                 = false
 EOT
   log "==== OCP cluster creation started ===="
   # Deploy OCP cluster
