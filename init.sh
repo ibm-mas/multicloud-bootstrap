@@ -414,5 +414,5 @@ elif [[ $CLUSTER_TYPE == "azure" ]]; then
   az storage blob upload --account-name ${STORAGE_ACNT_NAME} --container-name masocpcontainer --name ocp-cluster-provisioning-deployment-context/mas-provisioning.log --file $GIT_REPO_HOME/mas-provisioning.log --auth-mode login
 fi
 log "Shutting down VM in a minute"
-shutdown -P "+1"
-exit $RESP_CODE
+#shutdown -P "+1"
+#exit $RESP_CODE
