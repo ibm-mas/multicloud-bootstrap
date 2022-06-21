@@ -423,6 +423,10 @@ else
   log "Buyer chose to not send email notification"
 fi
 
+# Create a secret in the Cloud to keep environment access credentials
+cd $GIT_REPO_HOME
+./create-secret.sh
+
 # Upload log file to object store
 if [[ $CLUSTER_TYPE == "aws" ]]; then
   # Upload the log file to s3

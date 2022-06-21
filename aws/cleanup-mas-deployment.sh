@@ -547,6 +547,18 @@ else
 fi
 echo "---------------------------------------------"
 
+## Delete secret in Secrets Manager
+echo "Checking for secret"
+SECRET=$(aws secretsmanager describe-secret --secret-id masocp-secret-$UNIQ_STR --region $REGION | jq ".Name" | tr -d '"')
+echo "SECRET = $SECRET"
+if [[ -n $SECRET ]]; then
+  # Delete secret
+  aws secretsmanager delete-secret --secret-id masocp-secret-$UNIQ_STR --region $REGION
+  echo "Deleted secret $SECRET"
+else
+  echo "No secret for this MAS instance"
+fi
+
 # Delete CloudFormation stack
 if [[ -n $STACK_NAME ]]; then
   echo "Checking for CloudFormation stack"

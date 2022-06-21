@@ -766,7 +766,7 @@
                                 "git clone https://github.com/ibm-mas/ansible-devops.git;",
                                 "cd ansible-devops;",
                                 "rm -rf multicloud-bootstrap 1>/dev/null 2>&1;",
-                                "git clone -b main https://github.com/ibm-mas/multicloud-bootstrap.git;",
+                                "git clone https://github.com/ibm-mas/multicloud-bootstrap.git;",
                                 "cd multicloud-bootstrap;",
                                 "find . -type f -name \"*.sh\" -exec chmod +x {} \\;;",
                                 "./init.sh \"aws\" \"",
@@ -984,30 +984,6 @@
                 ]
             }
         },
-        "OpenShiftUser": {
-            "Description": "Username to login to OpenShift console",
-            "Condition": "NoExistingOCPCluster",
-            "Value": "masocpuser"
-        },
-        "OpenShiftPassword": {
-            "Description": "Username to login to OpenShift console",
-            "Condition": "NoExistingOCPCluster",
-            "Value": {
-                "Fn::Join": [
-                    "",
-                    [
-                        "masocp",
-                        {
-                            "Fn::GetAtt": [
-                                "CallLambdaRandomizer",
-                                "Lower_RandomString"
-                            ]
-                        },
-                        "pass"
-                    ]
-                ]
-            }
-        },
         "MASInitialSetupUrl": {
             "Description": "Url to perform MAS initial setup, make sure you have imported the MAS public certificate into the browser",
             "Condition": "NoExistingOCPCluster",
@@ -1195,10 +1171,6 @@
                     ]
                 ]
             }
-        },
-        "MASCredentials": {
-            "Description": "Username and password to login to MAS UI",
-            "Value": "<Get it from OCP secret 'mas-[uniqstr]-credentials-superuser' in namespace 'mas-mas-[uniqstr]-core'>"
         },
         "DeploymentStatus": {
             "Description": "Status of the deployment. Value will be a JSON string in the format {\"[signal-unique-id]\":\"SUCCESS/FAILURE#[message]\"}.",

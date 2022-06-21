@@ -288,7 +288,9 @@
     "ownerRoleAssignmentId": "[guid(subscription().id, variables('ownerRoleDefinitionId'),variables('managedIdentityId'))]",
     "ownerRoleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '8e3af657-a8ff-443c-a75c-2fe8c4bcb635')]",
     "storageBlobRoleAssignmentId": "[guid(subscription().id, variables('storageBlobRoleDefinitionId'),variables('managedIdentityId'))]",
-    "storageBlobRoleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'ba92f5b4-2d11-453d-a403-e96b0029c9fe')]"
+    "storageBlobRoleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'ba92f5b4-2d11-453d-a403-e96b0029c9fe')]",
+    "keyVaultRoleAssignmentId": "[guid(subscription().id, variables('keyVaultRoleDefinitionId'),variables('managedIdentityId'))]",
+    "keyVaultRoleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'f25e0fa2-a7c8-4377-a976-54943a77a395')]"
   },
   "resources": [
     {
@@ -317,7 +319,17 @@
         "principalId": "[reference(variables('managedIdentityName')).principalId]",
         "principalType": "ServicePrincipal",
         "scope": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', variables('rgName'))]"
-
+      }
+    },
+    {
+      "type": "Microsoft.Authorization/roleAssignments",
+      "apiVersion": "2020-04-01-preview",
+      "name": "[variables('keyVaultRoleAssignmentId')]",
+      "properties": {
+        "roleDefinitionId": "[variables('keyVaultRoleDefinitionId')]",
+        "principalId": "[reference(variables('managedIdentityName')).principalId]",
+        "principalType": "ServicePrincipal",
+        "scope": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', variables('rgName'))]"
       }
     },
     {
@@ -656,16 +668,6 @@
       "condition": "[equals(parameters('openShiftClusterApiUrl'), '')]",
       "value": "[uri(concat('https://api.masocp-', variables('projectName'), '.', parameters('publicDomain')), '')]"
     },
-    "openShiftUser": {
-      "type": "string",
-      "condition": "[equals(parameters('openShiftClusterApiUrl'), '')]",
-      "value": "masocpuser"
-    },
-    "openShiftPwd": {
-      "type": "string",
-      "condition": "[equals(parameters('openShiftClusterApiUrl'), '')]",
-      "value": "[concat('masocp', variables('projectName'), 'pass')]"
-    },
     "masInitialSetupUrl": {
       "type": "string",
       "condition": "[equals(parameters('openShiftClusterApiUrl'), '')]",
@@ -695,10 +697,6 @@
       "type": "string",
       "condition": "[not(equals(parameters('openShiftClusterApiUrl'), ''))]",
       "value": "[uri(concat('https://wsmasocp.home.mas-', variables('projectName'), '.apps.', last(split(parameters('openShiftClusterApiUrl'),'api.'))), '')]"
-    },
-    "masCredentials": {
-      "type": "string",
-      "value": "<Get it from OCP secret 'mas-[uniqstr]-credentials-superuser' in namespace 'mas-mas-[uniqstr]-core'>"
     }
   }
 }
