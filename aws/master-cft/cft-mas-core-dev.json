@@ -284,7 +284,7 @@
                 "HVM64": "ami-0f0d0911d82fea2d7"
             },
             "eu-west-2": {
-                "HVM64": "ami-04dc3d5c44368c1ef"
+                "HVM64": "ami-08d236c8ea436886e"
             },
             "eu-west-3": {
                 "HVM64": "ami-0a0881f78a66f4baa"
@@ -922,6 +922,7 @@
                                 {
                                     "Ref": "EmailNotification"
                                 },
+                                "' '",
                                 {
                                     "Ref": "Existingvpcid"
                                 },
