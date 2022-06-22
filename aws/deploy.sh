@@ -173,15 +173,15 @@ oc create -f $GIT_REPO_HOME/templates/container-runtime-config.yml
 #   envsubst < /tmp/dockerconfig.json > /tmp/.dockerconfigjson
 #   oc set data secret/pull-secret -n openshift-config --from-file=/tmp/.dockerconfigjson
 
-  ## Create bastion host
-  cd $GIT_REPO_HOME/aws
-  set +e
-  ./create-bastion-host.sh
-  retcode=$?
-  if [[ $retcode -ne 0 ]]; then
-    log "Bastion host creation failed in Terraform step"
-    exit 22
-  fi
+  ## Create bastion host - Commented for private cluster
+#  cd $GIT_REPO_HOME/aws
+#  set +e
+#  ./create-bastion-host.sh
+#  retcode=$?
+#  if [[ $retcode -ne 0 ]]; then
+#    log "Bastion host creation failed in Terraform step"
+#    exit 22
+#  fi
   set -e
 
   # Backup Terraform configuration
