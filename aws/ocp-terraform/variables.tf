@@ -223,7 +223,7 @@ variable "service_network_cidr" {
 variable "private_cluster" {
   type        = bool
   description = "Endpoints should resolve to Private IPs"
-  default     = false
+  default     = true
 }
 
 variable "openshift_pull_secret_file_path" {
