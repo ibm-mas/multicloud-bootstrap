@@ -16,6 +16,34 @@
             "Description": "Select the public hosted zone that you created in the AWS Route 53 service, for example: mas4aws.myorg.com",
             "Type": "AWS::Route53::HostedZone::Id"
         },
+        "Existingvpcid": {
+            "Description": "Enter the existing vpc_id",
+            "Type": "AWS::EC2::VPC"
+        },
+        "Existingmastersubnet1id": {
+            "Description": "Enter the master_subnet1_id",
+            "Type": "AWS::EC2::Subnet"
+        },
+        "Existingmastersubnet2id": {
+            "Description": "Enter the master_subnet2_id",
+            "Type": "AWS::EC2::Subnet"
+        },
+        "Existingmastersubnet3id": {
+            "Description": "Enter the master_subnet3_id",
+            "Type": "AWS::EC2::Subnet"
+        },
+        "Existingworkersubnet1id": {
+            "Description": "Enter the worker_subnet1_id",
+            "Type": "AWS::EC2::Subnet"
+        },
+        "Existingworkersubnet2id": {
+            "Description": "Enter the worker_subnet2_id",
+            "Type": "AWS::EC2::Subnet"
+        },
+        "Existingworkersubnet3id": {
+            "Description": "Enter the worker_subnet3_id",
+            "Type": "AWS::EC2::Subnet"
+        },
         "BootnodeSGIngressCidrIp": {
             "Description": "Use CIDR notation to enter the IP addresses that can access the bootnode. For example, 192.12.33.3/32. To allow access from all IP addresses, enter 0.0.0.0/0.",
             "Type": "String",
@@ -214,6 +242,20 @@
                     "Parameters": [
                         "EmailNotification"
                     ]
+                },
+                {
+                    "Label": {
+                        "default": "Existing Public VPC details "
+                    },
+                    "Parameters": [
+                        "Existingvpcid",
+                        "Existingmastersubnet1id",
+                        "Existingmastersubnet2id",
+                        "Existingmastersubnet3id",
+                        "Existingworkersubnet1id",
+                        "Existingworkersubnet2id",
+                        "Existingworkersubnet3id"
+                    ]
                 }
             ]
         }
@@ -242,7 +284,7 @@
                 "HVM64": "ami-0f0d0911d82fea2d7"
             },
             "eu-west-2": {
-                "HVM64": "ami-07c5733dbc5af0b56"
+                "HVM64": "ami-08d236c8ea436886e"
             },
             "eu-west-3": {
                 "HVM64": "ami-0a0881f78a66f4baa"
@@ -766,7 +808,7 @@
                                 "git clone https://github.com/ibm-mas/ansible-devops.git;",
                                 "cd ansible-devops;",
                                 "rm -rf multicloud-bootstrap 1>/dev/null 2>&1;",
-                                "git clone -b main https://github.com/ibm-mas/multicloud-bootstrap.git;",
+                                "git clone -b existingvpc https://github.com/ibm-mas/multicloud-bootstrap.git;",
                                 "cd multicloud-bootstrap;",
                                 "find . -type f -name \"*.sh\" -exec chmod +x {} \\;;",
                                 "./init.sh \"aws\" \"",
@@ -880,7 +922,36 @@
                                 {
                                     "Ref": "EmailNotification"
                                 },
-                                "' \"prod\" ",
+                                "' '",
+                                {
+                                    "Ref": "Existingvpcid"
+                                },
+                                "' '",
+                                {
+                                    "Ref": "Existingmastersubnet1id"
+                                },
+                                "' '",
+                                {
+                                    "Ref": "Existingmastersubnet2id"
+                                },
+                                "' '",
+                                {
+                                    "Ref": "Existingmastersubnet3id"
+                                },
+                                "' '",
+                                {
+                                    "Ref": "Existingworkersubnet1id"
+                                },
+                                "' '",
+                                {
+                                    "Ref": "Existingworkersubnet2id"
+                                },
+                                "' '",
+                                {
+                                    "Ref": "Existingworkersubnet3id"
+                                },
+                                "' '",
+                                "' \"dev\" ",
                                 "2>&1 | tee mas-provisioning.log; "
                             ]
                         ]
@@ -1062,7 +1133,9 @@
                                 {
                                     "Fn::Split": [
                                         "api.",
-                                       { "Ref": "OpenShiftClusterApiUrl"}
+                                        {
+                                            "Ref": "OpenShiftClusterApiUrl"
+                                        }
                                     ]
                                 }
                             ]
@@ -1125,7 +1198,9 @@
                                 {
                                     "Fn::Split": [
                                         "api.",
-                                        {"Ref": "OpenShiftClusterApiUrl"}
+                                        {
+                                            "Ref": "OpenShiftClusterApiUrl"
+                                        }
                                     ]
                                 }
                             ]
@@ -1187,7 +1262,9 @@
                                 {
                                     "Fn::Split": [
                                         "api.",
-                                        {"Ref": "OpenShiftClusterApiUrl"}
+                                        {
+                                            "Ref": "OpenShiftClusterApiUrl"
+                                        }
                                     ]
                                 }
                             ]
