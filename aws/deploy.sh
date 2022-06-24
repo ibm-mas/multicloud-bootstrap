@@ -214,7 +214,7 @@ oc set data secret/pull-secret -n openshift-config --from-file=/tmp/.dockerconfi
 
 ## Configure OCP cluster
 log "==== OCP cluster configuration (Cert Manager and 
-) started ===="
+SBO) started ===="
 cd $GIT_REPO_HOME/../ibm/mas_devops/playbooks
 set +e
 export ROLE_NAME=ibm_catalogs && ansible-playbook ibm.mas_devops.run_role
