@@ -82,7 +82,7 @@ if [[ $OPENSHIFT_USER_PROVIDE == "false" ]]; then
   zip -r $BACKUP_FILE_NAME ansible-devops/*
   rm -rf /tmp/ansible-devops
   set +e
-  az storage blob upload --account-name ${STORAGE_ACNT_NAME} --container-name masocpcontainer --name ${DEPLOYMENT_CONTEXT_UPLOAD_PATH} --file ${BACKUP_FILE_NAME} --auth-mode login
+  az storage blob upload --account-name ${STORAGE_ACNT_NAME} --container-name masocpcontainer --name ${DEPLOYMENT_CONTEXT_UPLOAD_PATH} --file ${BACKUP_FILE_NAME} 
   retcode=$?
   if [[ $retcode -ne 0 ]]; then
     log "Failed while uploading deployment context to blob storage3"
