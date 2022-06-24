@@ -53,7 +53,7 @@ export Existingworkersubnet2id=${46}
 export Existingworkersubnet3id=${47}
 
 
-export ENV_TYPE=dev
+export ENV_TYPE=prod
 
 # Load helper functions
 . helper.sh
