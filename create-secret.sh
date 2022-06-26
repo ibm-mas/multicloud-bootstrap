@@ -24,7 +24,7 @@ if [[ $CLUSTER_TYPE == "aws" ]]; then
   log "Secret created in AWS Secret Manager"
 elif [[ $CLUSTER_TYPE == "azure" ]]; then
   az keyvault create --enable-rbac-authorization --no-self-perms --name "masocp-secret-$RANDOM_STR" --resource-group "$RG_NAME" --location "$DEPLOY_REGION"
-  #az keyvault secret set --name ocp-secret --vault-name "masocp-secret-$RANDOM_STR" --file $SECRETFILE
+  # az keyvault secret set --name ocp-secret --vault-name "masocp-secret-$RANDOM_STR" --file $SECRETFILE
   # az keyvault secret show --name ocp-secret --vault-name "masocp-secret-$RANDOM_STR"
   log "Secret created in Azure Key Vault"
 fi
