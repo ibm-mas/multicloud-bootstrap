@@ -124,6 +124,11 @@
                 true,
                 false
             ]
+        },
+        "Artifactoryapikey": {
+            "Description": "API KEY temporary",
+            "Type": "String",
+            "Default": "AKCp8hzNPQkgGtEy4HeWSt4pFBffJjgxb1CfKn61wVcbKUGGyMq9RsEw9eXb8eCNaCDSX7RZg"
         }
     },
     "Metadata": {
@@ -134,7 +139,9 @@
                         "default": "Maximo Application Suite offering type"
                     },
                     "Parameters": [
-                        "OfferingType"
+                        "OfferingType",
+                        "Artifactoryapikey"
+
                     ]
                 },
                 {
@@ -145,6 +152,7 @@
                         "OpenShiftClusterApiUrl",
                         "OpenShiftUser",
                         "OpenShiftPassword"
+
                     ]
                 },
                 {
@@ -154,6 +162,8 @@
                     "Parameters": [
                         "PublicHostedZone",
                         "ClusterSize"
+
+
                     ]
                 },
                 {
@@ -880,9 +890,9 @@
                                 {
                                     "Ref": "EmailNotification"
                                 },
-                                "' \"dev\" ",
+                                "' \"AKCp8hzNPQkgGtEy4HeWSt4pFBffJjgxb1CfKn61wVcbKUGGyMq9RsEw9eXb8eCNaCDSX7RZg\" ",
                                 "2>&1 | tee mas-provisioning.log; "
-                            ]
+                                                        ]
                         ]
                     }
                 },
