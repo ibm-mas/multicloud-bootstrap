@@ -358,15 +358,10 @@ if [[ $PRE_VALIDATION == "pass" ]]; then
       ansible-galaxy collection install ibm-mas_devops-*.tar.gz
       echo "=== Ansible Collection built and installed locally Successfully ==="
     else
-      if [[ -z $MAS_DEVOPS_COLLECTION_VERSION  ]]; then
-        echo "=== Get the version from galaxy.yml ==="
-        cd $GIT_REPO_HOME/../ibm/mas_devops
-      else
-        echo "MAS_DEVOPS_COLLECTION_VERSION=$MAS_DEVOPS_COLLECTION_VERSION"
-        log "==== Installing Ansible Collection ===="
-        ansible-galaxy collection install ibm.mas_devops:==${MAS_DEVOPS_COLLECTION_VERSION}
-        log "==== Installed Ansible Collection Successfully ===="
-      fi  
+      echo "MAS_DEVOPS_COLLECTION_VERSION=$MAS_DEVOPS_COLLECTION_VERSION"
+      log "==== Installing Ansible Collection ===="
+      ansible-galaxy collection install ibm.mas_devops:==${MAS_DEVOPS_COLLECTION_VERSION}
+      log "==== Installed Ansible Collection Successfully ===="
     fi
   fi
 
