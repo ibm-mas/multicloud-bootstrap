@@ -16,7 +16,7 @@
 
 set -euo pipefail
 
-echo "Installing Azure File CSI driver, version: $ver ..."
+echo "Installing Azure File CSI driver, version: $driver_version ..."
 kubectl apply -f rbac-csi-azurefile-controller.yaml
 kubectl apply -f rbac-csi-azurefile-node.yaml
 kubectl apply -f csi-azurefile-controller.yaml
