@@ -192,6 +192,9 @@ else
         log "ERROR: Valid MAS license is reqiuired for MAS deployment"
         SCRIPT_STATUS=18
     fi
+    if [[ -f entitlement.lic ]]; then
+        chmod 600 entitlement.lic
+    fi
 fi
 
 if [[ $CLUSTER_TYPE == "azure" ]]; then

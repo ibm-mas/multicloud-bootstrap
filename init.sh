@@ -422,6 +422,9 @@ fi
 cd $GIT_REPO_HOME
 ./create-secret.sh
 
+# Delete temporary password files
+rm -rf /tmp/*password*
+
 # Upload log file to object store
 if [[ $CLUSTER_TYPE == "aws" ]]; then
   # Upload the log file to s3
