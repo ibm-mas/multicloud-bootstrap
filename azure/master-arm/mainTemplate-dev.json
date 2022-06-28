@@ -267,8 +267,8 @@
   "variables": {
     "seller_subscription_id": "b2ca5467-2502-4b05-b78e-744604c6531d",
     "seller_resource_group": "EdgeTest",
-    "seller_compute_gallery_name": "masbyolimagegallery20220627090551",
-    "seller_image_definition": "masocp-image-def-20220627090551",
+    "seller_compute_gallery_name": "masbyolimagegallery20220627142331",
+    "seller_image_definition": "masocp-image-def-20220627142331",
     "projectName": "[substring(uniqueString(resourceGroup().id, deployment().name), 0, 6)]",
     "rgName": "[resourceGroup().name]",
     "vNetName": "[concat(variables('projectName'), '-vnet')]",
