@@ -23,8 +23,12 @@ if [[ $CLUSTER_TYPE == "aws" ]]; then
   aws secretsmanager create-secret --name "masocp-secret-$RANDOM_STR" --secret-string "file://$SECRETFILE"
   log "Secret created in AWS Secret Manager"
 elif [[ $CLUSTER_TYPE == "azure" ]]; then
-  az keyvault create --enable-rbac-authorization --no-self-perms --name "masocp-secret-$RANDOM_STR" --resource-group "$RG_NAME" --location "$DEPLOY_REGION"
-  # az keyvault secret set --name ocp-secret --vault-name "masocp-secret-$RANDOM_STR" --file $SECRETFILE
+  # Get the identity object id
+  mgid=$(az identity list | jq '.[0].principalId' | tr -d '"')
+  log "Managed identity principal id: $mgid"
+  az keyvault create --no-self-perms --name "masocp-secret-$RANDOM_STR" --resource-group "$RG_NAME" --location "$DEPLOY_REGION"
+  az keyvault set-policy --name "masocp-secret-$RANDOM_STR" --object-id "$mgid" --secret-permissions all --key-permissions all --certificate-permissions all
+  az keyvault secret set --name ocp-secret --vault-name "masocp-secret-$RANDOM_STR" --file $SECRETFILE
   # az keyvault secret show --name ocp-secret --vault-name "masocp-secret-$RANDOM_STR"
   log "Secret created in Azure Key Vault"
 fi

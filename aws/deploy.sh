@@ -36,10 +36,6 @@ log " SLS_STORAGE_CLASS: $SLS_STORAGE_CLASS"
 log " CPD_METADB_BLOCK_STORAGE_CLASS: $CPD_METADB_BLOCK_STORAGE_CLASS"
 log " SSH_PUB_KEY: $SSH_PUB_KEY"
 
-if [[ -f entitlement.lic ]]; then
-  chmod 600 entitlement.lic
-fi
-
 ## Download files from S3 bucket
 # Download SLS certificate
 cd $GIT_REPO_HOME
@@ -133,6 +129,9 @@ master_replica_count            = "$MASTER_NODE_COUNT"
 worker_replica_count            = "$WORKER_NODE_COUNT"
 accept_cpd_license              = "accept"
 EOT
+  if [[ -f terraform.tfvars ]]; then
+      chmod 600 terraform.tfvars
+  fi
   log "==== OCP cluster creation started ===="
   # Deploy OCP cluster
   sed -i "s/<REGION>/$DEPLOY_REGION/g" variables.tf
@@ -140,6 +139,9 @@ EOT
   terraform plan -input=false -out=tfplan
   set +e
   terraform apply -input=false -auto-approve
+  if [[ -f terraform.tfstate ]]; then
+      chmod 600 terraform.tfstate
+  fi
   retcode=$?
   if [[ $retcode -ne 0 ]]; then
     log "OCP cluster creation failed in Terraform step"
@@ -209,7 +211,7 @@ export emailAddress=$(cat .dockerconfigjson | jq -r '.auths["cloud.openshift.com
 jq '.auths |= . + {"cp.icr.io": { "auth" : "$encodedEntitlementKey", "email" : "$emailAddress"}}' .dockerconfigjson > /tmp/dockerconfig.json
 envsubst < /tmp/dockerconfig.json > /tmp/.dockerconfigjson
 oc set data secret/pull-secret -n openshift-config --from-file=/tmp/.dockerconfigjson
-
+chmod 600 /tmp/.dockerconfigjson /tmp/dockerconfig.json
 
 ## Configure OCP cluster
 log "==== OCP cluster configuration (Cert Manager and SBO) started ===="
