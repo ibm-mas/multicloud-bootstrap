@@ -1,7 +1,8 @@
 import jaydebeapi
 import os
 con=jaydebeapi.connect('com.ibm.db2.jcc.DB2Driver', 
-                        os.getenv('MAS_JDBC_URL').replace(':sslConnection=true;',''),
+                       # os.getenv('MAS_JDBC_URL').replace(':sslConnection=true;',''),
+                        os.getenv('MAS_JDBC_URL'),
                         {'user':os.getenv('MAS_JDBC_USER'),
                         'password':os.getenv('MAS_JDBC_PASSWORD'),
                         'sslConnection':'true',
