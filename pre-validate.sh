@@ -169,6 +169,7 @@ fi
 
 ## Evalute custom annotations to set with reference from aws-product-codes.config
 ## Evaluate PRODUCT_NAME environment variable to create configmap in SLS namespace.
+## MAS_ANNOTATIONS environment variable is used in suit-install role of MAS Installtion
 
 if [[ $CLUSTER_TYPE == "aws" ]]; then
     product_code_metadata="$(curl http://169.254.169.254/latest/meta-data/product-codes)"
