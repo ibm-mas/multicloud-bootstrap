@@ -307,34 +307,6 @@ fi
 
 ## Deploy MAS
 log "==== MAS deployment started ===="
-## Evalute custom annotations to set with reference from aws-product-codes.config
-product_code_metadata="$(curl http://169.254.169.254/latest/meta-data/product-codes)"
-
-if [[ -n "$product_code_metadata" ]];then
-  log "Product Code: $product_code_metadata"
-  if echo "$product_code_metadata" | grep -Ei '404\s+-\s+Not\s+Found' 1>/dev/null 2>&1; then
-     log "MAS product code not found in metadata, skipping custom annotations for Suite CR"
-  else
-    aws_product_codes_config_file="$GIT_REPO_HOME/aws/aws-product-codes.config"
-    log "Checking for product type corrosponding to $product_code_metadata from file $aws_product_codes_config_file"
-    if grep -E "^$product_code_metadata:" $aws_product_codes_config_file 1>/dev/null 2>&1;then
-      product_type="$(grep -E "^$product_code_metadata:" $aws_product_codes_config_file | cut -f 3 -d ":")"
-      if [[ $product_type == "byol" ]];then
-        export MAS_ANNOTATIONS="mas.ibm.com/hyperscalerProvider=aws,mas.ibm.com/hyperscalerFormat=byol,mas.ibm.com/hyperscalerChannel=ibm"
-      elif [[ $product_type == "privatepublic" ]];then
-        export MAS_ANNOTATIONS="mas.ibm.com/hyperscalerProvider=aws,mas.ibm.com/hyperscalerFormat=privatepublic,mas.ibm.com/hyperscalerChannel=aws"
-      else
-        log "Invalid product type : $product_type"
-        exit 28
-      fi
-    else
-      log "Product code not found in file $aws_product_codes_config_file"
-      exit 28
-    fi
-  fi
-else
-  log "MAS product code not found, skipping custom annotations for Suite CR"
-fi
 export ROLE_NAME=suite_dns && ansible-playbook ibm.mas_devops.run_role
 export ROLE_NAME=suite_install && ansible-playbook ibm.mas_devops.run_role
 export ROLE_NAME=suite_config && ansible-playbook ibm.mas_devops.run_role
