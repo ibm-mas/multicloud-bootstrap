@@ -63,14 +63,18 @@ if [[ -f uds.crt ]]; then
 fi
 
 ### Read License File & Retrive SLS hostname and host id
-line=$(head -n 1 entitlement.lic)
-set -- $line
-hostid=$3
-log " SLS_HOST_ID: $hostid"
-#SLS Instance name
-export SLS_LICENSE_ID="$hostid"
-log " SLS_INSTANCE_NAME=$SLS_INSTANCE_NAME"
-log " SLS_LICENSE_ID=$SLS_LICENSE_ID"
+if [[ -n "$MAS_LICENSE_URL" ]];then
+  line=$(head -n 1 entitlement.lic)
+  set -- $line
+  hostid=$3
+  log " SLS_HOST_ID: $hostid"
+  #SLS Instance name
+  export SLS_LICENSE_ID="$hostid"
+  log " SLS_INSTANCE_NAME=$SLS_INSTANCE_NAME"
+  log " SLS_LICENSE_ID=$SLS_LICENSE_ID"
+else
+  log " MAS LICENSE URL file is not available."
+fi
 
 ## IAM
 # Create IAM policy
