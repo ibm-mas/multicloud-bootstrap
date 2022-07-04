@@ -172,7 +172,9 @@ fi
 ## MAS_ANNOTATIONS environment variable is used in suit-install role of MAS Installtion
 
 if [[ $CLUSTER_TYPE == "aws" ]]; then
-    product_code_metadata="$(curl http://169.254.169.254/latest/meta-data/product-codes)"
+    # product_code_metadata="$(curl http://169.254.169.254/latest/meta-data/product-codes)"
+    # Hardcoding product_code_metadata for testing purpose until ami gets created for paid product.
+    product_code_metadata="1905n4jwbijcylk3xm02poizl"
 
     if [[ -n "$product_code_metadata" ]];then
         log "Product Code: $product_code_metadata"
