@@ -132,7 +132,7 @@ elif [[ $CLUSTER_TYPE == "azure" ]]; then
   export STORAGE_ACNT_NAME="masocp${RANDOM_STR}stgaccount"
 fi
 # Mongo variables
-export MAS_INSTANCE_ID="mas-${RANDOM_STR}"
+export MAS_INSTANCE_ID="${RANDOM_STR}" //  Changed  to make mas-mas-${RANDOM_STR} to mas-${RANDOM_STR}
 export MAS_CONFIG_DIR=/var/tmp/masconfigdir
 export MONGODB_NAMESPACE="mongoce-${RANDOM_STR}"
 # Amqstreams variables
