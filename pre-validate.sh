@@ -184,14 +184,14 @@ if [[ $CLUSTER_TYPE == "aws" ]]; then
             aws_product_codes_config_file="$GIT_REPO_HOME/aws/aws-product-codes.config"
             log "Checking for product type corrosponding to $product_code_metadata from file $aws_product_codes_config_file"
             if grep -E "^$product_code_metadata:" $aws_product_codes_config_file 1>/dev/null 2>&1;then
-                product_type="$(grep -E "^$product_code_metadata:" $aws_product_codes_config_file | cut -f 3 -d ":")"
+                export PRODUCT_TYPE="$(grep -E "^$product_code_metadata:" $aws_product_codes_config_file | cut -f 3 -d ":")"
                 export PRODUCT_NAME="$(grep -E "^$product_code_metadata:" $aws_product_codes_config_file | cut -f 4 -d ":")"
-                if [[ $product_type == "byol" ]];then
+                if [[ $PRODUCT_TYPE == "byol" ]];then
                     export MAS_ANNOTATIONS="mas.ibm.com/hyperscalerProvider=aws,mas.ibm.com/hyperscalerFormat=byol,mas.ibm.com/hyperscalerChannel=ibm"
-                elif [[ $product_type == "privatepublic" ]];then
+                elif [[ $PRODUCT_TYPE == "privatepublic" ]];then
                     export MAS_ANNOTATIONS="mas.ibm.com/hyperscalerProvider=aws,mas.ibm.com/hyperscalerFormat=privatepublic,mas.ibm.com/hyperscalerChannel=aws"
                 else
-                    log "Invalid product type : $product_type"
+                    log "Invalid product type : $PRODUCT_TYPE"
                     SCRIPT_STATUS=28
                 fi
             else
@@ -207,7 +207,7 @@ fi
 
 # Check if MAS license is provided
 if [[ -z $MAS_LICENSE_URL ]]; then
-    if [[ $product_type == "byol" ]]; then
+    if [[ $PRODUCT_TYPE == "byol" ]]; then
         log "ERROR: Valid MAS license is reqiuired for MAS deployment"
         SCRIPT_STATUS=18
     fi
