@@ -338,6 +338,20 @@ if [[ $PRE_VALIDATION == "pass" ]]; then
     export OCP_USERNAME=$EXS_OCP_USER
     export OCP_PASSWORD=$EXS_OCP_PWD
     export OPENSHIFT_USER_PROVIDE="true"
+    export OCP_SERVER="$(echo https://api.${CLUSTER_NAME}.${BASE_DOMAIN}:6443)"
+    oc login -u $OCP_USERNAME -p $OCP_PASSWORD --server=$OCP_SERVER --insecure-skip-tls-verify=true
+    # Perform prerequisite checks
+    log "===== PRE-REQUISITE VALIDATION STARTED ====="
+    ./pre-requisite.sh
+    retcode=$?
+    log "Pre requisite return code is $retcode"
+    if [[ $retcode -ne 0 ]]; then
+      log "Prerequisite checks failed"
+      mark_provisioning_failed $retcode
+    else
+      log "Prerequisite checks successful"
+    fi
+    log "===== PRE-REQUISITE CHECKS COMPLETED  ====="
   else
     ## No input from user. Generate Cluster Name, Username, and Password.
     log "Debug: No cluster details or insufficient data provided. Proceed to create new OCP cluster later"
