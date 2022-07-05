@@ -342,7 +342,7 @@ if [[ $PRE_VALIDATION == "pass" ]]; then
     oc login -u $OCP_USERNAME -p $OCP_PASSWORD --server=$OCP_SERVER --insecure-skip-tls-verify=true
     # Perform prerequisite checks
     log "===== PRE-REQUISITE VALIDATION STARTED ====="
-    ./pre-requisite.sh
+    source pre-requisite.sh
     retcode=$?
     log "Pre requisite return code is $retcode"
     if [[ $retcode -ne 0 ]]; then
