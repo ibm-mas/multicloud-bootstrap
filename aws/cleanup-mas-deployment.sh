@@ -390,7 +390,7 @@ if [[ -n $S3BUCKETS ]]; then
   echo "Found S3 buckets for this MAS instance"
   for inst in $S3BUCKETS; do
     inst=$(echo $inst | tr -d '\r\n')
-    aws s3 rb s3://$inst --force
+    aws s3 rb s3://$inst --force --region $REGION
     echo "Deleted bucket $inst"
   done
 else
