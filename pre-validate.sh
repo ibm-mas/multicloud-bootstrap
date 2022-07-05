@@ -186,6 +186,8 @@ if [[ $CLUSTER_TYPE == "aws" ]]; then
             if grep -E "^$product_code_metadata:" $aws_product_codes_config_file 1>/dev/null 2>&1;then
                 export PRODUCT_TYPE="$(grep -E "^$product_code_metadata:" $aws_product_codes_config_file | cut -f 3 -d ":")"
                 export PRODUCT_NAME="$(grep -E "^$product_code_metadata:" $aws_product_codes_config_file | cut -f 4 -d ":")"
+                log "PRODUCT_NAME: $PRODUCT_NAME"
+                log "PRODUCT_TYPE: $PRODUCT_TYPE"
                 if [[ $PRODUCT_TYPE == "byol" ]];then
                     export MAS_ANNOTATIONS="mas.ibm.com/hyperscalerProvider=aws,mas.ibm.com/hyperscalerFormat=byol,mas.ibm.com/hyperscalerChannel=ibm"
                 elif [[ $PRODUCT_TYPE == "privatepublic" ]];then

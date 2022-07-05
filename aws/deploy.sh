@@ -279,7 +279,7 @@ fi
 if [[ (-z $SLS_URL) || (-z $SLS_REGISTRATION_KEY) || (-z $SLS_PUB_CERT_URL) ]]
 then
     # Deploy SLS
-    if [[ "$PRODUCT_TYPE" == "privatepublic" ]];then
+    if [[ $PRODUCT_TYPE == "privatepublic" ]];then
       # Create Products Configmap and CredetialRequest in sls namespace for Paid Offering.
       envsubst < "$GIT_REPO_HOME"/aws/products_template.yaml > "$GIT_REPO_HOME"/aws/products.yaml
       envsubst < "$GIT_REPO_HOME"/aws/CredentialRequest_template.yaml > "$GIT_REPO_HOME"/aws/CredentialRequest.yaml
