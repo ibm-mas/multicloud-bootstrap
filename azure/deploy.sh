@@ -32,17 +32,20 @@ log "==== Downloading MAS license ===="
 cd $GIT_REPO_HOME
 if [[ ! -z ${MAS_LICENSE_URL} ]]; then
   azcopy copy "${MAS_LICENSE_URL}" "entitlement.lic"
+  chmod 600 entitlement.lic
 fi
 
 # Download SLS certificate
 cd $GIT_REPO_HOME
 if [[ ! -z ${SLS_PUB_CERT_URL} ]]; then
   azcopy copy "${SLS_PUB_CERT_URL}" "sls.crt"
+  chmod 600 sls.crt
 fi
 # Download BAS certificate
 cd $GIT_REPO_HOME
 if [[ ! -z ${UDS_PUB_CERT_URL} ]]; then
   azcopy copy "${UDS_PUB_CERT_URL}" "uds.crt"
+  chmod 600 uds.crt
 fi
 
 ## Read License File & Retrive SLS hostname and host id

@@ -27,10 +27,16 @@ openshift-password      = "$OCP_PASSWORD"
 master-node-count       = "$MASTER_NODE_COUNT"
 worker-node-count       = "$WORKER_NODE_COUNT"
 EOT
+if [[ -f terraform.tfvars ]]; then
+    chmod 600 terraform.tfvars
+fi
 log "==== OCP cluster creation started ===="
 terraform init -input=false
 terraform plan -input=false -out=tfplan
 terraform apply -input=false -auto-approve
+if [[ -f terraform.tfstate ]]; then
+    chmod 600 terraform.tfstate
+fi
 retcode=$?
 if [[ $retcode -ne 0 ]]; then
     log "OCP cluster creation failed in Terraform step"
