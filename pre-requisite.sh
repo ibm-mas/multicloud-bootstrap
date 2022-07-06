@@ -39,3 +39,6 @@ export SLS_LICENSE_ID=$(oc get LicenseService  -n $SLS_NAMESPACE -o json | jq .i
 log " SLS_REGISTRATION_KEY: $SLS_REGISTRATION_KEY"
 log " SLS_INSTANCE_NAME=$SLS_INSTANCE_NAME"
 log " SLS_LICENSE_ID=$SLS_LICENSE_ID"
+
+export CPD_INSTANCE_NAMESPACE=$(oc get ibmcpd --all-namespaces -o json | jq .items[0].metadata.namespace -r)
+log " CPD_INSTANCE_NAMESPACE=$CPD_INSTANCE_NAMESPACE"
