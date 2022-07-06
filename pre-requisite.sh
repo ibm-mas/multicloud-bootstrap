@@ -31,3 +31,11 @@ log " MONGODB_NAMESPACE: $MONGODB_NAMESPACE"
 
 export SLS_MONGODB_CFG_FILE="${MAS_CONFIG_DIR}/mongo-${MONGODB_NAMESPACE}.yml"
 log " SLS_MONGODB_CFG_FILE: $SLS_MONGODB_CFG_FILE"
+
+export SLS_INSTANCE_NAME=$(oc get LicenseService  -n $SLS_NAMESPACE -o json | jq .items[0].metadata.name -r)
+export SLS_REGISTRATION_KEY=$(oc get LicenseService  -n $SLS_NAMESPACE -o json | jq .items[0].status.registrationKey -r)
+export SLS_LICENSE_ID=$(oc get LicenseService  -n $SLS_NAMESPACE -o json | jq .items[0].status.licenseId -r)
+
+log " SLS_REGISTRATION_KEY: $SLS_REGISTRATION_KEY"
+log " SLS_INSTANCE_NAME=$SLS_INSTANCE_NAME"
+log " SLS_LICENSE_ID=$SLS_LICENSE_ID"
