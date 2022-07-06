@@ -1,5 +1,4 @@
 #!/bin/bash
-. $GIT_REPO_HOME/helper.sh
 # Helper functions
 log() {
   echo "$(date '+%Y-%m-%d %H:%M:%S') $1"
