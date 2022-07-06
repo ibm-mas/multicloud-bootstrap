@@ -2,7 +2,10 @@
 set -e
 #for $PROUDUCT TYPE 
 . helper.sh
-validate_prouduct_type
+if [[ $CLUSTER_TYPE == "aws" ]]; then
+#validating product type for helper.sh
+    validate_prouduct_type
+fi
 # This script will initiate the provisioning process of MAS. It will perform following steps,
 
 ## Variables
