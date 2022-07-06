@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
-
+#for $PROUDUCT TYPE 
+. helper.sh
+validate_prouduct_type
 # This script will initiate the provisioning process of MAS. It will perform following steps,
 
 ## Variables

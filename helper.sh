@@ -179,37 +179,37 @@ split_ocp_api_url() {
   export BASE_DOMAIN=$BASE_DOMAIN
 }
 #creating a function to pre-validate
-validate_prouduct_type(){
-      # product_code_metadata="$(curl http://169.254.169.254/latest/meta-data/product-codes)"
-    # Hardcoding product_code_metadata for testing purpose until ami gets created for paid product.
-    product_code_metadata="1905n4jwbijcylk3xm02poizl"
+validate_prouduct_type() {
+  # product_code_metadata="$(curl http://169.254.169.254/latest/meta-data/product-codes)"
+  # Hardcoding product_code_metadata for testing purpose until ami gets created for paid product.
+  product_code_metadata="1905n4jwbijcylk3xm02poizl"
 
-    if [[ -n "$product_code_metadata" ]];then
-        log "Product Code: $product_code_metadata"
-        if echo "$product_code_metadata" | grep -Ei '404\s+-\s+Not\s+Found' 1>/dev/null 2>&1; then
-            log "MAS product code not found in metadata, skipping custom annotations for Suite CR"
-        else
-            aws_product_codes_config_file="$GIT_REPO_HOME/aws/aws-product-codes.config"
-            log "Checking for product type corrosponding to $product_code_metadata from file $aws_product_codes_config_file"
-            if grep -E "^$product_code_metadata:" $aws_product_codes_config_file 1>/dev/null 2>&1;then
-                export PRODUCT_TYPE="$(grep -E "^$product_code_metadata:" $aws_product_codes_config_file | cut -f 3 -d ":")"
-                export PRODUCT_NAME="$(grep -E "^$product_code_metadata:" $aws_product_codes_config_file | cut -f 4 -d ":")"
-                log "PRODUCT_NAME: $PRODUCT_NAME"
-                log "PRODUCT_TYPE: $PRODUCT_TYPE"
-                if [[ $PRODUCT_TYPE == "byol" ]];then
-                    export MAS_ANNOTATIONS="mas.ibm.com/hyperscalerProvider=aws,mas.ibm.com/hyperscalerFormat=byol,mas.ibm.com/hyperscalerChannel=ibm"
-                elif [[ $PRODUCT_TYPE == "privatepublic" ]];then
-                    export MAS_ANNOTATIONS="mas.ibm.com/hyperscalerProvider=aws,mas.ibm.com/hyperscalerFormat=privatepublic,mas.ibm.com/hyperscalerChannel=aws"
-                else
-                    log "Invalid product type : $PRODUCT_TYPE"
-                    SCRIPT_STATUS=28
-                fi
-            else
-                log "Product code not found in file $aws_product_codes_config_file"
-                SCRIPT_STATUS=28
-            fi
-        fi
+  if [[ -n "$product_code_metadata" ]]; then
+    log "Product Code: $product_code_metadata"
+    if echo "$product_code_metadata" | grep -Ei '404\s+-\s+Not\s+Found' 1>/dev/null 2>&1; then
+      log "MAS product code not found in metadata, skipping custom annotations for Suite CR"
     else
-        log "MAS product code not found, skipping custom annotations for Suite CR"
+      aws_product_codes_config_file="$GIT_REPO_HOME/aws/aws-product-codes.config"
+      log "Checking for product type corrosponding to $product_code_metadata from file $aws_product_codes_config_file"
+      if grep -E "^$product_code_metadata:" $aws_product_codes_config_file 1>/dev/null 2>&1; then
+        export PRODUCT_TYPE="$(grep -E "^$product_code_metadata:" $aws_product_codes_config_file | cut -f 3 -d ":")"
+        export PRODUCT_NAME="$(grep -E "^$product_code_metadata:" $aws_product_codes_config_file | cut -f 4 -d ":")"
+        log "PRODUCT_NAME: $PRODUCT_NAME"
+        log "PRODUCT_TYPE: $PRODUCT_TYPE"
+        if [[ $PRODUCT_TYPE == "byol" ]]; then
+          export MAS_ANNOTATIONS="mas.ibm.com/hyperscalerProvider=aws,mas.ibm.com/hyperscalerFormat=byol,mas.ibm.com/hyperscalerChannel=ibm"
+        elif [[ $PRODUCT_TYPE == "privatepublic" ]]; then
+          export MAS_ANNOTATIONS="mas.ibm.com/hyperscalerProvider=aws,mas.ibm.com/hyperscalerFormat=privatepublic,mas.ibm.com/hyperscalerChannel=aws"
+        else
+          log "Invalid product type : $PRODUCT_TYPE"
+          SCRIPT_STATUS=28
+        fi
+      else
+        log "Product code not found in file $aws_product_codes_config_file"
+        SCRIPT_STATUS=28
+      fi
     fi
+  else
+    log "MAS product code not found, skipping custom annotations for Suite CR"
+  fi
 }
