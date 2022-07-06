@@ -1,6 +1,6 @@
 {
     "AWSTemplateFormatVersion": "2010-09-09",
-    "Description": "Template to create Bootnode used for deploying MAS on OpenShift",
+    "Description": "Template to create Bootnode used for deploying MAS on OpenShift in Private Cluster",
     "Parameters": {
         "OfferingType": {
             "Description": "Select your preferred Suite offering type.",
@@ -12,8 +12,8 @@
                 "MAS Core + Manage (no Cloud Pak for Data)"
             ]
         },
-        "PublicHostedZone": {
-            "Description": "Select the public hosted zone that you created in the AWS Route 53 service, for example: mas4aws.myorg.com",
+        "PrivateHostedZone": {
+            "Description": "Select the private hosted zone that you created in the AWS Route 53 service, for example: mas4aws.myorg.com",
             "Type": "AWS::Route53::HostedZone::Id"
         },
         "Existingvpcid": {
@@ -180,7 +180,7 @@
                         "default": "New OpenShift cluster configuration details (complete this section only if you want to create a new cluster)"
                     },
                     "Parameters": [
-                        "PublicHostedZone",
+                        "PrivateHostedZone",
                         "ClusterSize"
                     ]
                 },
@@ -641,7 +641,7 @@
                     ]
                 },
                 "ZoneId": {
-                    "Ref": "PublicHostedZone"
+                    "Ref": "PrivateHostedZone"
                 },
                 "Region": {
                     "Ref": "AWS::Region"
@@ -740,10 +740,8 @@
                     }
                 ],
                 "VpcId": {
-                    "Fn::GetAtt": [
-                        "CallLambdaFunctionGetSubnetForBootnode",
-                        "DefaultVPCId"
-                    ]
+                    "Ref": "Existingvpcid"
+
                 },
                 "Tags": [
                     {
@@ -770,10 +768,7 @@
             "Type": "AWS::EC2::Instance",
             "Properties": {
                 "SubnetId": {
-                    "Fn::GetAtt": [
-                        "CallLambdaFunctionGetSubnetForBootnode",
-                        "DefaultVPCAz1SubnetId"
-                    ]
+                    "Ref": "Existingpublicsubnet1id"
                 },
                 "ImageId": {
                     "Fn::FindInMap": [
@@ -808,7 +803,7 @@
                                 "git clone https://github.com/ibm-mas/ansible-devops.git;",
                                 "cd ansible-devops;",
                                 "rm -rf multicloud-bootstrap 1>/dev/null 2>&1;",
-                                "git clone -b existingvpclatest https://github.com/ibm-mas/multicloud-bootstrap.git;",
+                                "git clone -b existingvpcprivate https://github.com/ibm-mas/multicloud-bootstrap.git;",
                                 "cd multicloud-bootstrap;",
                                 "find . -type f -name \"*.sh\" -exec chmod +x {} \\;;",
                                 "./init.sh \"aws\" \"",

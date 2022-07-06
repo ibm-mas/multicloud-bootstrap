@@ -136,7 +136,7 @@ master_subnet3_id               = "$Existingprivatesubnet3id"
 worker_subnet1_id               = "$Existingpublicsubnet1id"
 worker_subnet2_id               = "$Existingpublicsubnet2id"
 worker_subnet3_id               = "$Existingpublicsubnet3id"
-private_cluster                 = false
+private_cluster                 = true
 EOT
   if [[ -f terraform.tfvars ]]; then
       chmod 600 terraform.tfvars
