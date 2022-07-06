@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 #for $PROUDUCT TYPE 
-. helper.sh
+. "$GIT_REPO_HOME"/helper.sh
 if [[ $CLUSTER_TYPE == "aws" ]]; then
 #validating product type for helper.sh
     validate_prouduct_type
