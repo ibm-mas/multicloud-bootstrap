@@ -1,6 +1,6 @@
 #!/bin/bash
 SCRIPT_STATUS=0
-
+. helper.sh
 # Check if region is supported
 if [[ $CLUSTER_TYPE == "aws" ]]; then
     SUPPORTED_REGIONS="us-east-1;us-east-2;us-west-2;ca-central-1;eu-north-1;eu-south-1;eu-west-1;eu-west-2;eu-west-3;eu-central-1;ap-northeast-1;ap-northeast-2;ap-northeast-3;ap-south-1;ap-southeast-1;ap-southeast-2;sa-east-1"
@@ -172,41 +172,9 @@ fi
 ## MAS_ANNOTATIONS environment variable is used in suit-install role of MAS Installtion
 
 if [[ $CLUSTER_TYPE == "aws" ]]; then
-    # product_code_metadata="$(curl http://169.254.169.254/latest/meta-data/product-codes)"
-    # Hardcoding product_code_metadata for testing purpose until ami gets created for paid product.
-    product_code_metadata="1905n4jwbijcylk3xm02poizl"
-
-    if [[ -n "$product_code_metadata" ]];then
-        log "Product Code: $product_code_metadata"
-        if echo "$product_code_metadata" | grep -Ei '404\s+-\s+Not\s+Found' 1>/dev/null 2>&1; then
-            log "MAS product code not found in metadata, skipping custom annotations for Suite CR"
-        else
-            aws_product_codes_config_file="$GIT_REPO_HOME/aws/aws-product-codes.config"
-            log "Checking for product type corrosponding to $product_code_metadata from file $aws_product_codes_config_file"
-            if grep -E "^$product_code_metadata:" $aws_product_codes_config_file 1>/dev/null 2>&1;then
-                export PRODUCT_TYPE="$(grep -E "^$product_code_metadata:" $aws_product_codes_config_file | cut -f 3 -d ":")"
-                export PRODUCT_NAME="$(grep -E "^$product_code_metadata:" $aws_product_codes_config_file | cut -f 4 -d ":")"
-                log "PRODUCT_NAME: $PRODUCT_NAME"
-                log "PRODUCT_TYPE: $PRODUCT_TYPE"
-                if [[ $PRODUCT_TYPE == "byol" ]];then
-                    export MAS_ANNOTATIONS="mas.ibm.com/hyperscalerProvider=aws,mas.ibm.com/hyperscalerFormat=byol,mas.ibm.com/hyperscalerChannel=ibm"
-                elif [[ $PRODUCT_TYPE == "privatepublic" ]];then
-                    export MAS_ANNOTATIONS="mas.ibm.com/hyperscalerProvider=aws,mas.ibm.com/hyperscalerFormat=privatepublic,mas.ibm.com/hyperscalerChannel=aws"
-                else
-                    log "Invalid product type : $PRODUCT_TYPE"
-                    SCRIPT_STATUS=28
-                fi
-            else
-                log "Product code not found in file $aws_product_codes_config_file"
-                SCRIPT_STATUS=28
-            fi
-        fi
-    else
-        log "MAS product code not found, skipping custom annotations for Suite CR"
-    fi
+#validating product type for helper.sh
+    validate_prouduct_type
 fi
-
-
 # Check if MAS license is provided
 if [[ -z $MAS_LICENSE_URL ]]; then
     if [[ $PRODUCT_TYPE == "byol" ]]; then
