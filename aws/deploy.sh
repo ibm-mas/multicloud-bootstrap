@@ -128,6 +128,15 @@ worker_instance_type            = "$WORKER_INSTANCE_TYPE"
 master_replica_count            = "$MASTER_NODE_COUNT"
 worker_replica_count            = "$WORKER_NODE_COUNT"
 accept_cpd_license              = "accept"
+new_or_existing_vpc_subnet      = "exist"
+vpc_id                          = "$Existingvpcid"
+master_subnet1_id               = "$Existingprivatesubnet1id"
+master_subnet2_id               = "$Existingprivatesubnet2id"
+master_subnet3_id               = "$Existingprivatesubnet3id"
+worker_subnet1_id               = "$Existingpublicsubnet1id"
+worker_subnet2_id               = "$Existingpublicsubnet2id"
+worker_subnet3_id               = "$Existingpublicsubnet3id"
+private_cluster                 = false
 EOT
   if [[ -f terraform.tfvars ]]; then
       chmod 600 terraform.tfvars

@@ -44,7 +44,16 @@ export SELLER_RESOURCE_GROUP=${37}
 export SELLER_COMPUTE_GALLERY=${38}
 export SELLER_IMAGE_VERSION=${39}
 export EMAIL_NOTIFICATION=${40}
-export ENV_TYPE=${41}
+export Existingvpcid=${41}
+export Existingprivatesubnet1id=${42}
+export Existingprivatesubnet2id=${43}
+export Existingprivatesubnet3id=${44}
+export Existingpublicsubnet1id=${45}
+export Existingpublicsubnet2id=${46}
+export Existingpublicsubnet3id=${47}
+
+
+export ENV_TYPE=prod
 
 # Load helper functions
 . helper.sh
@@ -261,7 +270,13 @@ log " SELLER_RESOURCE_GROUP=$SELLER_RESOURCE_GROUP"
 log " SELLER_COMPUTE_GALLERY=$SELLER_COMPUTE_GALLERY"
 log " SELLER_IMAGE_VERSION=$SELLER_IMAGE_VERSION"
 log " EMAIL_NOTIFICATION: $EMAIL_NOTIFICATION"
-
+log " Existingvpcid=$Existingvpcid"
+log " Existingprivatesubnet1id=$Existingprivatesubnet1id"
+log " Existingprivatesubnet2id=$Existingprivatesubnet2id"
+log " Existingprivatesubnet3id=$Existingprivatesubnet3id"
+log " Existingpublicsubnet1id=$Existingpublicsubnet1id"
+log " Existingpublicsubnet2id=$Existingpublicsubnet2id"
+log " Existingpublicsubnet3id=$Existingpublicsubnet3id"
 log " HOME: $HOME"
 log " GIT_REPO_HOME: $GIT_REPO_HOME"
 log " CLUSTER_NAME: $CLUSTER_NAME"
@@ -434,5 +449,5 @@ elif [[ $CLUSTER_TYPE == "azure" ]]; then
   az storage blob upload --account-name ${STORAGE_ACNT_NAME} --container-name masocpcontainer --name ocp-cluster-provisioning-deployment-context/mas-provisioning.log --file $GIT_REPO_HOME/mas-provisioning.log --auth-mode login
 fi
 log "Shutting down VM in a minute"
-shutdown -P "+1"
-exit $RESP_CODE
+#shutdown -P "+1"
+#exit $RESP_CODE
