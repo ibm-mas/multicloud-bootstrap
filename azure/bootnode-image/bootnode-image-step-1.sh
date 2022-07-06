@@ -27,7 +27,7 @@
 #     Specific branch is normally used when testing the changes from your feature branch.
 #     Specific tag is normally used when the bootstrap code is locked for a specific release.
 #     
-# Exampale commands:
+# Example commands:
 # 1. To create a VM image from Ansible collection '10.0.0' and bootstrap branch 'sp-new-1',
 #    ./bootnode-image-step-1.sh "00000000-2502-4b05-0000-744604c6531d" "10.0.0" "" "sp-new-1"
 # 2. To create a VM image from latest Ansible automation code and latest bootstrap code,
