@@ -52,13 +52,13 @@ gpgkey=https://packages.microsoft.com/keys/microsoft.asc" | tee /etc/yum.repos.d
 dnf install azure-cli -y
 
 # Install AzureCopy cli 
-wget https://aka.ms/downloadazcopy-v10-linux -O azcopy_linux_amd64.tar.gz
+wget -q https://aka.ms/downloadazcopy-v10-linux -O azcopy_linux_amd64.tar.gz
 tar -xzvf azcopy_linux_amd64.tar.gz
 mv -f azcopy_linux_amd64_*/azcopy /usr/sbin
 rm -rf azcopy_linux_amd64*
 
 ## Install jq
-wget "https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64"
+wget -q "https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64"
 mv jq-linux64 jq
 chmod +x jq
 mv jq /usr/local/bin
@@ -67,7 +67,7 @@ mv jq /usr/local/bin
 dnf module install -y container-tools
 
 ## Download Openshift CLI and move to /usr/local/bin
-wget "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.8.11/openshift-client-linux-4.8.11.tar.gz"
+wget -q "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.8.11/openshift-client-linux-4.8.11.tar.gz"
 tar -xvf openshift-client-linux-4.8.11.tar.gz
 chmod u+x oc kubectl
 mv oc /usr/local/bin
@@ -77,7 +77,7 @@ rm -rf openshift-client-linux-4.8.11.tar.gz
 ## Install terraform
 TERRAFORM_VER=`curl -s https://api.github.com/repos/hashicorp/terraform/releases/latest |  grep tag_name | cut -d: -f2 | tr -d \"\,\v | awk '{$1=$1};1'`
 echo $TERRAFORM_VER
-wget https://releases.hashicorp.com/terraform/${TERRAFORM_VER}/terraform_${TERRAFORM_VER}_linux_amd64.zip
+wget -q https://releases.hashicorp.com/terraform/${TERRAFORM_VER}/terraform_${TERRAFORM_VER}_linux_amd64.zip
 unzip terraform_${TERRAFORM_VER}_linux_amd64.zip
 mv terraform /usr/local/bin/
 rm -rf terraform_${TERRAFORM_VER}_linux_amd64.zip
@@ -116,6 +116,7 @@ if [[ $BOOTSTRAP_AUTOMATION_TAG_OR_BRANCH == "" ]]; then
   echo "No BOOTSTRAP_AUTOMATION_TAG_OR_BRANCH is provided, using the 'main' branch"
   BOOTSTRAP_AUTOMATION_TAG_OR_BRANCH="main"
 fi
+echo "Cloning bootstrap automation from tag/branch $BOOTSTRAP_AUTOMATION_TAG_OR_BRANCH"
 git clone -b $BOOTSTRAP_AUTOMATION_TAG_OR_BRANCH https://github.com/ibm-mas/multicloud-bootstrap.git
 cd multicloud-bootstrap
 rm -rf aws azure/bootnode-image azure/master-arm
