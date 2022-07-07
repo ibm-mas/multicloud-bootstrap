@@ -54,6 +54,8 @@ export MAS_ICR_CPOPEN=wiotp-docker-local.artifactory.swg-devops.com
 export MAS_ENTITLEMENT_USERNAME=shajsyed@in.ibm.com
 export MAS_ENTITLEMENT_KEY=$ARTIFACTORY_APIKEY
 export MAS_CATALOG_SOURCE=ibm-mas-operators
+export MAS_APP_CHANNEL_MANAGE=dev84
+export MAS_APP_SOURCE_MANAGE=ibm-mas-manage-operators
 
 # Load helper functions
 . helper.sh
