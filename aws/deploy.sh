@@ -226,21 +226,27 @@ chmod 600 /tmp/.dockerconfigjson /tmp/dockerconfig.json
 log "==== OCP cluster configuration (Cert Manager and SBO) started ===="
 cd $GIT_REPO_HOME/../ibm/mas_devops/playbooks
 set +e
-# Install Development Catalog by exporting below 4 environment variables
-export ARTIFACTORY_USERNAME="$(aws secretsmanager get-secret-value --secret-id pullsecret-mas-sls | jq -r '.SecretString' | jq -r '.ARTIFACTORY_USERNAME')"
-export ARTIFACTORY_APIKEY="$(aws secretsmanager get-secret-value --secret-id pullsecret-mas-sls | jq -r '.SecretString' | jq -r '.ARTIFACTORY_APIKEY')"
-export SLS_USERNAME="$(aws secretsmanager get-secret-value --secret-id pullsecret-mas-sls | jq -r '.SecretString' | jq -r '.SLS_USERNAME')"
-export SLS_PASSWORD="$(aws secretsmanager get-secret-value --secret-id pullsecret-mas-sls | jq -r '.SecretString' | jq -r '.SLS_PASSWORD')"
 
-export ROLE_NAME=ibm_catalogs && ansible-playbook ibm.mas_devops.run_role
-# unset ARTIFACTORY_USERNAME & ARTIFACTORY_APIKEY to have production catalogs installed & call ibm_catalog again
-unset ARTIFACTORY_USERNAME
-unset ARTIFACTORY_APIKEY
-export ROLE_NAME=ibm_catalogs && ansible-playbook ibm.mas_devops.run_role
-export MAS_CHANNEL=m5dev88
-export ROLE_NAME=common_services && ansible-playbook ibm.mas_devops.run_role
-export ROLE_NAME=cert_manager && ansible-playbook ibm.mas_devops.run_role
-export ROLE_NAME=sbo && ansible-playbook ibm.mas_devops.run_role
+if  [[ $PRODUCT_TYPE == "privatepublic" ]];then
+# Install Development Catalog by exporting below 4 environment variables
+    export ARTIFACTORY_USERNAME="$(aws secretsmanager get-secret-value --secret-id pullsecret-mas-sls | jq -r '.SecretString' | jq -r '.ARTIFACTORY_USERNAME')"
+    export ARTIFACTORY_APIKEY="$(aws secretsmanager get-secret-value --secret-id pullsecret-mas-sls | jq -r '.SecretString' | jq -r '.ARTIFACTORY_APIKEY')"
+    export SLS_USERNAME="$(aws secretsmanager get-secret-value --secret-id pullsecret-mas-sls | jq -r '.SecretString' | jq -r '.SLS_USERNAME')"
+    export SLS_PASSWORD="$(aws secretsmanager get-secret-value --secret-id pullsecret-mas-sls | jq -r '.SecretString' | jq -r '.SLS_PASSWORD')"
+    export ROLE_NAME=ibm_catalogs && ansible-playbook ibm.mas_devops.run_role
+    # unset ARTIFACTORY_USERNAME & ARTIFACTORY_APIKEY to have production catalogs installed & call ibm_catalog again
+    #unset ARTIFACTORY_USERNAME
+    #unset ARTIFACTORY_APIKEY
+fi
+
+    export ROLE_NAME=ibm_catalogs && ansible-playbook ibm.mas_devops.run_role
+if  [[ $PRODUCT_TYPE == "privatepublic" ]];then
+     export MAS_CHANNEL=m5dev88
+fi
+    export ROLE_NAME=common_services && ansible-playbook ibm.mas_devops.run_role
+    export ROLE_NAME=cert_manager && ansible-playbook ibm.mas_devops.run_role
+    export ROLE_NAME=sbo && ansible-playbook ibm.mas_devops.run_role
+
 if [[ $? -ne 0 ]]; then
   # One reason for this failure is catalog sources not having required state information, so recreate the catalog-operator pod
   # https://bugzilla.redhat.com/show_bug.cgi?id=1807128
@@ -290,8 +296,16 @@ then
       envsubst < "$GIT_REPO_HOME"/aws/CredentialRequest_template.yaml > "$GIT_REPO_HOME"/aws/CredentialRequest.yaml
       oc new-project "$SLS_NAMESPACE"
       oc create -f "$GIT_REPO_HOME"/aws/products.yaml -n "$SLS_NAMESPACE"
-      oc create -f "$GIT_REPO_HOME"/aws/CredentialRequest.yaml
+      #oc create -f "$GIT_REPO_HOME"/aws/CredentialRequest.yaml
+      oc create secret generic <instance_id>-aws-access --from-literal=region=$DEPLOY_REGION --from-literal=accessKeyId=$AWS_ACCESS_KEY_ID --from-literal=secretAccessKey=$AWS_SECRET_ACCESS_KEY -n 
+      export SLS_ENTITLEMENT_USERNAME=$SLS_USERNAME
+      export SLS_ENTITLEMENT_KEY=$SLS_PASSWORD
+      export SLS_CATALOG_SOURCE=ibm-sls-operators
+      export SLS_CHANNEL=m5dev34
+      export SLS_ICR_CP=cp.stg.icr.io/cp
+      export SLS_ICR_CPOPEN=cp.stg.icr.io/cp
     fi
+
     log "==== SLS deployment started ===="
     export ROLE_NAME=sls && ansible-playbook ibm.mas_devops.run_role
     log "==== SLS deployment completed ===="
@@ -337,6 +351,13 @@ fi
 
 ## Deploy MAS
 log "==== MAS deployment started ===="
+if [[ $PRODUCT_TYPE == "privatepublic" ]];then
+  export MAS_CATALOG_SOURCE=ibm-mas-operators
+  export MAS_ICR_CP=wiotp-docker-local.artifactory.swg-devops.com
+  export MAS_ICR_CPOPEN=wiotp-docker-local.artifactory.swg-devops.com
+  export MAS_ENTITLEMENT_USERNAME=$ARTIFACTORY_USERNAME
+  export MAS_ENTITLEMENT_KEY=$ARTIFACTORY_APIKEY
+fi
 export ROLE_NAME=suite_dns && ansible-playbook ibm.mas_devops.run_role
 export ROLE_NAME=suite_install && ansible-playbook ibm.mas_devops.run_role
 export ROLE_NAME=suite_config && ansible-playbook ibm.mas_devops.run_role
