@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-#for $PROUDUCT TYPE 
+#for $PROUDUCT TYPE
 . "$GIT_REPO_HOME"/helper.sh
 if [[ $CLUSTER_TYPE == "aws" ]]; then
 #validating product type for helper.sh
@@ -216,8 +216,18 @@ export OCP_TOKEN="$(oc whoami --show-token)"
 oc extract secret/pull-secret -n openshift-config --keys=.dockerconfigjson --to=. --confirm
 export encodedEntitlementKey=$(echo cp:$SLS_ENTITLEMENT_KEY | tr -d '\n' | base64 -w0)
 ##export encodedEntitlementKey=$(echo cp:$SLS_ENTITLEMENT_KEY | base64 -w0)
+
 export emailAddress=$(cat .dockerconfigjson | jq -r '.auths["cloud.openshift.com"].email')
-jq '.auths |= . + {"cp.icr.io": { "auth" : "$encodedEntitlementKey", "email" : "$emailAddress"}}' .dockerconfigjson > /tmp/dockerconfig.json
+staging_sls_user="$(aws secretsmanager get-secret-value --secret-id pullsecret-mas-sls | jq -r '.SecretString' | jq -r '.SLS_USERNAME')"
+staging_sls_password="$(aws secretsmanager get-secret-value --secret-id pullsecret-mas-sls | jq -r '.SecretString' | jq -r '.SLS_PASSWORD')"
+export staging_sls_encodedEntitlementKey=$(echo $staging_sls_user:$staging_sls_password | tr -d '\n' | base64 -w0)
+
+artifactory_user="$(aws secretsmanager get-secret-value --secret-id pullsecret-mas-sls | jq -r '.SecretString' | jq -r '.ARTIFACTORY_USERNAME')"
+artifactory_apikey="$(aws secretsmanager get-secret-value --secret-id pullsecret-mas-sls | jq -r '.SecretString' | jq -r '.ARTIFACTORY_APIKEY')"
+export artifactoryencodedEntitlementKey=$(echo $artifactory_user:$artifactory_apikey | tr -d '\n' | base64 -w0)
+
+# jq '.auths |= . + {"cp.icr.io": { "auth" : "$encodedEntitlementKey", "email" : "$emailAddress"}}' .dockerconfigjson > /tmp/dockerconfig.json
+jq '.auths |= . + {"cp.icr.io": { "auth" : "$encodedEntitlementKey", "email" : "$emailAddress"},"cp.stg.icr.io": { "auth" : "$staging_sls_encodedEntitlementKey", "email" : "$emailAddress"},"wiotp-docker-local.artifactory.swg-devops.com": { "auth" : "$artifactoryencodedEntitlementKey", "email" : "$emailAddress"}}' .dockerconfigjson > /tmp/dockerconfig.json
 envsubst < /tmp/dockerconfig.json > /tmp/.dockerconfigjson
 oc set data secret/pull-secret -n openshift-config --from-file=/tmp/.dockerconfigjson
 chmod 600 /tmp/.dockerconfigjson /tmp/dockerconfig.json
