@@ -143,7 +143,8 @@ export KAFKA_USER_NAME=masuser
 # SLS variables
 export SLS_NAMESPACE="ibm-sls-${RANDOM_STR}"
 export SLS_MONGODB_CFG_FILE="${MAS_CONFIG_DIR}/mongo-${MONGODB_NAMESPACE}.yml"
-export SLS_LICENSE_FILE="${MAS_CONFIG_DIR}/entitlement.lic"
+#commenting for testing 
+#export SLS_LICENSE_FILE="${MAS_CONFIG_DIR}/entitlement.lic"
 export SLS_TLS_CERT_LOCAL_FILE_PATH="${GIT_REPO_HOME}/sls.crt"
 export SLS_INSTANCE_NAME="masocp-${RANDOM_STR}"
 # UDS variables
