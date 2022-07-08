@@ -106,18 +106,8 @@ oc login -u $OCP_USERNAME -p $OCP_PASSWORD --server=$OCP_SERVER --insecure-skip-
 export OCP_TOKEN="$(oc whoami --show-token)"
 oc extract secret/pull-secret -n openshift-config --keys=.dockerconfigjson --to=. --confirm
 export encodedEntitlementKey=$(echo cp:$SLS_ENTITLEMENT_KEY | tr -d '\n' | base64 -w0)
-
-# Adding credentials to global pull secret.
-staging_sls_user="$(aws secretsmanager get-secret-value --secret-id pullsecret-mas-sls | jq -r '.SecretString' | jq -r '.SLS_USERNAME')"
-staging_sls_password="$(aws secretsmanager get-secret-value --secret-id pullsecret-mas-sls | jq -r '.SecretString' | jq -r '.SLS_PASSWORD')"
-export staging_sls_encodedEntitlementKey=$(echo $staging_sls_user:$staging_sls_password | tr -d '\n' | base64 -w0)
-
-artifactory_user="$(aws secretsmanager get-secret-value --secret-id pullsecret-mas-sls | jq -r '.SecretString' | jq -r '.ARTIFACTORY_USERNAME')"
-artifactory_apikey="$(aws secretsmanager get-secret-value --secret-id pullsecret-mas-sls | jq -r '.SecretString' | jq -r '.ARTIFACTORY_APIKEY')"
-export artifactoryencodedEntitlementKey=$(echo $artifactory_user:$artifactory_apikey | tr -d '\n' | base64 -w0)
-
 export emailAddress=$(cat .dockerconfigjson | jq -r '.auths["cloud.openshift.com"].email')
-#jq '.auths |= . + {"cp.icr.io": { "auth" : "$encodedEntitlementKey", "email" : "$emailAddress"}}' .dockerconfigjson >/tmp/dockerconfig.json
+jq '.auths |= . + {"cp.icr.io": { "auth" : "$encodedEntitlementKey", "email" : "$emailAddress"}}' .dockerconfigjson >/tmp/dockerconfig.json
 
 envsubst </tmp/dockerconfig.json >/tmp/.dockerconfigjson
 oc set data secret/pull-secret -n openshift-config --from-file=/tmp/.dockerconfigjson
