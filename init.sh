@@ -56,6 +56,7 @@ export -f get_sls_endpoint_url
 export -f get_sls_registration_key
 export -f get_uds_endpoint_url
 export -f get_uds_api_key
+export -f validate_prouduct_type
 
 ## Configure CloudWatch agent
 if [[ $CLUSTER_TYPE == "aws" ]]; then
@@ -143,7 +144,7 @@ export KAFKA_USER_NAME=masuser
 # SLS variables
 export SLS_NAMESPACE="ibm-sls-${RANDOM_STR}"
 export SLS_MONGODB_CFG_FILE="${MAS_CONFIG_DIR}/mongo-${MONGODB_NAMESPACE}.yml"
-#commenting for testing 
+#commenting for testing
 #export SLS_LICENSE_FILE="${MAS_CONFIG_DIR}/entitlement.lic"
 export SLS_TLS_CERT_LOCAL_FILE_PATH="${GIT_REPO_HOME}/sls.crt"
 export SLS_INSTANCE_NAME="masocp-${RANDOM_STR}"
@@ -168,7 +169,7 @@ elif [[ $CLUSTER_TYPE == "azure" ]]; then
 fi
 export CPD_OPERATORS_NAMESPACE="ibm-cpd-operators-${RANDOM_STR}"
 export CPD_INSTANCE_NAMESPACE="ibm-cpd-${RANDOM_STR}"
-#CPD_SERVICES_NAMESPACE is used in roles - cp4d, cp4dv3_install, cp4dv3_install_services and suite_dns 
+#CPD_SERVICES_NAMESPACE is used in roles - cp4d, cp4dv3_install, cp4dv3_install_services and suite_dns
 export CPD_SERVICES_NAMESPACE="cpd-services-${RANDOM_STR}"
 # DB2WH variables
 export DB2_META_STORAGE_CLASS=$CPD_PRIMARY_STORAGE_CLASS
