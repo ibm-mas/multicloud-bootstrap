@@ -310,7 +310,7 @@ then
       oc new-project "$SLS_NAMESPACE"
       oc create -f "$GIT_REPO_HOME"/aws/products.yaml -n "$SLS_NAMESPACE"
       #oc create -f "$GIT_REPO_HOME"/aws/CredentialRequest.yaml
-      oc create secret generic "$MAS_INSTANCE_ID"-aws-access --from-literal=region="$DEPLOY_REGION" --from-literal=accessKeyId="$AWS_ACCESS_KEY_ID" --from-literal=secretAccessKey="$AWS_SECRET_ACCESS_KEY" -n "$SLS_NAMESPACE"
+      oc create secret generic "$SLS_INSTANCE_NAME"-aws-access --from-literal=region="$DEPLOY_REGION" --from-literal=accessKeyId="$AWS_ACCESS_KEY_ID" --from-literal=secretAccessKey="$AWS_SECRET_ACCESS_KEY" -n "$SLS_NAMESPACE"
       export SLS_ENTITLEMENT_USERNAME=$staging_sls_user
       export SLS_ENTITLEMENT_KEY=$staging_sls_password
       export SLS_CATALOG_SOURCE=ibm-sls-operators
