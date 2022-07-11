@@ -46,6 +46,9 @@ export SELLER_IMAGE_VERSION=${39}
 export EMAIL_NOTIFICATION=${40}
 export ENV_TYPE=${41}
 
+# Temporary code
+export TENANT_ID = "fcf67057-50c9-4ad4-98f3-ffca64add9e9"
+
 # Load helper functions
 . helper.sh
 export -f log
@@ -297,7 +300,7 @@ log " DEPLOY_MANAGE: $DEPLOY_MANAGE"
 
 if [[ $CLUSTER_TYPE == "azure" ]]; then
   # Perform az login for accessing blob storage
-  az login --identity
+  az login --service-principal --username $AZURE_SP_CLIENT_ID --password $AZURE_SP_CLIENT_PWD --tenant $TENANT_ID
   az resource list -n masocp-${RANDOM_STR}-bootnode-vm
 
   # Get subscription ID, tenant ID

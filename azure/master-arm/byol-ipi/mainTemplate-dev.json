@@ -282,56 +282,9 @@
     "networkInterfaceName": "[concat(variables('projectName'), '-nic')]",
     "networkSecurityGroupName": "[concat(variables('projectName'), '-nsg')]",
     "networkSecurityGroupName2": "[concat(variables('vNetSubnetName'), '-nsg')]",
-    "storageaccountName": "[concat('masocp', variables('projectName'),'stgaccount')]",
-    "managedIdentityName": "[concat('masocp-', variables('projectName'), '-managedidentity')]",
-    "managedIdentityId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', variables('rgName'), '/providers/Microsoft.ManagedIdentity/userAssignedIdentities/', variables('managedIdentityName'))]",
-    "ownerRoleAssignmentId": "[guid(subscription().id, variables('ownerRoleDefinitionId'),variables('managedIdentityId'))]",
-    "ownerRoleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '8e3af657-a8ff-443c-a75c-2fe8c4bcb635')]",
-    "storageBlobRoleAssignmentId": "[guid(subscription().id, variables('storageBlobRoleDefinitionId'),variables('managedIdentityId'))]",
-    "storageBlobRoleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'ba92f5b4-2d11-453d-a403-e96b0029c9fe')]",
-    "keyVaultRoleAssignmentId": "[guid(subscription().id, variables('keyVaultRoleDefinitionId'),variables('managedIdentityId'))]",
-    "keyVaultRoleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'f25e0fa2-a7c8-4377-a976-54943a77a395')]"
+    "storageaccountName": "[concat('masocp', variables('projectName'),'stgaccount')]"
   },
   "resources": [
-    {
-      "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
-      "name": "[variables('managedIdentityName')]",
-      "apiVersion": "2018-11-30",
-      "location": "[parameters('location')]"
-    },
-    {
-      "type": "Microsoft.Authorization/roleAssignments",
-      "apiVersion": "2020-04-01-preview",
-      "name": "[variables('ownerRoleAssignmentId')]",
-      "properties": {
-        "roleDefinitionId": "[variables('ownerRoleDefinitionId')]",
-        "principalId": "[reference(variables('managedIdentityName')).principalId]",
-        "principalType": "ServicePrincipal",
-        "scope": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', variables('rgName'))]"
-      }
-    },
-    {
-      "type": "Microsoft.Authorization/roleAssignments",
-      "apiVersion": "2020-04-01-preview",
-      "name": "[variables('storageBlobRoleAssignmentId')]",
-      "properties": {
-        "roleDefinitionId": "[variables('storageBlobRoleDefinitionId')]",
-        "principalId": "[reference(variables('managedIdentityName')).principalId]",
-        "principalType": "ServicePrincipal",
-        "scope": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', variables('rgName'))]"
-      }
-    },
-    {
-      "type": "Microsoft.Authorization/roleAssignments",
-      "apiVersion": "2020-04-01-preview",
-      "name": "[variables('keyVaultRoleAssignmentId')]",
-      "properties": {
-        "roleDefinitionId": "[variables('keyVaultRoleDefinitionId')]",
-        "principalId": "[reference(variables('managedIdentityName')).principalId]",
-        "principalType": "ServicePrincipal",
-        "scope": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', variables('rgName'))]"
-      }
-    },
     {
       "type": "Microsoft.Network/networkSecurityGroups",
       "apiVersion": "2020-05-01",
@@ -513,12 +466,6 @@
       "apiVersion": "2018-06-01",
       "name": "[variables('vmName')]",
       "location": "[parameters('location')]",
-      "identity": {
-        "type": "userAssigned",
-        "userAssignedIdentities": {
-          "[resourceID('Microsoft.ManagedIdentity/userAssignedIdentities/', variables('managedIdentityName'))]": {}
-        }
-      },
       "dependsOn": [
         "[resourceId('Microsoft.Network/networkInterfaces', variables('networkInterfaceName'))]"
       ],
