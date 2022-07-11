@@ -136,7 +136,7 @@ master_subnet3_id               = "$Existingprivatesubnet3id"
 worker_subnet1_id               = "$Existingpublicsubnet1id"
 worker_subnet2_id               = "$Existingpublicsubnet2id"
 worker_subnet3_id               = "$Existingpublicsubnet3id"
-private_cluster                 = false
+private_cluster                 = "$OCPClusterType"
 EOT
   if [[ -f terraform.tfvars ]]; then
       chmod 600 terraform.tfvars
@@ -178,12 +178,12 @@ oc create -f $GIT_REPO_HOME/templates/container-runtime-config.yml
   ## Create bastion host
   cd $GIT_REPO_HOME/aws
   set +e
-  ./create-bastion-host.sh
-  retcode=$?
-  if [[ $retcode -ne 0 ]]; then
-    log "Bastion host creation failed in Terraform step"
-    exit 22
-  fi
+ # ./create-bastion-host.sh
+  #retcode=$?
+  #if [[ $retcode -ne 0 ]]; then
+   # log "Bastion host creation failed in Terraform step"
+   # exit 22
+  #fi
   set -e
 
   # Backup Terraform configuration

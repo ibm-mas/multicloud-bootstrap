@@ -13,7 +13,7 @@
             ]
         },
         "PublicHostedZone": {
-            "Description": "Select the public hosted zone that you created in the AWS Route 53 service, for example: mas4aws.myorg.com",
+            "Description": "Select the public/private hosted zone that you created in the AWS Route 53 service, for example: mas4aws.myorg.com",
             "Type": "AWS::Route53::HostedZone::Id"
         },
         "Existingvpcid": {
@@ -152,6 +152,14 @@
                 true,
                 false
             ]
+        }, "OCPClusterType": {
+            "Description": "Select false for Public OCP cluster , true for private OCP cluster",
+            "Default": false,
+            "Type": "String",
+            "AllowedValues": [
+                true,
+                false
+            ]
         }
     },
     "Metadata": {
@@ -245,9 +253,10 @@
                 },
                 {
                     "Label": {
-                        "default": "Existing VPC Details  (leave this section empty to create a new VPC )"
+                        "default": "Choose the OCP cluster type/ and enter existing VPC Details  (leave this section empty to create a new VPC )"
                     },
                     "Parameters": [
+                        "OCPClusterType",
                         "Existingvpcid",
                         "Existingprivatesubnet1id",
                         "Existingprivatesubnet2id",
@@ -740,10 +749,8 @@
                     }
                 ],
                 "VpcId": {
-                    "Fn::GetAtt": [
-                        "CallLambdaFunctionGetSubnetForBootnode",
-                        "DefaultVPCId"
-                    ]
+                    "Ref": "Existingvpcid"
+
                 },
                 "Tags": [
                     {
@@ -770,10 +777,7 @@
             "Type": "AWS::EC2::Instance",
             "Properties": {
                 "SubnetId": {
-                    "Fn::GetAtt": [
-                        "CallLambdaFunctionGetSubnetForBootnode",
-                        "DefaultVPCAz1SubnetId"
-                    ]
+                    "Ref": "Existingpublicsubnet1id"
                 },
                 "ImageId": {
                     "Fn::FindInMap": [
@@ -949,6 +953,10 @@
                                 "' '",
                                 {
                                     "Ref": "Existingpublicsubnet3id"
+                                },
+                                "' '",
+                                {
+                                    "Ref": "OCPClusterType"
                                 },
                                 "' '",
                                 "' \"dev\" ",

@@ -51,8 +51,7 @@ export Existingprivatesubnet3id=${44}
 export Existingpublicsubnet1id=${45}
 export Existingpublicsubnet2id=${46}
 export Existingpublicsubnet3id=${47}
-
-
+export OCPClusterType=${48}
 export ENV_TYPE=prod
 
 # Load helper functions
@@ -277,6 +276,7 @@ log " Existingprivatesubnet3id=$Existingprivatesubnet3id"
 log " Existingpublicsubnet1id=$Existingpublicsubnet1id"
 log " Existingpublicsubnet2id=$Existingpublicsubnet2id"
 log " Existingpublicsubnet3id=$Existingpublicsubnet3id"
+log " OCPClusterType=$OCPClusterType"
 log " HOME: $HOME"
 log " GIT_REPO_HOME: $GIT_REPO_HOME"
 log " CLUSTER_NAME: $CLUSTER_NAME"
