@@ -13,7 +13,7 @@ op_versions['cpd-platform-operator']='^[2]\.[0]\.[8-9]$'
 op_versions['user-data-services-operator']='^[2]\.[0]\.[8-9]$'
 op_versions['ibm-cert-manager-operator']='^[3]\.[2][1]\.[0-9]$'
 op_versions['ibm-sls']='^[3]\.[3]\.[0-9]$'
-op_versions['service-binding-operator']='^[1]\.[1]\.[0]$'
+op_versions['service-binding-operator']='^[1]\.[1]\.[1]$'
 
 declare -A op_namespaces
 op_namespaces['cpd-platform-operator']='CPD_OPERATORS_NAMESPACE'
@@ -38,6 +38,9 @@ function getOPNamespace() {
 			SCRIPT_STATUS=29
 			exit $SCRIPT_STATUS
 		fi
+	else
+		SCRIPT_STATUS=29
+		exit $SCRIPT_STATUS
     fi    
 	
 }
