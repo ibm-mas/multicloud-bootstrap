@@ -12,7 +12,7 @@
                 "MAS Core + Manage (no Cloud Pak for Data)"
             ]
         },
-        "PublicHostedZone": {
+        "HostedZone": {
             "Description": "Select the public/private hosted zone that you created in the AWS Route 53 service, for example: mas4aws.myorg.com",
             "Type": "AWS::Route53::HostedZone::Id"
         },
