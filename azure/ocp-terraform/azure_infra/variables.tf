@@ -77,7 +77,7 @@ variable "worker-subnet-cidr" {
   default = "10.0.2.0/24"
 }
 
-#Bastion host variable 
+#Bastion host variable
 variable "bastion_cidr" {
   default = "10.0.3.224/27"
 }
@@ -141,7 +141,7 @@ variable "ssh-public-key" {
 variable "private-or-public-cluster" {
   default = "public"
 }
-#For MAS keeping storage as ocs 
+#For MAS keeping storage as ocs
 #Other options are portworx and nfs
 variable "storage" {
   default = "ocs"
@@ -179,7 +179,7 @@ variable "cpd-external-username" {
   default     = "cp"
 }
 variable "ocp_version" {
-  default = "4.8.11"
+  default = "4.8.46"
 }
 
 
@@ -232,7 +232,7 @@ variable "rwo_cpd_storageclass" {
   }
 }
 ############################################
-# CPD 4.0 service variables 
+# CPD 4.0 service variables
 ###########################################
 variable "cpd_platform" {
   type = map(string)
