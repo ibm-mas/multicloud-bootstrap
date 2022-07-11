@@ -28,7 +28,12 @@ fi
 
 # Check if provided hosted zone is public
 if [[ $CLUSTER_TYPE == "aws" ]]; then
-    aws route53 list-hosted-zones --output text --query 'HostedZones[*].[Config.PrivateZone,Name,Id]' --output text | grep $BASE_DOMAIN | grep False
+
+      if [[ $OCPClusterType == "false" ]]; then
+       aws route53 list-hosted-zones --output text --query 'HostedZones[*].[Config.PrivateZone,Name,Id]' --output text | grep $BASE_DOMAIN | grep False
+    else
+      aws route53 list-hosted-zones --output text --query 'HostedZones[*].[Config.PrivateZone,Name,Id]' --output text | grep $BASE_DOMAIN | grep True
+    fi
 #elif [[ $CLUSTER_TYPE == "azure" ]]; then
     #az network dns zone list | jq -r --arg BASE_DOMAIN "$BASE_DOMAIN" '.[]|select (.name==$BASE_DOMAIN)|.zoneType' | grep -iE 'public'
 else
