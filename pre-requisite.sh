@@ -4,13 +4,6 @@ export -f log
 
 getOCPVersion
 echo "--------------"
-getSBOVersion
-echo "--------------"
-getVersion MongoDBCommunity
-echo "--------------"
-getVersion Db2uCluster
-echo "--------------"
-getKafkaVersion
 
 arr=(ocs-operator cpd-platform-operator ibm-cert-manager-operator user-data-services-operator ibm-sls)
 i=0
@@ -21,6 +14,16 @@ do
 	getOPNamespace ${arr[$i]}
 	i=`expr $i + 1`
 done
+
+getSBOVersion
+echo "--------------"
+getVersion MongoDBCommunity
+echo "--------------"
+getVersion Db2uCluster
+echo "--------------"
+getKafkaVersion
+
+
 
 
 echo "---------------"
