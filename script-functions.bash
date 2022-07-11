@@ -1,7 +1,4 @@
 #!/bin/bash
-#set -e
-. helper.sh
-export -f log
 
 SCRIPT_STATUS=0
 declare -A op_versions
@@ -36,11 +33,12 @@ function getOPNamespace() {
 		else
 			echo "Unsupported ${1} version $op_version."
 			SCRIPT_STATUS=29
-			exit $SCRIPT_STATUS
+			return $SCRIPT_STATUS
 		fi
 	else
+		echo "${1} not installed."
 		SCRIPT_STATUS=29
-		exit $SCRIPT_STATUS
+		return $SCRIPT_STATUS
     fi    
 	
 }
@@ -57,7 +55,7 @@ function getVersion() {
   	else
     	echo "Unsupported ${1} version $currentVersion."
 		SCRIPT_STATUS=29
-		exit $SCRIPT_STATUS
+		return $SCRIPT_STATUS
   	fi
 }
 
@@ -74,7 +72,7 @@ function getKafkaVersion() {
   	else
     	echo "Unsupported Kafka version $currentVersion."
 		SCRIPT_STATUS=29
-		exit $SCRIPT_STATUS
+		return $SCRIPT_STATUS
   fi
 }
 
@@ -86,7 +84,7 @@ function getSBOVersion() {
   	else
     	echo "Unsupported service-binding-operator version $currentVersion."
 		SCRIPT_STATUS=29
-		exit $SCRIPT_STATUS
+		return $SCRIPT_STATUS
   	fi
 }
 
@@ -99,6 +97,6 @@ function getOCPVersion() {
   	else
     	echo "Unsupportedd Openshift version $currentOpenshiftVersion.Supported OpenShift versions are 4.8 to 4.10."
 		SCRIPT_STATUS=29
-		exit $SCRIPT_STATUS
+		return $SCRIPT_STATUS
   fi
 }

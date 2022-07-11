@@ -340,10 +340,13 @@ if [[ $PRE_VALIDATION == "pass" ]]; then
     export OPENSHIFT_USER_PROVIDE="true"
     export OCP_SERVER="$(echo https://api.${CLUSTER_NAME}.${BASE_DOMAIN}:6443)"
     oc login -u $OCP_USERNAME -p $OCP_PASSWORD --server=$OCP_SERVER --insecure-skip-tls-verify=true
+    
     # Perform prerequisite checks
     log "===== PRE-REQUISITE VALIDATION STARTED ====="
+
     source pre-requisite.sh
     retcode=$?
+
     log "Pre requisite return code is $retcode"
     if [[ $retcode -ne 0 ]]; then
       log "Prerequisite checks failed"

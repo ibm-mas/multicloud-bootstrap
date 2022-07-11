@@ -3,6 +3,10 @@
 export -f log
 
 getOCPVersion
+retcode=$?
+if [[ $retcode -eq 29 ]]; then
+	return $retcode
+fi
 echo "--------------"
 
 arr=(ocs-operator cpd-platform-operator ibm-cert-manager-operator user-data-services-operator ibm-sls)
@@ -12,19 +16,36 @@ while [ $i -lt ${#arr[@]} ]
 do
 	echo "--------------"
 	getOPNamespace ${arr[$i]}
+	retcode=$?
+	if [[ $retcode -eq 29 ]]; then
+    	return $retcode
+	fi
 	i=`expr $i + 1`
 done
 
 getSBOVersion
+retcode=$?
+if [[ $retcode -eq 29 ]]; then
+	return $retcode
+fi
 echo "--------------"
 getVersion MongoDBCommunity
+retcode=$?
+if [[ $retcode -eq 29 ]]; then
+	return $retcode
+fi
 echo "--------------"
 getVersion Db2uCluster
+retcode=$?
+if [[ $retcode -eq 29 ]]; then
+	return $retcode
+fi
 echo "--------------"
 getKafkaVersion
-
-
-
+retcode=$?
+if [[ $retcode -eq 29 ]]; then
+	return $retcode
+fi
 
 echo "---------------"
 log " KAFKA_NAMESPACE: $KAFKA_NAMESPACE"
