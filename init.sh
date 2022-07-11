@@ -350,6 +350,8 @@ if [[ $PRE_VALIDATION == "pass" ]]; then
     log "Pre requisite return code is $retcode"
     if [[ $retcode -ne 0 ]]; then
       log "Prerequisite checks failed"
+      PRE_VALIDATION=fail
+      log "Debug: Pre-requisite validation failed. Proceed to create new OCP cluster later"
       mark_provisioning_failed $retcode
     else
       log "Prerequisite checks successful"
@@ -360,8 +362,10 @@ if [[ $PRE_VALIDATION == "pass" ]]; then
     log "Debug: No cluster details or insufficient data provided. Proceed to create new OCP cluster later"
     export OPENSHIFT_USER_PROVIDE="false"
   fi
+fi
   log " OPENSHIFT_USER_PROVIDE=$OPENSHIFT_USER_PROVIDE"
 
+if [[ $PRE_VALIDATION == "pass" ]]; then
   # Create Red Hat pull secret
   echo "$OCP_PULL_SECRET" > $OPENSHIFT_PULL_SECRET_FILE_PATH
   chmod 600 $OPENSHIFT_PULL_SECRET_FILE_PATH
