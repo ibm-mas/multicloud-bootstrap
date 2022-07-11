@@ -47,7 +47,7 @@ export EMAIL_NOTIFICATION=${40}
 export ENV_TYPE=${41}
 
 # Temporary code
-export TENANT_ID = "fcf67057-50c9-4ad4-98f3-ffca64add9e9"
+export TENANT_ID="fcf67057-50c9-4ad4-98f3-ffca64add9e9"
 
 # Load helper functions
 . helper.sh
