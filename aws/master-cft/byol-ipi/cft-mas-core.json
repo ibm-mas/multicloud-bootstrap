@@ -1038,7 +1038,7 @@
                                 {
                                     "Fn::Split": [
                                         "api.",
-                                       {"Ref": "OpenShiftClusterApiUrl"}
+                                        {"Ref": "OpenShiftClusterApiUrl"}
                                     ]
                                 }
                             ]

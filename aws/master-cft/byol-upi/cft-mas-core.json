@@ -9,13 +9,40 @@
             "MinLength": "1",
             "AllowedValues": [
                 "MAS Core + Cloud Pak for Data",
-                "MAS Core + Manage (no Cloud Pak for Data)",
-                "MAS Core + Cloud Pak for Data + Manage"
+                "MAS Core + Manage (no Cloud Pak for Data)"
             ]
         },
-        "PublicHostedZone": {
-            "Description": "Select the public hosted zone that you created in the AWS Route 53 service, for example: mas4aws.myorg.com",
+        "HostedZone": {
+            "Description": "Select the public/private hosted zone that you created in the AWS Route 53 service, for example: mas4aws.myorg.com",
             "Type": "AWS::Route53::HostedZone::Id"
+        },
+        "Existingvpcid": {
+            "Description": "Enter/Select the ID of your existing VPC for deployment",
+            "Type": "String"
+        },
+        "Existingprivatesubnet1id": {
+            "Description": "Enter/Select the of your private existing Subnet for the above VPC for deployment( Private Subnet :1) ",
+            "Type": "String"
+        },
+        "Existingprivatesubnet2id": {
+            "Description": "Enter/Select the of your private existing Subnet for the above VPC for deployment( Private Subnet :2)",
+            "Type": "String"
+        },
+        "Existingprivatesubnet3id": {
+            "Description": "Enter/Select the of your private existing Subnet for the above VPC for deployment( Private Subnet :3)",
+            "Type": "String"
+        },
+        "Existingpublicsubnet1id": {
+            "Description": "Enter/Select the of your public existing Subnet for the above VPC for deployment( Public Subnet :1)",
+            "Type": "String"
+        },
+        "Existingpublicsubnet2id": {
+            "Description": "Enter/Select the of your public existing Subnet for the above VPC for deployment( Public Subnet :2)",
+            "Type": "String"
+        },
+        "Existingpublicsubnet3id": {
+            "Description": "Enter/Select the of your public existing Subnet for the above VPC for deployment( Public Subnet :3)",
+            "Type": "String"
         },
         "BootnodeSGIngressCidrIp": {
             "Description": "Use CIDR notation to enter the IP addresses that can access the bootnode. For example, 192.12.33.3/32. To allow access from all IP addresses, enter 0.0.0.0/0.",
@@ -125,6 +152,14 @@
                 true,
                 false
             ]
+        }, "OCPClusterType": {
+            "Description": "Select false for Public OCP cluster , true for private OCP cluster",
+            "Default": false,
+            "Type": "String",
+            "AllowedValues": [
+                true,
+                false
+            ]
         }
     },
     "Metadata": {
@@ -153,7 +188,7 @@
                         "default": "New OpenShift cluster configuration details (complete this section only if you want to create a new cluster)"
                     },
                     "Parameters": [
-                        "PublicHostedZone",
+                        "HostedZone",
                         "ClusterSize"
                     ]
                 },
@@ -215,6 +250,21 @@
                     "Parameters": [
                         "EmailNotification"
                     ]
+                },
+                {
+                    "Label": {
+                        "default": "Choose the OCP cluster type/ and enter existing VPC Details  (leave this section empty to create a new VPC )"
+                    },
+                    "Parameters": [
+                        "OCPClusterType",
+                        "Existingvpcid",
+                        "Existingprivatesubnet1id",
+                        "Existingprivatesubnet2id",
+                        "Existingprivatesubnet3id",
+                        "Existingpublicsubnet1id",
+                        "Existingpublicsubnet2id",
+                        "Existingpublicsubnet3id"
+                    ]
                 }
             ]
         }
@@ -225,52 +275,52 @@
                 "HVM64": "ami-07809a17acfe15035"
             },
             "us-east-2": {
-                "HVM64": "ami-00ba0ee5d999cd7e7"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "us-west-2": {
-                "HVM64": "ami-0c2bf9db9c23d8ef2"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "ca-central-1": {
-                "HVM64": "ami-01d7e931190fb52e6"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "eu-north-1": {
-                "HVM64": "ami-023d4dfcbd33ca27f"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "eu-south-1": {
-                "HVM64": "ami-06c78840eda1c6464"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "eu-west-1": {
-                "HVM64": "ami-0a821a5026741f9ab"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "eu-west-2": {
-                "HVM64": "ami-065e2aefc015c400b"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "eu-west-3": {
-                "HVM64": "ami-018e7f03ae7e26249"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "eu-central-1": {
-                "HVM64": "ami-09e81852f8ff6976a"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "ap-northeast-1": {
-                "HVM64": "ami-0b1e9431f015e6f51"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "ap-northeast-2": {
-                "HVM64": "ami-013ca7a32b575d108"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "ap-northeast-3": {
-                "HVM64": "ami-067192b67be841c56"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "ap-south-1": {
-                "HVM64": "ami-0da7aecfb8496cab4"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "ap-southeast-1": {
-                "HVM64": "ami-0fdb1e4f1e84cb2aa"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "ap-southeast-2": {
-                "HVM64": "ami-014cf8441144f02d6"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "sa-east-1": {
-                "HVM64": "ami-0c3e1fda0b6cd10a8"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             }
         }
     },
@@ -600,7 +650,7 @@
                     ]
                 },
                 "ZoneId": {
-                    "Ref": "PublicHostedZone"
+                    "Ref": "HostedZone"
                 },
                 "Region": {
                     "Ref": "AWS::Region"
@@ -699,10 +749,8 @@
                     }
                 ],
                 "VpcId": {
-                    "Fn::GetAtt": [
-                        "CallLambdaFunctionGetSubnetForBootnode",
-                        "DefaultVPCId"
-                    ]
+                    "Ref": "Existingvpcid"
+
                 },
                 "Tags": [
                     {
@@ -729,10 +777,7 @@
             "Type": "AWS::EC2::Instance",
             "Properties": {
                 "SubnetId": {
-                    "Fn::GetAtt": [
-                        "CallLambdaFunctionGetSubnetForBootnode",
-                        "DefaultVPCAz1SubnetId"
-                    ]
+                    "Ref": "Existingpublicsubnet1id"
                 },
                 "ImageId": {
                     "Fn::FindInMap": [
@@ -767,7 +812,7 @@
                                 "git clone https://github.com/ibm-mas/ansible-devops.git;",
                                 "cd ansible-devops;",
                                 "rm -rf multicloud-bootstrap 1>/dev/null 2>&1;",
-                                "git clone https://github.com/ibm-mas/multicloud-bootstrap.git;",
+                                "git clone -b main https://github.com/ibm-mas/multicloud-bootstrap.git;",
                                 "cd multicloud-bootstrap;",
                                 "find . -type f -name \"*.sh\" -exec chmod +x {} \\;;",
                                 "./init.sh \"aws\" \"",
@@ -881,7 +926,40 @@
                                 {
                                     "Ref": "EmailNotification"
                                 },
-                                "' \"dev\" ",
+                                "' '",
+                                {
+                                    "Ref": "Existingvpcid"
+                                },
+                                "' '",
+                                {
+                                    "Ref": "Existingprivatesubnet1id"
+                                },
+                                "' '",
+                                {
+                                    "Ref": "Existingprivatesubnet2id"
+                                },
+                                "' '",
+                                {
+                                    "Ref": "Existingprivatesubnet3id"
+                                },
+                                "' '",
+                                {
+                                    "Ref": "Existingpublicsubnet1id"
+                                },
+                                "' '",
+                                {
+                                    "Ref": "Existingpublicsubnet2id"
+                                },
+                                "' '",
+                                {
+                                    "Ref": "Existingpublicsubnet3id"
+                                },
+                                "' '",
+                                {
+                                    "Ref": "OCPClusterType"
+                                },
+                                "' '",
+                                "' \"prod\" ",
                                 "2>&1 | tee mas-provisioning.log; "
                             ]
                         ]
