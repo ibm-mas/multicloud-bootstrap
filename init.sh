@@ -140,7 +140,7 @@ elif [[ $CLUSTER_TYPE == "azure" ]]; then
   export STORAGE_ACNT_NAME="masocp${RANDOM_STR}stgaccount"
 fi
 # Mongo variables
-export MAS_INSTANCE_ID="mas-${RANDOM_STR}"
+export MAS_INSTANCE_ID="${RANDOM_STR}" //  Changed  to make mas-mas-${RANDOM_STR} to mas-${RANDOM_STR}
 export MAS_CONFIG_DIR=/var/tmp/masconfigdir
 export MONGODB_NAMESPACE="mongoce-${RANDOM_STR}"
 # Amqstreams variables
@@ -446,7 +446,7 @@ if [[ $CLUSTER_TYPE == "aws" ]]; then
   aws s3 cp $GIT_REPO_HOME/mas-provisioning.log $DEPLOYMENT_CONTEXT_UPLOAD_PATH
 elif [[ $CLUSTER_TYPE == "azure" ]]; then
   # Upload the log file to blob storage
-  az storage blob upload --account-name ${STORAGE_ACNT_NAME} --container-name masocpcontainer --name ocp-cluster-provisioning-deployment-context/mas-provisioning.log --file $GIT_REPO_HOME/mas-provisioning.log --auth-mode login
+  az storage blob upload --account-name ${STORAGE_ACNT_NAME} --container-name masocpcontainer --name ocp-cluster-provisioning-deployment-context/mas-provisioning.log --file $GIT_REPO_HOME/mas-provisioning.log
 fi
 log "Shutting down VM in a minute"
 #shutdown -P "+1"

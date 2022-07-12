@@ -267,8 +267,8 @@
   "variables": {
     "seller_subscription_id": "b2ca5467-2502-4b05-b78e-744604c6531d",
     "seller_resource_group": "EdgeTest",
-    "seller_compute_gallery_name": "masbyolimagegallery20220709005707",
-    "seller_image_definition": "masocp-image-def-20220709005707",
+    "seller_compute_gallery_name": "masbyolimagegallery20220628151305",
+    "seller_image_definition": "masocp-image-def-20220628151305",
     "projectName": "[substring(uniqueString(resourceGroup().id, deployment().name), 0, 6)]",
     "rgName": "[resourceGroup().name]",
     "vNetName": "[concat(variables('projectName'), '-vnet')]",
@@ -307,7 +307,8 @@
         "roleDefinitionId": "[variables('ownerRoleDefinitionId')]",
         "principalId": "[reference(variables('managedIdentityName')).principalId]",
         "principalType": "ServicePrincipal",
-        "scope": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', variables('rgName'))]"
+        "scope": "[resourceGroup().id]",
+        "delegatedManagedIdentityResourceId": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities',variables('managedIdentityName'))]"
       }
     },
     {
@@ -318,7 +319,8 @@
         "roleDefinitionId": "[variables('storageBlobRoleDefinitionId')]",
         "principalId": "[reference(variables('managedIdentityName')).principalId]",
         "principalType": "ServicePrincipal",
-        "scope": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', variables('rgName'))]"
+        "scope": "[resourceGroup().id]",
+        "delegatedManagedIdentityResourceId": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities',variables('managedIdentityName'))]"
       }
     },
     {
@@ -329,7 +331,8 @@
         "roleDefinitionId": "[variables('keyVaultRoleDefinitionId')]",
         "principalId": "[reference(variables('managedIdentityName')).principalId]",
         "principalType": "ServicePrincipal",
-        "scope": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', variables('rgName'))]"
+        "scope": "[resourceGroup().id]",
+        "delegatedManagedIdentityResourceId": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities',variables('managedIdentityName'))]"
       }
     },
     {
