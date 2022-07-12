@@ -690,36 +690,6 @@
                 }
             }
         },
-        "LambdaFunctionGetSubnetForBootnode": {
-            "Type": "AWS::Lambda::Function",
-            "Properties": {
-                "Handler": "index.lambda_handler",
-                "Role": {
-                    "Fn::GetAtt": [
-                        "LambdaRole",
-                        "Arn"
-                    ]
-                },
-                "Runtime": "python3.7",
-                "Code": {
-                    "ZipFile": "import boto3\nimport string\nimport cfnresponse\ndef lambda_handler(event, context):\n    responseData = {}\n    try:\n        ec2_client = boto3.client('ec2', region_name=event[\"ResourceProperties\"][\"Region\"])\n        response = ec2_client.describe_vpcs()\n        for vpc_response in response['Vpcs']:\n          vpc_id = vpc_response['VpcId']\n          is_default = vpc_response['IsDefault']\n          if is_default == True:\n            default_vpc_id = vpc_id\n            break\n        response = ec2_client.describe_subnets()\n        for subnet_response in response['Subnets']:\n          subnet_id = subnet_response['SubnetId']\n          subnet_vpc_id = subnet_response['VpcId']\n          az_id = subnet_response['AvailabilityZoneId']\n          if subnet_vpc_id == default_vpc_id:\n            if \"az1\" in az_id:\n              responseData['DefaultVPCId'] = subnet_vpc_id\n              responseData['DefaultVPCAz1SubnetId'] = subnet_id\n        cfnresponse.send(event, context, cfnresponse.SUCCESS, responseData, \"CustomResourcePhysicalID\")\n    except Exception as e:\n        print(\"Exception Error : \" + str(e))\n        cfnresponse.send(event, context, cfnresponse.FAILED, responseData, \"CustomResourcePhysicalID\")\n"
-                }
-            }
-        },
-        "CallLambdaFunctionGetSubnetForBootnode": {
-            "Type": "Custom::CallLambdaFunctionGetSubnetForBootnode",
-            "Properties": {
-                "ServiceToken": {
-                    "Fn::GetAtt": [
-                        "LambdaFunctionGetSubnetForBootnode",
-                        "Arn"
-                    ]
-                },
-                "Region": {
-                    "Ref": "AWS::Region"
-                }
-            }
-        },
         "BootnodeSecurityGroup": {
             "Type": "AWS::EC2::SecurityGroup",
             "Properties": {
