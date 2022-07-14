@@ -94,7 +94,7 @@ variable "worker_subnet3_id" {
 #############################
 
 variable "enable_permission_quota_check" {
-  default = false
+  default = true
 }
 
 variable "cluster_name" {
