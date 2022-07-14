@@ -199,7 +199,14 @@ export MAS_APPWS_JDBC_BINDING="workspace-application"
 export MAS_JDBC_CERT_LOCAL_FILE=$GIT_REPO_HOME/db.crt
 export MAS_CLOUD_AUTOMATION_VERSION=1.0
 export MAS_DEVOPS_COLLECTION_VERSION=10.0.0
-
+if [ -z "$Existingvpcid" ]; then
+  export new_or_existing_vpc_subnet="new"
+  export enable_permission_quota_check=true
+  export OCPClusterType=false
+else
+   export new_or_existing_vpc_subnet="exist"
+   export enable_permission_quota_check=false
+fi
 RESP_CODE=0
 
 # Export env variables which are not set by default during userdata execution
@@ -313,13 +320,7 @@ log " DEPLOY_CP4D: $DEPLOY_CP4D"
 log " DEPLOY_MANAGE: $DEPLOY_MANAGE"
 
 
-if [ -z "$Existingvpcid" ]; then
-  export new_or_existing_vpc_subnet="new"
-  export enable_permission_quota_check=true
-else
-   export new_or_existing_vpc_subnet="exist"
-   export enable_permission_quota_check=false
-fi
+
 
 if [[ $CLUSTER_TYPE == "azure" ]]; then
   # Perform az login for accessing blob storage
