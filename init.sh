@@ -315,6 +315,7 @@ log " DEPLOY_MANAGE: $DEPLOY_MANAGE"
 
 if [ -z "$Existingvpcid" ]; then
   export new_or_existing_vpc_subnet="new"
+  export enable_permission_quota_check=true
 else
    export new_or_existing_vpc_subnet="exist"
    export enable_permission_quota_check=false
