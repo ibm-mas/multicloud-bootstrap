@@ -953,7 +953,7 @@
                                 },
                                 "' '",
                                 {
-                                    "Ref": "OCPClusterType"
+                                    "Ref": "PrivateCluster"
                                 },
                                 "' '",
                                 "' \"prod\" ",

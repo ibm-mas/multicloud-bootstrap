@@ -29,7 +29,7 @@ fi
 # Check if provided hosted zone is public
 if [[ $CLUSTER_TYPE == "aws" ]]; then
 
-      if [[ $OCPClusterType == "false" ]]; then
+      if [[ $PrivateCluster == "false" ]]; then
        aws route53 list-hosted-zones --output text --query 'HostedZones[*].[Config.PrivateZone,Name,Id]' --output text | grep $BASE_DOMAIN | grep False
     else
       aws route53 list-hosted-zones --output text --query 'HostedZones[*].[Config.PrivateZone,Name,Id]' --output text | grep $BASE_DOMAIN | grep True
