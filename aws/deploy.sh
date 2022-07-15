@@ -128,6 +128,16 @@ worker_instance_type            = "$WORKER_INSTANCE_TYPE"
 master_replica_count            = "$MASTER_NODE_COUNT"
 worker_replica_count            = "$WORKER_NODE_COUNT"
 accept_cpd_license              = "accept"
+new_or_existing_vpc_subnet      = "$new_or_existing_vpc_subnet"
+enable_permission_quota_check   = "$enable_permission_quota_check"
+vpc_id                          = "$EXISTING_NETWORK"
+master_subnet1_id               = "$EXISTING_PRIVATE_SUBNET1_ID"
+master_subnet2_id               = "$EXISTING_PRIVATE_SUBNET2_ID"
+master_subnet3_id               = "$EXISTING_PRIVATE_SUBNET3_ID"
+worker_subnet1_id               = "$EXISTING_PUBLIC_SUBNET1_ID"
+worker_subnet2_id               = "$EXISTING_PUBLIC_SUBNET2_ID"
+worker_subnet3_id               = "$EXISTING_PUBLIC_SUBNET3_ID"
+private_cluster                 = "$PRIVATE_CLUSTER"
 EOT
   if [[ -f terraform.tfvars ]]; then
       chmod 600 terraform.tfvars
@@ -169,12 +179,15 @@ oc create -f $GIT_REPO_HOME/templates/container-runtime-config.yml
   ## Create bastion host
   cd $GIT_REPO_HOME/aws
   set +e
-  ./create-bastion-host.sh
-  retcode=$?
-  if [[ $retcode -ne 0 ]]; then
-    log "Bastion host creation failed in Terraform step"
-    exit 22
+  if [[ new_or_existing_vpc_subnet == "new" ]]; then
+   ./create-bastion-host.sh
+   retcode=$?
+    if [[ $retcode -ne 0 ]]; then
+     log "Bastion host creation failed in Terraform step"
+     exit 22
+    fi
   fi
+
   set -e
 
   # Backup Terraform configuration

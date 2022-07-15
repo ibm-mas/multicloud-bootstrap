@@ -32,19 +32,28 @@ export EXS_OCP_URL=${25}
 export EXS_OCP_USER=${26}
 export EXS_OCP_PWD=${27}
 export RG_NAME=${28}
-export RECEPIENT=${29}
-export SMTP_HOST=${30}
-export SMTP_PORT=${31}
-export SMTP_USERNAME=${32}
-export SMTP_PASSWORD=${33}
-export AZURE_SP_CLIENT_ID=${34}
-export AZURE_SP_CLIENT_PWD=${35}
-export SELLER_SUBSCRIPTION_ID=${36}
-export SELLER_RESOURCE_GROUP=${37}
-export SELLER_COMPUTE_GALLERY=${38}
-export SELLER_IMAGE_VERSION=${39}
-export EMAIL_NOTIFICATION=${40}
-export ENV_TYPE=${41}
+export EMAIL_NOTIFICATION=${29}
+export RECEPIENT=${30}
+export SMTP_HOST=${31}
+export SMTP_PORT=${32}
+export SMTP_USERNAME=${33}
+export SMTP_PASSWORD=${34}
+export AZURE_SP_CLIENT_ID=${35}
+export AZURE_SP_CLIENT_PWD=${36}
+export SELLER_SUBSCRIPTION_ID=${37}
+export TENANT_ID=${38}
+export BOOTNODE_VPC_ID=${39}
+export BOOTNODE_SUBNET_ID=${40}
+export EXISTING_NETWORK=${41}
+export EXISTING_NETWORK_RG=${42}
+export EXISTING_PRIVATE_SUBNET1_ID=${43}
+export EXISTING_PRIVATE_SUBNET2_ID=${44}
+export EXISTING_PRIVATE_SUBNET3_ID=${45}
+export EXISTING_PUBLIC_SUBNET1_ID=${46}
+export EXISTING_PUBLIC_SUBNET2_ID=${47}
+export EXISTING_PUBLIC_SUBNET3_ID=${48}
+export PRIVATE_CLUSTER=${49}
+export ENV_TYPE=prod
 
 # Load helper functions
 . helper.sh
@@ -132,7 +141,7 @@ elif [[ $CLUSTER_TYPE == "azure" ]]; then
   export STORAGE_ACNT_NAME="masocp${RANDOM_STR}stgaccount"
 fi
 # Mongo variables
-export MAS_INSTANCE_ID="${RANDOM_STR}" //  Changed  to make mas-mas-${RANDOM_STR} to mas-${RANDOM_STR}
+export MAS_INSTANCE_ID="${RANDOM_STR}"
 export MAS_CONFIG_DIR=/var/tmp/masconfigdir
 export MONGODB_NAMESPACE="mongoce-${RANDOM_STR}"
 # Amqstreams variables
@@ -190,7 +199,14 @@ export MAS_APPWS_JDBC_BINDING="workspace-application"
 export MAS_JDBC_CERT_LOCAL_FILE=$GIT_REPO_HOME/db.crt
 export MAS_CLOUD_AUTOMATION_VERSION=1.0
 export MAS_DEVOPS_COLLECTION_VERSION=10.0.0
-
+if [ -z "$EXISTING_NETWORK" ]; then
+  export new_or_existing_vpc_subnet="new"
+  export enable_permission_quota_check=true
+  export PRIVATE_CLUSTER=false
+else
+   export new_or_existing_vpc_subnet="exist"
+   export enable_permission_quota_check=false
+fi
 RESP_CODE=0
 
 # Export env variables which are not set by default during userdata execution
@@ -257,11 +273,18 @@ log " SMTP_USERNAME=$SMTP_USERNAME"
 log " SMTP_PASSWORD=$SMTP_PASSWORD"
 log " AZURE_SP_CLIENT_ID=$AZURE_SP_CLIENT_ID"
 log " SELLER_SUBSCRIPTION_ID=$SELLER_SUBSCRIPTION_ID"
-log " SELLER_RESOURCE_GROUP=$SELLER_RESOURCE_GROUP"
-log " SELLER_COMPUTE_GALLERY=$SELLER_COMPUTE_GALLERY"
-log " SELLER_IMAGE_VERSION=$SELLER_IMAGE_VERSION"
+log " TENANT_ID=$TENANT_ID"
 log " EMAIL_NOTIFICATION: $EMAIL_NOTIFICATION"
-
+log " EXISTING_NETWORK=$EXISTING_NETWORK"
+log " EXISTING_PRIVATE_SUBNET1_ID=$EXISTING_PRIVATE_SUBNET1_ID"
+log " EXISTING_PRIVATE_SUBNET2_ID=$EXISTING_PRIVATE_SUBNET2_ID"
+log " EXISTING_PRIVATE_SUBNET3_ID=$EXISTING_PRIVATE_SUBNET3_ID"
+log " EXISTING_PUBLIC_SUBNET1_ID=$EXISTING_PUBLIC_SUBNET1_ID"
+log " EXISTING_PUBLIC_SUBNET2_ID=$EXISTING_PUBLIC_SUBNET2_ID"
+log " EXISTING_PUBLIC_SUBNET3_ID=$EXISTING_PUBLIC_SUBNET3_ID"
+log " BOOTNODE_VPC_ID=$BOOTNODE_VPC_ID"
+log " BOOTNODE_SUBNET_ID=$BOOTNODE_SUBNET_ID"
+log " PRIVATE_CLUSTER=$PRIVATE_CLUSTER"
 log " HOME: $HOME"
 log " GIT_REPO_HOME: $GIT_REPO_HOME"
 log " CLUSTER_NAME: $CLUSTER_NAME"
@@ -294,6 +317,9 @@ export DEPLOY_CP4D=$(echo $DEPLOY_CP4D | cut -d '=' -f 2)
 export DEPLOY_MANAGE=$(echo $DEPLOY_MANAGE | cut -d '=' -f 2)
 log " DEPLOY_CP4D: $DEPLOY_CP4D"
 log " DEPLOY_MANAGE: $DEPLOY_MANAGE"
+
+
+
 
 if [[ $CLUSTER_TYPE == "azure" ]]; then
   # Perform az login for accessing blob storage
