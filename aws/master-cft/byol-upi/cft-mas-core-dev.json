@@ -161,7 +161,7 @@
                 false
             ]
         },
-        "OCPClusterType": {
+        "PrivateCluster": {
             "Description": "Select false for Public OCP cluster , true for private OCP cluster",
             "Default": false,
             "Type": "String",
@@ -274,7 +274,7 @@
                         "default": "Choose the OCP cluster type/ and enter existing VPC Details  (leave this section empty to create a new VPC )"
                     },
                     "Parameters": [
-                        "OCPClusterType",
+                        "PrivateCluster",
                         "ExistingVpcId",
                         "ExistingPrivateSubnet1Id",
                         "ExistingPrivateSubnet2Id",

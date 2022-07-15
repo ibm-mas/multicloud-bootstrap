@@ -44,15 +44,15 @@ export SELLER_SUBSCRIPTION_ID=${37}
 export TENANT_ID=${38}
 export BOOTNODE_VPC_ID=${39}
 export BOOTNODE_SUBNET_ID=${40}
-export Existingvpcid=${41}
+export EXISTING_NETWORK=${41}
 export EXISTING_NETWORK_RG=${42}
-export Existingprivatesubnet1id=${43}
-export Existingprivatesubnet2id=${44}
-export Existingprivatesubnet3id=${45}
-export Existingpublicsubnet1id=${46}
-export Existingpublicsubnet2id=${47}
-export Existingpublicsubnet3id=${48}
-export OCPClusterType=${49}
+export EXISTING_PRIVATE_SUBNET1_ID=${43}
+export EXISTING_PRIVATE_SUBNET2_ID=${44}
+export EXISTING_PRIVATE_SUBNET3_ID=${45}
+export EXISTING_PUBLIC_SUBNET1_ID=${46}
+export EXISTING_PUBLIC_SUBNET2_ID=${47}
+export EXISTING_PUBLIC_SUBNET3_ID=${48}
+export PRIVATE_CLUSTER=${49}
 export ENV_TYPE=prod
 
 # Load helper functions
@@ -199,10 +199,10 @@ export MAS_APPWS_JDBC_BINDING="workspace-application"
 export MAS_JDBC_CERT_LOCAL_FILE=$GIT_REPO_HOME/db.crt
 export MAS_CLOUD_AUTOMATION_VERSION=1.0
 export MAS_DEVOPS_COLLECTION_VERSION=10.0.0
-if [ -z "$Existingvpcid" ]; then
+if [ -z "$EXISTING_NETWORK" ]; then
   export new_or_existing_vpc_subnet="new"
   export enable_permission_quota_check=true
-  export OCPClusterType=false
+  export PRIVATE_CLUSTER=false
 else
    export new_or_existing_vpc_subnet="exist"
    export enable_permission_quota_check=false
@@ -275,17 +275,16 @@ log " AZURE_SP_CLIENT_ID=$AZURE_SP_CLIENT_ID"
 log " SELLER_SUBSCRIPTION_ID=$SELLER_SUBSCRIPTION_ID"
 log " TENANT_ID=$TENANT_ID"
 log " EMAIL_NOTIFICATION: $EMAIL_NOTIFICATION"
-log " Existingvpcid=$Existingvpcid"
-log " Existingprivatesubnet1id=$Existingprivatesubnet1id"
-log " Existingprivatesubnet2id=$Existingprivatesubnet2id"
-log " Existingprivatesubnet3id=$Existingprivatesubnet3id"
-log " Existingpublicsubnet1id=$Existingpublicsubnet1id"
-log " Existingpublicsubnet2id=$Existingpublicsubnet2id"
-log " Existingpublicsubnet3id=$Existingpublicsubnet3id"
-log " Existingpublicsubnet3id=$Existingpublicsubnet3id"
+log " EXISTING_NETWORK=$EXISTING_NETWORK"
+log " EXISTING_PRIVATE_SUBNET1_ID=$EXISTING_PRIVATE_SUBNET1_ID"
+log " EXISTING_PRIVATE_SUBNET2_ID=$EXISTING_PRIVATE_SUBNET2_ID"
+log " EXISTING_PRIVATE_SUBNET3_ID=$EXISTING_PRIVATE_SUBNET3_ID"
+log " EXISTING_PUBLIC_SUBNET1_ID=$EXISTING_PUBLIC_SUBNET1_ID"
+log " EXISTING_PUBLIC_SUBNET2_ID=$EXISTING_PUBLIC_SUBNET2_ID"
+log " EXISTING_PUBLIC_SUBNET3_ID=$EXISTING_PUBLIC_SUBNET3_ID"
 log " BOOTNODE_VPC_ID=$BOOTNODE_VPC_ID"
 log " BOOTNODE_SUBNET_ID=$BOOTNODE_SUBNET_ID"
-log " OCPClusterType=$OCPClusterType"
+log " PRIVATE_CLUSTER=$PRIVATE_CLUSTER"
 log " HOME: $HOME"
 log " GIT_REPO_HOME: $GIT_REPO_HOME"
 log " CLUSTER_NAME: $CLUSTER_NAME"

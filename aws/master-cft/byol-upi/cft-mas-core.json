@@ -16,32 +16,32 @@
             "Description": "Select the public/private hosted zone that you created in the AWS Route 53 service, for example: mas4aws.myorg.com",
             "Type": "AWS::Route53::HostedZone::Id"
         },
-        "Existingvpcid": {
-            "Description": "Enter/Select the ID of your existing VPC for deployment",
+        "ExistingVpcId": {
+            "Description": "Enter your existing VPC Id for deployment",
             "Type": "String"
         },
-        "Existingprivatesubnet1id": {
-            "Description": "Enter/Select the of your private existing Subnet for the above VPC for deployment( Private Subnet :1) ",
+        "ExistingPrivateSubnet1Id": {
+            "Description": "Enter your existing private subnet Id for the above VPC Id for deployment( Private Subnet :1) ",
             "Type": "String"
         },
-        "Existingprivatesubnet2id": {
-            "Description": "Enter/Select the of your private existing Subnet for the above VPC for deployment( Private Subnet :2)",
+        "ExistingPrivateSubnet2Id": {
+            "Description": "Enter your existing private subnet Id for the above VPC Id for deployment( Private Subnet :2)",
             "Type": "String"
         },
-        "Existingprivatesubnet3id": {
-            "Description": "Enter/Select the of your private existing Subnet for the above VPC for deployment( Private Subnet :3)",
+        "ExistingPrivateSubnet3Id": {
+            "Description": "Enter your existing private subnet Id for the above VPC Id for deployment( Private Subnet :3)",
             "Type": "String"
         },
-        "Existingpublicsubnet1id": {
-            "Description": "Enter/Select the of your public existing Subnet for the above VPC for deployment( Public Subnet :1)",
+        "ExistingPublicSubnet1Id": {
+            "Description": "Enter your existing public subnet Id for the above VPC Id for deployment( Public Subnet :1)",
             "Type": "String"
         },
-        "Existingpublicsubnet2id": {
-            "Description": "Enter/Select the of your public existing Subnet for the above VPC for deployment( Public Subnet :2)",
+        "ExistingPublicSubnet2Id": {
+            "Description": "Enter your existing public subnet Id for the above VPC Id for deployment( Public Subnet :2)",
             "Type": "String"
         },
-        "Existingpublicsubnet3id": {
-            "Description": "Enter/Select the of your public existing Subnet for the above VPC for deployment( Public Subnet :3)",
+        "ExistingPublicSubnet3Id": {
+            "Description": "Enter your existing public subnet Id for the above VPC Id for deployment( Public Subnet :3)",
             "Type": "String"
         },
         "BootnodeSGIngressCidrIp": {
@@ -144,6 +144,14 @@
             "Description": "Enter the HTTP or S3 location of the service's public certificate that you retrieved from the 'ca-bundle.pem' file in the 'mas-*-uds-cfg' secret in the MAS core namespace.",
             "Type": "String"
         },
+        "BootNodeVPCId": {
+            "Description": "Enter the VPC Id , bootnode will be created in this VPC",
+            "Type": "String"
+        },
+        "BootNodeSubnetId": {
+            "Description": "Enter the private /public SubnetId for the above VPC Id, bootnode will be created in this Subnet",
+            "Type": "String"
+        },
         "EmailNotification": {
             "Description": "Indicate whether you want to receive emails that contain the connection details and credentials for the Suite. These emails are sent only to the verified email addresses that you configured in the Amazon SES service.",
             "Default": false,
@@ -152,7 +160,8 @@
                 true,
                 false
             ]
-        }, "OCPClusterType": {
+        },
+        "PrivateCluster": {
             "Description": "Select false for Public OCP cluster , true for private OCP cluster",
             "Default": false,
             "Type": "String",
@@ -253,17 +262,26 @@
                 },
                 {
                     "Label": {
+                        "default": "Choose the BootNode VPC details , leave the fields blank when cluster created with existing VPC)"
+                    },
+                    "Parameters": [
+                        "BootNodeVPCId",
+                        "BootNodeSubnetId"
+                    ]
+                },
+                {
+                    "Label": {
                         "default": "Choose the OCP cluster type/ and enter existing VPC Details  (leave this section empty to create a new VPC )"
                     },
                     "Parameters": [
-                        "OCPClusterType",
-                        "Existingvpcid",
-                        "Existingprivatesubnet1id",
-                        "Existingprivatesubnet2id",
-                        "Existingprivatesubnet3id",
-                        "Existingpublicsubnet1id",
-                        "Existingpublicsubnet2id",
-                        "Existingpublicsubnet3id"
+                        "PrivateCluster",
+                        "ExistingVpcId",
+                        "ExistingPrivateSubnet1Id",
+                        "ExistingPrivateSubnet2Id",
+                        "ExistingPrivateSubnet3Id",
+                        "ExistingPublicSubnet1Id",
+                        "ExistingPublicSubnet2Id",
+                        "ExistingPublicSubnet3Id"
                     ]
                 }
             ]
@@ -749,7 +767,7 @@
                     }
                 ],
                 "VpcId": {
-                    "Ref": "Existingvpcid"
+                    "Ref": "ExistingVpcId"
 
                 },
                 "Tags": [
@@ -777,7 +795,7 @@
             "Type": "AWS::EC2::Instance",
             "Properties": {
                 "SubnetId": {
-                    "Ref": "Existingpublicsubnet1id"
+                    "Ref": "ExistingPublicSubnet1Id"
                 },
                 "ImageId": {
                     "Fn::FindInMap": [
@@ -922,37 +940,46 @@
                                 {
                                     "Ref": "OpenShiftPassword"
                                 },
-                                "' '' '' '' '' '' '' '' '' '' '' '' '' '",
+                                "' '' '",
                                 {
                                     "Ref": "EmailNotification"
                                 },
-                                "' '",
+
+                                "' '' '' '' '' '' '' '' '' '' '",
                                 {
-                                    "Ref": "Existingvpcid"
+                                    "Ref": "BootNodeVPCId"
                                 },
                                 "' '",
                                 {
-                                    "Ref": "Existingprivatesubnet1id"
+                                    "Ref": "BootNodeSubnetId"
                                 },
                                 "' '",
                                 {
-                                    "Ref": "Existingprivatesubnet2id"
+                                    "Ref": "ExistingVpcId"
+                                },
+                                "' '' '",
+                                {
+                                    "Ref": "ExistingPrivateSubnet1Id"
                                 },
                                 "' '",
                                 {
-                                    "Ref": "Existingprivatesubnet3id"
+                                    "Ref": "ExistingPrivateSubnet2Id"
                                 },
                                 "' '",
                                 {
-                                    "Ref": "Existingpublicsubnet1id"
+                                    "Ref": "ExistingPrivateSubnet3Id"
                                 },
                                 "' '",
                                 {
-                                    "Ref": "Existingpublicsubnet2id"
+                                    "Ref": "ExistingPublicSubnet1Id"
                                 },
                                 "' '",
                                 {
-                                    "Ref": "Existingpublicsubnet3id"
+                                    "Ref": "ExistingPublicSubnet2Id"
+                                },
+                                "' '",
+                                {
+                                    "Ref": "ExistingPublicSubnet3Id"
                                 },
                                 "' '",
                                 {

@@ -877,11 +877,12 @@
                                 {
                                     "Ref": "OpenShiftPassword"
                                 },
-                                "' '' '' '' '' '' '' '' '' '' '' '' '' '",
+                                "' '' '",
                                 {
                                     "Ref": "EmailNotification"
                                 },
-                                "' \"dev\" ",
+                                "' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '",
+                                "' \"prod\" ",
                                 "2>&1 | tee mas-provisioning.log; "
                             ]
                         ]
