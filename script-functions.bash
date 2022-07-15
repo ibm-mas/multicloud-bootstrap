@@ -122,7 +122,7 @@ function getWorkerNodeDetails(){
 		cpu=$(oc get -o template nodes "$i" --template={{.status.allocatable.cpu}})
 		memory=$(oc get -o template nodes "$i" --template={{.status.allocatable.memory}})
 		
-		if [[ ($cpu -lt 16) || (${memory::-2} -lt 62000000) ]]; then
+		if [[ ($cpu -lt 15) || (${memory::-2} -lt 62000000) ]]; then
 			log " Minimum CPU/Memory requirements not satisfied"
 			SCRIPT_STATUS=29
 			return $SCRIPT_STATUS
