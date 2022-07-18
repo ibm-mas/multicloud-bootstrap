@@ -108,7 +108,7 @@ mark_provisioning_failed() {
     export STATUS_MSG="Please provide a valid MAS license URL."
   elif [[ $retcode -eq 19 ]]; then
     export STATUS_MSG="Please provide all the inputs to use existing OCP."
-  elif [[ $retcode -eq 21 ]]; then
+  elif [[ $retcode -eq 21 || $retcode -eq 1 ]]; then
     export STATUS_MSG="Failure in creating OCP cluster."
   elif [[ $retcode -eq 22 ]]; then
     export STATUS_MSG="Failure in creating Bastion host."
