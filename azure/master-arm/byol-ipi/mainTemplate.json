@@ -642,7 +642,7 @@
     },
     {
       "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
-      "apiVersion": "2021-06-01",
+      "apiVersion": "2021-09-01",
       "name": "[concat(variables('storageaccountName'), '/default/masocpcontainer')]",
       "dependsOn": [
         "[resourceId('Microsoft.Storage/storageAccounts', variables('storageaccountName'))]"
