@@ -16,7 +16,7 @@
             "Description": "Select the public/private hosted zone that you created in the AWS Route 53 service, for example: mas4aws.myorg.com",
             "Type": "AWS::Route53::HostedZone::Id"
         },
-        "ExistingVpcId": {
+        "ExistingVPCId": {
             "Description": "Enter the existing VPC ID to create the OpenShift cluster resources into (required for UPI mode deployment).",
             "Type": "String"
         },
@@ -414,9 +414,6 @@
                                         "ses:SendEmail",
                                         "ses:SendRawEmail"
                                     ],
-
-
-
                                     "Resource": [
                                         {
                                             "Fn::Join": [
