@@ -262,7 +262,7 @@
                 },
                 {
                     "Label": {
-                        "default": "Choose the BootNode VPC details , leave the fields blank when cluster created with existing VPC)"
+                        "default": "Cluster and bootnode access"
                     },
                     "Parameters": [
                         "BootNodeVPCId",
@@ -708,6 +708,48 @@
                 }
             }
         },
+        "LambdaFunctionGetSubnetForBootnode": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+                "Handler": "index.lambda_handler",
+                "Role": {
+                    "Fn::GetAtt": [
+                        "LambdaRole",
+                        "Arn"
+                    ]
+                },
+                "Runtime": "python3.7",
+                "Code": {
+                    "ZipFile":"import boto3\nimport string\nimport cfnresponse\ndef lambda_handler(event, context):\n    try:\n        responseData = {}\n        properties = event[\"ResourceProperties\"]\n        if \"ExistingVPCId\" in properties:\n            if properties[\"ExistingVPCId\"] is not None and properties[\"ExistingVPCId\"] != \"\":\n                responseData['DefaultVPCId'] = properties[\"ExistingVPCId\"]\n                responseData[\"DefaultVPCAz1SubnetId\"] = properties[\"ExistingPrivateSubnet1Id\"]\n        elif \"BootnodeVpcId\" in properties:\n            if properties[\"BootnodeVpcId\"] is not None and properties[\"BootnodeVpcId\"] != \"\":\n                responseData['DefaultVPCId'] = properties[\"BootnodeVpcId\"]\n                responseData[\"DefaultVPCAz1SubnetId\"] = properties[\"BootNodeSubnetId\"]\n        else:\n            ec2_client = boto3.client('ec2', region_name=event[\"ResourceProperties\"][\"Region\"])\n            response = ec2_client.describe_vpcs()\n            for vpc_response in response['Vpcs']:\n                vpc_id = vpc_response['VpcId']\n                is_default = vpc_response['IsDefault']\n                if is_default == True:\n                    default_vpc_id = vpc_id\n                break\n            response = ec2_client.describe_subnets()\n            for subnet_response in response['Subnets']:\n                subnet_id = subnet_response['SubnetId']\n                subnet_vpc_id = subnet_response['VpcId']\n                az_id = subnet_response['AvailabilityZoneId']\n                if subnet_vpc_id == default_vpc_id:\n                    if \"az1\" in az_id:\n                        responseData['DefaultVPCId'] = subnet_vpc_id\n                        responseData['DefaultVPCAz1SubnetId'] = subnet_id\n        cfnresponse.send(event, context, cfnresponse.SUCCESS, responseData, \"CustomResourcePhysicalID\")    \n    except Exception as e:\n        print(\"Exception Error : \" + str(e))\n        cfnresponse.send(event, context, cfnresponse.FAILED, responseData, \"CustomResourcePhysicalID\")\n"
+                }
+            }
+        },
+        "CallLambdaFunctionGetSubnetForBootnode": {
+            "Type": "Custom::CallLambdaFunctionGetSubnetForBootnode",
+            "Properties": {
+                "ServiceToken": {
+                    "Fn::GetAtt": [
+                        "LambdaFunctionGetSubnetForBootnode",
+                        "Arn"
+                    ]
+                },
+                "Region": {
+                    "Ref": "AWS::Region"
+                },
+                "BootnodeVpcId": {
+                    "Ref": "BootnodeVpcId"
+                },
+                "BootNodeSubnetId": {
+                    "Ref": "BootNodeSubnetId"
+                },
+                "ExistingVPCId": {
+                    "Ref": "ExistingVPCId"
+                },
+                "ExistingPrivateSubnet1Id": {
+                    "Ref": "ExistingPrivateSubnet1Id"
+                }
+            }
+        },
         "BootnodeSecurityGroup": {
             "Type": "AWS::EC2::SecurityGroup",
             "Properties": {
@@ -737,8 +779,10 @@
                     }
                 ],
                 "VpcId": {
-                    "Ref": "ExistingVpcId"
-
+                    "Fn::GetAtt": [
+                        "CallLambdaFunctionGetSubnetForBootnode",
+                        "DefaultVPCId"
+                    ]
                 },
                 "Tags": [
                     {
@@ -765,7 +809,10 @@
             "Type": "AWS::EC2::Instance",
             "Properties": {
                 "SubnetId": {
-                    "Ref": "ExistingPublicSubnet1Id"
+                    "Fn::GetAtt": [
+                        "CallLambdaFunctionGetSubnetForBootnode",
+                        "DefaultVPCAz1SubnetId"
+                    ]
                 },
                 "ImageId": {
                     "Fn::FindInMap": [
@@ -800,7 +847,7 @@
                                 "git clone https://github.com/ibm-mas/ansible-devops.git;",
                                 "cd ansible-devops;",
                                 "rm -rf multicloud-bootstrap 1>/dev/null 2>&1;",
-                                "git clone  https://github.com/ibm-mas/multicloud-bootstrap.git;",
+                                "git clone  -b mergeUPIcode https://github.com/ibm-mas/multicloud-bootstrap.git;",
                                 "cd multicloud-bootstrap;",
                                 "find . -type f -name \"*.sh\" -exec chmod +x {} \\;;",
                                 "./init.sh \"aws\" \"",
