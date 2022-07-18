@@ -125,7 +125,9 @@ mark_provisioning_failed() {
   elif [[ $retcode -eq 28 ]]; then
     export STATUS_MSG="Missing or Invalid Product Code."
   elif [[ $retcode -eq 29 ]]; then
-    export STATUS_MSG="Provided cluster does not meet the requirements. Please select option to create a new cluster in a new deployment."  
+    export STATUS_MSG="Provided cluster does not meet the requirements. Please select option to create a new cluster in a new deployment."
+  elif [[ $retcode -eq 30 ]]; then
+    export STATUS_MSG="MAS is not supported on ROSA cluster. Please select option to create a new cluster in a new deployment or provide a self-managed cluster."
   fi
   export MESSAGE_TEXT=NA
   export OPENSHIFT_CLUSTER_CONSOLE_URL=NA

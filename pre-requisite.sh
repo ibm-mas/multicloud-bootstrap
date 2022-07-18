@@ -2,6 +2,12 @@
 . helper.sh
 export -f log
 
+checkROSA
+retcode=$?
+if [[ $retcode -eq 30 ]]; then
+	return $retcode
+fi
+
 getOCPVersion
 retcode=$?
 if [[ $retcode -eq 29 ]]; then
