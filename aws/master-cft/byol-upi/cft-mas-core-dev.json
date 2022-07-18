@@ -145,7 +145,7 @@
             "Type": "String"
         },
         "BootNodeVPCId": {
-            "Description": "Enter the VPC Id to create the bootnode into. Default VPC created by AWS will be used if not specified. If 'ExistingVpcId' parameter is specified, the same will be used as 'BootnodeVpcId' ignoring the value provided here. If existing OpenShift cluster is specified, make sure it is reachable from this VPC",
+            "Description": "Enter the VPC Id to create the bootnode into. Default VPC created by AWS will be used if not specified. If 'ExistingVPCId' parameter is specified, the same will be used as 'BootNodeVPCId' ignoring the value provided here. If existing OpenShift cluster is specified, make sure it is reachable from this VPC",
             "Type": "String"
         },
         "BootNodeSubnetId": {
@@ -207,7 +207,9 @@
                     },
                     "Parameters": [
                         "SSHKey",
-                        "BootnodeSGIngressCidrIp"
+                        "BootnodeSGIngressCidrIp",
+                        "BootNodeVPCId",
+                        "BootNodeSubnetId"
                     ]
                 },
                 {
@@ -262,20 +264,11 @@
                 },
                 {
                     "Label": {
-                        "default": "Cluster and bootnode access"
-                    },
-                    "Parameters": [
-                        "BootNodeVPCId",
-                        "BootNodeSubnetId"
-                    ]
-                },
-                {
-                    "Label": {
                         "default": "Choose the OCP cluster type/ and enter existing VPC Details  (leave this section empty to create a new VPC )"
                     },
                     "Parameters": [
                         "PrivateCluster",
-                        "ExistingVpcId",
+                        "ExistingVPCId",
                         "ExistingPrivateSubnet1Id",
                         "ExistingPrivateSubnet2Id",
                         "ExistingPrivateSubnet3Id",
@@ -723,7 +716,7 @@
                 },
                 "Runtime": "python3.7",
                 "Code": {
-                    "ZipFile":"import boto3\nimport string\nimport cfnresponse\ndef lambda_handler(event, context):\n    try:\n        responseData = {}\n        properties = event[\"ResourceProperties\"]\n        if \"ExistingVPCId\" in properties:\n            if properties[\"ExistingVPCId\"] is not None and properties[\"ExistingVPCId\"] != \"\":\n                responseData['DefaultVPCId'] = properties[\"ExistingVPCId\"]\n                responseData[\"DefaultVPCAz1SubnetId\"] = properties[\"ExistingPublicSubnet1Id\"]\n        elif \"BootnodeVpcId\" in properties:\n            if properties[\"BootnodeVpcId\"] is not None and properties[\"BootnodeVpcId\"] != \"\":\n                responseData['DefaultVPCId'] = properties[\"BootnodeVpcId\"]\n                responseData[\"DefaultVPCAz1SubnetId\"] = properties[\"BootNodeSubnetId\"]\n        else:\n            ec2_client = boto3.client('ec2', region_name=event[\"ResourceProperties\"][\"Region\"])\n            response = ec2_client.describe_vpcs()\n            for vpc_response in response['Vpcs']:\n                vpc_id = vpc_response['VpcId']\n                is_default = vpc_response['IsDefault']\n                if is_default == True:\n                    default_vpc_id = vpc_id\n                break\n            response = ec2_client.describe_subnets()\n            for subnet_response in response['Subnets']:\n                subnet_id = subnet_response['SubnetId']\n                subnet_vpc_id = subnet_response['VpcId']\n                az_id = subnet_response['AvailabilityZoneId']\n                if subnet_vpc_id == default_vpc_id:\n                    if \"az1\" in az_id:\n                        responseData['DefaultVPCId'] = subnet_vpc_id\n                        responseData['DefaultVPCAz1SubnetId'] = subnet_id\n        cfnresponse.send(event, context, cfnresponse.SUCCESS, responseData, \"CustomResourcePhysicalID\")    \n    except Exception as e:\n        print(\"Exception Error : \" + str(e))\n        cfnresponse.send(event, context, cfnresponse.FAILED, responseData, \"CustomResourcePhysicalID\")\n"                }
+                    "ZipFile":"import boto3\nimport string\nimport cfnresponse\ndef lambda_handler(event, context):\n    try:\n        responseData = {}\n        properties = event[\"ResourceProperties\"]\n        if \"ExistingVPCId\" in properties:\n            if properties[\"ExistingVPCId\"] is not None and properties[\"ExistingVPCId\"] != \"\":\n                responseData['DefaultVPCId'] = properties[\"ExistingVPCId\"]\n                responseData[\"DefaultVPCAz1SubnetId\"] = properties[\"ExistingPublicSubnet1Id\"]\n        elif \"BootNodeVPCId\" in properties:\n            if properties[\"BootNodeVPCId\"] is not None and properties[\"BootNodeVPCId\"] != \"\":\n                responseData['DefaultVPCId'] = properties[\"BootNodeVPCId\"]\n                responseData[\"DefaultVPCAz1SubnetId\"] = properties[\"BootNodeSubnetId\"]\n        else:\n            ec2_client = boto3.client('ec2', region_name=event[\"ResourceProperties\"][\"Region\"])\n            response = ec2_client.describe_vpcs()\n            for vpc_response in response['Vpcs']:\n                vpc_id = vpc_response['VpcId']\n                is_default = vpc_response['IsDefault']\n                if is_default == True:\n                    default_vpc_id = vpc_id\n                break\n            response = ec2_client.describe_subnets()\n            for subnet_response in response['Subnets']:\n                subnet_id = subnet_response['SubnetId']\n                subnet_vpc_id = subnet_response['VpcId']\n                az_id = subnet_response['AvailabilityZoneId']\n                if subnet_vpc_id == default_vpc_id:\n                    if \"az1\" in az_id:\n                        responseData['DefaultVPCId'] = subnet_vpc_id\n                        responseData['DefaultVPCAz1SubnetId'] = subnet_id\n        cfnresponse.send(event, context, cfnresponse.SUCCESS, responseData, \"CustomResourcePhysicalID\")    \n    except Exception as e:\n        print(\"Exception Error : \" + str(e))\n        cfnresponse.send(event, context, cfnresponse.FAILED, responseData, \"CustomResourcePhysicalID\")\n"                }
             }
         },
         "CallLambdaFunctionGetSubnetForBootnode": {
@@ -745,8 +738,8 @@
                 "BootNodeSubnetId": {
                     "Ref": "BootNodeSubnetId"
                 },
-                "ExistingVpcId": {
-                    "Ref": "ExistingVpcId"
+                "ExistingVPCId": {
+                    "Ref": "ExistingVPCId"
                 },
 
                 "ExistingPublicSubnet1Id": {
@@ -976,7 +969,7 @@
                                 },
                                 "' '",
                                 {
-                                    "Ref": "ExistingVpcId"
+                                    "Ref": "ExistingVPCId"
                                 },
                                 "' '' '",
                                 {
