@@ -321,8 +321,6 @@ log " DEPLOY_CP4D: $DEPLOY_CP4D"
 log " DEPLOY_MANAGE: $DEPLOY_MANAGE"
 
 
-exit 0
-
 if [[ $CLUSTER_TYPE == "azure" ]]; then
   # Perform az login for accessing blob storage
   az login --identity
