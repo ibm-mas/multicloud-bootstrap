@@ -51,7 +51,7 @@
             "MaxLength": "18",
             "Default": "0.0.0.0/0",
             "AllowedPattern": "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})",
-            "ConstraintDescription": "must be a valid IP CIDR range of the form x.x.x.x/x."
+            "ConstraintDescription": "must be a valid IP CIDR range of the form w.x.y.z/a."
         },
         "ClusterSize": {
             "Description": "Select your preferred cluster size. All master nodes (M) are m5.2xlarge Amazon EC2 instances. All worker nodes (W) are m5.4xlarge instances. Choose from: small (3M, 3W, total memory: 288GB), medium (3M, 5W, total memory: 416GB), or large (5M, 7W, total memory: 608GB).",
