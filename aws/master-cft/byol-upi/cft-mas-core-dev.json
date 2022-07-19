@@ -16,38 +16,42 @@
             "Description": "Select the public/private hosted zone that you created in the AWS Route 53 service, for example: mas4aws.myorg.com",
             "Type": "AWS::Route53::HostedZone::Id"
         },
-        "ExistingVpcId": {
-            "Description": "Enter your existing VPC Id for deployment",
+        "ExistingVPCId": {
+            "Description": "Enter the existing VPC ID to create the OpenShift cluster resources into (required for UPI mode deployment).",
             "Type": "String"
         },
         "ExistingPrivateSubnet1Id": {
-            "Description": "Enter your existing private subnet Id for the above VPC Id for deployment( Private Subnet :1) ",
+            "Description": "Enter the private subnet1 ID from the existing VPC (required for UPI mode deployment). ",
             "Type": "String"
         },
         "ExistingPrivateSubnet2Id": {
-            "Description": "Enter your existing private subnet Id for the above VPC Id for deployment( Private Subnet :2)",
+            "Description": "Enter the private subnet2 ID from the existing VPC (required for UPI mode deployment).",
             "Type": "String"
         },
         "ExistingPrivateSubnet3Id": {
-            "Description": "Enter your existing private subnet Id for the above VPC Id for deployment( Private Subnet :3)",
+            "Description": "Enter the private subnet3 ID from the existing VPC (required for UPI mode deployment).",
             "Type": "String"
         },
         "ExistingPublicSubnet1Id": {
-            "Description": "Enter your existing public subnet Id for the above VPC Id for deployment( Public Subnet :1)",
+            "Description": "Enter the public subnet1 ID from the existing VPC (required for UPI mode deployment).",
             "Type": "String"
         },
         "ExistingPublicSubnet2Id": {
-            "Description": "Enter your existing public subnet Id for the above VPC Id for deployment( Public Subnet :2)",
+            "Description": "Enter the public subnet2 ID from the existing VPC (required for UPI mode deployment).",
             "Type": "String"
         },
         "ExistingPublicSubnet3Id": {
-            "Description": "Enter your existing public subnet Id for the above VPC Id for deployment( Public Subnet :3)",
+            "Description": "Enter the public subnet3 ID from the existing VPC (required for UPI mode deployment).)",
             "Type": "String"
         },
         "BootnodeSGIngressCidrIp": {
             "Description": "Use CIDR notation to enter the IP addresses that can access the bootnode. For example, 192.12.33.3/32. To allow access from all IP addresses, enter 0.0.0.0/0.",
             "Type": "String",
-            "MinLength": "1"
+            "MinLength": "9",
+            "MaxLength": "18",
+            "Default": "0.0.0.0/0",
+            "AllowedPattern": "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})",
+            "ConstraintDescription": "must be a valid IP CIDR range of the form w.x.y.z/a."
         },
         "ClusterSize": {
             "Description": "Select your preferred cluster size. All master nodes (M) are m5.2xlarge Amazon EC2 instances. All worker nodes (W) are m5.4xlarge instances. Choose from: small (3M, 3W, total memory: 288GB), medium (3M, 5W, total memory: 416GB), or large (5M, 7W, total memory: 608GB).",
@@ -145,11 +149,11 @@
             "Type": "String"
         },
         "BootNodeVPCId": {
-            "Description": "Enter the VPC Id , bootnode will be created in this VPC",
+            "Description": "Enter the VPC Id to create the bootnode into. Default VPC created by AWS will be used if not specified. If 'ExistingVPCId' parameter is specified, the same will be used as 'BootNodeVPCId' ignoring the value provided here. If existing OpenShift cluster is specified, make sure it is reachable from this VPC",
             "Type": "String"
         },
         "BootNodeSubnetId": {
-            "Description": "Enter the private /public SubnetId for the above VPC Id, bootnode will be created in this Subnet",
+            "Description": "Enter the subnet ID from  the bootnode VPC to be used for the bootnode.",
             "Type": "String"
         },
         "EmailNotification": {
@@ -162,7 +166,7 @@
             ]
         },
         "PrivateCluster": {
-            "Description": "Select false for Public OCP cluster , true for private OCP cluster",
+            "Description": "Select true to create a private OpenShift cluster",
             "Default": false,
             "Type": "String",
             "AllowedValues": [
@@ -207,7 +211,9 @@
                     },
                     "Parameters": [
                         "SSHKey",
-                        "BootnodeSGIngressCidrIp"
+                        "BootnodeSGIngressCidrIp",
+                        "BootNodeVPCId",
+                        "BootNodeSubnetId"
                     ]
                 },
                 {
@@ -262,20 +268,11 @@
                 },
                 {
                     "Label": {
-                        "default": "Choose the BootNode VPC details , leave the fields blank when cluster created with existing VPC)"
-                    },
-                    "Parameters": [
-                        "BootNodeVPCId",
-                        "BootNodeSubnetId"
-                    ]
-                },
-                {
-                    "Label": {
                         "default": "Choose the OCP cluster type/ and enter existing VPC Details  (leave this section empty to create a new VPC )"
                     },
                     "Parameters": [
                         "PrivateCluster",
-                        "ExistingVpcId",
+                        "ExistingVPCId",
                         "ExistingPrivateSubnet1Id",
                         "ExistingPrivateSubnet2Id",
                         "ExistingPrivateSubnet3Id",
@@ -708,6 +705,49 @@
                 }
             }
         },
+        "LambdaFunctionGetSubnetForBootnode": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+                "Handler": "index.lambda_handler",
+                "Role": {
+                    "Fn::GetAtt": [
+                        "LambdaRole",
+                        "Arn"
+                    ]
+                },
+                "Runtime": "python3.7",
+                "Code": {
+                    "ZipFile":"import boto3\nimport string\nimport cfnresponse\ndef lambda_handler(event, context):\n    try:\n        responseData = {}\n        properties = event[\"ResourceProperties\"]\n        if \"ExistingVPCId\" in properties:\n            if properties[\"ExistingVPCId\"] is not None and properties[\"ExistingVPCId\"] != \"\":\n                responseData['DefaultVPCId'] = properties[\"ExistingVPCId\"]\n                responseData[\"DefaultVPCAz1SubnetId\"] = properties[\"ExistingPublicSubnet1Id\"]\n        elif \"BootNodeVPCId\" in properties:\n            if properties[\"BootNodeVPCId\"] is not None and properties[\"BootNodeVPCId\"] != \"\":\n                responseData['DefaultVPCId'] = properties[\"BootNodeVPCId\"]\n                responseData[\"DefaultVPCAz1SubnetId\"] = properties[\"BootNodeSubnetId\"]\n        else:\n            ec2_client = boto3.client('ec2', region_name=event[\"ResourceProperties\"][\"Region\"])\n            response = ec2_client.describe_vpcs()\n            for vpc_response in response['Vpcs']:\n                vpc_id = vpc_response['VpcId']\n                is_default = vpc_response['IsDefault']\n                if is_default == True:\n                    default_vpc_id = vpc_id\n                break\n            response = ec2_client.describe_subnets()\n            for subnet_response in response['Subnets']:\n                subnet_id = subnet_response['SubnetId']\n                subnet_vpc_id = subnet_response['VpcId']\n                az_id = subnet_response['AvailabilityZoneId']\n                if subnet_vpc_id == default_vpc_id:\n                    if \"az1\" in az_id:\n                        responseData['DefaultVPCId'] = subnet_vpc_id\n                        responseData['DefaultVPCAz1SubnetId'] = subnet_id\n        cfnresponse.send(event, context, cfnresponse.SUCCESS, responseData, \"CustomResourcePhysicalID\")    \n    except Exception as e:\n        print(\"Exception Error : \" + str(e))\n        cfnresponse.send(event, context, cfnresponse.FAILED, responseData, \"CustomResourcePhysicalID\")\n"                }
+            }
+        },
+        "CallLambdaFunctionGetSubnetForBootnode": {
+            "Type": "Custom::CallLambdaFunctionGetSubnetForBootnode",
+            "Properties": {
+                "ServiceToken": {
+                    "Fn::GetAtt": [
+                        "LambdaFunctionGetSubnetForBootnode",
+                        "Arn"
+                    ]
+                },
+                "Region": {
+                    "Ref": "AWS::Region"
+                },
+
+                "BootNodeVPCId": {
+                    "Ref": "BootNodeVPCId"
+                },
+                "BootNodeSubnetId": {
+                    "Ref": "BootNodeSubnetId"
+                },
+                "ExistingVPCId": {
+                    "Ref": "ExistingVPCId"
+                },
+
+                "ExistingPublicSubnet1Id": {
+                    "Ref": "ExistingPublicSubnet1Id"
+                }
+            }
+        },
         "BootnodeSecurityGroup": {
             "Type": "AWS::EC2::SecurityGroup",
             "Properties": {
@@ -737,8 +777,10 @@
                     }
                 ],
                 "VpcId": {
-                    "Ref": "ExistingVpcId"
-
+                    "Fn::GetAtt": [
+                        "CallLambdaFunctionGetSubnetForBootnode",
+                        "DefaultVPCId"
+                    ]
                 },
                 "Tags": [
                     {
@@ -765,7 +807,10 @@
             "Type": "AWS::EC2::Instance",
             "Properties": {
                 "SubnetId": {
-                    "Ref": "ExistingPublicSubnet1Id"
+                    "Fn::GetAtt": [
+                        "CallLambdaFunctionGetSubnetForBootnode",
+                        "DefaultVPCAz1SubnetId"
+                    ]
                 },
                 "ImageId": {
                     "Fn::FindInMap": [
@@ -800,7 +845,7 @@
                                 "git clone https://github.com/ibm-mas/ansible-devops.git;",
                                 "cd ansible-devops;",
                                 "rm -rf multicloud-bootstrap 1>/dev/null 2>&1;",
-                                "git clone  https://github.com/ibm-mas/multicloud-bootstrap.git;",
+                                "git clone https://github.com/ibm-mas/multicloud-bootstrap.git;",
                                 "cd multicloud-bootstrap;",
                                 "find . -type f -name \"*.sh\" -exec chmod +x {} \\;;",
                                 "./init.sh \"aws\" \"",
@@ -925,7 +970,7 @@
                                 },
                                 "' '",
                                 {
-                                    "Ref": "ExistingVpcId"
+                                    "Ref": "ExistingVPCId"
                                 },
                                 "' '' '",
                                 {
