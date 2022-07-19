@@ -212,8 +212,8 @@ if [[ $CLUSTER_TYPE == "azure" ]]; then
 fi
 
 # Check if all the subnet values are provided for existing VPC Id
-if [[ ! -z $ExistingVPCId ]]; then
-  if [[ ( ! -z $ExistingPrivateSubnet1Id) && ( ! -z $ExistingPrivateSubnet2Id) && ( ! -z $ExistingPrivateSubnet3Id) && ( ! -z $ExistingPublicSubnet1Id) && (! -z $ExistingPublicSubnet2Id) && ( ! -z $ExistingPublicSubnet3Id) ]]; then
+if [[ -n $ExistingVPCId ]]; then
+  if [[ ( -n $ExistingPrivateSubnet1Id) && ( -n $ExistingPrivateSubnet2Id) && ( -n $ExistingPrivateSubnet3Id) && ( -n $ExistingPublicSubnet1Id) && (-n $ExistingPublicSubnet2Id) && ( -n $ExistingPublicSubnet3Id) ]]; then
     log "=== OCP cluster will be deployed with existing VPCs ==="
  else
         log "ERROR: Subnets missing for the VPC"
