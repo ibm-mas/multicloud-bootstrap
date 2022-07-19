@@ -207,6 +207,13 @@ else
    export new_or_existing_vpc_subnet="exist"
    export enable_permission_quota_check=false
 fi
+
+if [ -z "$EXISTING_NETWORK" && $CLUSTER_TYPE == "azure" ]; then
+  export INSTALLATION_MODE="UPI"
+else
+  export INSTALLATION_MODE="IPI"
+fi
+
 RESP_CODE=0
 
 # Export env variables which are not set by default during userdata execution
@@ -320,8 +327,17 @@ export DEPLOY_MANAGE=$(echo $DEPLOY_MANAGE | cut -d '=' -f 2)
 log " DEPLOY_CP4D: $DEPLOY_CP4D"
 log " DEPLOY_MANAGE: $DEPLOY_MANAGE"
 
+if [[ $CLUSTER_TYPE == "azure" && $INSTALLATION_MODE == "UPI" ]]; then
+  # Perform az login
+  az login --service-principal -u ${AZURE_SP_CLIENT_ID} -p ${AZURE_SP_CLIENT_PWD} --tenant ${TENANT_ID}
+  az resource list -n masocp-${RANDOM_STR}-bootnode-vm
 
-if [[ $CLUSTER_TYPE == "azure" ]]; then
+  # Get subscription ID, tenant ID
+  export AZURE_SUBSC_ID=`az account list | jq -r '.[].id'`
+  log " AZURE_SUBSC_ID: $AZURE_SUBSC_ID"
+fi
+
+if [[ $CLUSTER_TYPE == "azure" && $INSTALLATION_MODE == "IPI" ]]; then
   # Perform az login for accessing blob storage
   az login --identity
   az resource list -n masocp-${RANDOM_STR}-bootnode-vm

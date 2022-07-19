@@ -1,0 +1,1 @@
+echo "Inside create OCP cluster UPI script"
