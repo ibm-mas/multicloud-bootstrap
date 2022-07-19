@@ -306,11 +306,11 @@ then
     if [[ $PRODUCT_TYPE == "privatepublic" ]];then
       # Create Products Configmap and CredetialRequest in sls namespace for Paid Offering.
       envsubst < "$GIT_REPO_HOME"/aws/products_template.yaml > "$GIT_REPO_HOME"/aws/products.yaml
-      envsubst < "$GIT_REPO_HOME"/aws/CredentialRequest_template.yaml > "$GIT_REPO_HOME"/aws/CredentialRequest.yaml
+      envsubst < "$GIT_REPO_HOME"/aws/CredentialsRequest_template.yaml > "$GIT_REPO_HOME"/aws/CredentialRequest.yaml
       oc new-project "$SLS_NAMESPACE"
       oc create -f "$GIT_REPO_HOME"/aws/products.yaml -n "$SLS_NAMESPACE"
-      #oc create -f "$GIT_REPO_HOME"/aws/CredentialRequest.yaml
-      oc create secret generic "$SLS_INSTANCE_NAME"-aws-access --from-literal=region="$DEPLOY_REGION" --from-literal=accessKeyId="$AWS_ACCESS_KEY_ID" --from-literal=secretAccessKey="$AWS_SECRET_ACCESS_KEY" -n "$SLS_NAMESPACE"
+      oc create -f "$GIT_REPO_HOME"/aws/CredentialsRequest.yaml
+      #oc create secret generic "$SLS_INSTANCE_NAME"-aws-access --from-literal=region="$DEPLOY_REGION" --from-literal=accessKeyId="$AWS_ACCESS_KEY_ID" --from-literal=secretAccessKey="$AWS_SECRET_ACCESS_KEY" -n "$SLS_NAMESPACE"
       export SLS_ENTITLEMENT_USERNAME=$staging_sls_user
       export SLS_ENTITLEMENT_KEY=$staging_sls_password
       export SLS_CATALOG_SOURCE=ibm-sls-operators

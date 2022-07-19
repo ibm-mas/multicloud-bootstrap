@@ -6,6 +6,7 @@ metadata:
 data:
   products.yaml: |-
     productName: ${PRODUCT_NAME}
+    region: ${AWS_REGION}
     entitlementName: "APP_POINTS"
     tokenId: AppPoints
     products:
