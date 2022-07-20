@@ -209,9 +209,9 @@ else
 fi
 
 if [[ -z "$EXISTING_NETWORK" && $CLUSTER_TYPE == "azure" ]]; then
-  export INSTALLATION_MODE="UPI"
-else
   export INSTALLATION_MODE="IPI"
+else
+  export INSTALLATION_MODE="UPI"
 fi
 log "==== INSTALLATION MODE: ${INSTALLATION_MODE}"
 
