@@ -12,37 +12,9 @@
                 "MAS Core + Manage (no Cloud Pak for Data)"
             ]
         },
-        "HostedZone": {
-            "Description": "Select the public/private hosted zone that you created in the AWS Route 53 service, for example: mas4aws.myorg.com",
+        "PublicHostedZone": {
+            "Description": "Select the public hosted zone that you created in the AWS Route 53 service, for example: mas4aws.myorg.com",
             "Type": "AWS::Route53::HostedZone::Id"
-        },
-        "ExistingVPCId": {
-            "Description": "Enter the existing VPC ID to create the OpenShift cluster resources into (required for UPI mode deployment).",
-            "Type": "String"
-        },
-        "ExistingPrivateSubnet1Id": {
-            "Description": "Enter the private subnet1 ID from the existing VPC (required for UPI mode deployment). ",
-            "Type": "String"
-        },
-        "ExistingPrivateSubnet2Id": {
-            "Description": "Enter the private subnet2 ID from the existing VPC (required for UPI mode deployment).",
-            "Type": "String"
-        },
-        "ExistingPrivateSubnet3Id": {
-            "Description": "Enter the private subnet3 ID from the existing VPC (required for UPI mode deployment).",
-            "Type": "String"
-        },
-        "ExistingPublicSubnet1Id": {
-            "Description": "Enter the public subnet1 ID from the existing VPC (required for UPI mode deployment).",
-            "Type": "String"
-        },
-        "ExistingPublicSubnet2Id": {
-            "Description": "Enter the public subnet2 ID from the existing VPC (required for UPI mode deployment).",
-            "Type": "String"
-        },
-        "ExistingPublicSubnet3Id": {
-            "Description": "Enter the public subnet3 ID from the existing VPC (required for UPI mode deployment).)",
-            "Type": "String"
         },
         "BootnodeSGIngressCidrIp": {
             "Description": "Use CIDR notation to enter the IP addresses that can access the bootnode. For example, 192.12.33.3/32. To allow access from all IP addresses, enter 0.0.0.0/0.",
@@ -144,25 +116,8 @@
             "Description": "Enter the HTTP or S3 location of the service's public certificate that you retrieved from the 'ca-bundle.pem' file in the 'mas-*-uds-cfg' secret in the MAS core namespace.",
             "Type": "String"
         },
-        "BootNodeVPCId": {
-            "Description": "Enter the VPC Id to create the bootnode into. Default VPC created by AWS will be used if not specified. If 'ExistingVPCId' parameter is specified, the same will be used as 'BootNodeVPCId' ignoring the value provided here. If existing OpenShift cluster is specified, make sure it is reachable from this VPC",
-            "Type": "String"
-        },
-        "BootNodeSubnetId": {
-            "Description": "Enter the subnet ID from  the bootnode VPC to be used for the bootnode.",
-            "Type": "String"
-        },
         "EmailNotification": {
             "Description": "Indicate whether you want to receive emails that contain the connection details and credentials for the Suite. These emails are sent only to the verified email addresses that you configured in the Amazon SES service.",
-            "Default": false,
-            "Type": "String",
-            "AllowedValues": [
-                true,
-                false
-            ]
-        },
-        "PrivateCluster": {
-            "Description": "Select true to create a private OpenShift cluster",
             "Default": false,
             "Type": "String",
             "AllowedValues": [
@@ -197,7 +152,7 @@
                         "default": "New OpenShift cluster configuration details (complete this section only if you want to create a new cluster)"
                     },
                     "Parameters": [
-                        "HostedZone",
+                        "PublicHostedZone",
                         "ClusterSize"
                     ]
                 },
@@ -207,9 +162,7 @@
                     },
                     "Parameters": [
                         "SSHKey",
-                        "BootnodeSGIngressCidrIp",
-                        "BootNodeVPCId",
-                        "BootNodeSubnetId"
+                        "BootnodeSGIngressCidrIp"
                     ]
                 },
                 {
@@ -260,21 +213,6 @@
                     },
                     "Parameters": [
                         "EmailNotification"
-                    ]
-                },
-                {
-                    "Label": {
-                        "default": "Choose the OCP cluster type/ and enter existing VPC Details  (leave this section empty to create a new VPC )"
-                    },
-                    "Parameters": [
-                        "PrivateCluster",
-                        "ExistingVPCId",
-                        "ExistingPrivateSubnet1Id",
-                        "ExistingPrivateSubnet2Id",
-                        "ExistingPrivateSubnet3Id",
-                        "ExistingPublicSubnet1Id",
-                        "ExistingPublicSubnet2Id",
-                        "ExistingPublicSubnet3Id"
                     ]
                 }
             ]
@@ -414,9 +352,6 @@
                                         "ses:SendEmail",
                                         "ses:SendRawEmail"
                                     ],
-
-
-
                                     "Resource": [
                                         {
                                             "Fn::Join": [
@@ -664,7 +599,7 @@
                     ]
                 },
                 "ZoneId": {
-                    "Ref": "HostedZone"
+                    "Ref": "PublicHostedZone"
                 },
                 "Region": {
                     "Ref": "AWS::Region"
@@ -716,7 +651,8 @@
                 },
                 "Runtime": "python3.7",
                 "Code": {
-                    "ZipFile":"import boto3\nimport string\nimport cfnresponse\ndef lambda_handler(event, context):\n    try:\n        responseData = {}\n        properties = event[\"ResourceProperties\"]\n        if \"ExistingVPCId\" in properties:\n            if properties[\"ExistingVPCId\"] is not None and properties[\"ExistingVPCId\"] != \"\":\n                responseData['DefaultVPCId'] = properties[\"ExistingVPCId\"]\n                responseData[\"DefaultVPCAz1SubnetId\"] = properties[\"ExistingPublicSubnet1Id\"]\n        elif \"BootNodeVPCId\" in properties:\n            if properties[\"BootNodeVPCId\"] is not None and properties[\"BootNodeVPCId\"] != \"\":\n                responseData['DefaultVPCId'] = properties[\"BootNodeVPCId\"]\n                responseData[\"DefaultVPCAz1SubnetId\"] = properties[\"BootNodeSubnetId\"]\n        else:\n            ec2_client = boto3.client('ec2', region_name=event[\"ResourceProperties\"][\"Region\"])\n            response = ec2_client.describe_vpcs()\n            for vpc_response in response['Vpcs']:\n                vpc_id = vpc_response['VpcId']\n                is_default = vpc_response['IsDefault']\n                if is_default == True:\n                    default_vpc_id = vpc_id\n                break\n            response = ec2_client.describe_subnets()\n            for subnet_response in response['Subnets']:\n                subnet_id = subnet_response['SubnetId']\n                subnet_vpc_id = subnet_response['VpcId']\n                az_id = subnet_response['AvailabilityZoneId']\n                if subnet_vpc_id == default_vpc_id:\n                    if \"az1\" in az_id:\n                        responseData['DefaultVPCId'] = subnet_vpc_id\n                        responseData['DefaultVPCAz1SubnetId'] = subnet_id\n        cfnresponse.send(event, context, cfnresponse.SUCCESS, responseData, \"CustomResourcePhysicalID\")    \n    except Exception as e:\n        print(\"Exception Error : \" + str(e))\n        cfnresponse.send(event, context, cfnresponse.FAILED, responseData, \"CustomResourcePhysicalID\")\n"                }
+                    "ZipFile": "import boto3\nimport string\nimport cfnresponse\ndef lambda_handler(event, context):\n    responseData = {}\n    try:\n        ec2_client = boto3.client('ec2', region_name=event[\"ResourceProperties\"][\"Region\"])\n        response = ec2_client.describe_vpcs()\n        for vpc_response in response['Vpcs']:\n          vpc_id = vpc_response['VpcId']\n          is_default = vpc_response['IsDefault']\n          if is_default == True:\n            default_vpc_id = vpc_id\n            break\n        response = ec2_client.describe_subnets()\n        for subnet_response in response['Subnets']:\n          subnet_id = subnet_response['SubnetId']\n          subnet_vpc_id = subnet_response['VpcId']\n          az_id = subnet_response['AvailabilityZoneId']\n          if subnet_vpc_id == default_vpc_id:\n            if \"az1\" in az_id:\n              responseData['DefaultVPCId'] = subnet_vpc_id\n              responseData['DefaultVPCAz1SubnetId'] = subnet_id\n        cfnresponse.send(event, context, cfnresponse.SUCCESS, responseData, \"CustomResourcePhysicalID\")\n    except Exception as e:\n        print(\"Exception Error : \" + str(e))\n        cfnresponse.send(event, context, cfnresponse.FAILED, responseData, \"CustomResourcePhysicalID\")\n"
+                }
             }
         },
         "CallLambdaFunctionGetSubnetForBootnode": {
@@ -730,20 +666,6 @@
                 },
                 "Region": {
                     "Ref": "AWS::Region"
-                },
-
-                "BootNodeVPCId": {
-                    "Ref": "BootNodeVPCId"
-                },
-                "BootNodeSubnetId": {
-                    "Ref": "BootNodeSubnetId"
-                },
-                "ExistingVPCId": {
-                    "Ref": "ExistingVPCId"
-                },
-
-                "ExistingPublicSubnet1Id": {
-                    "Ref": "ExistingPublicSubnet1Id"
                 }
             }
         },
@@ -844,7 +766,7 @@
                                 "git clone https://github.com/ibm-mas/ansible-devops.git;",
                                 "cd ansible-devops;",
                                 "rm -rf multicloud-bootstrap 1>/dev/null 2>&1;",
-                                "git clone  -b pre-requisite-382 https://github.com/ibm-mas/multicloud-bootstrap.git;",
+                                "git clone https://github.com/ibm-mas/multicloud-bootstrap.git;",
                                 "cd multicloud-bootstrap;",
                                 "find . -type f -name \"*.sh\" -exec chmod +x {} \\;;",
                                 "./init.sh \"aws\" \"",
@@ -958,48 +880,7 @@
                                 {
                                     "Ref": "EmailNotification"
                                 },
-
-                                "' '' '' '' '' '' '' '' '' '' '",
-                                {
-                                    "Ref": "BootNodeVPCId"
-                                },
-                                "' '",
-                                {
-                                    "Ref": "BootNodeSubnetId"
-                                },
-                                "' '",
-                                {
-                                    "Ref": "ExistingVPCId"
-                                },
-                                "' '' '",
-                                {
-                                    "Ref": "ExistingPrivateSubnet1Id"
-                                },
-                                "' '",
-                                {
-                                    "Ref": "ExistingPrivateSubnet2Id"
-                                },
-                                "' '",
-                                {
-                                    "Ref": "ExistingPrivateSubnet3Id"
-                                },
-                                "' '",
-                                {
-                                    "Ref": "ExistingPublicSubnet1Id"
-                                },
-                                "' '",
-                                {
-                                    "Ref": "ExistingPublicSubnet2Id"
-                                },
-                                "' '",
-                                {
-                                    "Ref": "ExistingPublicSubnet3Id"
-                                },
-                                "' '",
-                                {
-                                    "Ref": "PrivateCluster"
-                                },
-                                "' '",
+                                "' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '",
                                 "' \"prod\" ",
                                 "2>&1 | tee mas-provisioning.log; "
                             ]
