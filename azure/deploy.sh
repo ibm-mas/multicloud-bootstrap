@@ -79,7 +79,7 @@ if [[ $OPENSHIFT_USER_PROVIDE == "false" ]]; then
     ./create-ocp-cluster-upi.sh
     retcode=$?
     if [[ $retcode -ne 0 ]]; then
-      log "OCP cluster creation failed in Terraform step"
+      log "OCP cluster creation failed in UPI step"
       exit 21
     fi
     set -e
