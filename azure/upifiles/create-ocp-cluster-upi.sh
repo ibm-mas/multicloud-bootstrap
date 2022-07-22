@@ -309,5 +309,6 @@ oc project kube-system --kubeconfig $PWD/auth/kubeconfig
 result=$(oc wait machineconfigpool/worker --for condition=updated --timeout=15m --kubeconfig ./auth/kubeconfig)
 echo $result
 sleep 60
+oc login https://api.${CLUSTER_NAME}.${BASE_DOMAIN}:6443 -u $OCP_USERNAME -p $OCP_PASSWORD --insecure-skip-tls-verify=true
 
 log "==== Openshift Username and Password : $OCP_USERNAME , $OCP_PASSWORD ===="
