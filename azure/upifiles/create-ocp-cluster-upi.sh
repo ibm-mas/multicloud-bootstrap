@@ -17,7 +17,6 @@ export pullSecret=${OCP_PULL_SECRET}
 export sshKey=${SSH_KEY_NAME}
 export AZURE_REGION=${DEPLOY_REGION}
 export BASE_DOMAIN_RESOURCE_GROUP=${BASE_DOMAIN_RG_NAME}
-export BASE_DOMAIN=${BASE_DOMAIN}
 #Important Parameters 
 export RESOURCE_GROUP=${EXISTING_NETWORK_RG}
 
@@ -306,6 +305,9 @@ sleep 30
 oc create secret generic htpass-secret --from-file=htpasswd=/tmp/.htpasswd -n openshift-config --kubeconfig $PWD/auth/kubeconfig
 oc apply -f $PWD/htpasswd.yaml --kubeconfig $PWD/auth/kubeconfig
 oc adm policy add-cluster-role-to-user cluster-admin $OCP_USERNAME --kubeconfig $PWD/auth/kubeconfig
+oc project kube-system --kubeconfig $PWD/auth/kubeconfig
+result=$(oc wait machineconfigpool/worker --for condition=updated --timeout=15m --kubeconfig ./auth/kubeconfig)
+echo $result
 sleep 60
 
 log "==== Openshift Username and Password : $OCP_USERNAME , $OCP_PASSWORD ===="
