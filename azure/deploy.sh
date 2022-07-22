@@ -75,14 +75,12 @@ if [[ $OPENSHIFT_USER_PROVIDE == "false" ]]; then
     set -e
   else
     cd $GIT_REPO_HOME/azure/upifiles
-    set +e
     ./create-ocp-cluster-upi.sh
     retcode=$?
     if [[ $retcode -ne 0 ]]; then
       log "OCP cluster creation failed in UPI step"
       exit 21
     fi
-    set -e
   fi
 
   export OCP_SERVER="$(echo https://api.${CLUSTER_NAME}.${BASE_DOMAIN}:6443)"
