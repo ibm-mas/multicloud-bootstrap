@@ -144,8 +144,15 @@ export KAFKA_USER_NAME=masuser
 # SLS variables
 export SLS_NAMESPACE="ibm-sls-${RANDOM_STR}"
 export SLS_MONGODB_CFG_FILE="${MAS_CONFIG_DIR}/mongo-${MONGODB_NAMESPACE}.yml"
-#commenting for testing
-#export SLS_LICENSE_FILE="${MAS_CONFIG_DIR}/entitlement.lic"
+
+# Exporting SLS_LICENSE_FILE only when product type is different than privatepublic(i.e. Paid offering)
+# Paid offering does not require entitlement.lic i.e. MAS license file.
+validate_prouduct_type
+if [[ $PRODUCT_TYPE == "privatepublic" ]];then
+  log "Product type is privatepublic hence not exporting SLS_LICENSE_FILE variable"
+else
+  export SLS_LICENSE_FILE="${MAS_CONFIG_DIR}/entitlement.lic"
+fi
 export SLS_TLS_CERT_LOCAL_FILE_PATH="${GIT_REPO_HOME}/sls.crt"
 export SLS_INSTANCE_NAME="masocp-${RANDOM_STR}"
 # UDS variables
