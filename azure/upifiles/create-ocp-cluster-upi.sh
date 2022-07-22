@@ -15,7 +15,6 @@ log "===== Setting Environment Variables ====="
 export azureRegion=${DEPLOY_REGION}
 export pullSecret=${OCP_PULL_SECRET}
 export sshKey=${SSH_KEY_NAME}
-export CLUSTER_NAME="masocp-${RANDOM_STR}"
 export AZURE_REGION=${DEPLOY_REGION}
 export BASE_DOMAIN_RESOURCE_GROUP=${BASE_DOMAIN_RG_NAME}
 export BASE_DOMAIN=${BASE_DOMAIN}
