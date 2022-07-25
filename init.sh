@@ -65,6 +65,7 @@ export -f get_sls_endpoint_url
 export -f get_sls_registration_key
 export -f get_uds_endpoint_url
 export -f get_uds_api_key
+export -f validate_prouduct_type
 
 ## Configure CloudWatch agent
 if [[ $CLUSTER_TYPE == "aws" ]]; then
@@ -152,7 +153,15 @@ export KAFKA_USER_NAME=masuser
 # SLS variables
 export SLS_NAMESPACE="ibm-sls-${RANDOM_STR}"
 export SLS_MONGODB_CFG_FILE="${MAS_CONFIG_DIR}/mongo-${MONGODB_NAMESPACE}.yml"
-export SLS_LICENSE_FILE="${MAS_CONFIG_DIR}/entitlement.lic"
+
+# Exporting SLS_LICENSE_FILE only when product type is different than privatepublic(i.e. Paid offering)
+# Paid offering does not require entitlement.lic i.e. MAS license file.
+validate_prouduct_type
+if [[ $PRODUCT_TYPE == "privatepublic" ]];then
+  log "Product type is privatepublic hence not exporting SLS_LICENSE_FILE variable"
+else
+  export SLS_LICENSE_FILE="${MAS_CONFIG_DIR}/entitlement.lic"
+fi
 export SLS_TLS_CERT_LOCAL_FILE_PATH="${GIT_REPO_HOME}/sls.crt"
 export SLS_INSTANCE_NAME="masocp-${RANDOM_STR}"
 # UDS variables
@@ -176,7 +185,7 @@ elif [[ $CLUSTER_TYPE == "azure" ]]; then
 fi
 export CPD_OPERATORS_NAMESPACE="ibm-cpd-operators-${RANDOM_STR}"
 export CPD_INSTANCE_NAMESPACE="ibm-cpd-${RANDOM_STR}"
-#CPD_SERVICES_NAMESPACE is used in roles - cp4d, cp4dv3_install, cp4dv3_install_services and suite_dns 
+#CPD_SERVICES_NAMESPACE is used in roles - cp4d, cp4dv3_install, cp4dv3_install_services and suite_dns
 export CPD_SERVICES_NAMESPACE="cpd-services-${RANDOM_STR}"
 # DB2WH variables
 export DB2_META_STORAGE_CLASS=$CPD_PRIMARY_STORAGE_CLASS

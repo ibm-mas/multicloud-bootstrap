@@ -85,7 +85,7 @@ if [[ $OPENSHIFT_USER_PROVIDE == "false" ]]; then
   zip -r $BACKUP_FILE_NAME ansible-devops/*
   rm -rf /tmp/ansible-devops
   set +e
-  az storage blob upload --account-name ${STORAGE_ACNT_NAME} --container-name masocpcontainer --name ${DEPLOYMENT_CONTEXT_UPLOAD_PATH} --file ${BACKUP_FILE_NAME} 
+  az storage blob upload --account-name ${STORAGE_ACNT_NAME} --container-name masocpcontainer --name ${DEPLOYMENT_CONTEXT_UPLOAD_PATH} --file ${BACKUP_FILE_NAME}
   retcode=$?
   if [[ $retcode -ne 0 ]]; then
     log "Failed while uploading deployment context to blob storage3"
@@ -108,6 +108,7 @@ oc extract secret/pull-secret -n openshift-config --keys=.dockerconfigjson --to=
 export encodedEntitlementKey=$(echo cp:$SLS_ENTITLEMENT_KEY | tr -d '\n' | base64 -w0)
 export emailAddress=$(cat .dockerconfigjson | jq -r '.auths["cloud.openshift.com"].email')
 jq '.auths |= . + {"cp.icr.io": { "auth" : "$encodedEntitlementKey", "email" : "$emailAddress"}}' .dockerconfigjson >/tmp/dockerconfig.json
+
 envsubst </tmp/dockerconfig.json >/tmp/.dockerconfigjson
 oc set data secret/pull-secret -n openshift-config --from-file=/tmp/.dockerconfigjson
 
