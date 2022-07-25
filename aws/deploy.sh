@@ -135,6 +135,16 @@ worker_instance_type            = "$WORKER_INSTANCE_TYPE"
 master_replica_count            = "$MASTER_NODE_COUNT"
 worker_replica_count            = "$WORKER_NODE_COUNT"
 accept_cpd_license              = "accept"
+new_or_existing_vpc_subnet      = "$new_or_existing_vpc_subnet"
+enable_permission_quota_check   = "$enable_permission_quota_check"
+vpc_id                          = "$EXISTING_NETWORK"
+master_subnet1_id               = "$EXISTING_PRIVATE_SUBNET1_ID"
+master_subnet2_id               = "$EXISTING_PRIVATE_SUBNET2_ID"
+master_subnet3_id               = "$EXISTING_PRIVATE_SUBNET3_ID"
+worker_subnet1_id               = "$EXISTING_PUBLIC_SUBNET1_ID"
+worker_subnet2_id               = "$EXISTING_PUBLIC_SUBNET2_ID"
+worker_subnet3_id               = "$EXISTING_PUBLIC_SUBNET3_ID"
+private_cluster                 = "$PRIVATE_CLUSTER"
 EOT
   if [[ -f terraform.tfvars ]]; then
       chmod 600 terraform.tfvars
@@ -176,12 +186,15 @@ oc create -f $GIT_REPO_HOME/templates/container-runtime-config.yml
   ## Create bastion host
   cd $GIT_REPO_HOME/aws
   set +e
-  ./create-bastion-host.sh
-  retcode=$?
-  if [[ $retcode -ne 0 ]]; then
-    log "Bastion host creation failed in Terraform step"
-    exit 22
+  if [[ new_or_existing_vpc_subnet == "new" ]]; then
+   ./create-bastion-host.sh
+   retcode=$?
+    if [[ $retcode -ne 0 ]]; then
+     log "Bastion host creation failed in Terraform step"
+     exit 22
+    fi
   fi
+
   set -e
 
   # Backup Terraform configuration
@@ -235,7 +248,7 @@ oc set data secret/pull-secret -n openshift-config --from-file=/tmp/.dockerconfi
 chmod 600 /tmp/.dockerconfigjson /tmp/dockerconfig.json
 
 ## Configure OCP cluster
-log "==== OCP cluster configuration (Cert Manager and SBO) started ===="
+log "==== OCP cluster configuration (Cert Manager) started ===="
 cd $GIT_REPO_HOME/../ibm/mas_devops/playbooks
 set +e
 
@@ -258,8 +271,6 @@ if  [[ $PRODUCT_TYPE == "privatepublic" ]];then
 fi
 export ROLE_NAME=common_services && ansible-playbook ibm.mas_devops.run_role
 export ROLE_NAME=cert_manager && ansible-playbook ibm.mas_devops.run_role
-export ROLE_NAME=sbo && ansible-playbook ibm.mas_devops.run_role
-
 if [[ $? -ne 0 ]]; then
   # One reason for this failure is catalog sources not having required state information, so recreate the catalog-operator pod
   # https://bugzilla.redhat.com/show_bug.cgi?id=1807128
@@ -272,7 +283,6 @@ if [[ $? -ne 0 ]]; then
   export ROLE_NAME=ibm_catalogs && ansible-playbook ibm.mas_devops.run_role
   export ROLE_NAME=common_services && ansible-playbook ibm.mas_devops.run_role
   export ROLE_NAME=cert_manager && ansible-playbook ibm.mas_devops.run_role
-  export ROLE_NAME=sbo && ansible-playbook ibm.mas_devops.run_role
   retcode=$?
   if [[ $retcode -ne 0 ]]; then
     log "Failed while configuring OCP cluster"
@@ -280,7 +290,7 @@ if [[ $? -ne 0 ]]; then
   fi
 fi
 set -e
-log "==== OCP cluster configuration (Cert Manager and SBO) completed ===="
+log "==== OCP cluster configuration (Cert Manager) completed ===="
 
 ## Deploy MongoDB
 log "==== MongoDB deployment started ===="

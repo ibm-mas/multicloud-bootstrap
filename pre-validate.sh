@@ -3,7 +3,7 @@ SCRIPT_STATUS=0
 
 # Check if region is supported
 if [[ $CLUSTER_TYPE == "aws" ]]; then
-    SUPPORTED_REGIONS="us-east-1;us-east-2;us-west-2;ca-central-1;eu-north-1;eu-south-1;eu-west-1;eu-west-2;eu-west-3;eu-central-1;ap-northeast-1;ap-northeast-2;ap-northeast-3;ap-south-1;ap-southeast-1;ap-southeast-2;sa-east-1"
+    SUPPORTED_REGIONS="us-east-1;us-east-2;us-west-2;ca-central-1;eu-north-1;eu-west-1;eu-west-2;eu-west-3;eu-central-1;ap-northeast-1;ap-northeast-2;ap-northeast-3;ap-south-1;ap-southeast-1;ap-southeast-2;sa-east-1"
 elif [[ $CLUSTER_TYPE == "azure" ]]; then
     # az account list-locations --query "[].{Name:name}" -o table|grep -Ev '^(Name|-)'|tr '\n' ';'
     SUPPORTED_REGIONS="eastus;eastus2;southcentralus;westus2;westus3;australiaeast;southeastasia;northeurope;swedencentral;uksouth;westeurope;centralus;southafricanorth;centralindia;eastasia;japaneast;koreacentral;canadacentral;francecentral;germanywestcentral;norwayeast;brazilsouth"
@@ -28,7 +28,12 @@ fi
 
 # Check if provided hosted zone is public
 if [[ $CLUSTER_TYPE == "aws" ]]; then
-    aws route53 list-hosted-zones --output text --query 'HostedZones[*].[Config.PrivateZone,Name,Id]' --output text | grep $BASE_DOMAIN | grep False
+
+      if [[ $PrivateCluster == "false" ]]; then
+       aws route53 list-hosted-zones --output text --query 'HostedZones[*].[Config.PrivateZone,Name,Id]' --output text | grep $BASE_DOMAIN | grep False
+    else
+      aws route53 list-hosted-zones --output text --query 'HostedZones[*].[Config.PrivateZone,Name,Id]' --output text | grep $BASE_DOMAIN | grep True
+    fi
 #elif [[ $CLUSTER_TYPE == "azure" ]]; then
     #az network dns zone list | jq -r --arg BASE_DOMAIN "$BASE_DOMAIN" '.[]|select (.name==$BASE_DOMAIN)|.zoneType' | grep -iE 'public'
 else
@@ -213,6 +218,16 @@ if [[ $CLUSTER_TYPE == "azure" ]]; then
             log "ERROR: Missing required parameters when email notification is set to true."
             SCRIPT_STATUS=26
         fi
+    fi
+fi
+
+# Check if all the subnet values are provided for existing VPC Id
+if [[ -n $ExistingVPCId ]]; then
+  if [[ ( -n $ExistingPrivateSubnet1Id) && ( -n $ExistingPrivateSubnet2Id) && ( -n $ExistingPrivateSubnet3Id) && ( -n $ExistingPublicSubnet1Id) && (-n $ExistingPublicSubnet2Id) && ( -n $ExistingPublicSubnet3Id) ]]; then
+    log "=== OCP cluster will be deployed with existing VPCs ==="
+ else
+        log "ERROR: Subnets missing for the VPC"
+        SCRIPT_STATUS=27
     fi
 fi
 

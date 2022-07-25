@@ -12,17 +12,17 @@ retrieve_mas_ca_cert() {
   found="false"
   counter=0
   while [[ $found == "false" ]] && [[ $counter < 20 ]]; do
-    oc get secret mas-${uniqstr}-cert-public-ca -n ibm-common-services
+    oc get secret ${uniqstr}-cert-public-ca -n ibm-common-services
     if [[ $? -eq 1 ]]; then
-      log "OCP secret mas-${uniqstr}-cert-public-ca not found ($counter), waiting ..."
+      log "OCP secret ${uniqstr}-cert-public-ca not found ($counter), waiting ..."
       sleep 30
       counter=$((counter + 1))
       continue
     else
-      log "OCP secret mas-${uniqstr}-cert-public-ca found"
+      log "OCP secret ${uniqstr}-cert-public-ca found"
       found="true"
     fi
-    oc get secret mas-${uniqstr}-cert-public-ca -n ibm-common-services -o yaml | grep ca.crt | cut -d ':' -f 2 | tr -d " ,\"" | base64 -d >$filepath
+    oc get secret ${uniqstr}-cert-public-ca -n ibm-common-services -o yaml | grep ca.crt | cut -d ':' -f 2 | tr -d " ,\"" | base64 -d >$filepath
   done
 }
 
@@ -33,19 +33,19 @@ get_mas_creds() {
   found="false"
   counter=0
   while [[ $found == "false" ]] && [[ $counter < 20 ]]; do
-    oc get secret mas-${uniqstr}-credentials-superuser -n mas-mas-${uniqstr}-core
+    oc get secret ${uniqstr}-credentials-superuser -n mas-${uniqstr}-core
     if [[ $? -eq 1 ]]; then
-      log "OCP secret mas-${uniqstr}-credentials-superuser not found ($counter), waiting ..."
+      log "OCP secret ${uniqstr}-credentials-superuser not found ($counter), waiting ..."
       sleep 30
       counter=$((counter + 1))
       continue
     else
-      log "OCP secret mas-${uniqstr}-credentials-superuser found"
+      log "OCP secret ${uniqstr}-credentials-superuser found"
       found="true"
     fi
     sleep 6
-    username=$(oc get secret mas-${uniqstr}-credentials-superuser -n mas-mas-${uniqstr}-core -o json | grep "\"username\"" | cut -d ':' -f 2 | tr -d " ,\"" | base64 -d)
-    password=$(oc get secret mas-${uniqstr}-credentials-superuser -n mas-mas-${uniqstr}-core -o json | grep "\"password\"" | cut -d ':' -f 2 | tr -d " ,\"" | base64 -d)
+    username=$(oc get secret ${uniqstr}-credentials-superuser -n mas-${uniqstr}-core -o json | grep "\"username\"" | cut -d ':' -f 2 | tr -d " ,\"" | base64 -d)
+    password=$(oc get secret ${uniqstr}-credentials-superuser -n mas-${uniqstr}-core -o json | grep "\"password\"" | cut -d ':' -f 2 | tr -d " ,\"" | base64 -d)
   done
 
   if [[ $found == "false" ]]; then
@@ -107,7 +107,7 @@ mark_provisioning_failed() {
     export STATUS_MSG="Please provide a valid MAS license URL."
   elif [[ $retcode -eq 19 ]]; then
     export STATUS_MSG="Please provide all the inputs to use existing OCP."
-  elif [[ $retcode -eq 21 ]]; then
+  elif [[ $retcode -eq 21 || $retcode -eq 1 ]]; then
     export STATUS_MSG="Failure in creating OCP cluster."
   elif [[ $retcode -eq 22 ]]; then
     export STATUS_MSG="Failure in creating Bastion host."

@@ -221,55 +221,55 @@
     "Mappings": {
         "RegionMap": {
             "us-east-1": {
-                "HVM64": "ami-088484ab34cd9622d"
+                "HVM64": "ami-07809a17acfe15035"
             },
             "us-east-2": {
-                "HVM64": "ami-0bd8d1e6a386638bf"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "us-west-2": {
-                "HVM64": "ami-067f0b34ab041764b"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "ca-central-1": {
-                "HVM64": "ami-0b169be60da52e1da"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "eu-north-1": {
-                "HVM64": "ami-00a91b9e0a538b0c6"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "eu-south-1": {
-                "HVM64": "ami-06c78840eda1c6464"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "eu-west-1": {
-                "HVM64": "ami-0f0d0911d82fea2d7"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "eu-west-2": {
-                "HVM64": "ami-07c5733dbc5af0b56"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "eu-west-3": {
-                "HVM64": "ami-0a0881f78a66f4baa"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "eu-central-1": {
-                "HVM64": "ami-0d23a3144777b775b"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "ap-northeast-1": {
-                "HVM64": "ami-00d99b966acbc651d"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "ap-northeast-2": {
-                "HVM64": "ami-0b56bf3a0cb67e0dd"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "ap-northeast-3": {
-                "HVM64": "ami-0b7cc5652ef8a1b78"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "ap-south-1": {
-                "HVM64": "ami-072bf189b8257f1dc"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "ap-southeast-1": {
-                "HVM64": "ami-010eb4be18aaf6e84"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "ap-southeast-2": {
-                "HVM64": "ami-0609dbe8a16e2b6d2"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "sa-east-1": {
-                "HVM64": "ami-0cde511b6667f71bf"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             }
         }
     },
@@ -876,10 +876,11 @@
                                 {
                                     "Ref": "OpenShiftPassword"
                                 },
-                                "' '' '' '' '' '' '' '' '' '' '' '' '' '",
+                                "' '' '",
                                 {
                                     "Ref": "EmailNotification"
                                 },
+                                "' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '",
                                 "' \"prod\" ",
                                 "2>&1 | tee mas-provisioning.log; "
                             ]
@@ -1038,7 +1039,7 @@
                                 {
                                     "Fn::Split": [
                                         "api.",
-                                       {"Ref": "OpenShiftClusterApiUrl"}
+                                        {"Ref": "OpenShiftClusterApiUrl"}
                                     ]
                                 }
                             ]
