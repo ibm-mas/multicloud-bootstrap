@@ -584,21 +584,6 @@
     {
       "type": "Microsoft.Compute/virtualMachines/extensions",
       "apiVersion": "2021-11-01",
-      "name": "[concat(variables('vmName'),'/', 'DependencyAgentLinux')]",
-      "location": "[parameters('location')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Compute/virtualMachines', variables('vmName'))]"
-      ],
-      "properties": {
-        "publisher": "Microsoft.Azure.Monitoring.DependencyAgent",
-        "type": "DependencyAgentLinux",
-        "typeHandlerVersion": "9.5",
-        "autoUpgradeMinorVersion": true
-      }
-    },
-    {
-      "type": "Microsoft.Compute/virtualMachines/extensions",
-      "apiVersion": "2021-11-01",
       "name": "[concat(variables('vmName'),'/', 'OMSExtension')]",
       "location": "[parameters('location')]",
       "dependsOn": [

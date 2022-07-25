@@ -227,13 +227,12 @@ oc set data secret/pull-secret -n openshift-config --from-file=/tmp/.dockerconfi
 chmod 600 /tmp/.dockerconfigjson /tmp/dockerconfig.json
 
 ## Configure OCP cluster
-log "==== OCP cluster configuration (Cert Manager and SBO) started ===="
+log "==== OCP cluster configuration (Cert Manager) started ===="
 cd $GIT_REPO_HOME/../ibm/mas_devops/playbooks
 set +e
 export ROLE_NAME=ibm_catalogs && ansible-playbook ibm.mas_devops.run_role
 export ROLE_NAME=common_services && ansible-playbook ibm.mas_devops.run_role
 export ROLE_NAME=cert_manager && ansible-playbook ibm.mas_devops.run_role
-export ROLE_NAME=sbo && ansible-playbook ibm.mas_devops.run_role
 if [[ $? -ne 0 ]]; then
   # One reason for this failure is catalog sources not having required state information, so recreate the catalog-operator pod
   # https://bugzilla.redhat.com/show_bug.cgi?id=1807128
@@ -246,7 +245,6 @@ if [[ $? -ne 0 ]]; then
   export ROLE_NAME=ibm_catalogs && ansible-playbook ibm.mas_devops.run_role
   export ROLE_NAME=common_services && ansible-playbook ibm.mas_devops.run_role
   export ROLE_NAME=cert_manager && ansible-playbook ibm.mas_devops.run_role
-  export ROLE_NAME=sbo && ansible-playbook ibm.mas_devops.run_role
   retcode=$?
   if [[ $retcode -ne 0 ]]; then
     log "Failed while configuring OCP cluster"
@@ -254,7 +252,7 @@ if [[ $? -ne 0 ]]; then
   fi
 fi
 set -e
-log "==== OCP cluster configuration (Cert Manager and SBO) completed ===="
+log "==== OCP cluster configuration (Cert Manager) completed ===="
 
 ## Deploy MongoDB
 log "==== MongoDB deployment started ===="
