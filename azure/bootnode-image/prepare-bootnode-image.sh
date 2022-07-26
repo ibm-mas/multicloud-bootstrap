@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 # This script should be executed on the Red Hat 8 instance before creating AMI from it.
 # The created AMI will be used to create Bootnode instance for MAS provisioning.
@@ -16,7 +17,6 @@
 #     Specific branch is normally used when testing the changes from your feature branch.
 #     Specific tag is normally used when the bootstrap code is locked for a specific release.
 #
-set -e
 
 ANSIBLE_COLLECTION_VERSION=$1
 ANSIBLE_COLLECTION_BRANCH=$2
