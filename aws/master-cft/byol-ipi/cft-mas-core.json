@@ -263,7 +263,7 @@
                 "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "ap-southeast-1": {
-                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
+                "HVM64": "ami-0b9055f69d0d3bb4c"
             },
             "ap-southeast-2": {
                 "HVM64": "ami-xxxxxxxxxxxxxxxxx"
@@ -766,7 +766,7 @@
                                 "git clone https://github.com/ibm-mas/ansible-devops.git;",
                                 "cd ansible-devops;",
                                 "rm -rf multicloud-bootstrap 1>/dev/null 2>&1;",
-                                "git clone -b main https://github.com/ibm-mas/multicloud-bootstrap.git;",
+                                "git clone -b tmp-cluster-create https://github.com/ibm-mas/multicloud-bootstrap.git;",
                                 "cd multicloud-bootstrap;",
                                 "find . -type f -name \"*.sh\" -exec chmod +x {} \\;;",
                                 "./init.sh \"aws\" \"",
