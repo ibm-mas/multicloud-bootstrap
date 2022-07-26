@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 # This script should be executed on the Red Hat 8 instance before creating AMI from it.
 # The created AMI will be used to create Bootnode instance for MAS provisioning.# Remove unnecessary packages# Update all packages to latest
@@ -53,6 +54,12 @@ rm -rf terraform_${TERRAFORM_VER}_linux_amd64.zip
 pip3 install ansible==4.9.0
 pip3 install openshift
 ansible-galaxy collection install community.kubernetes
+
+# Install CloudWatch agent
+cd /tmp
+wget https://s3.amazonaws.com/amazoncloudwatch-agent/redhat/amd64/latest/amazon-cloudwatch-agent.rpm
+rpm -U ./amazon-cloudwatch-agent.rpm
+rm -rf amazon-cloudwatch-agent.rpm
 
 # Remove the SSH keys
 rm -rf /home/ec2-user/.ssh/authorized_keys /root/.ssh/authorized_keys

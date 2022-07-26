@@ -70,12 +70,6 @@ export -f validate_prouduct_type
 ## Configure CloudWatch agent
 if [[ $CLUSTER_TYPE == "aws" ]]; then
   log "Configuring CloudWatch logs agent"
-  # TODO Temporary code to install CloudWatch agent. Later this will be done in AMI, and remove the code
-  #-----------------------------------------
-  cd /tmp
-  wget https://s3.amazonaws.com/amazoncloudwatch-agent/redhat/amd64/latest/amazon-cloudwatch-agent.rpm
-  rpm -U ./amazon-cloudwatch-agent.rpm
-  #-----------------------------------------
   # Create CloudWatch agent config file
   mkdir -p /opt/aws/amazon-cloudwatch-agent/bin
   cat <<EOT >> /opt/aws/amazon-cloudwatch-agent/bin/config.json
