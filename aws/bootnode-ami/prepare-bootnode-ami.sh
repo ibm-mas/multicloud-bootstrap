@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 # This script should be executed on the Red Hat 8 instance before creating AMI from it.
 # The created AMI will be used to create Bootnode instance for MAS provisioning.# Remove unnecessary packages# Update all packages to latest
@@ -32,13 +33,13 @@ mv jq /usr/local/bin
 dnf module install -y container-tools
 
 ## Download Openshift CLI and move to /usr/local/bin
-wget "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.8.11/openshift-client-linux-4.8.11.tar.gz"
-tar -xvf openshift-client-linux-4.8.11.tar.gz
+wget "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.8.46/openshift-client-linux-4.8.46.tar.gz"
+tar -xvf openshift-client-linux-4.8.46.tar.gz
 chmod u+x oc kubectl
 mv oc /usr/local/bin
 mv kubectl /usr/local/bin
 oc version
-rm -rf openshift-client-linux-4.8.11.tar.gz
+rm -rf openshift-client-linux-4.8.46.tar.gz
 
 ## Install terraform
 TERRAFORM_VER=`curl -s https://api.github.com/repos/hashicorp/terraform/releases/latest |  grep tag_name | cut -d: -f2 | tr -d \"\,\v | awk '{$1=$1};1'`
@@ -53,6 +54,12 @@ rm -rf terraform_${TERRAFORM_VER}_linux_amd64.zip
 pip3 install ansible==4.9.0
 pip3 install openshift
 ansible-galaxy collection install community.kubernetes
+
+# Install CloudWatch agent
+cd /tmp
+wget https://s3.amazonaws.com/amazoncloudwatch-agent/redhat/amd64/latest/amazon-cloudwatch-agent.rpm
+rpm -U ./amazon-cloudwatch-agent.rpm
+rm -rf amazon-cloudwatch-agent.rpm
 
 # Remove the SSH keys
 rm -rf /home/ec2-user/.ssh/authorized_keys /root/.ssh/authorized_keys

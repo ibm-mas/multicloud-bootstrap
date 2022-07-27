@@ -876,10 +876,11 @@
                                 {
                                     "Ref": "OpenShiftPassword"
                                 },
-                                "' '' '' '' '' '' '' '' '' '' '' '' '' '",
+                                "' '' '",
                                 {
                                     "Ref": "EmailNotification"
                                 },
+                                "' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '",
                                 "' \"prod\" ",
                                 "2>&1 | tee mas-provisioning.log; "
                             ]
@@ -1038,7 +1039,7 @@
                                 {
                                     "Fn::Split": [
                                         "api.",
-                                       {"Ref": "OpenShiftClusterApiUrl"}
+                                        {"Ref": "OpenShiftClusterApiUrl"}
                                     ]
                                 }
                             ]

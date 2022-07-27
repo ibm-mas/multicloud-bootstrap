@@ -29,7 +29,7 @@ fi
 # Check if provided hosted zone is public
 if [[ $CLUSTER_TYPE == "aws" ]]; then
 
-      if [[ $OCPClusterType == "false" ]]; then
+      if [[ $PrivateCluster == "false" ]]; then
        aws route53 list-hosted-zones --output text --query 'HostedZones[*].[Config.PrivateZone,Name,Id]' --output text | grep $BASE_DOMAIN | grep False
     else
       aws route53 list-hosted-zones --output text --query 'HostedZones[*].[Config.PrivateZone,Name,Id]' --output text | grep $BASE_DOMAIN | grep True
@@ -172,10 +172,20 @@ else
     fi
 fi
 
+## Evalute custom annotations to set with reference from aws-product-codes.config
+## Evaluate PRODUCT_NAME environment variable to create configmap in SLS namespace.
+## MAS_ANNOTATIONS environment variable is used in suit-install role of MAS Installtion
+
+if [[ $CLUSTER_TYPE == "aws" ]]; then
+#validating product type for helper.sh
+    validate_prouduct_type
+fi
 # Check if MAS license is provided
 if [[ -z $MAS_LICENSE_URL ]]; then
-    log "ERROR: Valid MAS license is reqiuired for MAS deployment"
-    SCRIPT_STATUS=18
+    if [[ $PRODUCT_TYPE == "byol" ]]; then
+        log "ERROR: Valid MAS license is reqiuired for MAS deployment"
+        SCRIPT_STATUS=18
+    fi
 else
     # Download MAS license
     log "==== Downloading MAS license ===="
@@ -208,6 +218,16 @@ if [[ $CLUSTER_TYPE == "azure" ]]; then
             log "ERROR: Missing required parameters when email notification is set to true."
             SCRIPT_STATUS=26
         fi
+    fi
+fi
+
+# Check if all the subnet values are provided for existing VPC Id
+if [[ -n $ExistingVPCId ]]; then
+  if [[ ( -n $ExistingPrivateSubnet1Id) && ( -n $ExistingPrivateSubnet2Id) && ( -n $ExistingPrivateSubnet3Id) && ( -n $ExistingPublicSubnet1Id) && (-n $ExistingPublicSubnet2Id) && ( -n $ExistingPublicSubnet3Id) ]]; then
+    log "=== OCP cluster will be deployed with existing VPCs ==="
+ else
+        log "ERROR: Subnets missing for the VPC"
+        SCRIPT_STATUS=27
     fi
 fi
 

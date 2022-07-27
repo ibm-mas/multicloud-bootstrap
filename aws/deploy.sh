@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e
 
+#validating product type for helper.sh
+validate_prouduct_type
+
 # This script will initiate the provisioning process of MAS. It will perform following steps,
 
 ## Variables
@@ -22,7 +25,7 @@ export CPD_SERVICE_STORAGE_CLASS="ocs-storagecluster-cephfs"
 
 # Retrieve SSH public key
 TOKEN=$(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
-SSH_PUB_KEY=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" â€“v http://169.254.169.254/latest/meta-data/public-keys/0/openssh-key)
+SSH_PUB_KEY=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/public-keys/0/openssh-key)
 
 log "Below are Cloud specific deployment parameters,"
 log " AWS_DEFAULT_REGION: $AWS_DEFAULT_REGION"
@@ -63,14 +66,18 @@ if [[ -f uds.crt ]]; then
 fi
 
 ### Read License File & Retrive SLS hostname and host id
-line=$(head -n 1 entitlement.lic)
-set -- $line
-hostid=$3
-log " SLS_HOST_ID: $hostid"
-#SLS Instance name
-export SLS_LICENSE_ID="$hostid"
-log " SLS_INSTANCE_NAME=$SLS_INSTANCE_NAME"
-log " SLS_LICENSE_ID=$SLS_LICENSE_ID"
+if [[ -n "$MAS_LICENSE_URL" ]];then
+  line=$(head -n 1 entitlement.lic)
+  set -- $line
+  hostid=$3
+  log " SLS_HOST_ID: $hostid"
+  #SLS Instance name
+  export SLS_LICENSE_ID="$hostid"
+  log " SLS_INSTANCE_NAME=$SLS_INSTANCE_NAME"
+  log " SLS_LICENSE_ID=$SLS_LICENSE_ID"
+else
+  log " MAS LICENSE URL file is not available."
+fi
 
 ## IAM
 # Create IAM policy
@@ -130,14 +137,14 @@ worker_replica_count            = "$WORKER_NODE_COUNT"
 accept_cpd_license              = "accept"
 new_or_existing_vpc_subnet      = "$new_or_existing_vpc_subnet"
 enable_permission_quota_check   = "$enable_permission_quota_check"
-vpc_id                          = "$Existingvpcid"
-master_subnet1_id               = "$Existingprivatesubnet1id"
-master_subnet2_id               = "$Existingprivatesubnet2id"
-master_subnet3_id               = "$Existingprivatesubnet3id"
-worker_subnet1_id               = "$Existingpublicsubnet1id"
-worker_subnet2_id               = "$Existingpublicsubnet2id"
-worker_subnet3_id               = "$Existingpublicsubnet3id"
-private_cluster                 = "$OCPClusterType"
+vpc_id                          = "$EXISTING_NETWORK"
+master_subnet1_id               = "$EXISTING_PRIVATE_SUBNET1_ID"
+master_subnet2_id               = "$EXISTING_PRIVATE_SUBNET2_ID"
+master_subnet3_id               = "$EXISTING_PRIVATE_SUBNET3_ID"
+worker_subnet1_id               = "$EXISTING_PUBLIC_SUBNET1_ID"
+worker_subnet2_id               = "$EXISTING_PUBLIC_SUBNET2_ID"
+worker_subnet3_id               = "$EXISTING_PUBLIC_SUBNET3_ID"
+private_cluster                 = "$PRIVATE_CLUSTER"
 EOT
   if [[ -f terraform.tfvars ]]; then
       chmod 600 terraform.tfvars
@@ -213,27 +220,57 @@ fi
 log "==== Adding ER key details to OCP default pull-secret ===="
 cd /tmp
 # Login to OCP cluster
-
 export OCP_SERVER="$(echo https://api.${CLUSTER_NAME}.${BASE_DOMAIN}:6443)"
 oc login -u $OCP_USERNAME -p $OCP_PASSWORD --server=$OCP_SERVER --insecure-skip-tls-verify=true
 export OCP_TOKEN="$(oc whoami --show-token)"
 oc extract secret/pull-secret -n openshift-config --keys=.dockerconfigjson --to=. --confirm
 export encodedEntitlementKey=$(echo cp:$SLS_ENTITLEMENT_KEY | tr -d '\n' | base64 -w0)
-##export encodedEntitlementKey=$(echo cp:$SLS_ENTITLEMENT_KEY | base64 -w0)
 export emailAddress=$(cat .dockerconfigjson | jq -r '.auths["cloud.openshift.com"].email')
-jq '.auths |= . + {"cp.icr.io": { "auth" : "$encodedEntitlementKey", "email" : "$emailAddress"}}' .dockerconfigjson > /tmp/dockerconfig.json
+
+if [[ $PRODUCT_TYPE == "privatepublic" ]];then
+  # Adding sls staging and artifactory credentials to pull secret
+  staging_sls_user="$(aws secretsmanager get-secret-value --secret-id pullsecret-mas-sls | jq -r '.SecretString' | jq -r '.SLS_USERNAME')"
+  staging_sls_password="$(aws secretsmanager get-secret-value --secret-id pullsecret-mas-sls | jq -r '.SecretString' | jq -r '.SLS_PASSWORD')"
+  export staging_sls_encodedEntitlementKey=$(echo $staging_sls_user:$staging_sls_password | tr -d '\n' | base64 -w0)
+  artifactory_user="$(aws secretsmanager get-secret-value --secret-id pullsecret-mas-sls | jq -r '.SecretString' | jq -r '.ARTIFACTORY_USERNAME')"
+  artifactory_apikey="$(aws secretsmanager get-secret-value --secret-id pullsecret-mas-sls | jq -r '.SecretString' | jq -r '.ARTIFACTORY_APIKEY')"
+  export artifactoryencodedEntitlementKey=$(echo $artifactory_user:$artifactory_apikey | tr -d '\n' | base64 -w0)
+  jq '.auths |= . + {"cp.icr.io": { "auth" : "$encodedEntitlementKey", "email" : "$emailAddress"},"cp.stg.icr.io": { "auth" : "$staging_sls_encodedEntitlementKey", "email" : "$emailAddress"},"wiotp-docker-local.artifactory.swg-devops.com": { "auth" : "$artifactoryencodedEntitlementKey", "email" : "$emailAddress"}}' .dockerconfigjson > /tmp/dockerconfig.json
+else
+  jq '.auths |= . + {"cp.icr.io": { "auth" : "$encodedEntitlementKey", "email" : "$emailAddress"}}' .dockerconfigjson > /tmp/dockerconfig.json
+fi
+log "printing /tmp/dockerconfig.json before"
+cat /tmp/dockerconfig.json
 envsubst < /tmp/dockerconfig.json > /tmp/.dockerconfigjson
+log "printing /tmp/dockerconfig.json after envsubst"
+cat /tmp/.dockerconfigjson
 oc set data secret/pull-secret -n openshift-config --from-file=/tmp/.dockerconfigjson
 chmod 600 /tmp/.dockerconfigjson /tmp/dockerconfig.json
 
 ## Configure OCP cluster
-log "==== OCP cluster configuration (Cert Manager and SBO) started ===="
+log "==== OCP cluster configuration (Cert Manager) started ===="
 cd $GIT_REPO_HOME/../ibm/mas_devops/playbooks
 set +e
-export ROLE_NAME=ibm_catalogs && ansible-playbook ibm.mas_devops.run_role
+
+if [[ $PRODUCT_TYPE == "privatepublic" ]];then
+# Install Development Catalog by exporting below 4 environment variables
+  export ARTIFACTORY_USERNAME=$artifactory_user
+  export ARTIFACTORY_APIKEY=$artifactory_apikey
+  export SLS_USERNAME=$staging_sls_user
+  export SLS_PASSWORD=$staging_sls_password
+  export ROLE_NAME=ibm_catalogs && ansible-playbook ibm.mas_devops.run_role
+  # unset ARTIFACTORY_USERNAME & ARTIFACTORY_APIKEY to have production catalogs installed & call ibm_catalog again
+  unset ARTIFACTORY_USERNAME
+  unset ARTIFACTORY_APIKEY
+else
+  export ROLE_NAME=ibm_catalogs && ansible-playbook ibm.mas_devops.run_role
+fi
+
+if  [[ $PRODUCT_TYPE == "privatepublic" ]];then
+    export MAS_CHANNEL=m5dev88
+fi
 export ROLE_NAME=common_services && ansible-playbook ibm.mas_devops.run_role
 export ROLE_NAME=cert_manager && ansible-playbook ibm.mas_devops.run_role
-export ROLE_NAME=sbo && ansible-playbook ibm.mas_devops.run_role
 if [[ $? -ne 0 ]]; then
   # One reason for this failure is catalog sources not having required state information, so recreate the catalog-operator pod
   # https://bugzilla.redhat.com/show_bug.cgi?id=1807128
@@ -246,7 +283,6 @@ if [[ $? -ne 0 ]]; then
   export ROLE_NAME=ibm_catalogs && ansible-playbook ibm.mas_devops.run_role
   export ROLE_NAME=common_services && ansible-playbook ibm.mas_devops.run_role
   export ROLE_NAME=cert_manager && ansible-playbook ibm.mas_devops.run_role
-  export ROLE_NAME=sbo && ansible-playbook ibm.mas_devops.run_role
   retcode=$?
   if [[ $retcode -ne 0 ]]; then
     log "Failed while configuring OCP cluster"
@@ -254,7 +290,7 @@ if [[ $? -ne 0 ]]; then
   fi
 fi
 set -e
-log "==== OCP cluster configuration (Cert Manager and SBO) completed ===="
+log "==== OCP cluster configuration (Cert Manager) completed ===="
 
 ## Deploy MongoDB
 log "==== MongoDB deployment started ===="
@@ -262,7 +298,9 @@ export ROLE_NAME=mongodb && ansible-playbook ibm.mas_devops.run_role
 log "==== MongoDB deployment completed ===="
 
 ## Copying the entitlement.lic to MAS_CONFIG_DIR
-cp $GIT_REPO_HOME/entitlement.lic $MAS_CONFIG_DIR
+if [[ -n "$MAS_LICENSE_URL" ]];then
+  cp $GIT_REPO_HOME/entitlement.lic $MAS_CONFIG_DIR
+fi
 
 if [[ $DEPLOY_MANAGE == "true" &&  $DEPLOY_CP4D == "true" ]]; then
   ## Deploy Amqstreams
@@ -275,6 +313,22 @@ fi
 if [[ (-z $SLS_URL) || (-z $SLS_REGISTRATION_KEY) || (-z $SLS_PUB_CERT_URL) ]]
 then
     # Deploy SLS
+    if [[ $PRODUCT_TYPE == "privatepublic" ]];then
+      # Create Products Configmap and CredetialRequest in sls namespace for Paid Offering.
+      envsubst < "$GIT_REPO_HOME"/aws/products_template.yaml > "$GIT_REPO_HOME"/aws/products.yaml
+      envsubst < "$GIT_REPO_HOME"/aws/CredentialsRequest_template.yaml > "$GIT_REPO_HOME"/aws/CredentialsRequest.yaml
+      oc new-project "$SLS_NAMESPACE"
+      oc create -f "$GIT_REPO_HOME"/aws/products.yaml -n "$SLS_NAMESPACE"
+      oc create -f "$GIT_REPO_HOME"/aws/CredentialsRequest.yaml
+      #oc create secret generic "$SLS_INSTANCE_NAME"-aws-access --from-literal=region="$DEPLOY_REGION" --from-literal=accessKeyId="$AWS_ACCESS_KEY_ID" --from-literal=secretAccessKey="$AWS_SECRET_ACCESS_KEY" -n "$SLS_NAMESPACE"
+      export SLS_ENTITLEMENT_USERNAME=$staging_sls_user
+      export SLS_ENTITLEMENT_KEY=$staging_sls_password
+      export SLS_CATALOG_SOURCE=ibm-sls-operators
+      export SLS_CHANNEL=m5dev34
+      export SLS_ICR_CP=cp.stg.icr.io/cp
+      export SLS_ICR_CPOPEN=cp.stg.icr.io/cp
+    fi
+
     log "==== SLS deployment started ===="
     export ROLE_NAME=sls && ansible-playbook ibm.mas_devops.run_role
     log "==== SLS deployment completed ===="
@@ -320,35 +374,15 @@ fi
 
 ## Deploy MAS
 log "==== MAS deployment started ===="
-## Evalute custom annotations to set with reference from aws-product-codes.config
-product_code_metadata="$(curl http://169.254.169.254/latest/meta-data/product-codes)"
-
-if [[ -n "$product_code_metadata" ]];then
-  log "Product Code: $product_code_metadata"
-  if echo "$product_code_metadata" | grep -Ei '404\s+-\s+Not\s+Found' 1>/dev/null 2>&1; then
-     log "MAS product code not found in metadata, skipping custom annotations for Suite CR"
-  else
-    aws_product_codes_config_file="$GIT_REPO_HOME/aws/aws-product-codes.config"
-    log "Checking for product type corrosponding to $product_code_metadata from file $aws_product_codes_config_file"
-    if grep -E "^$product_code_metadata:" $aws_product_codes_config_file 1>/dev/null 2>&1;then
-      product_type="$(grep -E "^$product_code_metadata:" $aws_product_codes_config_file | cut -f 3 -d ":")"
-      if [[ $product_type == "byol" ]];then
-        export MAS_ANNOTATIONS="mas.ibm.com/hyperscalerProvider=aws,mas.ibm.com/hyperscalerFormat=byol,mas.ibm.com/hyperscalerChannel=ibm"
-      elif [[ $product_type == "privatepublic" ]];then
-        export MAS_ANNOTATIONS="mas.ibm.com/hyperscalerProvider=aws,mas.ibm.com/hyperscalerFormat=privatepublic,mas.ibm.com/hyperscalerChannel=aws"
-      else
-        log "Invalid product type : $product_type"
-        exit 28
-      fi
-    else
-      log "Product code not found in file $aws_product_codes_config_file"
-      exit 28
-    fi
-  fi
-else
-  log "MAS product code not found, skipping custom annotations for Suite CR"
+if [[ $PRODUCT_TYPE == "privatepublic" ]];then
+  export MAS_CATALOG_SOURCE=ibm-mas-operators
+  export MAS_ICR_CP=wiotp-docker-local.artifactory.swg-devops.com
+  export MAS_ICR_CPOPEN=wiotp-docker-local.artifactory.swg-devops.com
+  export MAS_ENTITLEMENT_USERNAME=$artifactory_user
+  export MAS_ENTITLEMENT_KEY=$artifactory_apikey
 fi
-export ROLE_NAME=suite_dns && ansible-playbook ibm.mas_devops.run_role
+# Commenting suite_dns since IBM Cloud Internet Services is the only supported DNS provider currently
+# export ROLE_NAME=suite_dns && ansible-playbook ibm.mas_devops.run_role
 export ROLE_NAME=suite_install && ansible-playbook ibm.mas_devops.run_role
 export ROLE_NAME=suite_config && ansible-playbook ibm.mas_devops.run_role
 export ROLE_NAME=suite_verify && ansible-playbook ibm.mas_devops.run_role

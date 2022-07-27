@@ -85,7 +85,7 @@ if [[ $OPENSHIFT_USER_PROVIDE == "false" ]]; then
   zip -r $BACKUP_FILE_NAME ansible-devops/*
   rm -rf /tmp/ansible-devops
   set +e
-  az storage blob upload --account-name ${STORAGE_ACNT_NAME} --container-name masocpcontainer --name ${DEPLOYMENT_CONTEXT_UPLOAD_PATH} --file ${BACKUP_FILE_NAME} 
+  az storage blob upload --account-name ${STORAGE_ACNT_NAME} --container-name masocpcontainer --name ${DEPLOYMENT_CONTEXT_UPLOAD_PATH} --file ${BACKUP_FILE_NAME}
   retcode=$?
   if [[ $retcode -ne 0 ]]; then
     log "Failed while uploading deployment context to blob storage3"
@@ -108,6 +108,7 @@ oc extract secret/pull-secret -n openshift-config --keys=.dockerconfigjson --to=
 export encodedEntitlementKey=$(echo cp:$SLS_ENTITLEMENT_KEY | tr -d '\n' | base64 -w0)
 export emailAddress=$(cat .dockerconfigjson | jq -r '.auths["cloud.openshift.com"].email')
 jq '.auths |= . + {"cp.icr.io": { "auth" : "$encodedEntitlementKey", "email" : "$emailAddress"}}' .dockerconfigjson >/tmp/dockerconfig.json
+
 envsubst </tmp/dockerconfig.json >/tmp/.dockerconfigjson
 oc set data secret/pull-secret -n openshift-config --from-file=/tmp/.dockerconfigjson
 
@@ -122,13 +123,12 @@ if [[ $retcode -ne 0 ]]; then
 fi
 
 ## Configure OCP cluster
-log "==== OCP cluster configuration (Cert Manager and SBO) started ===="
+log "==== OCP cluster configuration (Cert Manager) started ===="
 cd $GIT_REPO_HOME
 set +e
 export ROLE_NAME=ibm_catalogs && ansible-playbook ibm.mas_devops.run_role
 export ROLE_NAME=common_services && ansible-playbook ibm.mas_devops.run_role
 export ROLE_NAME=cert_manager && ansible-playbook ibm.mas_devops.run_role
-export ROLE_NAME=sbo && ansible-playbook ibm.mas_devops.run_role
 if [[ $? -ne 0 ]]; then
   # One reason for this failure is catalog sources not having required state information, so recreate the catalog-operator pod
   # https://bugzilla.redhat.com/show_bug.cgi?id=1807128
@@ -141,7 +141,6 @@ if [[ $? -ne 0 ]]; then
   export ROLE_NAME=ibm_catalogs && ansible-playbook ibm.mas_devops.run_role
   export ROLE_NAME=common_services && ansible-playbook ibm.mas_devops.run_role
   export ROLE_NAME=cert_manager && ansible-playbook ibm.mas_devops.run_role
-  export ROLE_NAME=sbo && ansible-playbook ibm.mas_devops.run_role
   retcode=$?
   if [[ $retcode -ne 0 ]]; then
     log "Failed while configuring OCP cluster"
@@ -149,7 +148,7 @@ if [[ $? -ne 0 ]]; then
   fi
 fi
 set -e
-log "==== OCP cluster configuration (Cert Manager and SBO) completed ===="
+log "==== OCP cluster configuration (Cert Manager) completed ===="
 
 ## Deploy MongoDB
 log "==== MongoDB deployment started ===="

@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 # This script should be executed on the Red Hat 8 instance before creating AMI from it.
 # The created AMI will be used to create Bootnode instance for MAS provisioning.
@@ -12,11 +13,10 @@
 #     If you have specified value for ANSIBLE_COLLECTION_VERSION, this parameter will be ignored.
 #     If you do not specify values for either ANSIBLE_COLLECTION_VERSION or ANSIBLE_COLLECTION_BRANCH, the Ansible collection will be
 #     built locally from the master branch of Ansible collection repo, and installed.
-#   BOOTSTRAP_AUTOMATION_TAG_OR_BRANCH: If you want to build the image with specific bootstrap automation code tag or branch, provide that value. 
+#   BOOTSTRAP_AUTOMATION_TAG_OR_BRANCH: If you want to build the image with specific bootstrap automation code tag or branch, provide that value.
 #     Specific branch is normally used when testing the changes from your feature branch.
 #     Specific tag is normally used when the bootstrap code is locked for a specific release.
-#     
-set -e
+#
 
 ANSIBLE_COLLECTION_VERSION=$1
 ANSIBLE_COLLECTION_BRANCH=$2
@@ -51,7 +51,7 @@ gpgcheck=1
 gpgkey=https://packages.microsoft.com/keys/microsoft.asc" | tee /etc/yum.repos.d/azure-cli.repo
 dnf install azure-cli -y
 
-# Install AzureCopy cli 
+# Install AzureCopy cli
 wget -q https://aka.ms/downloadazcopy-v10-linux -O azcopy_linux_amd64.tar.gz
 tar -xzvf azcopy_linux_amd64.tar.gz
 mv -f azcopy_linux_amd64_*/azcopy /usr/sbin
@@ -67,12 +67,12 @@ mv jq /usr/local/bin
 dnf module install -y container-tools
 
 ## Download Openshift CLI and move to /usr/local/bin
-wget -q "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.8.11/openshift-client-linux-4.8.11.tar.gz"
-tar -xvf openshift-client-linux-4.8.11.tar.gz
+wget -q "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.8.46/openshift-client-linux-4.8.46.tar.gz"
+tar -xvf openshift-client-linux-4.8.46.tar.gz
 chmod u+x oc kubectl
 mv oc /usr/local/bin
 mv kubectl /usr/local/bin
-rm -rf openshift-client-linux-4.8.11.tar.gz
+rm -rf openshift-client-linux-4.8.46.tar.gz
 
 ## Install terraform
 TERRAFORM_VER=`curl -s https://api.github.com/repos/hashicorp/terraform/releases/latest |  grep tag_name | cut -d: -f2 | tr -d \"\,\v | awk '{$1=$1};1'`
@@ -108,7 +108,7 @@ else
 fi
 
 # Get the bootstrap github code
-cd /root 
+cd /root
 rm -rf ansible-devops
 mkdir -p ansible-devops
 cd ansible-devops

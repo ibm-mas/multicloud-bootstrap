@@ -96,8 +96,16 @@ if [[ -n $RG_NAME ]]; then
   set -e
 fi
 
-## Delete OCP cluster resource group
-echoBlue "Trying to delete OCP cluster resource group"
+# Check if this is IPI installation or UPI. The IPI installation will have a VNet named 'ocpfourx-vnet' in bootnode VPC. The UPI instalation 
+# does not have it as the existing VNet will be in the different resource group than the bootnode resource group.
+ocpvnet=$(az resource list --resource-group $RG_NAME --resource-type Microsoft.Network/virtualNetworks --name "ocpfourx-vnet" | jq '. | length')
+if [[ $ocpvnet -eq 1 ]]; then
+  INSTALL_MODE=IPI
+else
+  INSTALL_MODE=UPI
+fi
+echo "This is $INSTALL_MODE installation"
+
 if [[ -n $RG_NAME ]]; then
   # Get the cluster unique string
   UNIQ_STR=$(az deployment group list --resource-group $RG_NAME | jq ".[] | select(.properties.outputs.clusterUniqueString.value != null).properties.outputs.clusterUniqueString.value" | tr -d '"')
@@ -108,7 +116,7 @@ else
 fi
 echo "UNIQ_STR: $UNIQ_STR"
 if [[ ($UNIQ_STR == "null") || (-z $UNIQ_STR) ]]; then
-  echo "Could not retrieve the unique string from the resource group. Could not find a tag 'clusterUniqueString' on the resource group."
+  echo "Could not retrieve the unique string from the resource group. Could not find output param 'clusterUniqueString' in the deployment within resource group."
   echo "Skipping the deletion of OCP cluster resource group, will continue to delete the bootnode resource group"
 else
   # Get the OCP cluster resource group name
