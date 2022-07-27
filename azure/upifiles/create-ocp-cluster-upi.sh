@@ -222,7 +222,8 @@ export MASTER_IGNITION=`cat master.ign | base64 | tr -d '\n'`
 az deployment group create -g $RESOURCE_GROUP \
   --template-file "05_masters.json" \
   --parameters masterIgnition="$MASTER_IGNITION" \
-  --parameters baseName="$INFRA_ID"
+  --parameters baseName="$INFRA_ID" \
+  --parameters numberOfMasters="$MASTER_NODE_COUNT"
 if [ $? -ne 0 ]; then
     log "ERROR: Failed to complete master nodes deployment"
     exit 1
@@ -262,7 +263,8 @@ export WORKER_IGNITION=`cat worker.ign | base64 | tr -d '\n'`
 az deployment group create -g $RESOURCE_GROUP \
   --template-file "06_workers.json" \
   --parameters workerIgnition="$WORKER_IGNITION" \
-  --parameters baseName="$INFRA_ID"
+  --parameters baseName="$INFRA_ID" \
+  --parameters numberOfNodes="$WORKER_NODE_COUNT"
 if [ $? -ne 0 ]; then
     log "ERROR: Failed to complete worker deployment"
     exit 1
