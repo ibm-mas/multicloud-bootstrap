@@ -5,10 +5,10 @@ python3 -m pip install dotmap
 python3 -m pip install yq 
 #Exporting all the env vaiables required 
 #Download and install openshift-install
-wget https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/4.8.11/openshift-install-linux-4.8.11.tar.gz
-tar xzvf openshift-install-linux-4.8.11.tar.gz
+wget https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/4.8.46/openshift-install-linux-4.8.46.tar.gz
+tar xzvf openshift-install-linux-4.8.46.tar.gz
 mv openshift-install /usr/local/bin/
-rm -rf ./openshift-install-linux-4.8.11.tar.gz
+rm -rf ./openshift-install-linux-4.8.46.tar.gz
 #these params can be passed from ARM templates to the script 
 log "===== Setting Environment Variables ====="
 
@@ -299,7 +299,7 @@ log "===== Wait for cluster creation completion  ====="
 openshift-install wait-for install-complete --log-level=debug
 log "===== Cluster creation complted successfully  ====="
 
-log "===== Change Openshift Username and password  ====="
+log "===== Add new Openshift Username and password  ====="
 htpasswd -c -B -b /tmp/.htpasswd $OCP_USERNAME $OCP_PASSWORD
 sleep 30
 oc create secret generic htpass-secret --from-file=htpasswd=/tmp/.htpasswd -n openshift-config --kubeconfig $PWD/auth/kubeconfig
