@@ -20,7 +20,7 @@ if [[ $retcode -eq 29 ]]; then
 	return $retcode
 fi
 
-arr=(ocs-operator cpd-platform-operator ibm-cert-manager-operator user-data-services-operator ibm-sls service-binding-operator)
+arr=(ocs-operator cpd-platform-operator ibm-cert-manager-operator user-data-services-operator ibm-sls)
 i=0
 
 while [ $i -lt ${#arr[@]} ]
