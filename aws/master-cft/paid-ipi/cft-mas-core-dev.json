@@ -214,58 +214,58 @@
     },
     "Mappings": {
         "RegionMap": {
-			"us-east-1": {
-				"HVM64": "ami-03df8ec430f3dbebe"
-			},
-			"us-east-2": {
-				"HVM64": "ami-0cf47e4ed963c663b"
-			},
-			"us-west-2": {
-				"HVM64": "ami-01cfe72610b1c4aad"
-			},
-			"ca-central-1": {
-				"HVM64": "ami-08050f906002936b7"
-			},
-			"eu-north-1": {
-				"HVM64": "ami-0f1314f524511551b"
-			},
-			"eu-south-1": {
-				"HVM64": "ami-0cbb5862a7496d4fe"
-			},
-			"eu-west-1": {
-				"HVM64": "ami-0b77e91e9d19cc88d"
-			},
-			"eu-west-2": {
-				"HVM64": "ami-020cf028149b79e4f"
-			},
-			"eu-west-3": {
-				"HVM64": "ami-074beb0b12cd207dd"
-			},
-			"eu-central-1": {
-				"HVM64": "ami-0ab815ad876485573"
-			},
-			"ap-northeast-1": {
-				"HVM64": "ami-053f5900d52e73289"
-			},
-			"ap-northeast-2": {
-				"HVM64": "ami-0e245738202d112dd"
-			},
-			"ap-northeast-3": {
-				"HVM64": "ami-046570d186dc70728"
-			},
-			"ap-south-1": {
-				"HVM64": "ami-0fc15e974abb9b866"
-			},
-			"ap-southeast-1": {
-				"HVM64": "ami-0b9055f69d0d3bb4c"
-			},
-			"ap-southeast-2": {
-				"HVM64": "ami-093d3a640cee7b9eb"
-			},
-			"sa-east-1": {
-				"HVM64": "ami-06c00c9c0ba270d9a"
-			}
-		}
+            "us-east-1": {
+                "HVM64": "ami-07809a17acfe15035"
+            },
+            "us-east-2": {
+                "HVM64": "ami-00ba0ee5d999cd7e7"
+            },
+            "us-west-2": {
+                "HVM64": "ami-0c2bf9db9c23d8ef2"
+            },
+            "ca-central-1": {
+                "HVM64": "ami-01d7e931190fb52e6"
+            },
+            "eu-north-1": {
+                "HVM64": "ami-023d4dfcbd33ca27f"
+            },
+            "eu-south-1": {
+                "HVM64": "ami-06c78840eda1c6464"
+            },
+            "eu-west-1": {
+                "HVM64": "ami-0a821a5026741f9ab"
+            },
+            "eu-west-2": {
+                "HVM64": "ami-065e2aefc015c400b"
+            },
+            "eu-west-3": {
+                "HVM64": "ami-018e7f03ae7e26249"
+            },
+            "eu-central-1": {
+                "HVM64": "ami-09e81852f8ff6976a"
+            },
+            "ap-northeast-1": {
+                "HVM64": "ami-0b1e9431f015e6f51"
+            },
+            "ap-northeast-2": {
+                "HVM64": "ami-013ca7a32b575d108"
+            },
+            "ap-northeast-3": {
+                "HVM64": "ami-067192b67be841c56"
+            },
+            "ap-south-1": {
+                "HVM64": "ami-0da7aecfb8496cab4"
+            },
+            "ap-southeast-1": {
+                "HVM64": "ami-0fdb1e4f1e84cb2aa"
+            },
+            "ap-southeast-2": {
+                "HVM64": "ami-014cf8441144f02d6"
+            },
+            "sa-east-1": {
+                "HVM64": "ami-0c3e1fda0b6cd10a8"
+            }
+        }
     },
     "Conditions": {
         "NoExistingOCPCluster": {
@@ -866,10 +866,11 @@
                                 {
                                     "Ref": "OpenShiftPassword"
                                 },
-                                "' '' '' '' '' '' '' '' '' '' '' '' '' '",
+                                "' '' '",
                                 {
                                     "Ref": "EmailNotification"
                                 },
+                                "' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '",
                                 "' \"dev\" ",
                                 "2>&1 | tee mas-provisioning.log; "
                             ]
@@ -1028,7 +1029,7 @@
                                 {
                                     "Fn::Split": [
                                         "api.",
-                                       {"Ref": "OpenShiftClusterApiUrl"}
+                                        {"Ref": "OpenShiftClusterApiUrl"}
                                     ]
                                 }
                             ]
