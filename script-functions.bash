@@ -121,9 +121,21 @@ function getWorkerNodeDetails(){
 	do
 		cpu=$(oc get -o template nodes "$i" --template={{.status.allocatable.cpu}})
 		memory=$(oc get -o template nodes "$i" --template={{.status.allocatable.memory}})
-		# echo "CPU : " $cpu
-		# echo "memory : " $memory
-		if [[ (${cpu::-1} -lt 15000) || (${memory::-2} -lt 62000000) ]]; then
+
+		if [[ $ROSA == "true" ]]; then
+			#log " ROSA Cluster "
+			requiredCPU=15
+		else
+		 	requiredCPU=15000
+			cpu=${cpu::-1}
+		fi
+		
+		log " Worker Node : ${i}"
+		log " CPU : ${cpu}"
+		log " Minimum Required CPU : ${requiredCPU}"
+		log " Memory : ${memory}"
+		
+		if [[ (${cpu} -lt ${requiredCPU}) ||  (${memory::-2} -lt 62000000) ]]; then
 			log " Minimum CPU/Memory requirements not satisfied"
 			SCRIPT_STATUS=29
 			return $SCRIPT_STATUS
@@ -136,10 +148,14 @@ function getWorkerNodeDetails(){
 
 checkROSA(){
 	rosa_cm=$(oc get cm rosa-brand-logo -n openshift-config | awk  'NR==2 {print $2 }')
-	if [ $rosa_cm -eq 1 ]; then
-		log " ROSA Cluster"
-		SCRIPT_STATUS=30
-		return $SCRIPT_STATUS
+	if [[ $rosa_cm -eq 1 ]]; then
+		log " ROSA Cluster "
+		log " DEPLOY_CP4D: $DEPLOY_CP4D"
+		export ROSA="true"
+		if [[ $DEPLOY_CP4D == "true" ]]; then
+			SCRIPT_STATUS=30
+			return $SCRIPT_STATUS
+		fi	
 	fi
 
 }
