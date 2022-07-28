@@ -67,6 +67,8 @@ export -f get_uds_endpoint_url
 export -f get_uds_api_key
 export -f validate_prouduct_type
 
+export GIT_REPO_HOME=$(pwd)
+
 ## Configure CloudWatch agent
 if [[ $CLUSTER_TYPE == "aws" ]]; then
   log "Configuring CloudWatch logs agent"
@@ -119,7 +121,6 @@ fi
 
 ## Variables
 # OCP variables
-export GIT_REPO_HOME=$(pwd)
 export CLUSTER_NAME="masocp-${RANDOM_STR}"
 export OCP_USERNAME="masocpuser"
 export OCP_PASSWORD="mas${RANDOM_STR:3:3}`date +%H%M%S`${RANDOM_STR:0:3}"
