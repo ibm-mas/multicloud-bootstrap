@@ -156,6 +156,7 @@ if [[ $PRODUCT_TYPE == "privatepublic" ]];then
 else
   export SLS_LICENSE_FILE="${MAS_CONFIG_DIR}/entitlement.lic"
 fi
+export SLS_LICENSE_FILE="${MAS_CONFIG_DIR}/entitlement.lic"
 export SLS_TLS_CERT_LOCAL_FILE_PATH="${GIT_REPO_HOME}/sls.crt"
 export SLS_INSTANCE_NAME="masocp-${RANDOM_STR}"
 # UDS variables
@@ -339,6 +340,11 @@ if [[ $CLUSTER_TYPE == "azure" && $INSTALLATION_MODE == "UPI" ]]; then
   # Get subscription ID, tenant ID
   export AZURE_SUBSC_ID=`az account list | jq -r '.[].id'`
   log " AZURE_SUBSC_ID: $AZURE_SUBSC_ID"
+  export BASE_DOMAIN_RG_NAME=`az network dns zone list | jq --arg DNS_ZONE $BASE_DOMAIN '.[] | select(.name==$BASE_DOMAIN).resourceGroup' | tr -d '"'`
+  log " BASE_DOMAIN_RG_NAME: $BASE_DOMAIN_RG_NAME"
+  VNET_NAME=$EXISTING_NETWORK
+  export EXISTING_NETWORK_RG=`az network vnet list | jq --arg VNET_NAME $VNET_NAME '.[] | select(.name==$VNET_NAME).resourceGroup' | tr -d '"'`
+  log " EXISTING_NETWORK_RG: $EXISTING_NETWORK_RG"
 fi
 
 if [[ $CLUSTER_TYPE == "azure" && $INSTALLATION_MODE == "IPI" ]]; then
