@@ -235,7 +235,7 @@
                 },
                 {
                     "Label": {
-                        "default": "Choose the OCP cluster type/ and enter existing VPC Details  (leave this section empty to create a new VPC )"
+                        "default": "Choose the OCP cluster type  & existing VPC Details "
                     },
                     "Parameters": [
                         "PrivateCluster",
