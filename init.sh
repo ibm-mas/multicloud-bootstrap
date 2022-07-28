@@ -54,7 +54,7 @@ export EXISTING_PUBLIC_SUBNET2_ID=${47}
 export EXISTING_PUBLIC_SUBNET3_ID=${48}
 export PRIVATE_CLUSTER=${49}
 export ENV_TYPE=prod
-
+export GIT_REPO_HOME=$(pwd)
 # Load helper functions
 . helper.sh
 export -f log
@@ -344,7 +344,6 @@ if [[ $CLUSTER_TYPE == "azure" ]]; then
 fi
 
 cd $GIT_REPO_HOME
-
 # Perform prevalidation checks
 log "===== PRE-VALIDATION STARTED ====="
 ./pre-validate.sh
