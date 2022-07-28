@@ -340,8 +340,8 @@ if [[ $CLUSTER_TYPE == "azure" && $INSTALLATION_MODE == "UPI" ]]; then
   # Get subscription ID, tenant ID
   export AZURE_SUBSC_ID=`az account list | jq -r '.[].id'`
   log " AZURE_SUBSC_ID: $AZURE_SUBSC_ID"
-  BASE_DOMAIN=$BASE_DOMAIN
-  export BASE_DOMAIN_RG_NAME=`az network dns zone list | jq --arg DNS_ZONE $BASE_DOMAIN '.[] | select(.name==$BASE_DOMAIN).resourceGroup' | tr -d '"'`
+  DNS_ZONE=$BASE_DOMAIN
+  export BASE_DOMAIN_RG_NAME=`az network dns zone list | jq --arg DNS_ZONE $DNS_ZONE '.[] | select(.name==$DNS_ZONE).resourceGroup' | tr -d '"'`
   log " BASE_DOMAIN_RG_NAME: $BASE_DOMAIN_RG_NAME"
   VNET_NAME=$EXISTING_NETWORK
   export EXISTING_NETWORK_RG=`az network vnet list | jq --arg VNET_NAME $VNET_NAME '.[] | select(.name==$VNET_NAME).resourceGroup' | tr -d '"'`
