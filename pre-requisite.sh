@@ -4,7 +4,7 @@ export -f log
 
 checkROSA
 retcode=$?
-if [[ $retcode -eq 30 ]]; then
+if [[ $retcode -eq 30 || $retcode -eq 29  ]]; then
 	return $retcode
 fi
 

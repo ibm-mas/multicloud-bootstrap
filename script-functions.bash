@@ -9,6 +9,7 @@ op_versions['MongoDBCommunity']='^4\.([2-4]?)?(\.[0-9]+.*)*$'
 op_versions['Db2uCluster']='^11.(5)(.[0-9]+.*)*$'
 op_versions['kafkas.kafka.strimzi.io']='^2\.([4-7]?)?(\.[0-9]+.*)*$'
 op_versions['ocpVersion']='^4\.([8-9]|([1-9][0-9])?)?(\.[0-9]+.*)*$'
+op_versions['rosaVersion']='^4\.([1][0])?(\.[0-9]+.*)*$'
 op_versions['cpd-platform-operator']='^[2]\.[0]\.[8-9]$'
 op_versions['user-data-services-operator']='^[2]\.[0]\.[8-9]$'
 op_versions['ibm-cert-manager-operator']='^[3]\.[2][1]\.[0-9]$'
@@ -100,7 +101,7 @@ function getOCPVersion() {
     	log " Unsupportedd Openshift version $currentOpenshiftVersion.Supported OpenShift versions are 4.8 to 4.10."
 		SCRIPT_STATUS=29
 		return $SCRIPT_STATUS
-  fi
+ 	fi
 }
 
 function getWorkerNodeDetails(){
@@ -150,6 +151,15 @@ checkROSA(){
 	rosa_cm=$(oc get cm rosa-brand-logo -n openshift-config | awk  'NR==2 {print $2 }')
 	if [[ $rosa_cm -eq 1 ]]; then
 		log " ROSA Cluster "
+		currentOpenshiftVersion=$(oc get clusterversion | awk  'NR==2 {print $2 }')
+		log " OCP version is $currentOpenshiftVersion"
+		if [[ $currentOpenshiftVersion =~ ${op_versions[rosaVersion]} ]]; then
+    		log " Supported Version"
+  		else
+    		log " Unsupportedd ROSA version $currentOpenshiftVersion.Supported ROSA version is 4.10."
+			SCRIPT_STATUS=29
+			return $SCRIPT_STATUS
+ 		fi
 		log " DEPLOY_CP4D: $DEPLOY_CP4D"
 		export ROSA="true"
 		if [[ $DEPLOY_CP4D == "true" ]]; then
