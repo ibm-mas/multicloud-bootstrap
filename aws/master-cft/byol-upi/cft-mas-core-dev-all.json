@@ -65,19 +65,6 @@
                 "large"
             ]
         },
-        "OpenShiftClusterApiUrl": {
-            "Description": "Enter the cluster's URL in the format https://api.<cluster_name>.<domain_name>. Do not specify the port number. For example,https://api.masocp.joalae.mas4aws.com",
-            "Type": "String"
-        },
-        "OpenShiftUser": {
-            "Description": "Enter the username of the existing cluster account.",
-            "Type": "String"
-        },
-        "OpenShiftPassword": {
-            "Description": "Enter the password of the existing cluster account.",
-            "Type": "String",
-            "NoEcho": true
-        },
         "EntitledRegistryKey": {
             "Description": "Enter the registry key that you downloaded from the IBM Container Library.",
             "Type": "String",
@@ -149,14 +136,6 @@
             "Description": "Enter the HTTP or S3 location of the service's public certificate that you retrieved from the 'ca-bundle.pem' file in the 'mas-*-uds-cfg' secret in the MAS core namespace.",
             "Type": "String"
         },
-        "BootNodeVPCId": {
-            "Description": "Enter the VPC Id to create the bootnode into. Default VPC created by AWS will be used if not specified. If 'ExistingVPCId' parameter is specified, the same will be used as 'BootNodeVPCId' ignoring the value provided here. If existing OpenShift cluster is specified, make sure it is reachable from this VPC",
-            "Type": "String"
-        },
-        "BootNodeSubnetId": {
-            "Description": "Enter the subnet ID from  the bootnode VPC to be used for the bootnode.",
-            "Type": "String"
-        },
         "EmailNotification": {
             "Description": "Indicate whether you want to receive emails that contain the connection details and credentials for the Suite. These emails are sent only to the verified email addresses that you configured in the Amazon SES service.",
             "Default": false,
@@ -189,16 +168,6 @@
                 },
                 {
                     "Label": {
-                        "default": "Existing OpenShift cluster connection details (complete this section only if you want to reuse an existing cluster)"
-                    },
-                    "Parameters": [
-                        "OpenShiftClusterApiUrl",
-                        "OpenShiftUser",
-                        "OpenShiftPassword"
-                    ]
-                },
-                {
-                    "Label": {
                         "default": "New OpenShift cluster configuration details (complete this section only if you want to create a new cluster)"
                     },
                     "Parameters": [
@@ -212,9 +181,7 @@
                     },
                     "Parameters": [
                         "SSHKey",
-                        "BootnodeSGIngressCidrIp",
-                        "BootNodeVPCId",
-                        "BootNodeSubnetId"
+                        "BootnodeSGIngressCidrIp"
                     ]
                 },
                 {
@@ -269,15 +236,6 @@
                 },
                 {
                     "Label": {
-                        "default": "Choose the BootNode VPC details , leave the fields blank when cluster created with existing VPC)"
-                    },
-                    "Parameters": [
-                        "BootNodeVPCId",
-                        "BootNodeSubnetId"
-                    ]
-                },
-                {
-                    "Label": {
                         "default": "Choose the OCP cluster type/ and enter existing VPC Details  (leave this section empty to create a new VPC )"
                     },
                     "Parameters": [
@@ -297,55 +255,55 @@
     "Mappings": {
         "RegionMap": {
             "us-east-1": {
-                "HVM64": "ami-07809a17acfe15035"
+                "HVM64": "ami-0ef2a204a69167b2e"
             },
             "us-east-2": {
-                "HVM64": "ami-00ba0ee5d999cd7e7"
+                "HVM64": "ami-062b6a674eb0c2e9c"
             },
             "us-west-2": {
-                "HVM64": "ami-0c2bf9db9c23d8ef2"
+                "HVM64": "ami-049f9274268d2ff88"
             },
             "ca-central-1": {
-                "HVM64": "ami-01d7e931190fb52e6"
+                "HVM64": "ami-0d4af3a718018c899"
             },
             "eu-north-1": {
-                "HVM64": "ami-023d4dfcbd33ca27f"
+                "HVM64": "ami-0b3a8c8ed376a9193"
             },
             "eu-south-1": {
                 "HVM64": "ami-06c78840eda1c6464"
             },
             "eu-west-1": {
-                "HVM64": "ami-0a821a5026741f9ab"
+                "HVM64": "ami-0fb132ff756953f9a"
             },
             "eu-west-2": {
-                "HVM64": "ami-065e2aefc015c400b"
+                "HVM64": "ami-00c3f6ddb720e678c"
             },
             "eu-west-3": {
-                "HVM64": "ami-018e7f03ae7e26249"
+                "HVM64": "ami-027d2da40bb974cfb"
             },
             "eu-central-1": {
-                "HVM64": "ami-09e81852f8ff6976a"
+                "HVM64": "ami-03e573b07a13a8c31"
             },
             "ap-northeast-1": {
-                "HVM64": "ami-0b1e9431f015e6f51"
+                "HVM64": "ami-09f275ddde52139a7"
             },
             "ap-northeast-2": {
-                "HVM64": "ami-013ca7a32b575d108"
+                "HVM64": "ami-03a1fb3b705d0dd91"
             },
             "ap-northeast-3": {
-                "HVM64": "ami-067192b67be841c56"
+                "HVM64": "ami-0b01445f04bda9219"
             },
             "ap-south-1": {
-                "HVM64": "ami-0da7aecfb8496cab4"
+                "HVM64": "ami-0d6f41add7f1c62dd"
             },
             "ap-southeast-1": {
-                "HVM64": "ami-0fdb1e4f1e84cb2aa"
+                "HVM64": "ami-0825fcd346fb3babe"
             },
             "ap-southeast-2": {
-                "HVM64": "ami-014cf8441144f02d6"
+                "HVM64": "ami-09a4cfc5416a39c2c"
             },
             "sa-east-1": {
-                "HVM64": "ami-0c3e1fda0b6cd10a8"
+                "HVM64": "ami-037608508e4c078cd"
             }
         }
     },
@@ -356,18 +314,6 @@
                     "Ref": "OpenShiftClusterApiUrl"
                 },
                 ""
-            ]
-        },
-        "ExistingOCPCluster": {
-            "Fn::Not": [
-                {
-                    "Fn::Equals": [
-                        {
-                            "Ref": "OpenShiftClusterApiUrl"
-                        },
-                        ""
-                    ]
-                }
             ]
         }
     },
@@ -727,7 +673,7 @@
                 },
                 "Runtime": "python3.7",
                 "Code": {
-                    "ZipFile":"import boto3\nimport string\nimport cfnresponse\ndef lambda_handler(event, context):\n    try:\n        responseData = {}\n        properties = event[\"ResourceProperties\"]\n        if \"ExistingVPCId\" in properties:\n            if properties[\"ExistingVPCId\"] is not None and properties[\"ExistingVPCId\"] != \"\":\n                responseData['DefaultVPCId'] = properties[\"ExistingVPCId\"]\n                responseData[\"DefaultVPCAz1SubnetId\"] = properties[\"ExistingPublicSubnet1Id\"]\n        elif \"BootNodeVPCId\" in properties:\n            if properties[\"BootNodeVPCId\"] is not None and properties[\"BootNodeVPCId\"] != \"\":\n                responseData['DefaultVPCId'] = properties[\"BootNodeVPCId\"]\n                responseData[\"DefaultVPCAz1SubnetId\"] = properties[\"BootNodeSubnetId\"]\n        else:\n            ec2_client = boto3.client('ec2', region_name=event[\"ResourceProperties\"][\"Region\"])\n            response = ec2_client.describe_vpcs()\n            for vpc_response in response['Vpcs']:\n                vpc_id = vpc_response['VpcId']\n                is_default = vpc_response['IsDefault']\n                if is_default == True:\n                    default_vpc_id = vpc_id\n                break\n            response = ec2_client.describe_subnets()\n            for subnet_response in response['Subnets']:\n                subnet_id = subnet_response['SubnetId']\n                subnet_vpc_id = subnet_response['VpcId']\n                az_id = subnet_response['AvailabilityZoneId']\n                if subnet_vpc_id == default_vpc_id:\n                    if \"az1\" in az_id:\n                        responseData['DefaultVPCId'] = subnet_vpc_id\n                        responseData['DefaultVPCAz1SubnetId'] = subnet_id\n        cfnresponse.send(event, context, cfnresponse.SUCCESS, responseData, \"CustomResourcePhysicalID\")    \n    except Exception as e:\n        print(\"Exception Error : \" + str(e))\n        cfnresponse.send(event, context, cfnresponse.FAILED, responseData, \"CustomResourcePhysicalID\")\n"                }
+                    "ZipFile": "import boto3\nimport string\nimport cfnresponse\ndef lambda_handler(event, context):\n    try:\n        responseData = {}\n        properties = event[\"ResourceProperties\"]\n        if \"ExistingVPCId\" in properties:\n            if properties[\"ExistingVPCId\"] is not None and properties[\"ExistingVPCId\"] != \"\":\n                responseData['DefaultVPCId'] = properties[\"ExistingVPCId\"]\n                responseData[\"DefaultVPCAz1SubnetId\"] = properties[\"ExistingPrivateSubnet1Id\"]\n        else:\n            ec2_client = boto3.client('ec2', region_name=event[\"ResourceProperties\"][\"Region\"])\n            response = ec2_client.describe_vpcs()\n            for vpc_response in response['Vpcs']:\n                vpc_id = vpc_response['VpcId']\n                is_default = vpc_response['IsDefault']\n                if is_default == True:\n                    default_vpc_id = vpc_id\n                break\n            response = ec2_client.describe_subnets()\n            for subnet_response in response['Subnets']:\n                subnet_id = subnet_response['SubnetId']\n                subnet_vpc_id = subnet_response['VpcId']\n                az_id = subnet_response['AvailabilityZoneId']\n                if subnet_vpc_id == default_vpc_id:\n                    if \"az1\" in az_id:\n                        responseData['DefaultVPCId'] = subnet_vpc_id\n                        responseData['DefaultVPCAz1SubnetId'] = subnet_id\n        cfnresponse.send(event, context, cfnresponse.SUCCESS, responseData, \"CustomResourcePhysicalID\")\n    except Exception as e:\n        print(\"Exception Error : \" + str(e))\n        cfnresponse.send(event, context, cfnresponse.FAILED, responseData, \"CustomResourcePhysicalID\")\n" }
             }
         },
         "CallLambdaFunctionGetSubnetForBootnode": {
@@ -741,13 +687,6 @@
                 },
                 "Region": {
                     "Ref": "AWS::Region"
-                },
-
-                "BootNodeVPCId": {
-                    "Ref": "BootNodeVPCId"
-                },
-                "BootNodeSubnetId": {
-                    "Ref": "BootNodeSubnetId"
                 },
                 "ExistingVPCId": {
                     "Ref": "ExistingVPCId"
@@ -953,32 +892,13 @@
                                 {
                                     "Ref": "ImportDemoData"
                                 },
-                                "' '",
-                                {
-                                    "Ref": "OpenShiftClusterApiUrl"
-                                },
-                                "' '",
-                                {
-                                    "Ref": "OpenShiftUser"
-                                },
-                                "' '",
-                                {
-                                    "Ref": "OpenShiftPassword"
-                                },
-                                "' '' '",
+                                "' '' '' '' '' '",
+
                                 {
                                     "Ref": "EmailNotification"
                                 },
 
-                                "' '' '' '' '' '' '' '' '' '' '",
-                                {
-                                    "Ref": "BootNodeVPCId"
-                                },
-                                "' '",
-                                {
-                                    "Ref": "BootNodeSubnetId"
-                                },
-                                "' '",
+                                "' '' '' '' '' '' '' '' '' '' '' '' '",
                                 {
                                     "Ref": "ExistingVPCId"
                                 },
@@ -1148,37 +1068,6 @@
                 ]
             }
         },
-        "MASInitialSetupUrlLogin": {
-            "Description": "Url to perform MAS initial setup, make sure you have imported the MAS public certificate into the browser",
-            "Condition": "ExistingOCPCluster",
-            "Value": {
-                "Fn::Join": [
-                    "",
-                    [
-                        "https://admin.mas-",
-                        {
-                            "Fn::GetAtt": [
-                                "CallLambdaRandomizer",
-                                "Lower_RandomString"
-                            ]
-                        },
-                        ".apps.",
-                        {
-                            "Fn::Select": [
-                                "1",
-                                {
-                                    "Fn::Split": [
-                                        "api.",
-                                        {"Ref": "OpenShiftClusterApiUrl"}
-                                    ]
-                                }
-                            ]
-                        },
-                        "/initialsetup"
-                    ]
-                ]
-            }
-        },
         "MASAdminUrl": {
             "Description": "Url to login to MAS Admin UI, make sure you have imported the MAS public certificate into the browser",
             "Condition": "NoExistingOCPCluster",
@@ -1205,36 +1094,6 @@
                             "Fn::GetAtt": [
                                 "CallLambdaGetHostedZoneName",
                                 "ZoneName"
-                            ]
-                        }
-                    ]
-                ]
-            }
-        },
-        "MASAdminUrlLogin": {
-            "Description": "Url to login to MAS Admin UI, make sure you have imported the MAS public certificate into the browser",
-            "Condition": "ExistingOCPCluster",
-            "Value": {
-                "Fn::Join": [
-                    "",
-                    [
-                        "https://admin.mas-",
-                        {
-                            "Fn::GetAtt": [
-                                "CallLambdaRandomizer",
-                                "Lower_RandomString"
-                            ]
-                        },
-                        ".apps.",
-                        {
-                            "Fn::Select": [
-                                "1",
-                                {
-                                    "Fn::Split": [
-                                        "api.",
-                                        {"Ref": "OpenShiftClusterApiUrl"}
-                                    ]
-                                }
                             ]
                         }
                     ]
@@ -1273,37 +1132,7 @@
                 ]
             }
         },
-        "MASWorkspaceUrlLogin": {
-            "Description": "Url to login to MAS Workspace, make sure you have imported the MAS public certificate into the browser",
-            "Condition": "ExistingOCPCluster",
-            "Value": {
-                "Fn::Join": [
-                    "",
-                    [
-                        "https://wsmasocp.home.mas-",
-                        {
-                            "Fn::GetAtt": [
-                                "CallLambdaRandomizer",
-                                "Lower_RandomString"
-                            ]
-                        },
-                        ".apps.",
-                        {
-                            "Fn::Select": [
-                                "1",
-                                {
-                                    "Fn::Split": [
-                                        "api.",
-                                        {"Ref": "OpenShiftClusterApiUrl"}
-                                    ]
-                                }
-                            ]
-                        }
-                    ]
-                ]
-            }
-        },
-        "DeploymentStatus": {
+  "DeploymentStatus": {
             "Description": "Status of the deployment. Value will be a JSON string in the format {\"[signal-unique-id]\":\"SUCCESS/FAILURE#[message]\"}.",
             "Value": {
                 "Fn::GetAtt": [
