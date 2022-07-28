@@ -54,7 +54,7 @@ export EXISTING_PUBLIC_SUBNET2_ID=${47}
 export EXISTING_PUBLIC_SUBNET3_ID=${48}
 export PRIVATE_CLUSTER=${49}
 export ENV_TYPE=prod
-
+export GIT_REPO_HOME=$(pwd)
 # Load helper functions
 . helper.sh
 export -f log
@@ -119,7 +119,7 @@ fi
 
 ## Variables
 # OCP variables
-export GIT_REPO_HOME=$(pwd)
+
 export CLUSTER_NAME="masocp-${RANDOM_STR}"
 export OCP_USERNAME="masocpuser"
 export OCP_PASSWORD="mas${RANDOM_STR:3:3}`date +%H%M%S`${RANDOM_STR:0:3}"
