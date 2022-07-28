@@ -68,20 +68,17 @@ if [[ $OPENSHIFT_USER_PROVIDE == "false" ]]; then
     set +e
     ./create-ocp-cluster.sh
     retcode=$?
-    if [[ $retcode -ne 0 ]]; then
-      log "OCP cluster creation failed in Terraform step"
-      exit 21
-    fi
-    set -e
   else
     cd $GIT_REPO_HOME/azure/upifiles
+    set +e
     ./create-ocp-cluster-upi.sh
     retcode=$?
-    if [[ $retcode -ne 0 ]]; then
-      log "OCP cluster creation failed in UPI step"
-      exit 21
-    fi
   fi
+  if [[ $retcode -ne 0 ]]; then
+      log "OCP cluster creation failed"
+      exit 21
+  fi
+  set -e
   
   oc login -u $OCP_USERNAME -p $OCP_PASSWORD --server=https://api.${CLUSTER_NAME}.${BASE_DOMAIN}:6443 --insecure-skip-tls-verify=true
   log "==== Adding PID limits to worker nodes ===="
