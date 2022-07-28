@@ -64,6 +64,19 @@
                 "large"
             ]
         },
+        "OpenShiftClusterApiUrl": {
+            "Description": "Enter the cluster's URL in the format https://api.<cluster_name>.<domain_name>. Do not specify the port number. For example,https://api.masocp.joalae.mas4aws.com",
+            "Type": "String"
+        },
+        "OpenShiftUser": {
+            "Description": "Enter the username of the existing cluster account.",
+            "Type": "String"
+        },
+        "OpenShiftPassword": {
+            "Description": "Enter the password of the existing cluster account.",
+            "Type": "String",
+            "NoEcho": true
+        },
         "EntitledRegistryKey": {
             "Description": "Enter the registry key that you downloaded from the IBM Container Library.",
             "Type": "String",
