@@ -436,7 +436,8 @@
                                         "logs:CreateLogGroup",
                                         "logs:CreateLogStream",
                                         "logs:PutLogEvents",
-                                        "logs:DescribeLogStreams"
+                                        "logs:DescribeLogStreams",
+                                        "secretsmanager:CreateSecret"
                                     ],
                                     "Resource": "*"
                                 }
