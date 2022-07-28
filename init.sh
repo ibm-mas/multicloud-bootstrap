@@ -67,9 +67,17 @@ export -f get_uds_endpoint_url
 export -f get_uds_api_key
 export -f validate_prouduct_type
 
+export GIT_REPO_HOME=$(pwd)
+
 ## Configure CloudWatch agent
 if [[ $CLUSTER_TYPE == "aws" ]]; then
   log "Configuring CloudWatch logs agent"
+  # TODO Temporary code to install CloudWatch agent. Later this will be done in AMI, and remove the code
+  #-----------------------------------------
+  cd /tmp
+  wget https://s3.amazonaws.com/amazoncloudwatch-agent/redhat/amd64/latest/amazon-cloudwatch-agent.rpm
+  rpm -U ./amazon-cloudwatch-agent.rpm
+  #-----------------------------------------
   # Create CloudWatch agent config file
   mkdir -p /opt/aws/amazon-cloudwatch-agent/bin
   cat <<EOT >> /opt/aws/amazon-cloudwatch-agent/bin/config.json
@@ -119,7 +127,6 @@ fi
 
 ## Variables
 # OCP variables
-
 export CLUSTER_NAME="masocp-${RANDOM_STR}"
 export OCP_USERNAME="masocpuser"
 export OCP_PASSWORD="mas${RANDOM_STR:3:3}`date +%H%M%S`${RANDOM_STR:0:3}"
@@ -151,7 +158,7 @@ export SLS_MONGODB_CFG_FILE="${MAS_CONFIG_DIR}/mongo-${MONGODB_NAMESPACE}.yml"
 # Exporting SLS_LICENSE_FILE only when product type is different than privatepublic(i.e. Paid offering)
 # Paid offering does not require entitlement.lic i.e. MAS license file.
 validate_prouduct_type
-if [[ $PRODUCT_TYPE == "privatepublic" ]];then
+if [[ ($PRODUCT_TYPE == "privatepublic") && ($CLUSTER_TYPE == "aws") ]];then
   log "Product type is privatepublic hence not exporting SLS_LICENSE_FILE variable"
 else
   export SLS_LICENSE_FILE="${MAS_CONFIG_DIR}/entitlement.lic"
@@ -335,6 +342,7 @@ if [[ $CLUSTER_TYPE == "azure" ]]; then
   export AZURE_TENANT_ID=`az account list | jq -r '.[].tenantId'`
   log " AZURE_TENANT_ID: $AZURE_TENANT_ID"
 fi
+
 cd $GIT_REPO_HOME
 # Perform prevalidation checks
 log "===== PRE-VALIDATION STARTED ====="
