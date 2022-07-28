@@ -337,6 +337,8 @@ if [[ $CLUSTER_TYPE == "azure" ]]; then
   log " AZURE_TENANT_ID: $AZURE_TENANT_ID"
 fi
 
+cd $GIT_REPO_HOME
+
 # Perform prevalidation checks
 log "===== PRE-VALIDATION STARTED ====="
 ./pre-validate.sh
