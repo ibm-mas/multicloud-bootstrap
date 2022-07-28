@@ -335,7 +335,7 @@ if [[ $CLUSTER_TYPE == "azure" ]]; then
   export AZURE_TENANT_ID=`az account list | jq -r '.[].tenantId'`
   log " AZURE_TENANT_ID: $AZURE_TENANT_ID"
 fi
-
+cd $GIT_REPO_HOME
 # Perform prevalidation checks
 log "===== PRE-VALIDATION STARTED ====="
 ./pre-validate.sh
