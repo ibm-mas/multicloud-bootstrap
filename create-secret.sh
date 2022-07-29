@@ -15,8 +15,8 @@ cat <<EOT >> $SECRETFILE
 {
   "ocpusername": "$OCP_USERNAME",
   "ocppassword": "$OCP_PASSWORD",
-  "masusername" "$MAS_USER",
-  "maspassword" "$MAS_PASSWORD"
+  "masusername": "$MAS_USER",
+  "maspassword": "$MAS_PASSWORD"
 }
 EOT
 if [[ $CLUSTER_TYPE == "aws" ]]; then
