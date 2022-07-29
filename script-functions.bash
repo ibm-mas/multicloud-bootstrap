@@ -37,7 +37,7 @@ function getOCS() {
 
 function getOPNamespace() {
 	check_for_csv_success=$(oc get csv  --all-namespaces | awk -v pattern="$1" '$2 ~ pattern  { print }'  | awk -F' ' '{print $NF}')
-	if [[ $check_for_csv_success != "Succeeded" ]]; then
+	if [[ $check_for_csv_success = "Succeeded" ]]; then
 		op_namespace=$(oc get csv  --all-namespaces | awk -v pattern="$1" '$2 ~ pattern  { print }'  | awk -F' ' '{print $1}')
 		op_version=$(oc get csv  --all-namespaces | awk -v pattern="$1" '$2 ~ pattern  { print }'  | awk -F' ' '{print $2}' |  grep --perl-regexp '(?:(\d+)\.)?(?:(\d+)\.)?(?:(\d+)\.\d+)' --only-matching )
 		log " $1 version is $op_version"

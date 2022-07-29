@@ -37,7 +37,6 @@ i=0
 
 while [ $i -lt ${#arr[@]} ]
 do
-	
 	getOPNamespace ${arr[$i]}
 	retcode=$?
 	if [[ $retcode -eq 29 ]]; then
