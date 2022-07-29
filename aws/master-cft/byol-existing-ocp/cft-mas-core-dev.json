@@ -21,17 +21,6 @@
             "Type": "String",
             "MinLength": "1"
         },
-        "ClusterSize": {
-            "Description": "Select your preferred cluster size. All master nodes (M) are m5.2xlarge Amazon EC2 instances. All worker nodes (W) are m5.4xlarge instances. Choose from: small (3M, 3W, total memory: 288GB), medium (3M, 5W, total memory: 416GB), or large (5M, 7W, total memory: 608GB).",
-            "Type": "String",
-            "Default": "small",
-            "MinLength": "1",
-            "AllowedValues": [
-                "small",
-                "medium",
-                "large"
-            ]
-        },
         "OpenShiftClusterApiUrl": {
             "Description": "Enter the cluster's URL in the format https://api.<cluster_name>.<domain_name>. Do not specify the port number. For example,https://api.masocp.joalae.mas4aws.com",
             "Type": "String"
@@ -149,11 +138,10 @@
                 },
                 {
                     "Label": {
-                        "default": "New OpenShift cluster configuration details (complete this section only if you want to create a new cluster)"
+                        "default": "Existing OpenShift cluster configuration details (you must complete this section)"
                     },
                     "Parameters": [
-                        "PublicHostedZone",
-                        "ClusterSize"
+                        "PublicHostedZone"
                     ]
                 },
                 {
