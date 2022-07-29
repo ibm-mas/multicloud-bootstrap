@@ -195,10 +195,10 @@ checkROSA(){
  		fi
 		log " DEPLOY_CP4D: $DEPLOY_CP4D"
 		export ROSA="true"
-		if [[ $DEPLOY_CP4D == "true" ]]; then
-			SCRIPT_STATUS=30
-			return $SCRIPT_STATUS
-		fi	
+		# if [[ $DEPLOY_CP4D == "true" ]]; then
+		# 	SCRIPT_STATUS=30
+		# 	return $SCRIPT_STATUS
+		# fi	
 	fi
 
 }
