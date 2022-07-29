@@ -54,7 +54,7 @@ export EXISTING_PUBLIC_SUBNET2_ID=${47}
 export EXISTING_PUBLIC_SUBNET3_ID=${48}
 export PRIVATE_CLUSTER=${49}
 export ENV_TYPE=prod
-
+export GIT_REPO_HOME=$(pwd)
 # Load helper functions
 . helper.sh
 export -f log
@@ -67,9 +67,17 @@ export -f get_uds_endpoint_url
 export -f get_uds_api_key
 export -f validate_prouduct_type
 
+export GIT_REPO_HOME=$(pwd)
+
 ## Configure CloudWatch agent
 if [[ $CLUSTER_TYPE == "aws" ]]; then
   log "Configuring CloudWatch logs agent"
+  # TODO Temporary code to install CloudWatch agent. Later this will be done in AMI, and remove the code
+  #-----------------------------------------
+  cd /tmp
+  wget https://s3.amazonaws.com/amazoncloudwatch-agent/redhat/amd64/latest/amazon-cloudwatch-agent.rpm
+  rpm -U ./amazon-cloudwatch-agent.rpm
+  #-----------------------------------------
   # Create CloudWatch agent config file
   mkdir -p /opt/aws/amazon-cloudwatch-agent/bin
   cat <<EOT >> /opt/aws/amazon-cloudwatch-agent/bin/config.json
@@ -119,7 +127,6 @@ fi
 
 ## Variables
 # OCP variables
-export GIT_REPO_HOME=$(pwd)
 export CLUSTER_NAME="masocp-${RANDOM_STR}"
 export OCP_USERNAME="masocpuser"
 export OCP_PASSWORD="mas${RANDOM_STR:3:3}`date +%H%M%S`${RANDOM_STR:0:3}"
@@ -151,7 +158,7 @@ export SLS_MONGODB_CFG_FILE="${MAS_CONFIG_DIR}/mongo-${MONGODB_NAMESPACE}.yml"
 # Exporting SLS_LICENSE_FILE only when product type is different than privatepublic(i.e. Paid offering)
 # Paid offering does not require entitlement.lic i.e. MAS license file.
 validate_prouduct_type
-if [[ $PRODUCT_TYPE == "privatepublic" ]];then
+if [[ ($PRODUCT_TYPE == "privatepublic") && ($CLUSTER_TYPE == "aws") ]];then
   log "Product type is privatepublic hence not exporting SLS_LICENSE_FILE variable"
 else
   export SLS_LICENSE_FILE="${MAS_CONFIG_DIR}/entitlement.lic"
@@ -336,6 +343,7 @@ if [[ $CLUSTER_TYPE == "azure" ]]; then
   log " AZURE_TENANT_ID: $AZURE_TENANT_ID"
 fi
 
+cd $GIT_REPO_HOME
 # Perform prevalidation checks
 log "===== PRE-VALIDATION STARTED ====="
 ./pre-validate.sh
@@ -367,13 +375,34 @@ if [[ $PRE_VALIDATION == "pass" ]]; then
     export OCP_USERNAME=$EXS_OCP_USER
     export OCP_PASSWORD=$EXS_OCP_PWD
     export OPENSHIFT_USER_PROVIDE="true"
+    export OCP_SERVER="$(echo https://api.${CLUSTER_NAME}.${BASE_DOMAIN}:6443)"
+    oc login -u $OCP_USERNAME -p $OCP_PASSWORD --server=$OCP_SERVER --insecure-skip-tls-verify=true
+    
+    # Perform prerequisite checks
+    log "===== PRE-REQUISITE VALIDATION STARTED ====="
+
+    source pre-requisite.sh
+    retcode=$?
+
+    log "Pre requisite return code is $retcode"
+    if [[ $retcode -ne 0 ]]; then
+      log "Prerequisite checks failed"
+      PRE_VALIDATION=fail
+      log "Debug: Pre-requisite validation failed. Proceed to create new OCP cluster later"
+      mark_provisioning_failed $retcode
+    else
+      log "Prerequisite checks successful"
+    fi
+    log "===== PRE-REQUISITE CHECKS COMPLETED  ====="
   else
     ## No input from user. Generate Cluster Name, Username, and Password.
     log "Debug: No cluster details or insufficient data provided. Proceed to create new OCP cluster later"
     export OPENSHIFT_USER_PROVIDE="false"
   fi
+fi
   log " OPENSHIFT_USER_PROVIDE=$OPENSHIFT_USER_PROVIDE"
 
+if [[ $PRE_VALIDATION == "pass" ]]; then
   # Create Red Hat pull secret
   echo "$OCP_PULL_SECRET" > $OPENSHIFT_PULL_SECRET_FILE_PATH
   chmod 600 $OPENSHIFT_PULL_SECRET_FILE_PATH
