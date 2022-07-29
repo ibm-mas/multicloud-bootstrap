@@ -214,58 +214,55 @@
     },
     "Mappings": {
         "RegionMap": {
-			"us-east-1": {
-				"HVM64": "ami-03df8ec430f3dbebe"
-			},
-			"us-east-2": {
-				"HVM64": "ami-0cf47e4ed963c663b"
-			},
-			"us-west-2": {
-				"HVM64": "ami-01cfe72610b1c4aad"
-			},
-			"ca-central-1": {
-				"HVM64": "ami-08050f906002936b7"
-			},
-			"eu-north-1": {
-				"HVM64": "ami-0f1314f524511551b"
-			},
-			"eu-south-1": {
-				"HVM64": "ami-0cbb5862a7496d4fe"
-			},
-			"eu-west-1": {
-				"HVM64": "ami-0b77e91e9d19cc88d"
-			},
-			"eu-west-2": {
-				"HVM64": "ami-020cf028149b79e4f"
-			},
-			"eu-west-3": {
-				"HVM64": "ami-074beb0b12cd207dd"
-			},
-			"eu-central-1": {
-				"HVM64": "ami-0ab815ad876485573"
-			},
-			"ap-northeast-1": {
-				"HVM64": "ami-053f5900d52e73289"
-			},
-			"ap-northeast-2": {
-				"HVM64": "ami-0e245738202d112dd"
-			},
-			"ap-northeast-3": {
-				"HVM64": "ami-046570d186dc70728"
-			},
-			"ap-south-1": {
-				"HVM64": "ami-0fc15e974abb9b866"
-			},
-			"ap-southeast-1": {
-				"HVM64": "ami-0b9055f69d0d3bb4c"
-			},
-			"ap-southeast-2": {
-				"HVM64": "ami-093d3a640cee7b9eb"
-			},
-			"sa-east-1": {
-				"HVM64": "ami-06c00c9c0ba270d9a"
-			}
-		}
+            "us-east-1": {
+                "HVM64": "ami-0ef2a204a69167b2e"
+            },
+            "us-east-2": {
+                "HVM64": "ami-062b6a674eb0c2e9c"
+            },
+            "us-west-2": {
+                "HVM64": "ami-049f9274268d2ff88"
+            },
+            "ca-central-1": {
+                "HVM64": "ami-0d4af3a718018c899"
+            },
+            "eu-north-1": {
+                "HVM64": "ami-0b3a8c8ed376a9193"
+            },
+            "eu-west-1": {
+                "HVM64": "ami-0fb132ff756953f9a"
+            },
+            "eu-west-2": {
+                "HVM64": "ami-00c3f6ddb720e678c"
+            },
+            "eu-west-3": {
+                "HVM64": "ami-027d2da40bb974cfb"
+            },
+            "eu-central-1": {
+                "HVM64": "ami-03e573b07a13a8c31"
+            },
+            "ap-northeast-1": {
+                "HVM64": "ami-09f275ddde52139a7"
+            },
+            "ap-northeast-2": {
+                "HVM64": "ami-03a1fb3b705d0dd91"
+            },
+            "ap-northeast-3": {
+                "HVM64": "ami-0b01445f04bda9219"
+            },
+            "ap-south-1": {
+                "HVM64": "ami-0d6f41add7f1c62dd"
+            },
+            "ap-southeast-1": {
+                "HVM64": "ami-0825fcd346fb3babe"
+            },
+            "ap-southeast-2": {
+                "HVM64": "ami-09a4cfc5416a39c2c"
+            },
+            "sa-east-1": {
+                "HVM64": "ami-037608508e4c078cd"
+            }
+        }
     },
     "Conditions": {
         "NoExistingOCPCluster": {
@@ -439,7 +436,8 @@
                                         "logs:CreateLogGroup",
                                         "logs:CreateLogStream",
                                         "logs:PutLogEvents",
-                                        "logs:DescribeLogStreams"
+                                        "logs:DescribeLogStreams",
+                                        "secretsmanager:CreateSecret"
                                     ],
                                     "Resource": "*"
                                 }
@@ -866,10 +864,11 @@
                                 {
                                     "Ref": "OpenShiftPassword"
                                 },
-                                "' '' '' '' '' '' '' '' '' '' '' '' '' '",
+                                "' '' '",
                                 {
                                     "Ref": "EmailNotification"
                                 },
+                                "' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '",
                                 "' \"dev\" ",
                                 "2>&1 | tee mas-provisioning.log; "
                             ]
@@ -1028,7 +1027,7 @@
                                 {
                                     "Fn::Split": [
                                         "api.",
-                                       {"Ref": "OpenShiftClusterApiUrl"}
+                                        {"Ref": "OpenShiftClusterApiUrl"}
                                     ]
                                 }
                             ]
