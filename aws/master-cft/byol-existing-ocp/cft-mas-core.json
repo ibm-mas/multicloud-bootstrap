@@ -920,7 +920,7 @@
     "Outputs": {
         "MASCloudAutomationVersion": {
             "Description": "Version of the MAS automated deployment on Cloud",
-            "Value": "2.0-beta.1"
+            "Value": "2.0-alpha.1"
         },
         "ClusterUniqueString": {
             "Description": "Unique string that is part of cluster resoutce names",
