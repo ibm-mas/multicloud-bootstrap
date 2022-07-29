@@ -123,6 +123,10 @@ mark_provisioning_failed() {
     export STATUS_MSG="Failure in creating azurefiles storage class."
   elif [[ $retcode -eq 28 ]]; then
     export STATUS_MSG="Missing or Invalid Product Code."
+  elif [[ $retcode -eq 29 ]]; then
+    export STATUS_MSG="Provided cluster does not meet the requirements. Please select option to create a new cluster in a new deployment."
+  elif [[ $retcode -eq 30 ]]; then
+    export STATUS_MSG="MAS+CP4D offering is not supported on ROSA cluster. Please select option to create a new cluster in a new deployment or provide a self-managed cluster."
   fi
   export MESSAGE_TEXT=NA
   export OPENSHIFT_CLUSTER_CONSOLE_URL=NA

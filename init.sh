@@ -375,13 +375,34 @@ if [[ $PRE_VALIDATION == "pass" ]]; then
     export OCP_USERNAME=$EXS_OCP_USER
     export OCP_PASSWORD=$EXS_OCP_PWD
     export OPENSHIFT_USER_PROVIDE="true"
+    export OCP_SERVER="$(echo https://api.${CLUSTER_NAME}.${BASE_DOMAIN}:6443)"
+    oc login -u $OCP_USERNAME -p $OCP_PASSWORD --server=$OCP_SERVER --insecure-skip-tls-verify=true
+    
+    # Perform prerequisite checks
+    log "===== PRE-REQUISITE VALIDATION STARTED ====="
+
+    source pre-requisite.sh
+    retcode=$?
+
+    log "Pre requisite return code is $retcode"
+    if [[ $retcode -ne 0 ]]; then
+      log "Prerequisite checks failed"
+      PRE_VALIDATION=fail
+      log "Debug: Pre-requisite validation failed. Proceed to create new OCP cluster later"
+      mark_provisioning_failed $retcode
+    else
+      log "Prerequisite checks successful"
+    fi
+    log "===== PRE-REQUISITE CHECKS COMPLETED  ====="
   else
     ## No input from user. Generate Cluster Name, Username, and Password.
     log "Debug: No cluster details or insufficient data provided. Proceed to create new OCP cluster later"
     export OPENSHIFT_USER_PROVIDE="false"
   fi
+fi
   log " OPENSHIFT_USER_PROVIDE=$OPENSHIFT_USER_PROVIDE"
 
+if [[ $PRE_VALIDATION == "pass" ]]; then
   # Create Red Hat pull secret
   echo "$OCP_PULL_SECRET" > $OPENSHIFT_PULL_SECRET_FILE_PATH
   chmod 600 $OPENSHIFT_PULL_SECRET_FILE_PATH
