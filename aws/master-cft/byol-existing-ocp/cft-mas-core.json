@@ -139,7 +139,7 @@
                 },
                 {
                     "Label": {
-                        "default": "Existing OpenShift cluster connection details (complete this section only if you want to reuse an existing cluster)"
+                        "default": "Existing OpenShift cluster connection details (you must complete this section)"
                     },
                     "Parameters": [
                         "OpenShiftClusterApiUrl",
@@ -233,9 +233,6 @@
                 "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "eu-north-1": {
-                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
-            },
-            "eu-south-1": {
                 "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "eu-west-1": {
