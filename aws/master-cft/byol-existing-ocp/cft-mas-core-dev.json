@@ -908,66 +908,6 @@
             "Description": "Version of the MAS automated deployment on Cloud",
             "Value": "2.0-alpha.1"
         },
-        "ClusterUniqueString": {
-            "Description": "Unique string that is part of cluster resoutce names",
-            "Value": {
-                "Fn::GetAtt": [
-                    "CallLambdaRandomizer",
-                    "Lower_RandomString"
-                ]
-            }
-        },
-        "OpenShiftConsoleUrl": {
-            "Description": "Url to login to OpenShift console",
-            "Condition": "NoExistingOCPCluster",
-            "Value": {
-                "Fn::Join": [
-                    "",
-                    [
-                        "https://console-openshift-console.apps.masocp-",
-                        {
-                            "Fn::GetAtt": [
-                                "CallLambdaRandomizer",
-                                "Lower_RandomString"
-                            ]
-                        },
-                        ".",
-                        {
-                            "Fn::GetAtt": [
-                                "CallLambdaGetHostedZoneName",
-                                "ZoneName"
-                            ]
-                        }
-                    ]
-                ]
-            }
-        },
-        "OpenShiftApiUrl": {
-            "Description": "Url to login to OpenShift Api",
-            "Condition": "NoExistingOCPCluster",
-            "Value": {
-                "Fn::Join": [
-                    "",
-                    [
-                        "https://api.masocp-",
-                        {
-                            "Fn::GetAtt": [
-                                "CallLambdaRandomizer",
-                                "Lower_RandomString"
-                            ]
-                        },
-                        ".",
-                        {
-                            "Fn::GetAtt": [
-                                "CallLambdaGetHostedZoneName",
-                                "ZoneName"
-                            ]
-                        },
-                        ":6443"
-                    ]
-                ]
-            }
-        },
         "MASInitialSetupUrl": {
             "Description": "Url to perform MAS initial setup, make sure you have imported the MAS public certificate into the browser",
             "Condition": "NoExistingOCPCluster",
