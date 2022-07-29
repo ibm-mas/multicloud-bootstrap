@@ -215,52 +215,52 @@
     "Mappings": {
         "RegionMap": {
             "us-east-1": {
-                "HVM64": "ami-0d115b5646bb1a378"
+                "HVM64": "ami-0ef2a204a69167b2e"
             },
             "us-east-2": {
-                "HVM64": "ami-0b5f864a662c59fd0"
+                "HVM64": "ami-062b6a674eb0c2e9c"
             },
             "us-west-2": {
-                "HVM64": "ami-0ab487857937d828b"
+                "HVM64": "ami-049f9274268d2ff88"
             },
             "ca-central-1": {
-                "HVM64": "ami-002cfb3e2b6ee8b0d"
+                "HVM64": "ami-0d4af3a718018c899"
             },
             "eu-north-1": {
-                "HVM64": "ami-00c2cfe963ade048a"
+                "HVM64": "ami-0b3a8c8ed376a9193"
             },
             "eu-west-1": {
-                "HVM64": "ami-0755b534a86b6c68f"
+                "HVM64": "ami-0fb132ff756953f9a"
             },
             "eu-west-2": {
-                "HVM64": "ami-0819a51c90bcd79a7"
+                "HVM64": "ami-00c3f6ddb720e678c"
             },
             "eu-west-3": {
-                "HVM64": "ami-0bdbcfbf3e22b40ff"
+                "HVM64": "ami-027d2da40bb974cfb"
             },
             "eu-central-1": {
-                "HVM64": "ami-0ddf6fd9cf943a29a"
+                "HVM64": "ami-03e573b07a13a8c31"
             },
             "ap-northeast-1": {
-                "HVM64": "ami-0d1ee18b17bb0776b"
+                "HVM64": "ami-09f275ddde52139a7"
             },
             "ap-northeast-2": {
-                "HVM64": "ami-0e41fe74484d89867"
+                "HVM64": "ami-03a1fb3b705d0dd91"
             },
             "ap-northeast-3": {
-                "HVM64": "ami-05340bbad62779b69"
+                "HVM64": "ami-0b01445f04bda9219"
             },
             "ap-south-1": {
-                "HVM64": "ami-0e4abe6bf3a4cde5b"
+                "HVM64": "ami-0d6f41add7f1c62dd"
             },
             "ap-southeast-1": {
-                "HVM64": "ami-03401eac592d7637a"
+                "HVM64": "ami-0825fcd346fb3babe"
             },
             "ap-southeast-2": {
-                "HVM64": "ami-040871f0c3b25b5c1"
+                "HVM64": "ami-09a4cfc5416a39c2c"
             },
             "sa-east-1": {
-                "HVM64": "ami-05fe70392df8320c1"
+                "HVM64": "ami-037608508e4c078cd"
             }
         }
     },
