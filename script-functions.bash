@@ -22,9 +22,22 @@ op_namespaces['ibm-sls']='SLS_NAMESPACE'
 op_namespaces['MongoDBCommunity']='MONGODB_NAMESPACE'
 op_namespaces['kafkas.kafka.strimzi.io']='KAFKA_NAMESPACE'
 
+
+function getOCS() {
+	check_for_csv_success=$(oc get csv  --all-namespaces | awk -v pattern="$1" '$2 ~ pattern  { print }'  | awk -F' ' '{print $NF}')
+	if [[ $check_for_csv_success != "Succeeded" ]]; then
+		log " ${1} not installed."
+		SCRIPT_STATUS=29
+		return $SCRIPT_STATUS
+	else
+		log " ${1} is installed."
+    fi    
+	
+}
+
 function getOPNamespace() {
 	check_for_csv_success=$(oc get csv  --all-namespaces | awk -v pattern="$1" '$2 ~ pattern  { print }'  | awk -F' ' '{print $NF}')
-	if [[ $check_for_csv_success = "Succeeded" ]]; then
+	if [[ $check_for_csv_success != "Succeeded" ]]; then
 		op_namespace=$(oc get csv  --all-namespaces | awk -v pattern="$1" '$2 ~ pattern  { print }'  | awk -F' ' '{print $1}')
 		op_version=$(oc get csv  --all-namespaces | awk -v pattern="$1" '$2 ~ pattern  { print }'  | awk -F' ' '{print $2}' |  grep --perl-regexp '(?:(\d+)\.)?(?:(\d+)\.)?(?:(\d+)\.\d+)' --only-matching )
 		log " $1 version is $op_version"
@@ -34,21 +47,37 @@ function getOPNamespace() {
 			if [[  ${op_namespaces[${1}]} ]]; then
 				export ${op_namespaces[${1}]}=$op_namespace
 			fi
+			if [[  $1 = "ibm-sls" ]]; then
+				export SLS_MONGODB_CFG_FILE="${MAS_CONFIG_DIR}/mongo-${MONGODB_NAMESPACE}.yml"
+				log " SLS_MONGODB_CFG_FILE: $SLS_MONGODB_CFG_FILE"
+
+				export SLS_INSTANCE_NAME=$(oc get LicenseService  -n $SLS_NAMESPACE -o json | jq .items[0].metadata.name -r)
+				export SLS_REGISTRATION_KEY=$(oc get LicenseService  -n $SLS_NAMESPACE -o json | jq .items[0].status.registrationKey -r)
+				export SLS_LICENSE_ID=$(oc get LicenseService  -n $SLS_NAMESPACE -o json | jq .items[0].status.licenseId -r)
+
+				log " Debug: Existing SLS Details."
+				log " SLS_REGISTRATION_KEY: $SLS_REGISTRATION_KEY"
+				log " SLS_INSTANCE_NAME=$SLS_INSTANCE_NAME"
+				log " SLS_LICENSE_ID=$SLS_LICENSE_ID"
+			elif  [[  $1 = "cpd-platform-operator" ]]; then
+				export CPD_INSTANCE_NAMESPACE=$(oc get ibmcpd --all-namespaces -o json | jq .items[0].metadata.namespace -r)	
+			fi
+
 		else
 			log " Unsupported ${1} version $op_version."
 			SCRIPT_STATUS=29
 			return $SCRIPT_STATUS
 		fi
-	else
-		log " ${1} not installed."
-		SCRIPT_STATUS=29
-		return $SCRIPT_STATUS
-    fi    
-	
+    fi   
+	log " $1 will be installed."
 }
 
 function getVersion() {
 	namespace=$(oc get $1  --all-namespaces | awk  'NR==2 {print $1 }')
+	if [[ $namespace = "" ]]; then
+		log " $1 will be installed."
+		return
+	fi
 	currentVersion=$(oc get $1 -n ${namespace}  -o json | jq .items[0].spec.version -r)
 	log " $1 version is $currentVersion"
 	if [[ $currentVersion =~ ${op_versions[${1}]} ]]; then
@@ -65,6 +94,10 @@ function getVersion() {
 
 function getKafkaVersion() {
 	namespace=$(oc get kafkas.kafka.strimzi.io  --all-namespaces | awk  'NR==2 {print $1 }')
+	if [[ $namespace = "" ]]; then
+		log " $1 will be installed."
+		return
+	fi
 	currentVersion=$(oc get kafkas.kafka.strimzi.io -n ${namespace}  -o json | jq .items[0].spec.kafka.version -r)
 	log " Kafka version is $currentVersion"
 	if [[ $currentVersion =~ ${op_versions[kafkas.kafka.strimzi.io]} ]]; then
@@ -79,17 +112,17 @@ function getKafkaVersion() {
   fi
 }
 
-function getSBOVersion() {
-	currentVersion=$(oc get csv -n default | grep service-binding-operator | awk -F' ' '{print $1}' |  grep --perl-regexp '(?:(\d+)\.)?(?:(\d+)\.)?(?:(\d+)\.\d+)' --only-matching)
-	log " service-binding-operator version is $currentVersion"
-	if [[ $currentVersion =~ ${op_versions[service-binding-operator]} ]]; then
-		log " Supported Version"
-  	else
-    	log " Unsupported service-binding-operator version $currentVersion."
-		SCRIPT_STATUS=29
-		return $SCRIPT_STATUS
-  	fi
-}
+# function getSBOVersion() {
+# 	currentVersion=$(oc get csv -n default | grep service-binding-operator | awk -F' ' '{print $1}' |  grep --perl-regexp '(?:(\d+)\.)?(?:(\d+)\.)?(?:(\d+)\.\d+)' --only-matching)
+# 	log " service-binding-operator version is $currentVersion"
+# 	if [[ $currentVersion =~ ${op_versions[service-binding-operator]} ]]; then
+# 		log " Supported Version"
+#   	else
+#     	log " Unsupported service-binding-operator version $currentVersion."
+# 		SCRIPT_STATUS=29
+# 		return $SCRIPT_STATUS
+#   	fi
+# }
 
 function getOCPVersion() {
 	#ocpVersion="^4\\.([8-9]|([1-9][0-9])?)?(\\.[0-9]+.*)*$"
