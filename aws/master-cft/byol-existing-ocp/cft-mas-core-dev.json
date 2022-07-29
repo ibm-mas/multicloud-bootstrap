@@ -767,10 +767,7 @@
                                 {
                                     "Ref": "AWS::AccountId"
                                 },
-                                "\" \"",
-                                {
-                                    "Ref": "ClusterSize"
-                                },
+                                "\" \"\" \"",
                                 "\" \"",
                                 {
                                     "Fn::GetAtt": [
