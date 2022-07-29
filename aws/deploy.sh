@@ -227,23 +227,23 @@ oc extract secret/pull-secret -n openshift-config --keys=.dockerconfigjson --to=
 export encodedEntitlementKey=$(echo cp:$SLS_ENTITLEMENT_KEY | tr -d '\n' | base64 -w0)
 export emailAddress=$(cat .dockerconfigjson | jq -r '.auths["cloud.openshift.com"].email')
 
-if [[ $PRODUCT_TYPE == "privatepublic" ]];then
-  # Adding sls staging and artifactory credentials to pull secret
-  staging_sls_user="$(aws secretsmanager get-secret-value --secret-id pullsecret-mas-sls | jq -r '.SecretString' | jq -r '.SLS_USERNAME')"
-  staging_sls_password="$(aws secretsmanager get-secret-value --secret-id pullsecret-mas-sls | jq -r '.SecretString' | jq -r '.SLS_PASSWORD')"
-  export staging_sls_encodedEntitlementKey=$(echo $staging_sls_user:$staging_sls_password | tr -d '\n' | base64 -w0)
-  artifactory_user="$(aws secretsmanager get-secret-value --secret-id pullsecret-mas-sls | jq -r '.SecretString' | jq -r '.ARTIFACTORY_USERNAME')"
-  artifactory_apikey="$(aws secretsmanager get-secret-value --secret-id pullsecret-mas-sls | jq -r '.SecretString' | jq -r '.ARTIFACTORY_APIKEY')"
-  export artifactoryencodedEntitlementKey=$(echo $artifactory_user:$artifactory_apikey | tr -d '\n' | base64 -w0)
-  jq '.auths |= . + {"cp.icr.io": { "auth" : "$encodedEntitlementKey", "email" : "$emailAddress"},"cp.stg.icr.io": { "auth" : "$staging_sls_encodedEntitlementKey", "email" : "$emailAddress"},"wiotp-docker-local.artifactory.swg-devops.com": { "auth" : "$artifactoryencodedEntitlementKey", "email" : "$emailAddress"}}' .dockerconfigjson > /tmp/dockerconfig.json
-else
-  jq '.auths |= . + {"cp.icr.io": { "auth" : "$encodedEntitlementKey", "email" : "$emailAddress"}}' .dockerconfigjson > /tmp/dockerconfig.json
-fi
-log "printing /tmp/dockerconfig.json before"
-cat /tmp/dockerconfig.json
+# if [[ $PRODUCT_TYPE == "privatepublic" ]];then
+#   # Adding sls staging and artifactory credentials to pull secret
+#   staging_sls_user="$(aws secretsmanager get-secret-value --secret-id pullsecret-mas-sls | jq -r '.SecretString' | jq -r '.SLS_USERNAME')"
+#   staging_sls_password="$(aws secretsmanager get-secret-value --secret-id pullsecret-mas-sls | jq -r '.SecretString' | jq -r '.SLS_PASSWORD')"
+#   export staging_sls_encodedEntitlementKey=$(echo $staging_sls_user:$staging_sls_password | tr -d '\n' | base64 -w0)
+#   artifactory_user="$(aws secretsmanager get-secret-value --secret-id pullsecret-mas-sls | jq -r '.SecretString' | jq -r '.ARTIFACTORY_USERNAME')"
+#   artifactory_apikey="$(aws secretsmanager get-secret-value --secret-id pullsecret-mas-sls | jq -r '.SecretString' | jq -r '.ARTIFACTORY_APIKEY')"
+#   export artifactoryencodedEntitlementKey=$(echo $artifactory_user:$artifactory_apikey | tr -d '\n' | base64 -w0)
+#   jq '.auths |= . + {"cp.icr.io": { "auth" : "$encodedEntitlementKey", "email" : "$emailAddress"},"cp.stg.icr.io": { "auth" : "$staging_sls_encodedEntitlementKey", "email" : "$emailAddress"},"wiotp-docker-local.artifactory.swg-devops.com": { "auth" : "$artifactoryencodedEntitlementKey", "email" : "$emailAddress"}}' .dockerconfigjson > /tmp/dockerconfig.json
+# else
+jq '.auths |= . + {"cp.icr.io": { "auth" : "$encodedEntitlementKey", "email" : "$emailAddress"}}' .dockerconfigjson > /tmp/dockerconfig.json
+# fi
+# log "printing /tmp/dockerconfig.json before"
+# cat /tmp/dockerconfig.json
 envsubst < /tmp/dockerconfig.json > /tmp/.dockerconfigjson
-log "printing /tmp/dockerconfig.json after envsubst"
-cat /tmp/.dockerconfigjson
+# log "printing /tmp/dockerconfig.json after envsubst"
+# cat /tmp/.dockerconfigjson
 oc set data secret/pull-secret -n openshift-config --from-file=/tmp/.dockerconfigjson
 chmod 600 /tmp/.dockerconfigjson /tmp/dockerconfig.json
 
@@ -252,23 +252,23 @@ log "==== OCP cluster configuration (Cert Manager) started ===="
 cd $GIT_REPO_HOME/../ibm/mas_devops/playbooks
 set +e
 
-if [[ $PRODUCT_TYPE == "privatepublic" ]];then
-# Install Development Catalog by exporting below 4 environment variables
-  export ARTIFACTORY_USERNAME=$artifactory_user
-  export ARTIFACTORY_APIKEY=$artifactory_apikey
-  export SLS_USERNAME=$staging_sls_user
-  export SLS_PASSWORD=$staging_sls_password
-  export ROLE_NAME=ibm_catalogs && ansible-playbook ibm.mas_devops.run_role
-  # unset ARTIFACTORY_USERNAME & ARTIFACTORY_APIKEY to have production catalogs installed & call ibm_catalog again
-  unset ARTIFACTORY_USERNAME
-  unset ARTIFACTORY_APIKEY
-else
-  export ROLE_NAME=ibm_catalogs && ansible-playbook ibm.mas_devops.run_role
-fi
+# if [[ $PRODUCT_TYPE == "privatepublic" ]];then
+# # Install Development Catalog by exporting below 4 environment variables
+#   export ARTIFACTORY_USERNAME=$artifactory_user
+#   export ARTIFACTORY_APIKEY=$artifactory_apikey
+#   export SLS_USERNAME=$staging_sls_user
+#   export SLS_PASSWORD=$staging_sls_password
+#   export ROLE_NAME=ibm_catalogs && ansible-playbook ibm.mas_devops.run_role
+#   # unset ARTIFACTORY_USERNAME & ARTIFACTORY_APIKEY to have production catalogs installed & call ibm_catalog again
+#   unset ARTIFACTORY_USERNAME
+#   unset ARTIFACTORY_APIKEY
+# else
+export ROLE_NAME=ibm_catalogs && ansible-playbook ibm.mas_devops.run_role
+#fi
 
-if  [[ $PRODUCT_TYPE == "privatepublic" ]];then
-    export MAS_CHANNEL=m5dev88
-fi
+# if  [[ $PRODUCT_TYPE == "privatepublic" ]];then
+#     export MAS_CHANNEL=m5dev88
+# fi
 export ROLE_NAME=common_services && ansible-playbook ibm.mas_devops.run_role
 export ROLE_NAME=cert_manager && ansible-playbook ibm.mas_devops.run_role
 if [[ $? -ne 0 ]]; then
@@ -320,13 +320,13 @@ then
       oc new-project "$SLS_NAMESPACE"
       oc create -f "$GIT_REPO_HOME"/aws/products.yaml -n "$SLS_NAMESPACE"
       oc create -f "$GIT_REPO_HOME"/aws/CredentialsRequest.yaml
-      #oc create secret generic "$SLS_INSTANCE_NAME"-aws-access --from-literal=region="$DEPLOY_REGION" --from-literal=accessKeyId="$AWS_ACCESS_KEY_ID" --from-literal=secretAccessKey="$AWS_SECRET_ACCESS_KEY" -n "$SLS_NAMESPACE"
-      export SLS_ENTITLEMENT_USERNAME=$staging_sls_user
-      export SLS_ENTITLEMENT_KEY=$staging_sls_password
-      export SLS_CATALOG_SOURCE=ibm-sls-operators
-      export SLS_CHANNEL=m5dev34
-      export SLS_ICR_CP=cp.stg.icr.io/cp
-      export SLS_ICR_CPOPEN=cp.stg.icr.io/cp
+    #oc create secret generic "$SLS_INSTANCE_NAME"-aws-access --from-literal=region="$DEPLOY_REGION" --from-literal=accessKeyId="$AWS_ACCESS_KEY_ID" --from-literal=secretAccessKey="$AWS_SECRET_ACCESS_KEY" -n "$SLS_NAMESPACE"
+    #   export SLS_ENTITLEMENT_USERNAME=$staging_sls_user
+    #   export SLS_ENTITLEMENT_KEY=$staging_sls_password
+    #   export SLS_CATALOG_SOURCE=ibm-sls-operators
+    #   export SLS_CHANNEL=m5dev34
+    #   export SLS_ICR_CP=cp.stg.icr.io/cp
+    #   export SLS_ICR_CPOPEN=cp.stg.icr.io/cp
     fi
 
     log "==== SLS deployment started ===="
@@ -374,13 +374,13 @@ fi
 
 ## Deploy MAS
 log "==== MAS deployment started ===="
-if [[ $PRODUCT_TYPE == "privatepublic" ]];then
-  export MAS_CATALOG_SOURCE=ibm-mas-operators
-  export MAS_ICR_CP=wiotp-docker-local.artifactory.swg-devops.com
-  export MAS_ICR_CPOPEN=wiotp-docker-local.artifactory.swg-devops.com
-  export MAS_ENTITLEMENT_USERNAME=$artifactory_user
-  export MAS_ENTITLEMENT_KEY=$artifactory_apikey
-fi
+# if [[ $PRODUCT_TYPE == "privatepublic" ]];then
+#   export MAS_CATALOG_SOURCE=ibm-mas-operators
+#   export MAS_ICR_CP=wiotp-docker-local.artifactory.swg-devops.com
+#   export MAS_ICR_CPOPEN=wiotp-docker-local.artifactory.swg-devops.com
+#   export MAS_ENTITLEMENT_USERNAME=$artifactory_user
+#   export MAS_ENTITLEMENT_KEY=$artifactory_apikey
+# fi
 # Commenting suite_dns since IBM Cloud Internet Services is the only supported DNS provider currently
 # export ROLE_NAME=suite_dns && ansible-playbook ibm.mas_devops.run_role
 export ROLE_NAME=suite_install && ansible-playbook ibm.mas_devops.run_role

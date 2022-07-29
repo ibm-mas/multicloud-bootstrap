@@ -755,7 +755,7 @@
                                 "# Initiate the provisioning process\n",
                                 "ssh-keyscan github.com >> ~/.ssh/known_hosts;",
                                 "cd /root;",
-                                "git clone -b aws-paid https://github.com/ibm-mas/ansible-devops.git;",
+                                "git clone https://github.com/ibm-mas/ansible-devops.git;",
                                 "cd ansible-devops;",
                                 "rm -rf multicloud-bootstrap 1>/dev/null 2>&1;",
                                 "git clone -b aws-paid https://github.com/ibm-mas/multicloud-bootstrap.git;",
