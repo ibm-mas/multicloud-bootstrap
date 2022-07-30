@@ -34,18 +34,6 @@
             "Type": "String",
             "NoEcho": true
         },
-        "EntitledRegistryKey": {
-            "Description": "Enter the registry key that you downloaded from the IBM Container Library.",
-            "Type": "String",
-            "NoEcho": true,
-            "MinLength": "1"
-        },
-        "OpenShiftPullSecret": {
-            "Description": "Enter the JSON text from the pull secret file that you downloaded from the Red Hat Hybrid Cloud Console.",
-            "Type": "String",
-            "NoEcho": true,
-            "MinLength": "1"
-        },
         "MASLicenseUrl": {
             "Description": "Enter the HTTP or S3 location of your Suite license key file, for example: s3://masocp-license/entitlement.lic",
             "Type": "String",
@@ -158,8 +146,6 @@
                         "default": "Keys and licenses (you must complete this section)"
                     },
                     "Parameters": [
-                        "EntitledRegistryKey",
-                        "OpenShiftPullSecret",
                         "MASLicenseUrl"
                     ]
                 },
@@ -767,15 +753,9 @@
                                 {
                                     "Ref": "DeployWaitConditionHandle"
                                 },
-                                "\" \"",
-                                {
-                                    "Ref": "EntitledRegistryKey"
-                                },
+                                "\" \"\" \"",
                                 "\" ",
-                                "'",
-                                {
-                                    "Ref": "OpenShiftPullSecret"
-                                },
+                                "\" \"\" \"",
                                 "' '",
                                 {
                                     "Ref": "MASLicenseUrl"
