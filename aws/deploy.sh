@@ -66,7 +66,7 @@ if [[ -f uds.crt ]]; then
 fi
 
 ### Read License File & Retrive SLS hostname and host id
-if [[ -n "$MAS_LICENSE_URL" ]];then
+if [[ -n "$MAS_LICENSE_URL" ]]; then
   line=$(head -n 1 entitlement.lic)
   set -- $line
   hostid=$3
@@ -99,13 +99,11 @@ if [[ $OPENSHIFT_USER_PROVIDE == "false" ]]; then
   cd $GIT_REPO_HOME/aws/ocp-terraform
   rm -rf terraform.tfvars
 
-  if [[ $DEPLOY_REGION == "ap-northeast-1" ]]
-  then
+  if [[ $DEPLOY_REGION == "ap-northeast-1" ]]; then
     AVAILABILITY_ZONE_1="${DEPLOY_REGION}a"
     AVAILABILITY_ZONE_2="${DEPLOY_REGION}c"
     AVAILABILITY_ZONE_3="${DEPLOY_REGION}d"
-  elif [[ $DEPLOY_REGION == "ca-central-1" ]]
-  then
+  elif [[ $DEPLOY_REGION == "ca-central-1" ]]; then
     AVAILABILITY_ZONE_1="${DEPLOY_REGION}a"
     AVAILABILITY_ZONE_2="${DEPLOY_REGION}b"
     AVAILABILITY_ZONE_3="${DEPLOY_REGION}d"
@@ -115,7 +113,7 @@ if [[ $OPENSHIFT_USER_PROVIDE == "false" ]]; then
     AVAILABILITY_ZONE_3="${DEPLOY_REGION}c"
   fi
 
-  cat <<EOT >> terraform.tfvars
+  cat <<EOT >>terraform.tfvars
 cluster_name                    = "$CLUSTER_NAME"
 region                          = "$DEPLOY_REGION"
 az                              = "$AZ_MODE"
@@ -147,7 +145,7 @@ worker_subnet3_id               = "$EXISTING_PUBLIC_SUBNET3_ID"
 private_cluster                 = "$PRIVATE_CLUSTER"
 EOT
   if [[ -f terraform.tfvars ]]; then
-      chmod 600 terraform.tfvars
+    chmod 600 terraform.tfvars
   fi
   log "==== OCP cluster creation started ===="
   # Deploy OCP cluster
@@ -157,7 +155,7 @@ EOT
   set +e
   terraform apply -input=false -auto-approve
   if [[ -f terraform.tfstate ]]; then
-      chmod 600 terraform.tfstate
+    chmod 600 terraform.tfstate
   fi
   retcode=$?
   if [[ $retcode -ne 0 ]]; then
@@ -167,31 +165,19 @@ EOT
   set -e
   log "==== OCP cluster creation completed ===="
 
-oc login -u $OCP_USERNAME -p $OCP_PASSWORD --server=https://api.${CLUSTER_NAME}.${BASE_DOMAIN}:6443
-log "==== Adding PID limits to worker nodes ===="
-oc create -f $GIT_REPO_HOME/templates/container-runtime-config.yml
-
-## Add ER Key to global pull secret
-#   cd /tmp
-#   # Login to OCP cluster
-#   oc login -u $OCP_USERNAME -p $OCP_PASSWORD --server=https://api.${CLUSTER_NAME}.${BASE_DOMAIN}:6443
-#   oc extract secret/pull-secret -n openshift-config --keys=.dockerconfigjson --to=. --confirm
-#   export encodedEntitlementKey=$(echo cp:$SLS_ENTITLEMENT_KEY | tr -d '\n' | base64 -w0)
-#   ##export encodedEntitlementKey=$(echo cp:$SLS_ENTITLEMENT_KEY | base64 -w0)
-#   export emailAddress=$(cat .dockerconfigjson | jq -r '.auths["cloud.openshift.com"].email')
-#   jq '.auths |= . + {"cp.icr.io": { "auth" : "$encodedEntitlementKey", "email" : "$emailAddress"}}' .dockerconfigjson > /tmp/dockerconfig.json
-#   envsubst < /tmp/dockerconfig.json > /tmp/.dockerconfigjson
-#   oc set data secret/pull-secret -n openshift-config --from-file=/tmp/.dockerconfigjson
+  oc login -u $OCP_USERNAME -p $OCP_PASSWORD --server=https://api.${CLUSTER_NAME}.${BASE_DOMAIN}:6443
+  log "==== Adding PID limits to worker nodes ===="
+  oc create -f $GIT_REPO_HOME/templates/container-runtime-config.yml
 
   ## Create bastion host
   cd $GIT_REPO_HOME/aws
   set +e
   if [[ new_or_existing_vpc_subnet == "new" ]]; then
-   ./create-bastion-host.sh
-   retcode=$?
+    ./create-bastion-host.sh
+    retcode=$?
     if [[ $retcode -ne 0 ]]; then
-     log "Bastion host creation failed in Terraform step"
-     exit 22
+      log "Bastion host creation failed in Terraform step"
+      exit 22
     fi
   fi
 
@@ -226,24 +212,8 @@ export OCP_TOKEN="$(oc whoami --show-token)"
 oc extract secret/pull-secret -n openshift-config --keys=.dockerconfigjson --to=. --confirm
 export encodedEntitlementKey=$(echo cp:$SLS_ENTITLEMENT_KEY | tr -d '\n' | base64 -w0)
 export emailAddress=$(cat .dockerconfigjson | jq -r '.auths["cloud.openshift.com"].email')
-
-# if [[ $PRODUCT_TYPE == "privatepublic" ]];then
-#   # Adding sls staging and artifactory credentials to pull secret
-#   staging_sls_user="$(aws secretsmanager get-secret-value --secret-id pullsecret-mas-sls | jq -r '.SecretString' | jq -r '.SLS_USERNAME')"
-#   staging_sls_password="$(aws secretsmanager get-secret-value --secret-id pullsecret-mas-sls | jq -r '.SecretString' | jq -r '.SLS_PASSWORD')"
-#   export staging_sls_encodedEntitlementKey=$(echo $staging_sls_user:$staging_sls_password | tr -d '\n' | base64 -w0)
-#   artifactory_user="$(aws secretsmanager get-secret-value --secret-id pullsecret-mas-sls | jq -r '.SecretString' | jq -r '.ARTIFACTORY_USERNAME')"
-#   artifactory_apikey="$(aws secretsmanager get-secret-value --secret-id pullsecret-mas-sls | jq -r '.SecretString' | jq -r '.ARTIFACTORY_APIKEY')"
-#   export artifactoryencodedEntitlementKey=$(echo $artifactory_user:$artifactory_apikey | tr -d '\n' | base64 -w0)
-#   jq '.auths |= . + {"cp.icr.io": { "auth" : "$encodedEntitlementKey", "email" : "$emailAddress"},"cp.stg.icr.io": { "auth" : "$staging_sls_encodedEntitlementKey", "email" : "$emailAddress"},"wiotp-docker-local.artifactory.swg-devops.com": { "auth" : "$artifactoryencodedEntitlementKey", "email" : "$emailAddress"}}' .dockerconfigjson > /tmp/dockerconfig.json
-# else
-jq '.auths |= . + {"cp.icr.io": { "auth" : "$encodedEntitlementKey", "email" : "$emailAddress"}}' .dockerconfigjson > /tmp/dockerconfig.json
-# fi
-# log "printing /tmp/dockerconfig.json before"
-# cat /tmp/dockerconfig.json
-envsubst < /tmp/dockerconfig.json > /tmp/.dockerconfigjson
-# log "printing /tmp/dockerconfig.json after envsubst"
-# cat /tmp/.dockerconfigjson
+jq '.auths |= . + {"cp.icr.io": { "auth" : "$encodedEntitlementKey", "email" : "$emailAddress"}}' .dockerconfigjson >/tmp/dockerconfig.json
+envsubst </tmp/dockerconfig.json >/tmp/.dockerconfigjson
 oc set data secret/pull-secret -n openshift-config --from-file=/tmp/.dockerconfigjson
 chmod 600 /tmp/.dockerconfigjson /tmp/dockerconfig.json
 
@@ -252,23 +222,7 @@ log "==== OCP cluster configuration (Cert Manager) started ===="
 cd $GIT_REPO_HOME/../ibm/mas_devops/playbooks
 set +e
 
-# if [[ $PRODUCT_TYPE == "privatepublic" ]];then
-# # Install Development Catalog by exporting below 4 environment variables
-#   export ARTIFACTORY_USERNAME=$artifactory_user
-#   export ARTIFACTORY_APIKEY=$artifactory_apikey
-#   export SLS_USERNAME=$staging_sls_user
-#   export SLS_PASSWORD=$staging_sls_password
-#   export ROLE_NAME=ibm_catalogs && ansible-playbook ibm.mas_devops.run_role
-#   # unset ARTIFACTORY_USERNAME & ARTIFACTORY_APIKEY to have production catalogs installed & call ibm_catalog again
-#   unset ARTIFACTORY_USERNAME
-#   unset ARTIFACTORY_APIKEY
-# else
 export ROLE_NAME=ibm_catalogs && ansible-playbook ibm.mas_devops.run_role
-#fi
-
-# if  [[ $PRODUCT_TYPE == "privatepublic" ]];then
-#     export MAS_CHANNEL=m5dev88
-# fi
 export ROLE_NAME=common_services && ansible-playbook ibm.mas_devops.run_role
 export ROLE_NAME=cert_manager && ansible-playbook ibm.mas_devops.run_role
 if [[ $? -ne 0 ]]; then
@@ -298,11 +252,11 @@ export ROLE_NAME=mongodb && ansible-playbook ibm.mas_devops.run_role
 log "==== MongoDB deployment completed ===="
 
 ## Copying the entitlement.lic to MAS_CONFIG_DIR
-if [[ -n "$MAS_LICENSE_URL" ]];then
+if [[ -n "$MAS_LICENSE_URL" ]]; then
   cp $GIT_REPO_HOME/entitlement.lic $MAS_CONFIG_DIR
 fi
 
-if [[ $DEPLOY_MANAGE == "true" &&  $DEPLOY_CP4D == "true" ]]; then
+if [[ $DEPLOY_MANAGE == "true" && $DEPLOY_CP4D == "true" ]]; then
   ## Deploy Amqstreams
   log "==== Amq streams deployment started ===="
   export ROLE_NAME=kafka && ansible-playbook ibm.mas_devops.run_role
@@ -310,47 +264,38 @@ if [[ $DEPLOY_MANAGE == "true" &&  $DEPLOY_CP4D == "true" ]]; then
 fi
 
 ## Deploy SLS
-if [[ (-z $SLS_URL) || (-z $SLS_REGISTRATION_KEY) || (-z $SLS_PUB_CERT_URL) ]]
-then
-    # Deploy SLS
-    if [[ $PRODUCT_TYPE == "privatepublic" ]];then
-      # Create Products Configmap and CredetialRequest in sls namespace for Paid Offering.
-      envsubst < "$GIT_REPO_HOME"/aws/products_template.yaml > "$GIT_REPO_HOME"/aws/products.yaml
-      envsubst < "$GIT_REPO_HOME"/aws/CredentialsRequest_template.yaml > "$GIT_REPO_HOME"/aws/CredentialsRequest.yaml
-      oc new-project "$SLS_NAMESPACE"
-      oc create -f "$GIT_REPO_HOME"/aws/products.yaml -n "$SLS_NAMESPACE"
-      oc create -f "$GIT_REPO_HOME"/aws/CredentialsRequest.yaml
-    #oc create secret generic "$SLS_INSTANCE_NAME"-aws-access --from-literal=region="$DEPLOY_REGION" --from-literal=accessKeyId="$AWS_ACCESS_KEY_ID" --from-literal=secretAccessKey="$AWS_SECRET_ACCESS_KEY" -n "$SLS_NAMESPACE"
-    #   export SLS_ENTITLEMENT_USERNAME=$staging_sls_user
-    #   export SLS_ENTITLEMENT_KEY=$staging_sls_password
-    #   export SLS_CATALOG_SOURCE=ibm-sls-operators
-    #   export SLS_CHANNEL=m5dev34
-    #   export SLS_ICR_CP=cp.stg.icr.io/cp
-    #   export SLS_ICR_CPOPEN=cp.stg.icr.io/cp
-    fi
+if [[ (-z $SLS_URL) || (-z $SLS_REGISTRATION_KEY) || (-z $SLS_PUB_CERT_URL) ]]; then
+  # Deploy SLS
+  if [[ $PRODUCT_TYPE == "privatepublic" ]]; then
+    # Create Products Configmap and CredetialsRequest in sls namespace for Paid Offering.
+    envsubst <"$GIT_REPO_HOME"/aws/products_template.yaml >"$GIT_REPO_HOME"/aws/products.yaml
+    envsubst <"$GIT_REPO_HOME"/aws/CredentialsRequest_template.yaml >"$GIT_REPO_HOME"/aws/CredentialsRequest.yaml
+    oc new-project "$SLS_NAMESPACE"
+    oc create -f "$GIT_REPO_HOME"/aws/products.yaml -n "$SLS_NAMESPACE"
+    oc create -f "$GIT_REPO_HOME"/aws/CredentialsRequest.yaml
+  fi
 
-    log "==== SLS deployment started ===="
-    export ROLE_NAME=sls && ansible-playbook ibm.mas_devops.run_role
-    log "==== SLS deployment completed ===="
+  log "==== SLS deployment started ===="
+  export ROLE_NAME=sls && ansible-playbook ibm.mas_devops.run_role
+  log "==== SLS deployment completed ===="
 
 else
-    log "=== Using Existing SLS Deployment ==="
-    export ROLE_NAME=sls && ansible-playbook ibm.mas_devops.run_role
-    log "=== Generated SLS Config YAML ==="
+  log "=== Using Existing SLS Deployment ==="
+  export ROLE_NAME=sls && ansible-playbook ibm.mas_devops.run_role
+  log "=== Generated SLS Config YAML ==="
 fi
 
 ## Deploy UDS
-if [[ (-z $UDS_API_KEY) || (-z $UDS_ENDPOINT_URL) || (-z $UDS_PUB_CERT_URL) ]]
-then
-    # Deploy UDS
-    log "==== UDS deployment started ===="
-    export ROLE_NAME=uds && ansible-playbook ibm.mas_devops.run_role
-    log "==== UDS deployment completed ===="
+if [[ (-z $UDS_API_KEY) || (-z $UDS_ENDPOINT_URL) || (-z $UDS_PUB_CERT_URL) ]]; then
+  # Deploy UDS
+  log "==== UDS deployment started ===="
+  export ROLE_NAME=uds && ansible-playbook ibm.mas_devops.run_role
+  log "==== UDS deployment completed ===="
 
 else
-    log "=== Using Existing UDS Deployment ==="
-    export ROLE_NAME=uds && ansible-playbook ibm.mas_devops.run_role
-    log "=== Generated UDS Config YAML ==="
+  log "=== Using Existing UDS Deployment ==="
+  export ROLE_NAME=uds && ansible-playbook ibm.mas_devops.run_role
+  log "=== Generated UDS Config YAML ==="
 fi
 
 ## Deploy CP4D
@@ -374,15 +319,6 @@ fi
 
 ## Deploy MAS
 log "==== MAS deployment started ===="
-# if [[ $PRODUCT_TYPE == "privatepublic" ]];then
-#   export MAS_CATALOG_SOURCE=ibm-mas-operators
-#   export MAS_ICR_CP=wiotp-docker-local.artifactory.swg-devops.com
-#   export MAS_ICR_CPOPEN=wiotp-docker-local.artifactory.swg-devops.com
-#   export MAS_ENTITLEMENT_USERNAME=$artifactory_user
-#   export MAS_ENTITLEMENT_KEY=$artifactory_apikey
-# fi
-# Commenting suite_dns since IBM Cloud Internet Services is the only supported DNS provider currently
-# export ROLE_NAME=suite_dns && ansible-playbook ibm.mas_devops.run_role
 export ROLE_NAME=suite_install && ansible-playbook ibm.mas_devops.run_role
 export ROLE_NAME=suite_config && ansible-playbook ibm.mas_devops.run_role
 export ROLE_NAME=suite_verify && ansible-playbook ibm.mas_devops.run_role

@@ -186,7 +186,7 @@ split_ocp_api_url() {
 validate_prouduct_type() {
   product_code_metadata="$(curl http://169.254.169.254/latest/meta-data/product-codes)"
   # Hardcoding product_code_metadata for testing purpose until ami gets created for paid product.
-  product_code_metadata="1905n4jwbijcylk3xm02poizl"
+  # product_code_metadata="1905n4jwbijcylk3xm02poizl"
   if [[ -n "$product_code_metadata" ]]; then
     log "Product Code: $product_code_metadata"
     if echo "$product_code_metadata" | grep -Ei '404\s+-\s+Not\s+Found' 1>/dev/null 2>&1; then
