@@ -68,8 +68,9 @@ function getOPNamespace() {
 			SCRIPT_STATUS=29
 			return $SCRIPT_STATUS
 		fi
-    fi   
-	log " $1 will be installed."
+    else
+		log " $1 will be installed."
+	fi
 }
 
 function getVersion() {
@@ -156,13 +157,13 @@ function getWorkerNodeDetails(){
 		cpu=$(oc get -o template nodes "$i" --template={{.status.allocatable.cpu}})
 		memory=$(oc get -o template nodes "$i" --template={{.status.allocatable.memory}})
 
-		if [[ $ROSA == "true" ]]; then
-			#log " ROSA Cluster "
-			requiredCPU=15
-		else
+		# if [[ $ROSA == "true" ]]; then
+			# log " ROSA Cluster "
+			# requiredCPU=15
+		# else
 		 	requiredCPU=15000
 			cpu=${cpu::-1}
-		fi
+		# fi
 		
 		log " Worker Node : ${i}"
 		log " CPU : ${cpu}"
@@ -198,7 +199,7 @@ checkROSA(){
 		# if [[ $DEPLOY_CP4D == "true" ]]; then
 		# 	SCRIPT_STATUS=30
 		# 	return $SCRIPT_STATUS
-		# fi	
+		# fi
 	fi
 
 }

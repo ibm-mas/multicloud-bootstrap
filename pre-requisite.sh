@@ -8,11 +8,14 @@ if [[ $retcode -eq 30 || $retcode -eq 29  ]]; then
 	return $retcode
 fi
 
-getOCPVersion
-retcode=$?
-if [[ $retcode -eq 29 ]]; then
+if [[ $ROSA = ""  ]]; then
+	getOCPVersion
+	retcode=$?
+	if [[ $retcode -eq 29 ]]; then
 	return $retcode
+	fi
 fi
+
 
 getWorkerNodeDetails
 retcode=$?
@@ -32,7 +35,15 @@ if [[ $retcode -eq 29 ]]; then
 	return $retcode
 fi
 
-arr=(cpd-platform-operator ibm-sls ibm-cert-manager-operator user-data-services-operator)
+if [[ $DEPLOY_CP4D == "true" ]]; then
+	getOPNamespace cpd-platform-operator
+	retcode=$?
+	if [[ $retcode -eq 29 ]]; then
+	return $retcode
+	fi
+fi
+
+arr=(ibm-sls ibm-cert-manager-operator user-data-services-operator)
 i=0
 
 while [ $i -lt ${#arr[@]} ]
