@@ -248,52 +248,52 @@
     "Mappings": {
         "RegionMap": {
             "us-east-1": {
-                "HVM64": "ami-0ef2a204a69167b2e"
+                "HVM64": "ami-073adc95ec6baf82c"
             },
             "us-east-2": {
-                "HVM64": "ami-062b6a674eb0c2e9c"
+                "HVM64": "ami-XXXXXXXXXXXXXXXXX"
             },
             "us-west-2": {
-                "HVM64": "ami-049f9274268d2ff88"
+                "HVM64": "ami-XXXXXXXXXXXXXXXXX"
             },
             "ca-central-1": {
-                "HVM64": "ami-0d4af3a718018c899"
+                "HVM64": "ami-XXXXXXXXXXXXXXXXX"
             },
             "eu-north-1": {
-                "HVM64": "ami-0b3a8c8ed376a9193"
+                "HVM64": "ami-XXXXXXXXXXXXXXXXX"
             },
             "eu-west-1": {
-                "HVM64": "ami-0fb132ff756953f9a"
+                "HVM64": "ami-XXXXXXXXXXXXXXXXX"
             },
             "eu-west-2": {
-                "HVM64": "ami-00c3f6ddb720e678c"
+                "HVM64": "ami-XXXXXXXXXXXXXXXXX"
             },
             "eu-west-3": {
-                "HVM64": "ami-027d2da40bb974cfb"
+                "HVM64": "ami-XXXXXXXXXXXXXXXXX"
             },
             "eu-central-1": {
-                "HVM64": "ami-03e573b07a13a8c31"
+                "HVM64": "ami-XXXXXXXXXXXXXXXXX"
             },
             "ap-northeast-1": {
-                "HVM64": "ami-09f275ddde52139a7"
+                "HVM64": "ami-XXXXXXXXXXXXXXXXX"
             },
             "ap-northeast-2": {
-                "HVM64": "ami-03a1fb3b705d0dd91"
+                "HVM64": "ami-XXXXXXXXXXXXXXXXX"
             },
             "ap-northeast-3": {
-                "HVM64": "ami-0b01445f04bda9219"
+                "HVM64": "ami-XXXXXXXXXXXXXXXXX"
             },
             "ap-south-1": {
-                "HVM64": "ami-0d6f41add7f1c62dd"
+                "HVM64": "ami-XXXXXXXXXXXXXXXXX"
             },
             "ap-southeast-1": {
-                "HVM64": "ami-0825fcd346fb3babe"
+                "HVM64": "ami-XXXXXXXXXXXXXXXXX"
             },
             "ap-southeast-2": {
-                "HVM64": "ami-09a4cfc5416a39c2c"
+                "HVM64": "ami-XXXXXXXXXXXXXXXXX"
             },
             "sa-east-1": {
-                "HVM64": "ami-037608508e4c078cd"
+                "HVM64": "ami-XXXXXXXXXXXXXXXXX"
             }
         }
     },
@@ -869,7 +869,7 @@
                                     "Ref": "PrivateCluster"
                                 },
                                 "' '",
-                                "' \"dev\" ",
+                                "' \"prod\" ",
                                 "2>&1 | tee mas-provisioning.log; "
                             ]
                         ]
