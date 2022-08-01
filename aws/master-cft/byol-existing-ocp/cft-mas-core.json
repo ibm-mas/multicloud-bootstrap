@@ -9,61 +9,17 @@
             "MinLength": "1",
             "AllowedValues": [
                 "MAS Core + Cloud Pak for Data",
-                "MAS Core + Manage (no Cloud Pak for Data)",
-                "MAS Core + Cloud Pak for Data + Manage"
+                "MAS Core + Manage (no Cloud Pak for Data)"
             ]
         },
-        "HostedZone": {
-            "Description": "Select the public/private hosted zone that you created in the AWS Route 53 service, for example: mas4aws.myorg.com",
+        "PublicHostedZone": {
+            "Description": "Select the public hosted zone that you created in the AWS Route 53 service, for example: mas4aws.myorg.com",
             "Type": "AWS::Route53::HostedZone::Id"
-        },
-        "ExistingVPCId": {
-            "Description": "Enter the existing VPC ID to create the OpenShift cluster resources into (required for UPI mode deployment).",
-            "Type": "String"
-        },
-        "ExistingPrivateSubnet1Id": {
-            "Description": "Enter the private subnet1 ID from the existing VPC (required for UPI mode deployment). ",
-            "Type": "String"
-        },
-        "ExistingPrivateSubnet2Id": {
-            "Description": "Enter the private subnet2 ID from the existing VPC (required for UPI mode deployment).",
-            "Type": "String"
-        },
-        "ExistingPrivateSubnet3Id": {
-            "Description": "Enter the private subnet3 ID from the existing VPC (required for UPI mode deployment).",
-            "Type": "String"
-        },
-        "ExistingPublicSubnet1Id": {
-            "Description": "Enter the public subnet1 ID from the existing VPC (required for UPI mode deployment).",
-            "Type": "String"
-        },
-        "ExistingPublicSubnet2Id": {
-            "Description": "Enter the public subnet2 ID from the existing VPC (required for UPI mode deployment).",
-            "Type": "String"
-        },
-        "ExistingPublicSubnet3Id": {
-            "Description": "Enter the public subnet3 ID from the existing VPC (required for UPI mode deployment).)",
-            "Type": "String"
         },
         "BootnodeSGIngressCidrIp": {
             "Description": "Use CIDR notation to enter the IP addresses that can access the bootnode. For example, 192.12.33.3/32. To allow access from all IP addresses, enter 0.0.0.0/0.",
             "Type": "String",
-            "MinLength": "9",
-            "MaxLength": "18",
-            "Default": "0.0.0.0/0",
-            "AllowedPattern": "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})",
-            "ConstraintDescription": "must be a valid IP CIDR range of the form w.x.y.z/a."
-        },
-        "ClusterSize": {
-            "Description": "Select your preferred cluster size. All master nodes (M) are m5.2xlarge Amazon EC2 instances. All worker nodes (W) are m5.4xlarge instances. Choose from: small (3M, 3W, total memory: 288GB), medium (3M, 5W, total memory: 416GB), or large (5M, 7W, total memory: 608GB).",
-            "Type": "String",
-            "Default": "small",
-            "MinLength": "1",
-            "AllowedValues": [
-                "small",
-                "medium",
-                "large"
-            ]
+            "MinLength": "1"
         },
         "OpenShiftClusterApiUrl": {
             "Description": "Enter the cluster's URL in the format https://api.<cluster_name>.<domain_name>. Do not specify the port number. For example,https://api.masocp.joalae.mas4aws.com",
@@ -77,18 +33,6 @@
             "Description": "Enter the password of the existing cluster account.",
             "Type": "String",
             "NoEcho": true
-        },
-        "EntitledRegistryKey": {
-            "Description": "Enter the registry key that you downloaded from the IBM Container Library.",
-            "Type": "String",
-            "NoEcho": true,
-            "MinLength": "1"
-        },
-        "OpenShiftPullSecret": {
-            "Description": "Enter the JSON text from the pull secret file that you downloaded from the Red Hat Hybrid Cloud Console.",
-            "Type": "String",
-            "NoEcho": true,
-            "MinLength": "1"
         },
         "MASLicenseUrl": {
             "Description": "Enter the HTTP or S3 location of your Suite license key file, for example: s3://masocp-license/entitlement.lic",
@@ -149,25 +93,8 @@
             "Description": "Enter the HTTP or S3 location of the service's public certificate that you retrieved from the 'ca-bundle.pem' file in the 'mas-*-uds-cfg' secret in the MAS core namespace.",
             "Type": "String"
         },
-        "BootNodeVPCId": {
-            "Description": "Enter the VPC Id to create the bootnode into. Default VPC created by AWS will be used if not specified. If 'ExistingVPCId' parameter is specified, the same will be used as 'BootNodeVPCId' ignoring the value provided here. If existing OpenShift cluster is specified, make sure it is reachable from this VPC",
-            "Type": "String"
-        },
-        "BootNodeSubnetId": {
-            "Description": "Enter the subnet ID from  the bootnode VPC to be used for the bootnode.",
-            "Type": "String"
-        },
         "EmailNotification": {
             "Description": "Indicate whether you want to receive emails that contain the connection details and credentials for the Suite. These emails are sent only to the verified email addresses that you configured in the Amazon SES service.",
-            "Default": false,
-            "Type": "String",
-            "AllowedValues": [
-                true,
-                false
-            ]
-        },
-        "PrivateCluster": {
-            "Description": "Select true to create a private OpenShift cluster",
             "Default": false,
             "Type": "String",
             "AllowedValues": [
@@ -189,7 +116,7 @@
                 },
                 {
                     "Label": {
-                        "default": "Existing OpenShift cluster connection details (complete this section only if you want to reuse an existing cluster)"
+                        "default": "Existing OpenShift cluster connection details (you must complete this section)"
                     },
                     "Parameters": [
                         "OpenShiftClusterApiUrl",
@@ -199,11 +126,10 @@
                 },
                 {
                     "Label": {
-                        "default": "New OpenShift cluster configuration details (complete this section only if you want to create a new cluster)"
+                        "default": "Existing OpenShift cluster configuration details (you must complete this section)"
                     },
                     "Parameters": [
-                        "HostedZone",
-                        "ClusterSize"
+                        "PublicHostedZone"
                     ]
                 },
                 {
@@ -212,9 +138,7 @@
                     },
                     "Parameters": [
                         "SSHKey",
-                        "BootnodeSGIngressCidrIp",
-                        "BootNodeVPCId",
-                        "BootNodeSubnetId"
+                        "BootnodeSGIngressCidrIp"
                     ]
                 },
                 {
@@ -222,8 +146,6 @@
                         "default": "Keys and licenses (you must complete this section)"
                     },
                     "Parameters": [
-                        "EntitledRegistryKey",
-                        "OpenShiftPullSecret",
                         "MASLicenseUrl"
                     ]
                 },
@@ -266,30 +188,6 @@
                     "Parameters": [
                         "EmailNotification"
                     ]
-                },
-                {
-                    "Label": {
-                        "default": "Choose the BootNode VPC details , leave the fields blank when cluster created with existing VPC)"
-                    },
-                    "Parameters": [
-                        "BootNodeVPCId",
-                        "BootNodeSubnetId"
-                    ]
-                },
-                {
-                    "Label": {
-                        "default": "Choose the OCP cluster type/ and enter existing VPC Details  (leave this section empty to create a new VPC )"
-                    },
-                    "Parameters": [
-                        "PrivateCluster",
-                        "ExistingVPCId",
-                        "ExistingPrivateSubnet1Id",
-                        "ExistingPrivateSubnet2Id",
-                        "ExistingPrivateSubnet3Id",
-                        "ExistingPublicSubnet1Id",
-                        "ExistingPublicSubnet2Id",
-                        "ExistingPublicSubnet3Id"
-                    ]
                 }
             ]
         }
@@ -300,75 +198,50 @@
                 "HVM64": "ami-07809a17acfe15035"
             },
             "us-east-2": {
-                "HVM64": "ami-00ba0ee5d999cd7e7"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "us-west-2": {
-                "HVM64": "ami-0c2bf9db9c23d8ef2"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "ca-central-1": {
-                "HVM64": "ami-01d7e931190fb52e6"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "eu-north-1": {
-                "HVM64": "ami-023d4dfcbd33ca27f"
-            },
-            "eu-south-1": {
-                "HVM64": "ami-06c78840eda1c6464"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "eu-west-1": {
-                "HVM64": "ami-0a821a5026741f9ab"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "eu-west-2": {
-                "HVM64": "ami-065e2aefc015c400b"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "eu-west-3": {
-                "HVM64": "ami-018e7f03ae7e26249"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "eu-central-1": {
-                "HVM64": "ami-09e81852f8ff6976a"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "ap-northeast-1": {
-                "HVM64": "ami-0b1e9431f015e6f51"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "ap-northeast-2": {
-                "HVM64": "ami-013ca7a32b575d108"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "ap-northeast-3": {
-                "HVM64": "ami-067192b67be841c56"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "ap-south-1": {
-                "HVM64": "ami-0da7aecfb8496cab4"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "ap-southeast-1": {
-                "HVM64": "ami-0fdb1e4f1e84cb2aa"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "ap-southeast-2": {
-                "HVM64": "ami-014cf8441144f02d6"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "sa-east-1": {
-                "HVM64": "ami-0c3e1fda0b6cd10a8"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             }
-        }
-    },
-    "Conditions": {
-        "NoExistingOCPCluster": {
-            "Fn::Equals": [
-                {
-                    "Ref": "OpenShiftClusterApiUrl"
-                },
-                ""
-            ]
-        },
-        "ExistingOCPCluster": {
-            "Fn::Not": [
-                {
-                    "Fn::Equals": [
-                        {
-                            "Ref": "OpenShiftClusterApiUrl"
-                        },
-                        ""
-                    ]
-                }
-            ]
         }
     },
     "Resources": {
@@ -675,7 +548,7 @@
                     ]
                 },
                 "ZoneId": {
-                    "Ref": "HostedZone"
+                    "Ref": "PublicHostedZone"
                 },
                 "Region": {
                     "Ref": "AWS::Region"
@@ -727,7 +600,8 @@
                 },
                 "Runtime": "python3.7",
                 "Code": {
-                    "ZipFile":"import boto3\nimport string\nimport cfnresponse\ndef lambda_handler(event, context):\n    try:\n        responseData = {}\n        properties = event[\"ResourceProperties\"]\n        if \"ExistingVPCId\" in properties:\n            if properties[\"ExistingVPCId\"] is not None and properties[\"ExistingVPCId\"] != \"\":\n                responseData['DefaultVPCId'] = properties[\"ExistingVPCId\"]\n                responseData[\"DefaultVPCAz1SubnetId\"] = properties[\"ExistingPublicSubnet1Id\"]\n        elif \"BootNodeVPCId\" in properties:\n            if properties[\"BootNodeVPCId\"] is not None and properties[\"BootNodeVPCId\"] != \"\":\n                responseData['DefaultVPCId'] = properties[\"BootNodeVPCId\"]\n                responseData[\"DefaultVPCAz1SubnetId\"] = properties[\"BootNodeSubnetId\"]\n        else:\n            ec2_client = boto3.client('ec2', region_name=event[\"ResourceProperties\"][\"Region\"])\n            response = ec2_client.describe_vpcs()\n            for vpc_response in response['Vpcs']:\n                vpc_id = vpc_response['VpcId']\n                is_default = vpc_response['IsDefault']\n                if is_default == True:\n                    default_vpc_id = vpc_id\n                break\n            response = ec2_client.describe_subnets()\n            for subnet_response in response['Subnets']:\n                subnet_id = subnet_response['SubnetId']\n                subnet_vpc_id = subnet_response['VpcId']\n                az_id = subnet_response['AvailabilityZoneId']\n                if subnet_vpc_id == default_vpc_id:\n                    if \"az1\" in az_id:\n                        responseData['DefaultVPCId'] = subnet_vpc_id\n                        responseData['DefaultVPCAz1SubnetId'] = subnet_id\n        cfnresponse.send(event, context, cfnresponse.SUCCESS, responseData, \"CustomResourcePhysicalID\")    \n    except Exception as e:\n        print(\"Exception Error : \" + str(e))\n        cfnresponse.send(event, context, cfnresponse.FAILED, responseData, \"CustomResourcePhysicalID\")\n"                }
+                    "ZipFile": "import boto3\nimport string\nimport cfnresponse\ndef lambda_handler(event, context):\n    responseData = {}\n    try:\n        ec2_client = boto3.client('ec2', region_name=event[\"ResourceProperties\"][\"Region\"])\n        response = ec2_client.describe_vpcs()\n        for vpc_response in response['Vpcs']:\n          vpc_id = vpc_response['VpcId']\n          is_default = vpc_response['IsDefault']\n          if is_default == True:\n            default_vpc_id = vpc_id\n            break\n        response = ec2_client.describe_subnets()\n        for subnet_response in response['Subnets']:\n          subnet_id = subnet_response['SubnetId']\n          subnet_vpc_id = subnet_response['VpcId']\n          az_id = subnet_response['AvailabilityZoneId']\n          if subnet_vpc_id == default_vpc_id:\n            if \"az1\" in az_id:\n              responseData['DefaultVPCId'] = subnet_vpc_id\n              responseData['DefaultVPCAz1SubnetId'] = subnet_id\n        cfnresponse.send(event, context, cfnresponse.SUCCESS, responseData, \"CustomResourcePhysicalID\")\n    except Exception as e:\n        print(\"Exception Error : \" + str(e))\n        cfnresponse.send(event, context, cfnresponse.FAILED, responseData, \"CustomResourcePhysicalID\")\n"
+                }
             }
         },
         "CallLambdaFunctionGetSubnetForBootnode": {
@@ -741,20 +615,6 @@
                 },
                 "Region": {
                     "Ref": "AWS::Region"
-                },
-
-                "BootNodeVPCId": {
-                    "Ref": "BootNodeVPCId"
-                },
-                "BootNodeSubnetId": {
-                    "Ref": "BootNodeSubnetId"
-                },
-                "ExistingVPCId": {
-                    "Ref": "ExistingVPCId"
-                },
-
-                "ExistingPublicSubnet1Id": {
-                    "Ref": "ExistingPublicSubnet1Id"
                 }
             }
         },
@@ -870,10 +730,7 @@
                                 {
                                     "Ref": "AWS::AccountId"
                                 },
-                                "\" \"",
-                                {
-                                    "Ref": "ClusterSize"
-                                },
+                                "\" \"\" \"",
                                 "\" \"",
                                 {
                                     "Fn::GetAtt": [
@@ -896,15 +753,9 @@
                                 {
                                     "Ref": "DeployWaitConditionHandle"
                                 },
-                                "\" \"",
-                                {
-                                    "Ref": "EntitledRegistryKey"
-                                },
+                                "\" \"\" \"",
                                 "\" ",
-                                "'",
-                                {
-                                    "Ref": "OpenShiftPullSecret"
-                                },
+                                "\" \"\" \"",
                                 "' '",
                                 {
                                     "Ref": "MASLicenseUrl"
@@ -969,48 +820,7 @@
                                 {
                                     "Ref": "EmailNotification"
                                 },
-
-                                "' '' '' '' '' '' '' '' '' '' '",
-                                {
-                                    "Ref": "BootNodeVPCId"
-                                },
-                                "' '",
-                                {
-                                    "Ref": "BootNodeSubnetId"
-                                },
-                                "' '",
-                                {
-                                    "Ref": "ExistingVPCId"
-                                },
-                                "' '' '",
-                                {
-                                    "Ref": "ExistingPrivateSubnet1Id"
-                                },
-                                "' '",
-                                {
-                                    "Ref": "ExistingPrivateSubnet2Id"
-                                },
-                                "' '",
-                                {
-                                    "Ref": "ExistingPrivateSubnet3Id"
-                                },
-                                "' '",
-                                {
-                                    "Ref": "ExistingPublicSubnet1Id"
-                                },
-                                "' '",
-                                {
-                                    "Ref": "ExistingPublicSubnet2Id"
-                                },
-                                "' '",
-                                {
-                                    "Ref": "ExistingPublicSubnet3Id"
-                                },
-                                "' '",
-                                {
-                                    "Ref": "PrivateCluster"
-                                },
-                                "' '",
+                                "' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '",
                                 "' \"prod\" ",
                                 "2>&1 | tee mas-provisioning.log; "
                             ]
@@ -1053,104 +863,10 @@
     "Outputs": {
         "MASCloudAutomationVersion": {
             "Description": "Version of the MAS automated deployment on Cloud",
-            "Value": "1.0"
-        },
-        "ClusterUniqueString": {
-            "Description": "Unique string that is part of cluster resoutce names",
-            "Value": {
-                "Fn::GetAtt": [
-                    "CallLambdaRandomizer",
-                    "Lower_RandomString"
-                ]
-            }
-        },
-        "OpenShiftConsoleUrl": {
-            "Description": "Url to login to OpenShift console",
-            "Condition": "NoExistingOCPCluster",
-            "Value": {
-                "Fn::Join": [
-                    "",
-                    [
-                        "https://console-openshift-console.apps.masocp-",
-                        {
-                            "Fn::GetAtt": [
-                                "CallLambdaRandomizer",
-                                "Lower_RandomString"
-                            ]
-                        },
-                        ".",
-                        {
-                            "Fn::GetAtt": [
-                                "CallLambdaGetHostedZoneName",
-                                "ZoneName"
-                            ]
-                        }
-                    ]
-                ]
-            }
-        },
-        "OpenShiftApiUrl": {
-            "Description": "Url to login to OpenShift Api",
-            "Condition": "NoExistingOCPCluster",
-            "Value": {
-                "Fn::Join": [
-                    "",
-                    [
-                        "https://api.masocp-",
-                        {
-                            "Fn::GetAtt": [
-                                "CallLambdaRandomizer",
-                                "Lower_RandomString"
-                            ]
-                        },
-                        ".",
-                        {
-                            "Fn::GetAtt": [
-                                "CallLambdaGetHostedZoneName",
-                                "ZoneName"
-                            ]
-                        },
-                        ":6443"
-                    ]
-                ]
-            }
-        },
-        "MASInitialSetupUrl": {
-            "Description": "Url to perform MAS initial setup, make sure you have imported the MAS public certificate into the browser",
-            "Condition": "NoExistingOCPCluster",
-            "Value": {
-                "Fn::Join": [
-                    "",
-                    [
-                        "https://admin.mas-",
-                        {
-                            "Fn::GetAtt": [
-                                "CallLambdaRandomizer",
-                                "Lower_RandomString"
-                            ]
-                        },
-                        ".apps.masocp-",
-                        {
-                            "Fn::GetAtt": [
-                                "CallLambdaRandomizer",
-                                "Lower_RandomString"
-                            ]
-                        },
-                        ".",
-                        {
-                            "Fn::GetAtt": [
-                                "CallLambdaGetHostedZoneName",
-                                "ZoneName"
-                            ]
-                        },
-                        "/initialsetup"
-                    ]
-                ]
-            }
+            "Value": "2.0-alpha.1"
         },
         "MASInitialSetupUrlLogin": {
             "Description": "Url to perform MAS initial setup, make sure you have imported the MAS public certificate into the browser",
-            "Condition": "ExistingOCPCluster",
             "Value": {
                 "Fn::Join": [
                     "",
@@ -1175,45 +891,12 @@
                             ]
                         },
                         "/initialsetup"
-                    ]
-                ]
-            }
-        },
-        "MASAdminUrl": {
-            "Description": "Url to login to MAS Admin UI, make sure you have imported the MAS public certificate into the browser",
-            "Condition": "NoExistingOCPCluster",
-            "Value": {
-                "Fn::Join": [
-                    "",
-                    [
-                        "https://admin.mas-",
-                        {
-                            "Fn::GetAtt": [
-                                "CallLambdaRandomizer",
-                                "Lower_RandomString"
-                            ]
-                        },
-                        ".apps.masocp-",
-                        {
-                            "Fn::GetAtt": [
-                                "CallLambdaRandomizer",
-                                "Lower_RandomString"
-                            ]
-                        },
-                        ".",
-                        {
-                            "Fn::GetAtt": [
-                                "CallLambdaGetHostedZoneName",
-                                "ZoneName"
-                            ]
-                        }
                     ]
                 ]
             }
         },
         "MASAdminUrlLogin": {
             "Description": "Url to login to MAS Admin UI, make sure you have imported the MAS public certificate into the browser",
-            "Condition": "ExistingOCPCluster",
             "Value": {
                 "Fn::Join": [
                     "",
@@ -1235,38 +918,6 @@
                                         {"Ref": "OpenShiftClusterApiUrl"}
                                     ]
                                 }
-                            ]
-                        }
-                    ]
-                ]
-            }
-        },
-        "MASWorkspaceUrl": {
-            "Description": "Url to login to MAS Workspace, make sure you have imported the MAS public certificate into the browser",
-            "Condition": "NoExistingOCPCluster",
-            "Value": {
-                "Fn::Join": [
-                    "",
-                    [
-                        "https://wsmasocp.home.mas-",
-                        {
-                            "Fn::GetAtt": [
-                                "CallLambdaRandomizer",
-                                "Lower_RandomString"
-                            ]
-                        },
-                        ".apps.masocp-",
-                        {
-                            "Fn::GetAtt": [
-                                "CallLambdaRandomizer",
-                                "Lower_RandomString"
-                            ]
-                        },
-                        ".",
-                        {
-                            "Fn::GetAtt": [
-                                "CallLambdaGetHostedZoneName",
-                                "ZoneName"
                             ]
                         }
                     ]
@@ -1275,7 +926,6 @@
         },
         "MASWorkspaceUrlLogin": {
             "Description": "Url to login to MAS Workspace, make sure you have imported the MAS public certificate into the browser",
-            "Condition": "ExistingOCPCluster",
             "Value": {
                 "Fn::Join": [
                     "",
