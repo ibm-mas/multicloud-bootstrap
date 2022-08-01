@@ -271,7 +271,6 @@ if  [[ $PRODUCT_TYPE == "privatepublic" ]];then
 fi
 export ROLE_NAME=common_services && ansible-playbook ibm.mas_devops.run_role
 export ROLE_NAME=cert_manager && ansible-playbook ibm.mas_devops.run_role
-export ROLE_NAME=sbo && ansible-playbook ibm.mas_devops.run_role
 if [[ $? -ne 0 ]]; then
   # One reason for this failure is catalog sources not having required state information, so recreate the catalog-operator pod
   # https://bugzilla.redhat.com/show_bug.cgi?id=1807128
@@ -284,7 +283,6 @@ if [[ $? -ne 0 ]]; then
   export ROLE_NAME=ibm_catalogs && ansible-playbook ibm.mas_devops.run_role
   export ROLE_NAME=common_services && ansible-playbook ibm.mas_devops.run_role
   export ROLE_NAME=cert_manager && ansible-playbook ibm.mas_devops.run_role
-  export ROLE_NAME=sbo && ansible-playbook ibm.mas_devops.run_role
   retcode=$?
   if [[ $retcode -ne 0 ]]; then
     log "Failed while configuring OCP cluster"
