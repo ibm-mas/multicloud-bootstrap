@@ -248,7 +248,7 @@
     "Mappings": {
         "RegionMap": {
             "us-east-1": {
-                "HVM64": "ami-XXXXXXXXXXXXXXXXX"
+                "HVM64": "ami-073adc95ec6baf82c"
             },
             "us-east-2": {
                 "HVM64": "ami-XXXXXXXXXXXXXXXXX"
