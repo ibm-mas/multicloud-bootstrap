@@ -248,7 +248,7 @@ oc set data secret/pull-secret -n openshift-config --from-file=/tmp/.dockerconfi
 chmod 600 /tmp/.dockerconfigjson /tmp/dockerconfig.json
 
 ## Configure OCP cluster
-log "==== OCP cluster configuration (Cert Manager and SBO ) started ===="
+log "==== OCP cluster configuration (Cert Manager) started ===="
 cd $GIT_REPO_HOME/../ibm/mas_devops/playbooks
 set +e
 
@@ -290,7 +290,7 @@ if [[ $? -ne 0 ]]; then
   fi
 fi
 set -e
-log "==== OCP cluster configuration (Cert Manager and SBO ) completed ===="
+log "==== OCP cluster configuration (Cert Manager) completed ===="
 
 ## Deploy MongoDB
 log "==== MongoDB deployment started ===="
