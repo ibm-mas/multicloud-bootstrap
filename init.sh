@@ -53,7 +53,13 @@ export EXISTING_PUBLIC_SUBNET1_ID=${46}
 export EXISTING_PUBLIC_SUBNET2_ID=${47}
 export EXISTING_PUBLIC_SUBNET3_ID=${48}
 export PRIVATE_CLUSTER=${49}
-export ENV_TYPE=prod
+
+if [ -z ${50} ] || [ ${50} == "prod" ]; then
+  export ENV_TYPE="prod"
+else
+  export ENV_TYPE="dev"
+fi
+
 export GIT_REPO_HOME=$(pwd)
 # Load helper functions
 . helper.sh
