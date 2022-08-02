@@ -730,7 +730,7 @@
                                 {
                                     "Ref": "AWS::AccountId"
                                 },
-                                "\" \"\" \"",
+                                "\" \"",
                                 "\" \"",
                                 {
                                     "Fn::GetAtt": [
@@ -753,9 +753,9 @@
                                 {
                                     "Ref": "DeployWaitConditionHandle"
                                 },
-                                "\" \"\" \"",
+                                "\" \"",
                                 "\" ",
-                                "\" \"\" \"",
+                                "'",
                                 "' '",
                                 {
                                     "Ref": "MASLicenseUrl"
