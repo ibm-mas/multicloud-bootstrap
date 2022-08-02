@@ -870,7 +870,9 @@
                                 {
                                     "Fn::Split": [
                                         "api.",
-                                        {"Ref": "OpenShiftClusterApiUrl"}
+                                        {
+                                            "Ref": "OpenShiftClusterApiUrl"
+                                        }
                                     ]
                                 }
                             ]
@@ -900,7 +902,9 @@
                                 {
                                     "Fn::Split": [
                                         "api.",
-                                        {"Ref": "OpenShiftClusterApiUrl"}
+                                        {
+                                            "Ref": "OpenShiftClusterApiUrl"
+                                        }
                                     ]
                                 }
                             ]
@@ -929,7 +933,9 @@
                                 {
                                     "Fn::Split": [
                                         "api.",
-                                        {"Ref": "OpenShiftClusterApiUrl"}
+                                        {
+                                            "Ref": "OpenShiftClusterApiUrl"
+                                        }
                                     ]
                                 }
                             ]
