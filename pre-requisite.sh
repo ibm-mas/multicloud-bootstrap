@@ -68,13 +68,13 @@ if [[ $retcode -eq 29 ]]; then
 	return $retcode
 fi
 
-# getKafkaVersion
-# retcode=$?
-# if [[ $retcode -eq 29 ]]; then
-# 	return $retcode
-# fi
+getKafkaVersion
+retcode=$?
+if [[ $retcode -eq 29 ]]; then
+	return $retcode
+fi
 
-##log " KAFKA_NAMESPACE: $KAFKA_NAMESPACE"
+log " KAFKA_NAMESPACE: $KAFKA_NAMESPACE"
 log " CPD_OPERATORS_NAMESPACE: $CPD_OPERATORS_NAMESPACE"
 log " CPD_INSTANCE_NAMESPACE=$CPD_INSTANCE_NAMESPACE"
 log " SLS_NAMESPACE: $SLS_NAMESPACE"
