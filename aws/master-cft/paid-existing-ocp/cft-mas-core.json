@@ -34,6 +34,12 @@
             "Type": "String",
             "NoEcho": true
         },
+        "EntitledRegistryKey": {
+            "Description": "Enter the registry key that you downloaded from the IBM Container Library.",
+            "Type": "String",
+            "NoEcho": true,
+            "MinLength": "1"
+        },
         "MASManageDBUser": {
             "Description": "Enter the username that the Maximo Manage application uses to connect to the database.",
             "Type": "String"
@@ -138,6 +144,14 @@
                 },
                 {
                     "Label": {
+                        "default": "Keys and licenses (you must complete this section)"
+                    },
+                    "Parameters": [
+                        "EntitledRegistryKey"
+                    ]
+                },
+                {
+                    "Label": {
                         "default": "Maximo Manage database configuration (complete this section only if you chose the 'MAS + Manage' offering type)"
                     },
                     "Parameters": [
@@ -182,52 +196,52 @@
     "Mappings": {
         "RegionMap": {
             "us-east-1": {
-                "HVM64": "ami-073adc95ec6baf82c"
+                "HVM64": "ami-0663aa4f5e3ea9a30"
             },
             "us-east-2": {
-                "HVM64": "ami-XXXXXXXXXXXXXXXXX"
+                "HVM64": "ami-0015d74318b50eb1e"
             },
             "us-west-2": {
-                "HVM64": "ami-XXXXXXXXXXXXXXXXX"
+                "HVM64": "ami-0821cafcce4fc2688"
             },
             "ca-central-1": {
-                "HVM64": "ami-XXXXXXXXXXXXXXXXX"
+                "HVM64": "ami-030b370d9aca15cfa"
             },
             "eu-north-1": {
-                "HVM64": "ami-XXXXXXXXXXXXXXXXX"
+                "HVM64": "ami-098e79645f6b1fe5e"
             },
             "eu-west-1": {
-                "HVM64": "ami-XXXXXXXXXXXXXXXXX"
+                "HVM64": "ami-08fec0d0aaac92f41"
             },
             "eu-west-2": {
-                "HVM64": "ami-XXXXXXXXXXXXXXXXX"
+                "HVM64": "ami-0148e83ca025fb1c4"
             },
             "eu-west-3": {
-                "HVM64": "ami-XXXXXXXXXXXXXXXXX"
+                "HVM64": "ami-0de7facdeac48f412"
             },
             "eu-central-1": {
-                "HVM64": "ami-XXXXXXXXXXXXXXXXX"
+                "HVM64": "ami-0b385b9c219bffb9e"
             },
             "ap-northeast-1": {
-                "HVM64": "ami-XXXXXXXXXXXXXXXXX"
+                "HVM64": "ami-069f47ef9e8860025"
             },
             "ap-northeast-2": {
-                "HVM64": "ami-XXXXXXXXXXXXXXXXX"
+                "HVM64": "ami-0625060302b0a25a9"
             },
             "ap-northeast-3": {
-                "HVM64": "ami-XXXXXXXXXXXXXXXXX"
+                "HVM64": "ami-0ad182d44dbada8bf"
             },
             "ap-south-1": {
-                "HVM64": "ami-XXXXXXXXXXXXXXXXX"
+                "HVM64": "ami-0ef36f4268fdfd19e"
             },
             "ap-southeast-1": {
-                "HVM64": "ami-XXXXXXXXXXXXXXXXX"
+                "HVM64": "ami-09710a2dadbadbc7f"
             },
             "ap-southeast-2": {
-                "HVM64": "ami-XXXXXXXXXXXXXXXXX"
+                "HVM64": "ami-052190ea20426d706"
             },
             "sa-east-1": {
-                "HVM64": "ami-XXXXXXXXXXXXXXXXX"
+                "HVM64": "ami-0b4a6f590daa1e143"
             }
         }
     },
@@ -718,7 +732,7 @@
                                 {
                                     "Ref": "AWS::AccountId"
                                 },
-                                "\" \"\" \"",
+                                "\" \"",
                                 "\" \"",
                                 {
                                     "Fn::GetAtt": [
@@ -741,9 +755,12 @@
                                 {
                                     "Ref": "DeployWaitConditionHandle"
                                 },
-                                "\" \"\" \"",
+                                "\" \"",
+                                {
+                                    "Ref": "EntitledRegistryKey"
+                                },
                                 "\" ",
-                                "\" \"\" \"",
+                                "'",
                                 "' '' '",
                                 "' '",
                                 {
