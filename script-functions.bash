@@ -25,12 +25,14 @@ op_namespaces['kafkas.kafka.strimzi.io']='KAFKA_NAMESPACE'
 
 function getOCS() {
 	check_for_csv_success=$(oc get csv  --all-namespaces | awk -v pattern="$1" '$2 ~ pattern  { print }'  | awk -F' ' '{print $NF}')
-	if [[ $check_for_csv_success != "Succeeded" ]]; then
-		log " ${1} not installed."
+	sc_name=$(oc get sc | grep ocs-storagecluster-cephfs | awk -F' ' '{print $1}')
+	log " OCS StorageClass : $sc_name"
+	if [[ $check_for_csv_success != "Succeeded" && $sc_name = ""  ]]; then
+		log " OCS StorageClass is not available"
 		SCRIPT_STATUS=29
 		return $SCRIPT_STATUS
 	else
-		log " ${1} is installed."
+		log " OCS StorageClass is available"
     fi    
 	
 }
