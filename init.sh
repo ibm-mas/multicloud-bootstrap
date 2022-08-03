@@ -54,11 +54,12 @@ export EXISTING_PUBLIC_SUBNET2_ID=${47}
 export EXISTING_PUBLIC_SUBNET3_ID=${48}
 export PRIVATE_CLUSTER=${49}
 
-if [ -z ${50} ] || [ ${50} == "prod" ]; then
-  export ENV_TYPE="prod"
-else
-  export ENV_TYPE="dev"
-fi
+# if [ -z ${50} ] || [ ${50} == "prod" ]; then
+#  export ENV_TYPE="prod"
+# else
+#  export ENV_TYPE="dev"
+# fi
+export ENV_TYPE=${50}
 
 export GIT_REPO_HOME=$(pwd)
 # Load helper functions
