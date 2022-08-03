@@ -105,8 +105,8 @@ EOT
 fi
 
 # Check for input parameters
-if [[ (-z $CLUSTER_TYPE) || (-z $DEPLOY_REGION) || (-z $ACCOUNT_ID) || (-z $CLUSTER_SIZE) \
-   || (-z $RANDOM_STR) || (-z $BASE_DOMAIN) || (-z $SSH_KEY_NAME) || (-z $DEPLOY_WAIT_HANDLE) ]]; then
+if [[ (-z $CLUSTER_TYPE) || (-z $DEPLOY_REGION) || (-z $ACCOUNT_ID) \
+   || (-z $RANDOM_STR) || (-z $SSH_KEY_NAME) || (-z $DEPLOY_WAIT_HANDLE) ]]; then
   log "ERROR: Required parameter not specified, please provide all the required inputs to the script."
   PRE_VALIDATION=fail
 fi
@@ -400,7 +400,7 @@ if [[ $PRE_VALIDATION == "pass" ]]; then
     export OPENSHIFT_USER_PROVIDE="true"
     export OCP_SERVER="$(echo https://api.${CLUSTER_NAME}.${BASE_DOMAIN}:6443)"
     oc login -u $OCP_USERNAME -p $OCP_PASSWORD --server=$OCP_SERVER --insecure-skip-tls-verify=true
-    
+
     # Perform prerequisite checks
     log "===== PRE-REQUISITE VALIDATION STARTED ====="
 
