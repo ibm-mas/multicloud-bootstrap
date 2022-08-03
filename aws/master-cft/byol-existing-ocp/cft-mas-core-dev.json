@@ -831,7 +831,7 @@
                                     "Ref": "EmailNotification"
                                 },
                                 "' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '",
-                                "' \"prod\" ",
+                                "' \"dev\" ",
                                 "2>&1 | tee mas-provisioning.log; "
                             ]
                         ]
