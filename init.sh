@@ -365,6 +365,7 @@ if [[ $CLUSTER_TYPE == "azure" && $INSTALLATION_MODE == "IPI" ]]; then
   DNS_ZONE=$BASE_DOMAIN
   export BASE_DOMAIN_RG_NAME=`az network dns zone list | jq --arg DNS_ZONE $DNS_ZONE '.[] | select(.name==$DNS_ZONE).resourceGroup' | tr -d '"'`
   log " BASE_DOMAIN_RG_NAME: $BASE_DOMAIN_RG_NAME"
+  export AZURE_TENANT_ID=$TENANT_ID
   
 fi
 
