@@ -23,10 +23,12 @@ if [[ $retcode -eq 29 ]]; then
 	return $retcode
 fi
 
-getOCS ocs-operator
-retcode=$?
-if [[ $retcode -eq 29 ]]; then
-	return $retcode
+if [[ $CLUSTER_TYPE == "aws" ]]; then
+	getOCS ocs-operator
+	retcode=$?
+	if [[ $retcode -eq 29 ]]; then
+		return $retcode
+	fi
 fi
 
 getVersion MongoDBCommunity
