@@ -732,8 +732,7 @@
                                 {
                                     "Ref": "AWS::AccountId"
                                 },
-                                "\" \"",
-                                "\" \"",
+                                "\" \"\" \"",
                                 {
                                     "Fn::GetAtt": [
                                         "CallLambdaRandomizer",
