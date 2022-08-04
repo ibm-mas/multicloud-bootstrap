@@ -1,15 +1,4 @@
 #Starting the script 
-log "==== Install prerequisites ===="
-sudo yum install -y jq
-python3 -m pip install dotmap
-python3 -m pip install yq 
-#Exporting all the env vaiables required 
-#Download and install openshift-install
-wget https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/4.8.46/openshift-install-linux-4.8.46.tar.gz
-tar xzvf openshift-install-linux-4.8.46.tar.gz
-mv openshift-install /usr/local/bin/
-rm -rf ./openshift-install-linux-4.8.46.tar.gz
-#these params can be passed from ARM templates to the script 
 log "===== Setting Environment Variables ====="
 
 export azureRegion=${DEPLOY_REGION}
