@@ -53,14 +53,7 @@ export EXISTING_PUBLIC_SUBNET1_ID=${46}
 export EXISTING_PUBLIC_SUBNET2_ID=${47}
 export EXISTING_PUBLIC_SUBNET3_ID=${48}
 export PRIVATE_CLUSTER=${49}
-
-# if [ -z ${50} ] || [ ${50} == "prod" ]; then
-#  export ENV_TYPE="prod"
-# else
-#  export ENV_TYPE="dev"
-# fi
 export ENV_TYPE=${50}
-
 export GIT_REPO_HOME=$(pwd)
 # Load helper functions
 . helper.sh
@@ -224,6 +217,14 @@ else
    export new_or_existing_vpc_subnet="exist"
    export enable_permission_quota_check=false
 fi
+
+if [[ -z "$EXISTING_NETWORK" && $CLUSTER_TYPE == "azure" ]]; then
+  export INSTALLATION_MODE="IPI"
+else
+  export INSTALLATION_MODE="UPI"
+fi
+log "==== INSTALLATION MODE: ${INSTALLATION_MODE}"
+
 RESP_CODE=0
 
 # Export env variables which are not set by default during userdata execution
@@ -293,6 +294,8 @@ log " SELLER_SUBSCRIPTION_ID=$SELLER_SUBSCRIPTION_ID"
 log " TENANT_ID=$TENANT_ID"
 log " EMAIL_NOTIFICATION: $EMAIL_NOTIFICATION"
 log " EXISTING_NETWORK=$EXISTING_NETWORK"
+log " EXISTING_NETWORK_RG=$EXISTING_NETWORK_RG"
+log " ENV_TYPE=$ENV_TYPE"
 log " EXISTING_PRIVATE_SUBNET1_ID=$EXISTING_PRIVATE_SUBNET1_ID"
 log " EXISTING_PRIVATE_SUBNET2_ID=$EXISTING_PRIVATE_SUBNET2_ID"
 log " EXISTING_PRIVATE_SUBNET3_ID=$EXISTING_PRIVATE_SUBNET3_ID"
@@ -335,19 +338,35 @@ export DEPLOY_MANAGE=$(echo $DEPLOY_MANAGE | cut -d '=' -f 2)
 log " DEPLOY_CP4D: $DEPLOY_CP4D"
 log " DEPLOY_MANAGE: $DEPLOY_MANAGE"
 
-
-
-
-if [[ $CLUSTER_TYPE == "azure" ]]; then
-  # Perform az login for accessing blob storage
-  az login --identity
+if [[ $CLUSTER_TYPE == "azure" && $INSTALLATION_MODE == "UPI" ]]; then
+  # Perform az login
+  az login --service-principal -u ${AZURE_SP_CLIENT_ID} -p ${AZURE_SP_CLIENT_PWD} --tenant ${TENANT_ID}
   az resource list -n masocp-${RANDOM_STR}-bootnode-vm
 
   # Get subscription ID, tenant ID
   export AZURE_SUBSC_ID=`az account list | jq -r '.[].id'`
   log " AZURE_SUBSC_ID: $AZURE_SUBSC_ID"
-  export AZURE_TENANT_ID=`az account list | jq -r '.[].tenantId'`
-  log " AZURE_TENANT_ID: $AZURE_TENANT_ID"
+  DNS_ZONE=$BASE_DOMAIN
+  export BASE_DOMAIN_RG_NAME=`az network dns zone list | jq --arg DNS_ZONE $DNS_ZONE '.[] | select(.name==$DNS_ZONE).resourceGroup' | tr -d '"'`
+  log " BASE_DOMAIN_RG_NAME: $BASE_DOMAIN_RG_NAME"
+  VNET_NAME=$EXISTING_NETWORK
+  export EXISTING_NETWORK_RG=`az network vnet list | jq --arg VNET_NAME $VNET_NAME '.[] | select(.name==$VNET_NAME).resourceGroup' | tr -d '"'`
+  log " EXISTING_NETWORK_RG: $EXISTING_NETWORK_RG"
+fi
+
+if [[ $CLUSTER_TYPE == "azure" && $INSTALLATION_MODE == "IPI" ]]; then
+  # Perform az login for accessing blob storage
+  az login --service-principal -u ${AZURE_SP_CLIENT_ID} -p ${AZURE_SP_CLIENT_PWD} --tenant ${TENANT_ID}
+  az resource list -n masocp-${RANDOM_STR}-bootnode-vm
+
+  # Get subscription ID, tenant ID
+  export AZURE_SUBSC_ID=`az account list | jq -r '.[].id'`
+  log " AZURE_SUBSC_ID: $AZURE_SUBSC_ID"
+  DNS_ZONE=$BASE_DOMAIN
+  export BASE_DOMAIN_RG_NAME=`az network dns zone list | jq --arg DNS_ZONE $DNS_ZONE '.[] | select(.name==$DNS_ZONE).resourceGroup' | tr -d '"'`
+  log " BASE_DOMAIN_RG_NAME: $BASE_DOMAIN_RG_NAME"
+  export AZURE_TENANT_ID=$TENANT_ID
+  
 fi
 
 cd $GIT_REPO_HOME
