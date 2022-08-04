@@ -881,7 +881,7 @@
                                     "Ref": "PrivateCluster"
                                 },
                                 "' '",
-                                "' \"prod\" ",
+                                "' \"dev\" ",
                                 "2>&1 | tee mas-provisioning.log; "
                             ]
                         ]

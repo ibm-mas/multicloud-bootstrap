@@ -21,17 +21,6 @@
             "Type": "String",
             "MinLength": "1"
         },
-        "ClusterSize": {
-            "Description": "Select your preferred cluster size. All master nodes (M) are m5.2xlarge Amazon EC2 instances. All worker nodes (W) are m5.4xlarge instances. Choose from: small (3M, 3W, total memory: 288GB), medium (3M, 5W, total memory: 416GB), or large (5M, 7W, total memory: 608GB).",
-            "Type": "String",
-            "Default": "small",
-            "MinLength": "1",
-            "AllowedValues": [
-                "small",
-                "medium",
-                "large"
-            ]
-        },
         "OpenShiftClusterApiUrl": {
             "Description": "Enter the cluster's URL in the format https://api.<cluster_name>.<domain_name>. Do not specify the port number. For example,https://api.masocp.joalae.mas4aws.com",
             "Type": "String"
@@ -51,10 +40,9 @@
             "NoEcho": true,
             "MinLength": "1"
         },
-        "OpenShiftPullSecret": {
-            "Description": "Enter the JSON text from the pull secret file that you downloaded from the Red Hat Hybrid Cloud Console.",
+        "MASLicenseUrl": {
+            "Description": "Enter the HTTP or S3 location of your Suite license key file, for example: s3://masocp-license/entitlement.lic",
             "Type": "String",
-            "NoEcho": true,
             "MinLength": "1"
         },
         "MASManageDBUser": {
@@ -134,7 +122,7 @@
                 },
                 {
                     "Label": {
-                        "default": "Existing OpenShift cluster connection details (complete this section only if you want to reuse an existing cluster)"
+                        "default": "Existing OpenShift cluster connection details (you must complete this section)"
                     },
                     "Parameters": [
                         "OpenShiftClusterApiUrl",
@@ -144,11 +132,10 @@
                 },
                 {
                     "Label": {
-                        "default": "New OpenShift cluster configuration details (complete this section only if you want to create a new cluster)"
+                        "default": "Existing OpenShift cluster configuration details (you must complete this section)"
                     },
                     "Parameters": [
-                        "PublicHostedZone",
-                        "ClusterSize"
+                        "PublicHostedZone"
                     ]
                 },
                 {
@@ -166,7 +153,7 @@
                     },
                     "Parameters": [
                         "EntitledRegistryKey",
-                        "OpenShiftPullSecret"
+                        "MASLicenseUrl"
                     ]
                 },
                 {
@@ -262,28 +249,6 @@
             "sa-east-1": {
                 "HVM64": "ami-037608508e4c078cd"
             }
-        }
-    },
-    "Conditions": {
-        "NoExistingOCPCluster": {
-            "Fn::Equals": [
-                {
-                    "Ref": "OpenShiftClusterApiUrl"
-                },
-                ""
-            ]
-        },
-        "ExistingOCPCluster": {
-            "Fn::Not": [
-                {
-                    "Fn::Equals": [
-                        {
-                            "Ref": "OpenShiftClusterApiUrl"
-                        },
-                        ""
-                    ]
-                }
-            ]
         }
     },
     "Resources": {
@@ -436,8 +401,7 @@
                                         "logs:CreateLogGroup",
                                         "logs:CreateLogStream",
                                         "logs:PutLogEvents",
-                                        "logs:DescribeLogStreams",
-                                        "secretsmanager:CreateSecret"
+                                        "logs:DescribeLogStreams"
                                     ],
                                     "Resource": "*"
                                 }
@@ -758,7 +722,7 @@
                                 "git clone https://github.com/ibm-mas/ansible-devops.git;",
                                 "cd ansible-devops;",
                                 "rm -rf multicloud-bootstrap 1>/dev/null 2>&1;",
-                                "git clone -b aws-paid https://github.com/ibm-mas/multicloud-bootstrap.git;",
+                                "git clone https://github.com/ibm-mas/multicloud-bootstrap.git;",
                                 "cd multicloud-bootstrap;",
                                 "find . -type f -name \"*.sh\" -exec chmod +x {} \\;;",
                                 "./init.sh \"aws\" \"",
@@ -774,9 +738,6 @@
                                     "Ref": "AWS::AccountId"
                                 },
                                 "\" \"",
-                                {
-                                    "Ref": "ClusterSize"
-                                },
                                 "\" \"",
                                 {
                                     "Fn::GetAtt": [
@@ -805,10 +766,11 @@
                                 },
                                 "\" ",
                                 "'",
+                                "' '",
                                 {
-                                    "Ref": "OpenShiftPullSecret"
+                                    "Ref": "MASLicenseUrl"
                                 },
-                                "' '' '",
+                                "' '",
                                 {
                                     "Ref": "SLSEndpointUrl"
                                 },
@@ -911,104 +873,10 @@
     "Outputs": {
         "MASCloudAutomationVersion": {
             "Description": "Version of the MAS automated deployment on Cloud",
-            "Value": "1.0"
-        },
-        "ClusterUniqueString": {
-            "Description": "Unique string that is part of cluster resoutce names",
-            "Value": {
-                "Fn::GetAtt": [
-                    "CallLambdaRandomizer",
-                    "Lower_RandomString"
-                ]
-            }
-        },
-        "OpenShiftConsoleUrl": {
-            "Description": "Url to login to OpenShift console",
-            "Condition": "NoExistingOCPCluster",
-            "Value": {
-                "Fn::Join": [
-                    "",
-                    [
-                        "https://console-openshift-console.apps.masocp-",
-                        {
-                            "Fn::GetAtt": [
-                                "CallLambdaRandomizer",
-                                "Lower_RandomString"
-                            ]
-                        },
-                        ".",
-                        {
-                            "Fn::GetAtt": [
-                                "CallLambdaGetHostedZoneName",
-                                "ZoneName"
-                            ]
-                        }
-                    ]
-                ]
-            }
-        },
-        "OpenShiftApiUrl": {
-            "Description": "Url to login to OpenShift Api",
-            "Condition": "NoExistingOCPCluster",
-            "Value": {
-                "Fn::Join": [
-                    "",
-                    [
-                        "https://api.masocp-",
-                        {
-                            "Fn::GetAtt": [
-                                "CallLambdaRandomizer",
-                                "Lower_RandomString"
-                            ]
-                        },
-                        ".",
-                        {
-                            "Fn::GetAtt": [
-                                "CallLambdaGetHostedZoneName",
-                                "ZoneName"
-                            ]
-                        },
-                        ":6443"
-                    ]
-                ]
-            }
-        },
-        "MASInitialSetupUrl": {
-            "Description": "Url to perform MAS initial setup, make sure you have imported the MAS public certificate into the browser",
-            "Condition": "NoExistingOCPCluster",
-            "Value": {
-                "Fn::Join": [
-                    "",
-                    [
-                        "https://admin.mas-",
-                        {
-                            "Fn::GetAtt": [
-                                "CallLambdaRandomizer",
-                                "Lower_RandomString"
-                            ]
-                        },
-                        ".apps.masocp-",
-                        {
-                            "Fn::GetAtt": [
-                                "CallLambdaRandomizer",
-                                "Lower_RandomString"
-                            ]
-                        },
-                        ".",
-                        {
-                            "Fn::GetAtt": [
-                                "CallLambdaGetHostedZoneName",
-                                "ZoneName"
-                            ]
-                        },
-                        "/initialsetup"
-                    ]
-                ]
-            }
+            "Value": "2.0-alpha.1"
         },
         "MASInitialSetupUrlLogin": {
             "Description": "Url to perform MAS initial setup, make sure you have imported the MAS public certificate into the browser",
-            "Condition": "ExistingOCPCluster",
             "Value": {
                 "Fn::Join": [
                     "",
@@ -1033,45 +901,12 @@
                             ]
                         },
                         "/initialsetup"
-                    ]
-                ]
-            }
-        },
-        "MASAdminUrl": {
-            "Description": "Url to login to MAS Admin UI, make sure you have imported the MAS public certificate into the browser",
-            "Condition": "NoExistingOCPCluster",
-            "Value": {
-                "Fn::Join": [
-                    "",
-                    [
-                        "https://admin.mas-",
-                        {
-                            "Fn::GetAtt": [
-                                "CallLambdaRandomizer",
-                                "Lower_RandomString"
-                            ]
-                        },
-                        ".apps.masocp-",
-                        {
-                            "Fn::GetAtt": [
-                                "CallLambdaRandomizer",
-                                "Lower_RandomString"
-                            ]
-                        },
-                        ".",
-                        {
-                            "Fn::GetAtt": [
-                                "CallLambdaGetHostedZoneName",
-                                "ZoneName"
-                            ]
-                        }
                     ]
                 ]
             }
         },
         "MASAdminUrlLogin": {
             "Description": "Url to login to MAS Admin UI, make sure you have imported the MAS public certificate into the browser",
-            "Condition": "ExistingOCPCluster",
             "Value": {
                 "Fn::Join": [
                     "",
@@ -1093,38 +928,6 @@
                                         {"Ref": "OpenShiftClusterApiUrl"}
                                     ]
                                 }
-                            ]
-                        }
-                    ]
-                ]
-            }
-        },
-        "MASWorkspaceUrl": {
-            "Description": "Url to login to MAS Workspace, make sure you have imported the MAS public certificate into the browser",
-            "Condition": "NoExistingOCPCluster",
-            "Value": {
-                "Fn::Join": [
-                    "",
-                    [
-                        "https://wsmasocp.home.mas-",
-                        {
-                            "Fn::GetAtt": [
-                                "CallLambdaRandomizer",
-                                "Lower_RandomString"
-                            ]
-                        },
-                        ".apps.masocp-",
-                        {
-                            "Fn::GetAtt": [
-                                "CallLambdaRandomizer",
-                                "Lower_RandomString"
-                            ]
-                        },
-                        ".",
-                        {
-                            "Fn::GetAtt": [
-                                "CallLambdaGetHostedZoneName",
-                                "ZoneName"
                             ]
                         }
                     ]
@@ -1133,7 +936,6 @@
         },
         "MASWorkspaceUrlLogin": {
             "Description": "Url to login to MAS Workspace, make sure you have imported the MAS public certificate into the browser",
-            "Condition": "ExistingOCPCluster",
             "Value": {
                 "Fn::Join": [
                     "",
