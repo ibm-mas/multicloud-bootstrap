@@ -60,9 +60,6 @@ variable "aws_amis" {
     "eu-north-1": {
         "hvm": "ami-0791daa430c70ff09"
     },
-    "eu-south-1": {
-        "hvm": "ami-093ccc9e024810fc8"
-    },
     "eu-west-1": {
         "hvm": "ami-07323d56fb932c84c"
     },

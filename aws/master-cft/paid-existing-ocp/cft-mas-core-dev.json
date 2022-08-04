@@ -732,7 +732,8 @@
                                 {
                                     "Ref": "AWS::AccountId"
                                 },
-                                "\" \"\" \"",
+                                "\" \"",
+                                "\" \"",
                                 {
                                     "Fn::GetAtt": [
                                         "CallLambdaRandomizer",
@@ -758,7 +759,9 @@
                                 {
                                     "Ref": "EntitledRegistryKey"
                                 },
-                                "\" \"\" \"\" \"",
+                                "\" ",
+                                "'",
+                                "' '' '",
                                 {
                                     "Ref": "SLSEndpointUrl"
                                 },
