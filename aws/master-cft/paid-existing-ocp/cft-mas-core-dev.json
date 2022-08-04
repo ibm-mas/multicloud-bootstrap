@@ -759,7 +759,8 @@
                                 {
                                     "Ref": "EntitledRegistryKey"
                                 },
-                                "' '' '' '",
+                                "\" \"\" \"",
+                                "\" \"\" \"",
                                 {
                                     "Ref": "SLSEndpointUrl"
                                 },
