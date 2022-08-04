@@ -45,13 +45,6 @@
         "metadata": {
           "description": "Provide the public App Service domain that you created in the App Service Domains, for example: mas4aws.myorg.com"
         },
-        "defaultValue": "mas4azuredev.com"
-      },
-      "publicDomainResourceGroup": {
-        "type": "string",
-        "metadata": {
-          "description": "Provide the name of the resource group where public App Service domain is created"
-        },
         "defaultValue": ""
       },
       "bootnodeSGIngressCidrIp": {
@@ -73,7 +66,6 @@
           "large"
         ]
       },
-      
       "entitledRegistryKey": {
         "type": "secureString",
         "defaultValue": "",
@@ -219,13 +211,6 @@
         "type": "string",
         "metadata": {
           "description": "Vnet name used while creating network resources"
-        },
-        "defaultValue": ""
-      },
-      "openShiftVnetResourceGroup": {
-        "type": "string",
-        "metadata": {
-          "description": "Resource Group name where exising network resources are present."
         },
         "defaultValue": ""
       },
@@ -463,8 +448,7 @@
         "type": "Microsoft.Compute/virtualMachines",
         "apiVersion": "2021-11-01",
         "name": "[variables('vmName')]",
-        "location": "[parameters('location')]",
-        
+        "location": "[parameters('location')]",        
         "dependsOn": [
           "[resourceId('Microsoft.Network/networkInterfaces', variables('networkInterfaceName'))]"
         ],
@@ -529,7 +513,7 @@
               "typeHandlerVersion": "2.0",
               "autoUpgradeMinorVersion": true,
               "protectedSettings": {
-                "commandToExecute": "[concat('sleep 60;', 'cd /root/ansible-devops/multicloud-bootstrap;', './init-async.sh azure ''', parameters('offeringType'), ''' ''', parameters('location'), ''' null ''', parameters('clusterSize'), ''' ''', variables('projectName'), ''' ''', parameters('publicDomain'), ''' ''', parameters('publicDomainResourceGroup'), ''' ''', parameters('sshPublicKey'), ''' null ''', parameters('entitledRegistryKey'), ''' ''', parameters('openShiftPullSecret'), ''' ''', parameters('masLicenseUrl'), ''' ''', parameters('slsEndpointUrl'), ''' ''', parameters('slsRegistrationKey'), ''' ''', parameters('slsPublicCertificateUrl'), ''' ''', parameters('udsEndpointUrl'), ''' ''', parameters('udsAPIKey'), ''' ''', parameters('udsPublicCertificateUrl'), ''' ''', parameters('masManageDBUser'), ''' ''', parameters('masManageDBPassword'), ''' ''', parameters('masManageDBJdbcUrl'), ''' ''', parameters('masManageDBCertificateUrl'), ''' ''', parameters('importDemoData'), ''' '''' '''' '''' ''', variables('rgName'), ''' ''', parameters('emailNotification'), ''' ''', parameters('notificattionEmailAddress'), ''' ''', parameters('smtpHost'), ''' ''', parameters('smtpPort'), ''' ''', parameters('smtpUsername'), ''' ''', parameters('smtpPassword'), ''' ''', parameters('azureServicePrincipalClientId'), ''' ''', parameters('azureServicePrincipalClientSecret'), ''' ''', variables('seller_subscription_id'), ''' ''', parameters('azureServicePrincipalTenantId'), ''' null null ''', parameters('openShiftClustervnetId'), ''' ''', parameters('openShiftVnetResourceGroup'), ''' null null null null null null null prod ''', ''' > mas-provisioning.log 2>&1;')]"
+                "commandToExecute": "[concat('sleep 60;', 'cd /root/ansible-devops/multicloud-bootstrap;', './init-async.sh azure ''', parameters('offeringType'), ''' ''', parameters('location'), ''' null ''', parameters('clusterSize'), ''' ''', variables('projectName'), ''' ''', parameters('publicDomain'), ''' null ''', parameters('sshPublicKey'), ''' null ''', parameters('entitledRegistryKey'), ''' ''', parameters('openShiftPullSecret'), ''' ''', parameters('masLicenseUrl'), ''' ''', parameters('slsEndpointUrl'), ''' ''', parameters('slsRegistrationKey'), ''' ''', parameters('slsPublicCertificateUrl'), ''' ''', parameters('udsEndpointUrl'), ''' ''', parameters('udsAPIKey'), ''' ''', parameters('udsPublicCertificateUrl'), ''' ''', parameters('masManageDBUser'), ''' ''', parameters('masManageDBPassword'), ''' ''', parameters('masManageDBJdbcUrl'), ''' ''', parameters('masManageDBCertificateUrl'), ''' ''', parameters('importDemoData'), ''' '''' '''' '''' ''', variables('rgName'), ''' ''', parameters('emailNotification'), ''' ''', parameters('notificattionEmailAddress'), ''' ''', parameters('smtpHost'), ''' ''', parameters('smtpPort'), ''' ''', parameters('smtpUsername'), ''' ''', parameters('smtpPassword'), ''' ''', parameters('azureServicePrincipalClientId'), ''' ''', parameters('azureServicePrincipalClientSecret'), ''' ''', variables('seller_subscription_id'), ''' ''', parameters('azureServicePrincipalTenantId'), ''' null null ''', parameters('openShiftClustervnetId'), ''' null null null null null null null null prod ''', ''' > mas-provisioning.log 2>&1;')]"
               }
             }
           }
@@ -573,7 +557,7 @@
       },
       {
         "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
-        "apiVersion": "2021-06-01",
+        "apiVersion": "2021-09-01",
         "name": "[concat(variables('storageaccountName'), '/default/masocpcontainer')]",
         "dependsOn": [
           "[resourceId('Microsoft.Storage/storageAccounts', variables('storageaccountName'))]"
