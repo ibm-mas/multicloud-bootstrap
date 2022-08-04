@@ -356,14 +356,16 @@ fi
 
 if [[ $CLUSTER_TYPE == "azure" && $INSTALLATION_MODE == "IPI" ]]; then
   # Perform az login for accessing blob storage
-  az login --identity
+  az login --service-principal -u ${AZURE_SP_CLIENT_ID} -p ${AZURE_SP_CLIENT_PWD} --tenant ${TENANT_ID}
   az resource list -n masocp-${RANDOM_STR}-bootnode-vm
 
   # Get subscription ID, tenant ID
   export AZURE_SUBSC_ID=`az account list | jq -r '.[].id'`
   log " AZURE_SUBSC_ID: $AZURE_SUBSC_ID"
-  export AZURE_TENANT_ID=`az account list | jq -r '.[].tenantId'`
-  log " AZURE_TENANT_ID: $AZURE_TENANT_ID"
+  DNS_ZONE=$BASE_DOMAIN
+  export BASE_DOMAIN_RG_NAME=`az network dns zone list | jq --arg DNS_ZONE $DNS_ZONE '.[] | select(.name==$DNS_ZONE).resourceGroup' | tr -d '"'`
+  log " BASE_DOMAIN_RG_NAME: $BASE_DOMAIN_RG_NAME"
+  
 fi
 
 cd $GIT_REPO_HOME

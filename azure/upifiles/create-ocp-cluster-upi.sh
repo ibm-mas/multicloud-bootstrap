@@ -313,4 +313,4 @@ echo $result
 sleep 10m
 oc login https://api.${CLUSTER_NAME}.${BASE_DOMAIN}:6443 -u $OCP_USERNAME -p $OCP_PASSWORD --insecure-skip-tls-verify=true
 
-log "==== Openshift Username and Password : $OCP_USERNAME , $OCP_PASSWORD ===="
+log "==== Openshift User $OCP_USERNAME created ===="
