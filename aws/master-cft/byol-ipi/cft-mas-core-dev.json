@@ -235,9 +235,6 @@
             "eu-north-1": {
                 "HVM64": "ami-023d4dfcbd33ca27f"
             },
-            "eu-south-1": {
-                "HVM64": "ami-06c78840eda1c6464"
-            },
             "eu-west-1": {
                 "HVM64": "ami-0a821a5026741f9ab"
             },
