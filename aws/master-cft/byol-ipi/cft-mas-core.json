@@ -31,19 +31,7 @@
                 "medium",
                 "large"
             ]
-        },
-        "OpenShiftClusterApiUrl": {
-            "Description": "Enter the cluster's URL in the format https://api.<cluster_name>.<domain_name>. Do not specify the port number. For example,https://api.masocp.joalae.mas4aws.com",
-            "Type": "String"
-        },
-        "OpenShiftUser": {
-            "Description": "Enter the username of the existing cluster account.",
-            "Type": "String"
-        },
-        "OpenShiftPassword": {
-            "Description": "Enter the password of the existing cluster account.",
-            "Type": "String",
-            "NoEcho": true
+ 
         },
         "EntitledRegistryKey": {
             "Description": "Enter the registry key that you downloaded from the IBM Container Library.",
@@ -137,16 +125,7 @@
                         "OfferingType"
                     ]
                 },
-                {
-                    "Label": {
-                        "default": "Existing OpenShift cluster connection details (complete this section only if you want to reuse an existing cluster)"
-                    },
-                    "Parameters": [
-                        "OpenShiftClusterApiUrl",
-                        "OpenShiftUser",
-                        "OpenShiftPassword"
-                    ]
-                },
+               
                 {
                     "Label": {
                         "default": "New OpenShift cluster configuration details (complete this section only if you want to create a new cluster)"
@@ -235,9 +214,6 @@
             "eu-north-1": {
                 "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
-            "eu-south-1": {
-                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
-            },
             "eu-west-1": {
                 "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
@@ -259,9 +235,6 @@
             "ap-northeast-3": {
                 "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
-            "ap-south-1": {
-                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
-            },
             "ap-southeast-1": {
                 "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
@@ -271,28 +244,7 @@
             "sa-east-1": {
                 "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             }
-        }
-    },
-    "Conditions": {
-        "NoExistingOCPCluster": {
-            "Fn::Equals": [
-                {
-                    "Ref": "OpenShiftClusterApiUrl"
-                },
-                ""
-            ]
-        },
-        "ExistingOCPCluster": {
-            "Fn::Not": [
-                {
-                    "Fn::Equals": [
-                        {
-                            "Ref": "OpenShiftClusterApiUrl"
-                        },
-                        ""
-                    ]
-                }
-            ]
+        
         }
     },
     "Resources": {
@@ -766,7 +718,7 @@
                                 "git clone https://github.com/ibm-mas/ansible-devops.git;",
                                 "cd ansible-devops;",
                                 "rm -rf multicloud-bootstrap 1>/dev/null 2>&1;",
-                                "git clone -b main https://github.com/ibm-mas/multicloud-bootstrap.git;",
+                                "git clone https://github.com/ibm-mas/multicloud-bootstrap.git;",
                                 "cd multicloud-bootstrap;",
                                 "find . -type f -name \"*.sh\" -exec chmod +x {} \\;;",
                                 "./init.sh \"aws\" \"",
@@ -864,23 +816,12 @@
                                 {
                                     "Ref": "ImportDemoData"
                                 },
-                                "' '",
-                                {
-                                    "Ref": "OpenShiftClusterApiUrl"
-                                },
-                                "' '",
-                                {
-                                    "Ref": "OpenShiftUser"
-                                },
-                                "' '",
-                                {
-                                    "Ref": "OpenShiftPassword"
-                                },
-                                "' '' '",
+                                "' '' '' '' '' '",
+
                                 {
                                     "Ref": "EmailNotification"
                                 },
-                                "' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '",
+                                "' '' '' '' '' '' '' '' '' '' '' '' '",
                                 "' \"prod\" ",
                                 "2>&1 | tee mas-provisioning.log; "
                             ]
@@ -936,7 +877,7 @@
         },
         "OpenShiftConsoleUrl": {
             "Description": "Url to login to OpenShift console",
-            "Condition": "NoExistingOCPCluster",
+            
             "Value": {
                 "Fn::Join": [
                     "",
@@ -961,7 +902,7 @@
         },
         "OpenShiftApiUrl": {
             "Description": "Url to login to OpenShift Api",
-            "Condition": "NoExistingOCPCluster",
+            
             "Value": {
                 "Fn::Join": [
                     "",
@@ -987,7 +928,7 @@
         },
         "MASInitialSetupUrl": {
             "Description": "Url to perform MAS initial setup, make sure you have imported the MAS public certificate into the browser",
-            "Condition": "NoExistingOCPCluster",
+            
             "Value": {
                 "Fn::Join": [
                     "",
@@ -1020,7 +961,7 @@
         },
         "MASInitialSetupUrlLogin": {
             "Description": "Url to perform MAS initial setup, make sure you have imported the MAS public certificate into the browser",
-            "Condition": "ExistingOCPCluster",
+            
             "Value": {
                 "Fn::Join": [
                     "",
@@ -1033,17 +974,7 @@
                             ]
                         },
                         ".apps.",
-                        {
-                            "Fn::Select": [
-                                "1",
-                                {
-                                    "Fn::Split": [
-                                        "api.",
-                                        {"Ref": "OpenShiftClusterApiUrl"}
-                                    ]
-                                }
-                            ]
-                        },
+                        
                         "/initialsetup"
                     ]
                 ]
@@ -1051,7 +982,7 @@
         },
         "MASAdminUrl": {
             "Description": "Url to login to MAS Admin UI, make sure you have imported the MAS public certificate into the browser",
-            "Condition": "NoExistingOCPCluster",
+            
             "Value": {
                 "Fn::Join": [
                     "",
@@ -1083,7 +1014,7 @@
         },
         "MASAdminUrlLogin": {
             "Description": "Url to login to MAS Admin UI, make sure you have imported the MAS public certificate into the browser",
-            "Condition": "ExistingOCPCluster",
+            
             "Value": {
                 "Fn::Join": [
                     "",
@@ -1095,25 +1026,15 @@
                                 "Lower_RandomString"
                             ]
                         },
-                        ".apps.",
-                        {
-                            "Fn::Select": [
-                                "1",
-                                {
-                                    "Fn::Split": [
-                                        "api.",
-                                        {"Ref": "OpenShiftClusterApiUrl"}
-                                    ]
-                                }
-                            ]
-                        }
+                        ".apps."
+                        
                     ]
                 ]
             }
         },
         "MASWorkspaceUrl": {
             "Description": "Url to login to MAS Workspace, make sure you have imported the MAS public certificate into the browser",
-            "Condition": "NoExistingOCPCluster",
+            
             "Value": {
                 "Fn::Join": [
                     "",
@@ -1145,7 +1066,7 @@
         },
         "MASWorkspaceUrlLogin": {
             "Description": "Url to login to MAS Workspace, make sure you have imported the MAS public certificate into the browser",
-            "Condition": "ExistingOCPCluster",
+            
             "Value": {
                 "Fn::Join": [
                     "",
@@ -1157,18 +1078,7 @@
                                 "Lower_RandomString"
                             ]
                         },
-                        ".apps.",
-                        {
-                            "Fn::Select": [
-                                "1",
-                                {
-                                    "Fn::Split": [
-                                        "api.",
-                                        {"Ref": "OpenShiftClusterApiUrl"}
-                                    ]
-                                }
-                            ]
-                        }
+                        ".apps."
                     ]
                 ]
             }
