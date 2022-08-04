@@ -83,19 +83,6 @@
                 "label": "Application Settings",
                 "elements": [
                     {
-                        "name": "publicDomain",
-                        "type": "Microsoft.Common.TextBox",
-                        "label": "Public domain",
-                        "defaultValue": "",
-                        "toolTip": "Public hosted zone to use. e.g. mydomain.myorg.com (Applicable only if a new OCP cluster is being created)",
-                        "constraints": {
-                            "required": "[empty(steps('ExistingInfrastructure').openShiftClusterApiUrl)]",
-                            "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
-                            "validationMessage": "Contain letters, numbers and special characters only."
-                        },
-                        "visible": true
-                    },
-                    {
                         "name": "offeringType",
                         "type": "Microsoft.Common.DropDown",
                         "label": "Offering type",
@@ -110,31 +97,6 @@
                                 {
                                     "label": "MAS Core + Manage (no Cloud Pak for Data)",
                                     "value": "MAS Core + Manage (no Cloud Pak for Data)"
-                                }
-                            ],
-                            "required": true
-                        },
-                        "visible": true
-                    },
-                    {
-                        "name": "clusterSize",
-                        "type": "Microsoft.Common.DropDown",
-                        "label": "Cluster size",
-                        "defaultValue": "small",
-                        "toolTip": "OCP cluster size. (small-3M,3W,3S medium-3M,5W,3S large-5M,7W,3S) (M-m5.2xlarge W-m5.4xlarge S-m5.4xlarge)",
-                        "constraints": {
-                            "allowedValues": [
-                                {
-                                    "label": "small",
-                                    "value": "small"
-                                },
-                                {
-                                    "label": "medium",
-                                    "value": "medium"
-                                },
-                                {
-                                    "label": "large",
-                                    "value": "large"
                                 }
                             ],
                             "required": true
@@ -158,22 +120,6 @@
                         "visible": true
                     },
                     {
-                        "name": "openShiftPullSecret",
-                        "type": "Microsoft.Common.PasswordBox",
-                        "label": {
-                            "password": "OpenShift pull secret",
-                            "confirmPassword": "Confirm OpenShift pull secret"
-                        },
-                        "toolTip": "OpenShift Pull secret to download operator images. JSON string can be pasted as is.",
-                        "constraints": {
-                            "required": "[empty(steps('ExistingInfrastructure').openShiftClusterApiUrl)]"
-                        },
-                        "options": {
-                            "hideConfirmation": false
-                        },
-                        "visible": true
-                    },
-                    {
                         "name": "masLicenseUrl",
                         "type": "Microsoft.Common.TextBox",
                         "label": "MAS license URL",
@@ -189,39 +135,6 @@
                 ]
             },
             {
-                "name": "ExistingNetworkInfrastructure",
-                "label": "Existing Network Infrastructure",
-                "elements": [
-                    {
-                        "name": "openShiftClustervnetId",
-                        "type": "Microsoft.Common.TextBox",
-                        "label": "VNET Name",
-                        "defaultValue": "",
-                        "toolTip": "Vnet name eg.masocp-vnet",
-                        "constraints": {
-                            "required": true,
-                            "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
-                            "validationMessage": "Contain lowercase letters only."
-                        },
-                        "visible": true
-                    },
-                    {
-                        "name": "openShiftVnetResourceGroup",
-                        "type": "Microsoft.Common.TextBox",
-                        "label": "Existing network resource group name",
-                        "defaultValue": "",
-                        "toolTip": "Resource Group name where exising network resources are present.",
-                        "constraints": {
-                            "required": false,
-                            "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
-                            "validationMessage": "Contain letters, numbers and special characters only."
-                        },
-                        "visible": true
-                    }
-                    
-                ]
-            },
-            {
                 "name": "ExistingInfrastructure",
                 "label": "Existing Infrastructure",
                 "elements": [
@@ -232,7 +145,7 @@
                         "defaultValue": "",
                         "toolTip": "Existing OCP cluster URL in the format https://api.[clustername].[domain]. Do not specify port number, 6443 will be used. e.g. https://api.masocp-joalae.mydomain.myorg.com",
                         "constraints": {
-                            "required": "[or(not(empty(steps('ExistingInfrastructure').openShiftUser)), not(empty(steps('ExistingInfrastructure').openShiftPwd)))]",
+                            "required": true,
                             "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
                             "validationMessage": "Contain letters, numbers and special characters only."
                         },
@@ -245,7 +158,7 @@
                         "defaultValue": "",
                         "toolTip": "Username to access existing OCP cluster.",
                         "constraints": {
-                            "required": "[or(not(empty(steps('ExistingInfrastructure').openShiftClusterApiUrl)), not(empty(steps('ExistingInfrastructure').openShiftPwd)))]",
+                            "required": true,
                             "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
                             "validationMessage": "Contain letters, numbers and special characters only."
                         },
@@ -263,7 +176,7 @@
                             "hideConfirmation": false
                         },
                         "constraints": {
-                            "required": "[or(not(empty(steps('ExistingInfrastructure').openShiftClusterApiUrl)), not(empty(steps('ExistingInfrastructure').openShiftUser)))]"
+                            "required": true
                         },
                         "visible": true
                     },
@@ -533,17 +446,11 @@
 
 
 
-            "publicDomain": "[steps('ApplicationSettings').publicDomain]",
-            "publicDomainResourceGroup": "[steps('ApplicationSettings').publicDomainResourceGroup]",
             "offeringType": "[steps('ApplicationSettings').offeringType]",
-            "clusterSize": "[steps('ApplicationSettings').clusterSize]",
             "entitledRegistryKey": "[steps('ApplicationSettings').entitledRegistryKey]",
-            "openShiftPullSecret": "[steps('ApplicationSettings').openShiftPullSecret]",
             "masLicenseUrl": "[steps('ApplicationSettings').masLicenseUrl]",
 
-            "openShiftClustervnetId": "[steps('ExistingNetworkInfrastructure').openShiftClustervnetId]",
-            "openShiftVnetResourceGroup": "[steps('ExistingNetworkInfrastructure').openShiftVnetResourceGroup]",
-
+            
             "openShiftClusterApiUrl": "[steps('ExistingInfrastructure').openShiftClusterApiUrl]",
             "openShiftUser": "[steps('ExistingInfrastructure').openShiftUser]",
             "openShiftPwd": "[steps('ExistingInfrastructure').openShiftPwd]",

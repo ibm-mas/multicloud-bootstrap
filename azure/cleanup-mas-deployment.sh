@@ -117,10 +117,17 @@ fi
 echo "UNIQ_STR: $UNIQ_STR"
 if [[ ($UNIQ_STR == "null") || (-z $UNIQ_STR) ]]; then
   echo "Could not retrieve the unique string from the resource group. Could not find output param 'clusterUniqueString' in the deployment within resource group."
-  echo "Skipping the deletion of OCP cluster resource group, will continue to delete the bootnode resource group"
+  echo "Skipping the deletion of OCP cluster resources, will continue to delete the bootnode resource group"
 else
   # Get the OCP cluster resource group name
-  OCP_CLUSTER_RG_NAME=$(az group list | jq ".[] | select(.name | contains(\"masocp-$UNIQ_STR\")).name" | tr -d '"')
+  if [[ $INSTALL_MODE == "IPI" ]]; then
+    OCP_CLUSTER_RG_NAME=$(az group list | jq ".[] | select(.name | contains(\"masocp-$UNIQ_STR\")).name" | tr -d '"')
+  else
+    vnetname=$(az deployment group list --resource-group $RG_NAME | jq ".[] | select(.properties.parameters.openShiftClustervnetId.value != null).properties.parameters.openShiftClustervnetId.value" | tr -d '"')
+    INFRAID=$(echo $vnetname | cut -f 1 -d '-')
+    echo "INFRA_ID: $INFRAID"
+    OCP_CLUSTER_RG_NAME=$(az network vnet list | jq --arg VNET_NAME $vnetname '.[] | select(.name==$VNET_NAME).resourceGroup' | tr -d '"')
+  fi
   echo "OCP_CLUSTER_RG_NAME: $OCP_CLUSTER_RG_NAME"
   if [[ -n $OCP_CLUSTER_RG_NAME ]]; then
     # Check if OCP cluster resource group exists
@@ -128,10 +135,37 @@ else
     if [[ -z $rg ]]; then
       echo "OCP cluster resource group $OCP_CLUSTER_RG_NAME does not exist"
     else
-      # Delete the resource group of OCP cluster
-      echo "Deleting resource group $OCP_CLUSTER_RG_NAME ..."
-      az group delete --yes --name $OCP_CLUSTER_RG_NAME
-      echo "Deleted resource group $OCP_CLUSTER_RG_NAME"
+      if [[ $INSTALL_MODE == "IPI" ]]; then
+        # If IPI installation, delete the OCP cluster resource grup itself
+        echo "Deleting resource group $OCP_CLUSTER_RG_NAME ..."
+        az group delete --yes --name $OCP_CLUSTER_RG_NAME
+        echo "Deleted resource group $OCP_CLUSTER_RG_NAME"
+      else
+        # If UPI installation, delete only the OCP cluster related resources
+        # Find all resources having INFRA_ID in it
+        echo "Deleting resource from resource group"
+        for restype in Microsoft.Compute/virtualMachines Microsoft.Compute/disks Microsoft.Network/loadBalancers Microsoft.Network/networkInterfaces Microsoft.ManagedIdentity/userAssignedIdentities Microsoft.Network/publicIPAddresses Microsoft.Compute/images; do
+          unset residtodelete
+          echo " Checking resource type $restype"
+          for res in $(az resource list --resource-group $OCP_CLUSTER_RG_NAME --resource-type "$restype" | jq --arg INFRAID $INFRAID '.[] | select(.name | contains($INFRAID)) | .name,.id,":"' | tr -d '"' | tr '\n\r' ',' | tr ':' '\n' | sed 's/^,//g' | sed 's/,$//g'); do
+            resname=$(echo $res | cut -f 1 -d ',')
+            resid=$(echo $res | cut -f 2 -d ',')
+            residtodelete="$residtodelete $resid"
+            if [[ ($res == "$INFRAID-vnet" ) || ($res == "$INFRAID-nsg" ) ]]; then
+              echo " Existing VNet RG resource $resname skipping deletion"
+            else
+              echo " Existing VNet RG resource $resname deleting"
+            fi
+          done
+          echo "residtodelete=$residtodelete"
+          if [[ -n $residtodelete ]]; then
+            az resource delete --resource-group $OCP_CLUSTER_RG_NAME --resource-type "$restype" --ids $residtodelete > /dev/null
+          else
+            echo " No resources of type $restype found"
+          fi
+        done
+        echo "Deleted OCP cluster related resources"
+      fi
     fi
   else
     echo "OCP cluster resource group does not seem to exist"
@@ -166,7 +200,7 @@ else
     fi
   fi
 fi
-
+exit 0
 ## Delete bootnode resource group
 if [[ -n $RG_NAME ]]; then
   echoBlue "Trying to delete bootnode resource group"
