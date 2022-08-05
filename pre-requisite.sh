@@ -54,6 +54,9 @@ if [[ $PRODUCT_TYPE != "privatepublic" ]]; then
 	fi
 fi
 
+export SLS_MONGODB_CFG_FILE="${MAS_CONFIG_DIR}/mongo-${MONGODB_NAMESPACE}.yml"
+log " SLS_MONGODB_CFG_FILE: $SLS_MONGODB_CFG_FILE"
+
 arr=(ibm-cert-manager-operator user-data-services-operator)
 i=0
 

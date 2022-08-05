@@ -50,9 +50,6 @@ function getOPNamespace() {
 				export ${op_namespaces[${1}]}=$op_namespace
 			fi
 			if [[  $1 = "ibm-sls" ]]; then
-				export SLS_MONGODB_CFG_FILE="${MAS_CONFIG_DIR}/mongo-${MONGODB_NAMESPACE}.yml"
-				log " SLS_MONGODB_CFG_FILE: $SLS_MONGODB_CFG_FILE"
-
 				export SLS_INSTANCE_NAME=$(oc get LicenseService  -n $SLS_NAMESPACE -o json | jq .items[0].metadata.name -r)
 				export SLS_REGISTRATION_KEY=$(oc get LicenseService  -n $SLS_NAMESPACE -o json | jq .items[0].status.registrationKey -r)
 				export SLS_LICENSE_ID=$(oc get LicenseService  -n $SLS_NAMESPACE -o json | jq .items[0].status.licenseId -r)
