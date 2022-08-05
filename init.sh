@@ -130,7 +130,7 @@ fi
 export CLUSTER_NAME="masocp-${RANDOM_STR}"
 export OCP_USERNAME="masocpuser"
 export OCP_PASSWORD="mas${RANDOM_STR:3:3}`date +%H%M%S`${RANDOM_STR:0:3}"
-if [[ ($EXS_OCP_URL) && ($EXS_OCP_USER) && ($EXS_OCP_PWD) ]]; then    
+if [[ (! -z $EXS_OCP_URL) && (! -z $EXS_OCP_USER) && (! -z $EXS_OCP_PWD) ]]; then    
     export OCP_USERNAME=${EXS_OCP_USER}
     export OCP_PASSWORD=${EXS_OCP_PWD}
 fi
