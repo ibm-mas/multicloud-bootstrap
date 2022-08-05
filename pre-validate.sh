@@ -27,14 +27,14 @@ else
 fi
 
 # Check if provided hosted zone is public
-if [[ $CLUSTER_TYPE == "aws" ]]; then
+if [[ ($CLUSTER_TYPE == "aws") && (-n $BASE_DOMAIN) ]]; then
 
-      if [[ $PrivateCluster == "false" ]]; then
-       aws route53 list-hosted-zones --output text --query 'HostedZones[*].[Config.PrivateZone,Name,Id]' --output text | grep $BASE_DOMAIN | grep False
+    if [[ $PrivateCluster == "false" ]]; then
+        aws route53 list-hosted-zones --output text --query 'HostedZones[*].[Config.PrivateZone,Name,Id]' --output text | grep $BASE_DOMAIN | grep False
     else
-      aws route53 list-hosted-zones --output text --query 'HostedZones[*].[Config.PrivateZone,Name,Id]' --output text | grep $BASE_DOMAIN | grep True
+        aws route53 list-hosted-zones --output text --query 'HostedZones[*].[Config.PrivateZone,Name,Id]' --output text | grep $BASE_DOMAIN | grep True
     fi
-#elif [[ $CLUSTER_TYPE == "azure" ]]; then
+    #elif [[ $CLUSTER_TYPE == "azure" ]]; then
     #az network dns zone list | jq -r --arg BASE_DOMAIN "$BASE_DOMAIN" '.[]|select (.name==$BASE_DOMAIN)|.zoneType' | grep -iE 'public'
 else
     true
@@ -177,7 +177,7 @@ fi
 ## MAS_ANNOTATIONS environment variable is used in suit-install role of MAS Installtion
 
 if [[ $CLUSTER_TYPE == "aws" ]]; then
-#validating product type for helper.sh
+    #validating product type for helper.sh
     validate_prouduct_type
 fi
 # Check if MAS license is provided
@@ -223,9 +223,9 @@ fi
 
 # Check if all the subnet values are provided for existing VPC Id
 if [[ -n $ExistingVPCId ]]; then
-  if [[ ( -n $ExistingPrivateSubnet1Id) && ( -n $ExistingPrivateSubnet2Id) && ( -n $ExistingPrivateSubnet3Id) && ( -n $ExistingPublicSubnet1Id) && (-n $ExistingPublicSubnet2Id) && ( -n $ExistingPublicSubnet3Id) ]]; then
-    log "=== OCP cluster will be deployed with existing VPCs ==="
- else
+    if [[ (-n $ExistingPrivateSubnet1Id) && (-n $ExistingPrivateSubnet2Id) && (-n $ExistingPrivateSubnet3Id) && (-n $ExistingPublicSubnet1Id) && (-n $ExistingPublicSubnet2Id) && (-n $ExistingPublicSubnet3Id) ]]; then
+        log "=== OCP cluster will be deployed with existing VPCs ==="
+    else
         log "ERROR: Subnets missing for the VPC"
         SCRIPT_STATUS=27
     fi
