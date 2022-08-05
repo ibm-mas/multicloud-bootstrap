@@ -174,7 +174,7 @@ else
 
   # Get domain and domain resource group
   BASE_DOMAIN=$(az deployment group list --resource-group $RG_NAME | jq ".[] | select(.properties.outputs.clusterUniqueString.value != null).properties.parameters.publicDomain.value" | tr -d '"')
-  BASE_DOMAIN_RG_NAME=$(az deployment group list --resource-group $RG_NAME | jq ".[] | select(.properties.outputs.clusterUniqueString.value != null).properties.parameters.publicDomainResourceGroup.value" | tr -d '"')
+  BASE_DOMAIN_RG_NAME=$(az network dns zone list | jq --arg DNS_ZONE $BASE_DOMAIN '.[] | select(.name==$DNS_ZONE).resourceGroup' | tr -d '"')
   echo "BASE_DOMAIN=$BASE_DOMAIN"
   echo "BASE_DOMAIN_RG_NAME=$BASE_DOMAIN_RG_NAME"
   if [[ (-n $BASE_DOMAIN) || (-n $BASE_DOMAIN_RG_NAME) ]]; then
@@ -200,7 +200,7 @@ else
     fi
   fi
 fi
-exit 0
+
 ## Delete bootnode resource group
 if [[ -n $RG_NAME ]]; then
   echoBlue "Trying to delete bootnode resource group"
