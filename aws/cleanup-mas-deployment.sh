@@ -24,7 +24,7 @@
 #
 
 # Fail the script if any of the steps fail
-set -e 
+set -e
 
 # Functions
 usage() {
@@ -75,14 +75,14 @@ if [[ -z $REGION ]]; then
   echo "ERROR: Parameter 'region-code' not provided"
   usage
 fi
-SUPPORTED_REGIONS="us-east-1;us-east-2;us-west-2;ca-central-1;eu-north-1;eu-south-1;eu-west-1;eu-west-2;eu-west-3;eu-central-1;ap-northeast-1;ap-northeast-2;ap-northeast-3;ap-south-1;ap-southeast-1;ap-southeast-2;sa-east-1"
+SUPPORTED_REGIONS="us-east-1;us-east-2;us-west-2;ca-central-1;eu-north-1;eu-west-1;eu-west-2;eu-west-3;eu-central-1;ap-northeast-1;ap-northeast-2;ap-northeast-3;ap-south-1;ap-southeast-1;ap-southeast-2;sa-east-1"
 if [[ ${SUPPORTED_REGIONS,,} =~ $REGION ]]; then
   echo "Supported region provided"
 else
   echo "ERROR: Empty or unsupported region provided"
   echo "Supported regions are $SUPPORTED_REGIONS"
   usage
-fi 
+fi
 
 if [[ (-z $STACK_NAME) && (-z $UNIQUE_STR) ]]; then
   echo "ERROR: Both the parameters 'stack-name' and 'unique-string' are empty, one of these should have a value"
@@ -108,7 +108,7 @@ elif [[ -n UNIQUE_STR ]]; then
   echo "Deleting by 'unique-string' $UNIQ_STR"
 fi
 
-echo "==== Execution started at `date` ===="  
+echo "==== Execution started at `date` ===="
 echo "MAS instance unique string: $UNIQ_STR"
 echo "---------------------------------------------"
 
@@ -174,7 +174,7 @@ if [[ $VPC_ID != "null" ]]; then
       echo "Invoked deletion of NAT gateway $inst"
     done
     sleep 20
-    
+
     for inst in $NAT_GATEWAYS; do
       echo "Checking deletion status of NAT gateway with id $inst ..."
       state="deleting"
@@ -207,7 +207,7 @@ if [[ $VPC_ID != "null" ]]; then
     echo "No NAT gateways found for this MAS instance"
   fi
   echo "---------------------------------------------"
-  
+
   SLEEPTIME=2
   # Delete load balancers
   echo "Checking for load balancers"
@@ -224,7 +224,7 @@ if [[ $VPC_ID != "null" ]]; then
     echo "No load balancers found for this MAS instance"
   fi
   echo "---------------------------------------------"
-    
+
   # Delete v2 load balancers
   echo "Checking for v2 load balancers"
   LOAD_BALANCERS_V2=$(aws elbv2 describe-load-balancers --region $REGION | jq ".LoadBalancers[] | select(.VpcId == \"$VPC_ID\").LoadBalancerArn" | tr -d '"')
@@ -242,7 +242,7 @@ if [[ $VPC_ID != "null" ]]; then
   echo "Waiting for $SLEEPTIME seconds for network interfaces to be released"
   sleep $SLEEPTIME
   echo "---------------------------------------------"
-      
+
   # Delete network interfaces
   echo "Checking for network interfaces"
   NW_IFS=$(aws ec2 describe-network-interfaces --region $REGION --filter Name=vpc-id,Values=$VPC_ID | jq ".NetworkInterfaces[] | select(.VpcId == \"$VPC_ID\").NetworkInterfaceId" | tr -d '"')
@@ -258,7 +258,7 @@ if [[ $VPC_ID != "null" ]]; then
     echo "No network interfaces found for this MAS instance"
   fi
   echo "---------------------------------------------"
-  
+
   # Delete internet gateway
   echo "Checking for internet gateways"
   IGWID=$(aws ec2 describe-internet-gateways --region $REGION --filter Name=attachment.vpc-id,Values=$VPC_ID | jq ".InternetGateways[].InternetGatewayId" | tr -d '"')
@@ -275,7 +275,7 @@ if [[ $VPC_ID != "null" ]]; then
     echo "No internet gateways found for this MAS instance"
   fi
   echo "---------------------------------------------"
-  
+
   # Delete subnets
   echo "Checking for subnets"
   SUBNETS=$(aws ec2 describe-subnets --region $REGION --filter Name=vpc-id,Values=$VPC_ID | jq ".Subnets[].SubnetId" | tr -d '"')
@@ -290,7 +290,7 @@ if [[ $VPC_ID != "null" ]]; then
     echo "No subnets found for this MAS instance"
   fi
   echo "---------------------------------------------"
-  
+
   # Delete routing tables
   echo "Checking for routing tables"
   RTS=$(aws ec2 describe-route-tables --filter Name=vpc-id,Values=$VPC_ID --region $REGION | jq ".RouteTables[].RouteTableId" | tr -d '"')
@@ -311,7 +311,7 @@ if [[ $VPC_ID != "null" ]]; then
     echo "No routing tables found for this MAS instance"
   fi
   echo "---------------------------------------------"
-  
+
   # Delete network ACLs
   echo "Checking for network ACLs"
   NACLS=$(aws ec2 describe-network-acls --filter Name=vpc-id,Values=$VPC_ID --region $REGION | jq ".NetworkAcls[].NetworkAclId" | tr -d '"')
@@ -332,7 +332,7 @@ if [[ $VPC_ID != "null" ]]; then
     echo "No network ACLs found for this MAS instance"
   fi
   echo "---------------------------------------------"
-  
+
   # Delete security groups
   echo "Checking for security groups"
   SGS=$(aws ec2 describe-security-groups --region $REGION | jq ".SecurityGroups[] | select(.VpcId == \"$VPC_ID\").GroupId" | tr -d '"')
@@ -374,7 +374,7 @@ if [[ $VPC_ID != "null" ]]; then
     echo "No security groups found for this MAS instance"
   fi
   echo "---------------------------------------------"
-  
+
   # Delete VPC
   aws ec2 delete-vpc --region $REGION --vpc-id $VPC_ID
 else
@@ -527,7 +527,7 @@ if [[ -n $CWLG ]]; then
   echo "Found OCP installer created CloudWatch Log groups for this MAS instance"
   for inst in $CWLG; do
     # Delete log group
-    aws logs delete-log-group --log-group-name $inst --region $REGION 
+    aws logs delete-log-group --log-group-name $inst --region $REGION
     echo "Deleted OCP installer created CloudWatch Log group $inst"
   done
 else
@@ -539,7 +539,7 @@ if [[ -n $CWLG ]]; then
   echo "Found automation created CloudWatch Log groups for this MAS instance"
   for inst in $CWLG; do
     # Delete log group
-    aws logs delete-log-group --log-group-name $inst --region $REGION 
+    aws logs delete-log-group --log-group-name $inst --region $REGION
     echo "Deleted automation created CloudWatch Log group $inst"
   done
 else
