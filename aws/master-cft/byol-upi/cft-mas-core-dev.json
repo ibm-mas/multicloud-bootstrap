@@ -268,9 +268,6 @@
             "eu-north-1": {
                 "HVM64": "ami-0b3a8c8ed376a9193"
             },
-            "eu-south-1": {
-                "HVM64": "ami-06c78840eda1c6464"
-            },
             "eu-west-1": {
                 "HVM64": "ami-0fb132ff756953f9a"
             },
@@ -457,7 +454,12 @@
                                         "logs:CreateLogGroup",
                                         "logs:CreateLogStream",
                                         "logs:PutLogEvents",
-                                        "logs:DescribeLogStreams"
+                                        "logs:DescribeLogStreams",
+                                        "secretsmanager:GetResourcePolicy",
+                                        "secretsmanager:GetSecretValue",
+                                        "secretsmanager:DescribeSecret",
+                                        "secretsmanager:ListSecretVersionIds",
+                                        "secretsmanager:ListSecrets"
                                     ],
                                     "Resource": "*"
                                 }
@@ -540,7 +542,12 @@
                                         "logs:CreateLogGroup",
                                         "route53:GetHostedZone",
                                         "ec2:DescribeVpcs",
-                                        "ec2:DescribeSubnets"
+                                        "ec2:DescribeSubnets",
+                                        "secretsmanager:GetResourcePolicy",
+                                        "secretsmanager:GetSecretValue",
+                                        "secretsmanager:DescribeSecret",
+                                        "secretsmanager:ListSecretVersionIds",
+                                        "secretsmanager:ListSecrets"
                                     ],
                                     "Resource": "*"
                                 }
