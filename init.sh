@@ -266,8 +266,9 @@ log " BASE_DOMAIN: $BASE_DOMAIN"
 log " BASE_DOMAIN_RG_NAME: $BASE_DOMAIN_RG_NAME"
 log " SSH_KEY_NAME: $SSH_KEY_NAME"
 log " DEPLOY_WAIT_HANDLE: $DEPLOY_WAIT_HANDLE"
-log " SLS_ENTITLEMENT_KEY: $SLS_ENTITLEMENT_KEY"
-log " OCP_PULL_SECRET: $OCP_PULL_SECRET"
+# Do not log ER key and OCP pull secret, uncomment in case of debugging but comment it out once done
+#log " SLS_ENTITLEMENT_KEY: $SLS_ENTITLEMENT_KEY"
+#log " OCP_PULL_SECRET: $OCP_PULL_SECRET"
 log " DEPLOY_CP4D: $DEPLOY_CP4D"
 log " DEPLOY_MANAGE: $DEPLOY_MANAGE"
 log " MAS_LICENSE_URL: $MAS_LICENSE_URL"
@@ -288,7 +289,8 @@ log " RECEPIENT=$RECEPIENT"
 log " SMTP_HOST=$SMTP_HOST"
 log " SMTP_PORT=$SMTP_PORT"
 log " SMTP_USERNAME=$SMTP_USERNAME"
-log " SMTP_PASSWORD=$SMTP_PASSWORD"
+# Do not log SMTP password, uncomment in case of debugging but comment it out once done
+#log " SMTP_PASSWORD=$SMTP_PASSWORD"
 log " AZURE_SP_CLIENT_ID=$AZURE_SP_CLIENT_ID"
 log " SELLER_SUBSCRIPTION_ID=$SELLER_SUBSCRIPTION_ID"
 log " TENANT_ID=$TENANT_ID"
@@ -338,35 +340,23 @@ export DEPLOY_MANAGE=$(echo $DEPLOY_MANAGE | cut -d '=' -f 2)
 log " DEPLOY_CP4D: $DEPLOY_CP4D"
 log " DEPLOY_MANAGE: $DEPLOY_MANAGE"
 
-if [[ $CLUSTER_TYPE == "azure" && $INSTALLATION_MODE == "UPI" ]]; then
+if [[ $CLUSTER_TYPE == "azure" ]]; then
   # Perform az login
   az login --service-principal -u ${AZURE_SP_CLIENT_ID} -p ${AZURE_SP_CLIENT_PWD} --tenant ${TENANT_ID}
   az resource list -n masocp-${RANDOM_STR}-bootnode-vm
-
-  # Get subscription ID, tenant ID
+  # Get subscription ID
   export AZURE_SUBSC_ID=`az account list | jq -r '.[].id'`
   log " AZURE_SUBSC_ID: $AZURE_SUBSC_ID"
+  # Get Base domain RG name
   DNS_ZONE=$BASE_DOMAIN
   export BASE_DOMAIN_RG_NAME=`az network dns zone list | jq --arg DNS_ZONE $DNS_ZONE '.[] | select(.name==$DNS_ZONE).resourceGroup' | tr -d '"'`
   log " BASE_DOMAIN_RG_NAME: $BASE_DOMAIN_RG_NAME"
-  VNET_NAME=$EXISTING_NETWORK
-  export EXISTING_NETWORK_RG=`az network vnet list | jq --arg VNET_NAME $VNET_NAME '.[] | select(.name==$VNET_NAME).resourceGroup' | tr -d '"'`
-  log " EXISTING_NETWORK_RG: $EXISTING_NETWORK_RG"
-fi
-
-if [[ $CLUSTER_TYPE == "azure" && $INSTALLATION_MODE == "IPI" ]]; then
-  # Perform az login for accessing blob storage
-  az login --service-principal -u ${AZURE_SP_CLIENT_ID} -p ${AZURE_SP_CLIENT_PWD} --tenant ${TENANT_ID}
-  az resource list -n masocp-${RANDOM_STR}-bootnode-vm
-
-  # Get subscription ID, tenant ID
-  export AZURE_SUBSC_ID=`az account list | jq -r '.[].id'`
-  log " AZURE_SUBSC_ID: $AZURE_SUBSC_ID"
-  DNS_ZONE=$BASE_DOMAIN
-  export BASE_DOMAIN_RG_NAME=`az network dns zone list | jq --arg DNS_ZONE $DNS_ZONE '.[] | select(.name==$DNS_ZONE).resourceGroup' | tr -d '"'`
-  log " BASE_DOMAIN_RG_NAME: $BASE_DOMAIN_RG_NAME"
-  export AZURE_TENANT_ID=$TENANT_ID
-  
+  # Get VNet RG name for UPI based installation
+  if [[ $INSTALLATION_MODE == "UPI" ]]; then
+    VNET_NAME=$EXISTING_NETWORK
+    export EXISTING_NETWORK_RG=`az network vnet list | jq --arg VNET_NAME $VNET_NAME '.[] | select(.name==$VNET_NAME).resourceGroup' | tr -d '"'`
+    log " EXISTING_NETWORK_RG: $EXISTING_NETWORK_RG"
+  fi
 fi
 
 cd $GIT_REPO_HOME
@@ -476,6 +466,9 @@ if [[ $PRE_VALIDATION == "pass" ]]; then
     export MAS_URL_ADMIN="https:\/\/admin.mas-${RANDOM_STR}.apps.${CLUSTER_NAME}.${BASE_DOMAIN}"
     export MAS_URL_WORKSPACE="https:\/\/$MAS_WORKSPACE_ID.home.mas-${RANDOM_STR}.apps.${CLUSTER_NAME}.${BASE_DOMAIN}"
     RESP_CODE=0
+    # Create a secret in the Cloud to keep OCP access credentials
+    cd $GIT_REPO_HOME
+    ./create-secret.sh ocp
   else
     mark_provisioning_failed $retcode
   fi
@@ -502,9 +495,9 @@ else
   log "Buyer chose to not send email notification"
 fi
 
-# Create a secret in the Cloud to keep environment access credentials
+# Create a secret in the Cloud to keep MAS access credentials
 cd $GIT_REPO_HOME
-./create-secret.sh
+./create-secret.sh mas
 
 # Delete temporary password files
 rm -rf /tmp/*password*

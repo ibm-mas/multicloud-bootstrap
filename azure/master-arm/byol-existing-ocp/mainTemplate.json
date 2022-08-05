@@ -103,7 +103,7 @@
       },
       "masLicenseUrl": {
         "type": "string",
-        "defaultValue": "https://masocpstgacnt.blob.core.windows.net/masocpfiles/entitlement.lic?sp=r&st=2022-04-06T04:02:45Z&se=2022-06-30T12:02:45Z&spr=https&sv=2020-08-04&sr=c&sig=CN27jhRfxHDmDgz%2FugkySY7h%2BEZdp9H5PVAoaxP%2FURY%3D",
+        "defaultValue": "",
         "metadata": {
           "description": "Enter the URL (preferebly with SAS token) of your Suite license key file kept on the Blob storage, for example: https://masocpstgaccount.blob.core.windows.net/masocpcontainer/entitlement.lic?[blob-sas-token] (Applicable only for BYOL product)"
         }
