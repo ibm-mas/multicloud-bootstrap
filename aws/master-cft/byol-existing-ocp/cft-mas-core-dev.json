@@ -753,13 +753,6 @@
                                         "ZoneName"
                                     ]
                                 },
-                                "\" \"",
-                                {
-                                    "Fn::GetAtt": [
-                                        "CallLambdaGetHostedZoneName",
-                                        "ZoneName"
-                                    ]
-                                },
                                 "\" \"\" \"",
                                 {
                                     "Ref": "SSHKey"
