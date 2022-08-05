@@ -455,11 +455,8 @@
                                         "logs:CreateLogStream",
                                         "logs:PutLogEvents",
                                         "logs:DescribeLogStreams",
-                                        "secretsmanager:GetResourcePolicy",
-                                        "secretsmanager:GetSecretValue",
-                                        "secretsmanager:DescribeSecret",
-                                        "secretsmanager:ListSecretVersionIds",
-                                        "secretsmanager:ListSecrets"
+                                        "secretsmanager:CreateSecret",
+                                        "secretsmanager:GetSecretValue"
                                     ],
                                     "Resource": "*"
                                 }
@@ -543,11 +540,8 @@
                                         "route53:GetHostedZone",
                                         "ec2:DescribeVpcs",
                                         "ec2:DescribeSubnets",
-                                        "secretsmanager:GetResourcePolicy",
-                                        "secretsmanager:GetSecretValue",
-                                        "secretsmanager:DescribeSecret",
-                                        "secretsmanager:ListSecretVersionIds",
-                                        "secretsmanager:ListSecrets"
+                                        "secretsmanager:CreateSecret",
+                                        "secretsmanager:GetSecretValue"
                                     ],
                                     "Resource": "*"
                                 }
@@ -930,7 +924,7 @@
     "Outputs": {
         "MASCloudAutomationVersion": {
             "Description": "Version of the MAS automated deployment on Cloud",
-            "Value": "1.0"
+            "Value": "2.0-alpha.1"
         },
         "ClusterUniqueString": {
             "Description": "Unique string that is part of cluster resoutce names",
