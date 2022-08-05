@@ -12,10 +12,6 @@
                 "MAS Core + Manage (no Cloud Pak for Data)"
             ]
         },
-        "PublicHostedZone": {
-            "Description": "Select the public hosted zone that you created in the AWS Route 53 service, for example: mas4aws.myorg.com",
-            "Type": "AWS::Route53::HostedZone::Id"
-        },
         "BootNodeVPCId": {
             "Description": "Enter the VPC Id to create the bootnode into. Default VPC created by AWS will be used if not specified. If existing OpenShift cluster is specified, make sure it is reachable from this VPC",
             "Type" : "AWS::EC2::VPC::Id"
@@ -135,14 +131,6 @@
                         "OpenShiftClusterApiUrl",
                         "OpenShiftUser",
                         "OpenShiftPassword"
-                    ]
-                },
-                {
-                    "Label": {
-                        "default": "Existing OpenShift cluster configuration details (you must complete this section)"
-                    },
-                    "Parameters": [
-                        "PublicHostedZone"
                     ]
                 },
                 {
@@ -554,23 +542,6 @@
                 }
             }
         },
-        "CallLambdaGetHostedZoneName": {
-            "Type": "Custom::CallLambdaGetHostedZoneName",
-            "Properties": {
-                "ServiceToken": {
-                    "Fn::GetAtt": [
-                        "LambdaFunctionGetHostedZoneName",
-                        "Arn"
-                    ]
-                },
-                "ZoneId": {
-                    "Ref": "PublicHostedZone"
-                },
-                "Region": {
-                    "Ref": "AWS::Region"
-                }
-            }
-        },
         "DeploymentConfigBucket": {
             "Type": "AWS::S3::Bucket",
             "Properties": {
@@ -749,13 +720,8 @@
                                     ]
                                 },
                                 "\" \"",
-                                {
-                                    "Fn::GetAtt": [
-                                        "CallLambdaGetHostedZoneName",
-                                        "ZoneName"
-                                    ]
-                                },
-                                "\" \"\" \"",
+                                "\" \"",
+                                "\" \"",
                                 {
                                     "Ref": "SSHKey"
                                 },
