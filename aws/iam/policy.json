@@ -163,7 +163,6 @@
                 "route53:UpdateHostedZoneComment",
                 "s3:*",
                 "secretsmanager:CreateSecret",
-                "secretsmanager:GetSecretValue",
                 "servicequotas:ListAWSDefaultServiceQuotas",
                 "servicequotas:ListServiceQuotas",
                 "ses:SendEmail",

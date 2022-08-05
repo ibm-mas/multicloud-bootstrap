@@ -16,6 +16,14 @@
             "Description": "Select the public hosted zone that you created in the AWS Route 53 service, for example: mas4aws.myorg.com",
             "Type": "AWS::Route53::HostedZone::Id"
         },
+        "BootNodeVPCId": {
+            "Description": "Enter the VPC Id to create the bootnode into. Default VPC created by AWS will be used if not specified. If existing OpenShift cluster is specified, make sure it is reachable from this VPC",
+            "Type" : "AWS::EC2::VPC::Id"
+        },
+        "BootNodeSubnetId": {
+            "Description": "Enter the subnet ID from the bootnode VPC to be used for the bootnode.",
+            "Type": "AWS::EC2::Subnet::Id"
+        },
         "BootnodeSGIngressCidrIp": {
             "Description": "Use CIDR notation to enter the IP addresses that can access the bootnode. For example, 192.12.33.3/32. To allow access from all IP addresses, enter 0.0.0.0/0.",
             "Type": "String",
@@ -139,7 +147,9 @@
                     },
                     "Parameters": [
                         "SSHKey",
-                        "BootnodeSGIngressCidrIp"
+                        "BootnodeSGIngressCidrIp",
+                        "BootNodeVPCId",
+                        "BootNodeSubnetId"
                     ]
                 },
                 {
@@ -199,49 +209,49 @@
                 "HVM64": "ami-0663aa4f5e3ea9a30"
             },
             "us-east-2": {
-                "HVM64": "ami-0015d74318b50eb1e"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "us-west-2": {
-                "HVM64": "ami-0821cafcce4fc2688"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "ca-central-1": {
-                "HVM64": "ami-030b370d9aca15cfa"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "eu-north-1": {
-                "HVM64": "ami-098e79645f6b1fe5e"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "eu-west-1": {
-                "HVM64": "ami-08fec0d0aaac92f41"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "eu-west-2": {
-                "HVM64": "ami-0148e83ca025fb1c4"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "eu-west-3": {
-                "HVM64": "ami-0de7facdeac48f412"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "eu-central-1": {
-                "HVM64": "ami-0b385b9c219bffb9e"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "ap-northeast-1": {
-                "HVM64": "ami-069f47ef9e8860025"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "ap-northeast-2": {
-                "HVM64": "ami-0625060302b0a25a9"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "ap-northeast-3": {
-                "HVM64": "ami-0ad182d44dbada8bf"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "ap-south-1": {
-                "HVM64": "ami-0ef36f4268fdfd19e"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "ap-southeast-1": {
-                "HVM64": "ami-09710a2dadbadbc7f"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "ap-southeast-2": {
-                "HVM64": "ami-052190ea20426d706"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "sa-east-1": {
-                "HVM64": "ami-0b4a6f590daa1e143"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             }
         }
     },
@@ -649,10 +659,7 @@
                     }
                 ],
                 "VpcId": {
-                    "Fn::GetAtt": [
-                        "CallLambdaFunctionGetSubnetForBootnode",
-                        "DefaultVPCId"
-                    ]
+                    "Ref": "BootNodeVPCId"
                 },
                 "Tags": [
                     {
@@ -679,10 +686,7 @@
             "Type": "AWS::EC2::Instance",
             "Properties": {
                 "SubnetId": {
-                    "Fn::GetAtt": [
-                        "CallLambdaFunctionGetSubnetForBootnode",
-                        "DefaultVPCAz1SubnetId"
-                    ]
+                    "Ref": "BootNodeSubnetId"
                 },
                 "ImageId": {
                     "Fn::FindInMap": [
@@ -762,7 +766,6 @@
                                 "\" ",
                                 "'",
                                 "' '' '",
-                                "' '",
                                 {
                                     "Ref": "SLSEndpointUrl"
                                 },

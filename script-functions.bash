@@ -37,6 +37,19 @@ function getOCS() {
 	
 }
 
+function getazurefile() {
+	sc_name=$(oc get sc | grep azurefiles-premium | awk -F' ' '{print $1}')
+	log " azurefiles-premium StorageClass : $sc_name"
+	if [[ $sc_name = ""  ]]; then
+		log " azurefiles-premium StorageClass is not available"
+		SCRIPT_STATUS=29
+		return $SCRIPT_STATUS
+	else
+		log " azurefiles-premium StorageClass is available"
+    fi    
+	
+}
+
 function getOPNamespace() {
 	check_for_csv_success=$(oc get csv  --all-namespaces | awk -v pattern="$1" '$2 ~ pattern  { print }'  | awk -F' ' '{print $NF}')
 	if [[ $check_for_csv_success = "Succeeded" ]]; then
@@ -50,9 +63,6 @@ function getOPNamespace() {
 				export ${op_namespaces[${1}]}=$op_namespace
 			fi
 			if [[  $1 = "ibm-sls" ]]; then
-				export SLS_MONGODB_CFG_FILE="${MAS_CONFIG_DIR}/mongo-${MONGODB_NAMESPACE}.yml"
-				log " SLS_MONGODB_CFG_FILE: $SLS_MONGODB_CFG_FILE"
-
 				export SLS_INSTANCE_NAME=$(oc get LicenseService  -n $SLS_NAMESPACE -o json | jq .items[0].metadata.name -r)
 				export SLS_REGISTRATION_KEY=$(oc get LicenseService  -n $SLS_NAMESPACE -o json | jq .items[0].status.registrationKey -r)
 				export SLS_LICENSE_ID=$(oc get LicenseService  -n $SLS_NAMESPACE -o json | jq .items[0].status.licenseId -r)

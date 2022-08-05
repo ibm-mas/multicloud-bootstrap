@@ -25,10 +25,13 @@ fi
 
 if [[ $CLUSTER_TYPE == "aws" ]]; then
 	getOCS ocs-operator
-	retcode=$?
-	if [[ $retcode -eq 29 ]]; then
-		return $retcode
-	fi
+elif [[ $CLUSTER_TYPE == "azure" ]]; then
+	getazurefile
+fi
+
+retcode=$?
+if [[ $retcode -eq 29 ]]; then
+	return $retcode
 fi
 
 getVersion MongoDBCommunity
@@ -45,7 +48,19 @@ if [[ $DEPLOY_CP4D == "true" ]]; then
 	fi
 fi
 
-arr=(ibm-sls ibm-cert-manager-operator user-data-services-operator)
+# Skip SLS check in case of paid offering
+if [[ $PRODUCT_TYPE != "privatepublic" ]]; then
+	getOPNamespace ibm-sls
+	retcode=$?
+	if [[ $retcode -eq 29 ]]; then
+		return $retcode
+	fi
+fi
+
+export SLS_MONGODB_CFG_FILE="${MAS_CONFIG_DIR}/mongo-${MONGODB_NAMESPACE}.yml"
+log " SLS_MONGODB_CFG_FILE: $SLS_MONGODB_CFG_FILE"
+
+arr=(ibm-cert-manager-operator user-data-services-operator)
 i=0
 
 while [ $i -lt ${#arr[@]} ]

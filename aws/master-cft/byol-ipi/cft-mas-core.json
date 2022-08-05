@@ -235,9 +235,6 @@
             "eu-north-1": {
                 "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
-            "eu-south-1": {
-                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
-            },
             "eu-west-1": {
                 "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
@@ -445,7 +442,8 @@
                                         "logs:CreateLogGroup",
                                         "logs:CreateLogStream",
                                         "logs:PutLogEvents",
-                                        "logs:DescribeLogStreams"
+                                        "logs:DescribeLogStreams",
+                                        "secretsmanager:CreateSecret"
                                     ],
                                     "Resource": "*"
                                 }
