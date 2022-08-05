@@ -878,7 +878,6 @@
                                 {
                                     "Ref": "PrivateCluster"
                                 },
-                                "' '",
                                 "' \"prod\" ",
                                 "2>&1 | tee mas-provisioning.log; "
                             ]
@@ -987,7 +986,7 @@
                 "Fn::Join": [
                     "",
                     [
-                        "https://admin.mas-",
+                        "https://admin.",
                         {
                             "Fn::GetAtt": [
                                 "CallLambdaRandomizer",
@@ -1019,7 +1018,7 @@
                 "Fn::Join": [
                     "",
                     [
-                        "https://admin.mas-",
+                        "https://admin.",
                         {
                             "Fn::GetAtt": [
                                 "CallLambdaRandomizer",
@@ -1050,7 +1049,7 @@
                 "Fn::Join": [
                     "",
                     [
-                        "https://wsmasocp.home.mas-",
+                        "https://wsmasocp.home.",
                         {
                             "Fn::GetAtt": [
                                 "CallLambdaRandomizer",
