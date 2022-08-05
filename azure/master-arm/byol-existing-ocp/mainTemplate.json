@@ -47,13 +47,6 @@
         },
         "defaultValue": ""
       },
-      "publicDomainResourceGroup": {
-        "type": "string",
-        "metadata": {
-          "description": "Provide the name of the resource group where public App Service domain is created"
-        },
-        "defaultValue": ""
-      },
       "bootnodeSGIngressCidrIp": {
         "type": "string",
         "defaultValue": "0.0.0.0/0",
@@ -112,7 +105,7 @@
         "type": "string",
         "defaultValue": "https://masocpstgacnt.blob.core.windows.net/masocpfiles/entitlement.lic?sp=r&st=2022-04-06T04:02:45Z&se=2022-06-30T12:02:45Z&spr=https&sv=2020-08-04&sr=c&sig=CN27jhRfxHDmDgz%2FugkySY7h%2BEZdp9H5PVAoaxP%2FURY%3D",
         "metadata": {
-          "description": "Enter the Blob SAS location of your Suite license key file, for example: https://masocpstgaccount.blob.core.windows.net/masocpcontainer/entitlement.lic?[blob-sas-token] (Applicable only for BYOL product)"
+          "description": "Enter the URL (preferebly with SAS token) of your Suite license key file kept on the Blob storage, for example: https://masocpstgaccount.blob.core.windows.net/masocpcontainer/entitlement.lic?[blob-sas-token] (Applicable only for BYOL product)"
         }
       },
       "masManageDBUser": {
@@ -178,7 +171,7 @@
       "slsPublicCertificateUrl": {
         "type": "string",
         "metadata": {
-          "description": "Enter the Blob SAS location of the service's public certificate that you retrieved from the 'ca.crt' file in the 'mas-*-sls-cfg' route in the MAS core namespace."
+          "description": "Enter the URL (preferebly with SAS token) of the service's public certificate that you retrieved from the 'ca.crt' file in the 'mas-*-sls-cfg' route in the MAS core namespace."
         },
         "defaultValue": ""
       },
@@ -199,7 +192,7 @@
       "udsPublicCertificateUrl": {
         "type": "string",
         "metadata": {
-          "description": "Enter the Blob SAS location of the service's public certificate that you retrieved from the 'ca.crt' file in the 'mas-*-uds-cfg' route in the MAS core namespace."
+          "description": "Enter the URL (preferebly with SAS token) of the service's public certificate that you retrieved from the 'ca.crt' file in the 'mas-*-uds-cfg' route in the MAS core namespace."
         },
         "defaultValue": ""
       },
@@ -535,7 +528,7 @@
               "typeHandlerVersion": "2.0",
               "autoUpgradeMinorVersion": true,
               "protectedSettings": {
-                "commandToExecute": "[concat('sleep 60;', 'cd /root/ansible-devops/multicloud-bootstrap;', './init-async.sh azure ''', parameters('offeringType'), ''' ''', parameters('location'), ''' null ''', parameters('clusterSize'), ''' ''', variables('projectName'), ''' ''', parameters('publicDomain'), ''' ''', parameters('publicDomainResourceGroup'), ''' ''', parameters('sshPublicKey'), ''' null ''', parameters('entitledRegistryKey'), ''' ''', parameters('openShiftPullSecret'), ''' ''', parameters('masLicenseUrl'), ''' ''', parameters('slsEndpointUrl'), ''' ''', parameters('slsRegistrationKey'), ''' ''', parameters('slsPublicCertificateUrl'), ''' ''', parameters('udsEndpointUrl'), ''' ''', parameters('udsAPIKey'), ''' ''', parameters('udsPublicCertificateUrl'), ''' ''', parameters('masManageDBUser'), ''' ''', parameters('masManageDBPassword'), ''' ''', parameters('masManageDBJdbcUrl'), ''' ''', parameters('masManageDBCertificateUrl'), ''' ''', parameters('importDemoData'), ''' ''', parameters('openShiftClusterApiUrl'), ''' ''', parameters('openShiftUser'), ''' ''', parameters('openShiftPwd'), ''' ''', variables('rgName'), ''' ''', parameters('emailNotification'), ''' ''', parameters('notificattionEmailAddress'), ''' ''', parameters('smtpHost'), ''' ''', parameters('smtpPort'), ''' ''', parameters('smtpUsername'), ''' ''', parameters('smtpPassword'), ''' ''', parameters('azureServicePrincipalClientId'), ''' ''', parameters('azureServicePrincipalClientSecret'), ''' ''', variables('seller_subscription_id'), ''' ''', parameters('azureServicePrincipalTenantId'), ''' null null '''' '''' null null null null null null null prod ''', ''' > mas-provisioning.log 2>&1;')]"
+                "commandToExecute": "[concat('sleep 60;', 'cd /root/ansible-devops/multicloud-bootstrap;', './init-async.sh azure ''', parameters('offeringType'), ''' ''', parameters('location'), ''' null ''', parameters('clusterSize'), ''' ''', variables('projectName'), ''' ''', parameters('publicDomain'), ''' null ''', parameters('sshPublicKey'), ''' null ''', parameters('entitledRegistryKey'), ''' ''', parameters('openShiftPullSecret'), ''' ''', parameters('masLicenseUrl'), ''' ''', parameters('slsEndpointUrl'), ''' ''', parameters('slsRegistrationKey'), ''' ''', parameters('slsPublicCertificateUrl'), ''' ''', parameters('udsEndpointUrl'), ''' ''', parameters('udsAPIKey'), ''' ''', parameters('udsPublicCertificateUrl'), ''' ''', parameters('masManageDBUser'), ''' ''', parameters('masManageDBPassword'), ''' ''', parameters('masManageDBJdbcUrl'), ''' ''', parameters('masManageDBCertificateUrl'), ''' ''', parameters('importDemoData'), ''' ''', parameters('openShiftClusterApiUrl'), ''' ''', parameters('openShiftUser'), ''' ''', parameters('openShiftPwd'), ''' ''', variables('rgName'), ''' ''', parameters('emailNotification'), ''' ''', parameters('notificattionEmailAddress'), ''' ''', parameters('smtpHost'), ''' ''', parameters('smtpPort'), ''' ''', parameters('smtpUsername'), ''' ''', parameters('smtpPassword'), ''' ''', parameters('azureServicePrincipalClientId'), ''' ''', parameters('azureServicePrincipalClientSecret'), ''' ''', variables('seller_subscription_id'), ''' ''', parameters('azureServicePrincipalTenantId'), ''' null null '''' '''' null null null null null null null prod ''', ''' > mas-provisioning.log 2>&1;')]"
               }
             }
           }
@@ -579,7 +572,7 @@
       },
       {
         "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
-        "apiVersion": "2021-06-01",
+        "apiVersion": "2021-09-01",
         "name": "[concat(variables('storageaccountName'), '/default/masocpcontainer')]",
         "dependsOn": [
           "[resourceId('Microsoft.Storage/storageAccounts', variables('storageaccountName'))]"
@@ -602,46 +595,17 @@
       "clusterUniqueString": {
         "type": "string",
         "value": "[variables('projectName')]"
-      },
-      "openShiftConsoleUrl": {
-        "type": "string",
-        "condition": "[equals(parameters('openShiftClusterApiUrl'), '')]",
-        "value": "[uri(concat('https://console-openshift-console.apps.masocp-', variables('projectName'), '.', parameters('publicDomain')), '')]"
-      },
-      "openShiftApiUrl": {
-        "type": "string",
-        "condition": "[equals(parameters('openShiftClusterApiUrl'), '')]",
-        "value": "[uri(concat('https://api.masocp-', variables('projectName'), '.', parameters('publicDomain')), '')]"
-      },
-      
+      },     
       "masInitialSetupUrl": {
         "type": "string",
-        "condition": "[equals(parameters('openShiftClusterApiUrl'), '')]",
-        "value": "[uri(concat('https://admin.mas-', variables('projectName'), '.apps.masocp-', variables('projectName'), '.', parameters('publicDomain'), '/initialsetup'), '')]"
-      },
-      "masInitialSetupUrlLogin": {
-        "type": "string",
-        "condition": "[not(equals(parameters('openShiftClusterApiUrl'), ''))]",
         "value": "[uri(concat('https://admin.mas-', variables('projectName'), '.apps.', last(split(parameters('openShiftClusterApiUrl'),'api.')), '/initialsetup'), '')]"
       },
       "masAdminUrl": {
         "type": "string",
-        "condition": "[equals(parameters('openShiftClusterApiUrl'), '')]",
-        "value": "[uri(concat('https://admin.mas-', variables('projectName'), '.apps.masocp-', variables('projectName'), '.', parameters('publicDomain')), '')]"
-      },
-      "masAdminUrlLogin": {
-        "type": "string",
-        "condition": "[not(equals(parameters('openShiftClusterApiUrl'), ''))]",
         "value": "[uri(concat('https://admin.mas-', variables('projectName'), '.apps.', last(split(parameters('openShiftClusterApiUrl'),'api.'))), '')]"
       },
       "masWorkspaceUrl": {
         "type": "string",
-        "condition": "[equals(parameters('openShiftClusterApiUrl'), '')]",
-        "value": "[uri(concat('https://wsmasocp.home.mas-', variables('projectName'), '.apps.masocp-', variables('projectName'), '.', parameters('publicDomain')), '')]"
-      },
-      "masWorkspaceUrlLogin": {
-        "type": "string",
-        "condition": "[not(equals(parameters('openShiftClusterApiUrl'), ''))]",
         "value": "[uri(concat('https://wsmasocp.home.mas-', variables('projectName'), '.apps.', last(split(parameters('openShiftClusterApiUrl'),'api.'))), '')]"
       }
     }
