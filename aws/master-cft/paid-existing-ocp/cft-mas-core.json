@@ -12,10 +12,6 @@
                 "MAS Core + Manage (no Cloud Pak for Data)"
             ]
         },
-        "PublicHostedZone": {
-            "Description": "Select the public hosted zone that you created in the AWS Route 53 service, for example: mas4aws.myorg.com",
-            "Type": "AWS::Route53::HostedZone::Id"
-        },
         "BootNodeVPCId": {
             "Description": "Enter the VPC Id to create the bootnode into. Default VPC created by AWS will be used if not specified. If existing OpenShift cluster is specified, make sure it is reachable from this VPC",
             "Type" : "AWS::EC2::VPC::Id"
@@ -27,7 +23,11 @@
         "BootnodeSGIngressCidrIp": {
             "Description": "Use CIDR notation to enter the IP addresses that can access the bootnode. For example, 192.12.33.3/32. To allow access from all IP addresses, enter 0.0.0.0/0.",
             "Type": "String",
-            "MinLength": "1"
+            "MinLength": "9",
+            "MaxLength": "18",
+            "AllowedPattern": "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})",
+            "ConstraintDescription": "must be a valid IP CIDR range of the form w.x.y.z/a."
+
         },
         "OpenShiftClusterApiUrl": {
             "Description": "Enter the cluster's URL in the format https://api.<cluster_name>.<domain_name>. Do not specify the port number. For example,https://api.masocp.joalae.mas4aws.com",
@@ -135,14 +135,6 @@
                 },
                 {
                     "Label": {
-                        "default": "Existing OpenShift cluster configuration details (you must complete this section)"
-                    },
-                    "Parameters": [
-                        "PublicHostedZone"
-                    ]
-                },
-                {
-                    "Label": {
                         "default": "Cluster and bootnode access (you must complete this section)"
                     },
                     "Parameters": [
@@ -209,49 +201,49 @@
                 "HVM64": "ami-0663aa4f5e3ea9a30"
             },
             "us-east-2": {
-                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
+                "HVM64": "ami-0015d74318b50eb1e"
             },
             "us-west-2": {
-                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
+                "HVM64": "ami-0821cafcce4fc2688"
             },
             "ca-central-1": {
-                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
+                "HVM64": "ami-030b370d9aca15cfa"
             },
             "eu-north-1": {
-                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
+                "HVM64": "ami-098e79645f6b1fe5e"
             },
             "eu-west-1": {
-                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
+                "HVM64": "ami-08fec0d0aaac92f41"
             },
             "eu-west-2": {
-                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
+                "HVM64": "ami-0148e83ca025fb1c4"
             },
             "eu-west-3": {
-                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
+                "HVM64": "ami-0de7facdeac48f412"
             },
             "eu-central-1": {
-                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
+                "HVM64": "ami-0b385b9c219bffb9e"
             },
             "ap-northeast-1": {
-                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
+                "HVM64": "ami-069f47ef9e8860025"
             },
             "ap-northeast-2": {
-                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
+                "HVM64": "ami-0625060302b0a25a9"
             },
             "ap-northeast-3": {
-                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
+                "HVM64": "ami-0ad182d44dbada8bf"
             },
             "ap-south-1": {
-                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
+                "HVM64": "ami-0ef36f4268fdfd19e"
             },
             "ap-southeast-1": {
-                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
+                "HVM64": "ami-09710a2dadbadbc7f"
             },
             "ap-southeast-2": {
-                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
+                "HVM64": "ami-052190ea20426d706"
             },
             "sa-east-1": {
-                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
+                "HVM64": "ami-0b4a6f590daa1e143"
             }
         }
     },
@@ -550,23 +542,6 @@
                 }
             }
         },
-        "CallLambdaGetHostedZoneName": {
-            "Type": "Custom::CallLambdaGetHostedZoneName",
-            "Properties": {
-                "ServiceToken": {
-                    "Fn::GetAtt": [
-                        "LambdaFunctionGetHostedZoneName",
-                        "Arn"
-                    ]
-                },
-                "ZoneId": {
-                    "Ref": "PublicHostedZone"
-                },
-                "Region": {
-                    "Ref": "AWS::Region"
-                }
-            }
-        },
         "DeploymentConfigBucket": {
             "Type": "AWS::S3::Bucket",
             "Properties": {
@@ -745,13 +720,8 @@
                                     ]
                                 },
                                 "\" \"",
-                                {
-                                    "Fn::GetAtt": [
-                                        "CallLambdaGetHostedZoneName",
-                                        "ZoneName"
-                                    ]
-                                },
-                                "\" \"\" \"",
+                                "\" \"",
+                                "\" \"",
                                 {
                                     "Ref": "SSHKey"
                                 },
@@ -876,7 +846,7 @@
                 "Fn::Join": [
                     "",
                     [
-                        "https://admin.mas-",
+                        "https://admin.",
                         {
                             "Fn::GetAtt": [
                                 "CallLambdaRandomizer",
@@ -906,7 +876,7 @@
                 "Fn::Join": [
                     "",
                     [
-                        "https://admin.mas-",
+                        "https://admin.",
                         {
                             "Fn::GetAtt": [
                                 "CallLambdaRandomizer",
@@ -935,7 +905,7 @@
                 "Fn::Join": [
                     "",
                     [
-                        "https://wsmasocp.home.mas-",
+                        "https://wsmasocp.home.",
                         {
                             "Fn::GetAtt": [
                                 "CallLambdaRandomizer",
