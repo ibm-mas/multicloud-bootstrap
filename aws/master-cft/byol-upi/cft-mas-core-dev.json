@@ -455,8 +455,7 @@
                                         "logs:CreateLogStream",
                                         "logs:PutLogEvents",
                                         "logs:DescribeLogStreams",
-                                        "secretsmanager:CreateSecret",
-                                        "secretsmanager:GetSecretValue"
+                                        "secretsmanager:CreateSecret"
                                     ],
                                     "Resource": "*"
                                 }
@@ -540,8 +539,7 @@
                                         "route53:GetHostedZone",
                                         "ec2:DescribeVpcs",
                                         "ec2:DescribeSubnets",
-                                        "secretsmanager:CreateSecret",
-                                        "secretsmanager:GetSecretValue"
+                                        "secretsmanager:CreateSecret"
                                     ],
                                     "Resource": "*"
                                 }
