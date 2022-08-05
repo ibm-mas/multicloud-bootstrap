@@ -199,49 +199,49 @@
                 "HVM64": "ami-0663aa4f5e3ea9a30"
             },
             "us-east-2": {
-                "HVM64": "ami-0015d74318b50eb1e"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "us-west-2": {
-                "HVM64": "ami-0821cafcce4fc2688"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "ca-central-1": {
-                "HVM64": "ami-030b370d9aca15cfa"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "eu-north-1": {
-                "HVM64": "ami-098e79645f6b1fe5e"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "eu-west-1": {
-                "HVM64": "ami-08fec0d0aaac92f41"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "eu-west-2": {
-                "HVM64": "ami-0148e83ca025fb1c4"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "eu-west-3": {
-                "HVM64": "ami-0de7facdeac48f412"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "eu-central-1": {
-                "HVM64": "ami-0b385b9c219bffb9e"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "ap-northeast-1": {
-                "HVM64": "ami-069f47ef9e8860025"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "ap-northeast-2": {
-                "HVM64": "ami-0625060302b0a25a9"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "ap-northeast-3": {
-                "HVM64": "ami-0ad182d44dbada8bf"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "ap-south-1": {
-                "HVM64": "ami-0ef36f4268fdfd19e"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "ap-southeast-1": {
-                "HVM64": "ami-09710a2dadbadbc7f"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "ap-southeast-2": {
-                "HVM64": "ami-052190ea20426d706"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "sa-east-1": {
-                "HVM64": "ami-0b4a6f590daa1e143"
+                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             }
         }
     },
