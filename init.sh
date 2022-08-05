@@ -130,6 +130,10 @@ fi
 export CLUSTER_NAME="masocp-${RANDOM_STR}"
 export OCP_USERNAME="masocpuser"
 export OCP_PASSWORD="mas${RANDOM_STR:3:3}`date +%H%M%S`${RANDOM_STR:0:3}"
+if [[ ($EXS_OCP_URL) && ($EXS_OCP_USER) && ($EXS_OCP_PWD) ]]; then    
+    export OCP_USERNAME=${EXS_OCP_USER}
+    export OCP_PASSWORD=${EXS_OCP_PWD}
+fi
 export OPENSHIFT_PULL_SECRET_FILE_PATH=${GIT_REPO_HOME}/pull-secret.json
 export MASTER_NODE_COUNT="3"
 export WORKER_NODE_COUNT="3"
@@ -505,6 +509,7 @@ fi
 # Create a secret in the Cloud to keep environment access credentials
 cd $GIT_REPO_HOME
 ./create-secret.sh
+
 
 # Delete temporary password files
 rm -rf /tmp/*password*
