@@ -25,10 +25,13 @@ fi
 
 if [[ $CLUSTER_TYPE == "aws" ]]; then
 	getOCS ocs-operator
-	retcode=$?
-	if [[ $retcode -eq 29 ]]; then
-		return $retcode
-	fi
+elif [[ $CLUSTER_TYPE == "azure" ]]; then
+	getazurefile
+fi
+
+retcode=$?
+if [[ $retcode -eq 29 ]]; then
+	return $retcode
 fi
 
 getVersion MongoDBCommunity
