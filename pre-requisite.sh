@@ -46,7 +46,7 @@ if [[ $DEPLOY_CP4D == "true" ]]; then
 fi
 
 # Skip SLS check in case of paid offering
-if [[ $PRODUCT_TYPE == "privatepublic" ]]; then
+if [[ $PRODUCT_TYPE != "privatepublic" ]]; then
 	getOPNamespace ibm-sls
 	retcode=$?
 	if [[ $retcode -eq 29 ]]; then
