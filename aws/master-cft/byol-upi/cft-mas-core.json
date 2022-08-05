@@ -538,8 +538,7 @@
                                         "logs:CreateLogGroup",
                                         "route53:GetHostedZone",
                                         "ec2:DescribeVpcs",
-                                        "ec2:DescribeSubnets",
-                                        "secretsmanager:CreateSecret"
+                                        "ec2:DescribeSubnets"
                                     ],
                                     "Resource": "*"
                                 }
