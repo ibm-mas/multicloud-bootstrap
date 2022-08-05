@@ -45,7 +45,16 @@ if [[ $DEPLOY_CP4D == "true" ]]; then
 	fi
 fi
 
-arr=(ibm-sls ibm-cert-manager-operator user-data-services-operator)
+# Skip SLS check in case of paid offering
+if [[ $PRODUCT_TYPE == "privatepublic" ]]; then
+	getOPNamespace ibm-sls
+	retcode=$?
+	if [[ $retcode -eq 29 ]]; then
+		return $retcode
+	fi
+fi
+
+arr=(ibm-cert-manager-operator user-data-services-operator)
 i=0
 
 while [ $i -lt ${#arr[@]} ]
