@@ -466,9 +466,6 @@ if [[ $PRE_VALIDATION == "pass" ]]; then
     export MAS_URL_ADMIN="https:\/\/admin.mas-${RANDOM_STR}.apps.${CLUSTER_NAME}.${BASE_DOMAIN}"
     export MAS_URL_WORKSPACE="https:\/\/$MAS_WORKSPACE_ID.home.mas-${RANDOM_STR}.apps.${CLUSTER_NAME}.${BASE_DOMAIN}"
     RESP_CODE=0
-    # Create a secret in the Cloud to keep OCP access credentials
-    cd $GIT_REPO_HOME
-    ./create-secret.sh ocp
   else
     mark_provisioning_failed $retcode
   fi
