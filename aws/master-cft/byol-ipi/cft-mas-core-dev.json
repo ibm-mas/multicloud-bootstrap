@@ -32,19 +32,6 @@
                 "large"
             ]
         },
-        "OpenShiftClusterApiUrl": {
-            "Description": "Enter the cluster's URL in the format https://api.<cluster_name>.<domain_name>. Do not specify the port number. For example,https://api.masocp.joalae.mas4aws.com",
-            "Type": "String"
-        },
-        "OpenShiftUser": {
-            "Description": "Enter the username of the existing cluster account.",
-            "Type": "String"
-        },
-        "OpenShiftPassword": {
-            "Description": "Enter the password of the existing cluster account.",
-            "Type": "String",
-            "NoEcho": true
-        },
         "EntitledRegistryKey": {
             "Description": "Enter the registry key that you downloaded from the IBM Container Library.",
             "Type": "String",
@@ -139,16 +126,6 @@
                 },
                 {
                     "Label": {
-                        "default": "Existing OpenShift cluster connection details (complete this section only if you want to reuse an existing cluster)"
-                    },
-                    "Parameters": [
-                        "OpenShiftClusterApiUrl",
-                        "OpenShiftUser",
-                        "OpenShiftPassword"
-                    ]
-                },
-                {
-                    "Label": {
                         "default": "New OpenShift cluster configuration details (complete this section only if you want to create a new cluster)"
                     },
                     "Parameters": [
@@ -221,75 +198,54 @@
     "Mappings": {
         "RegionMap": {
             "us-east-1": {
-                "HVM64": "ami-07809a17acfe15035"
+                "HVM64": "ami-0ef2a204a69167b2e"
             },
             "us-east-2": {
-                "HVM64": "ami-00ba0ee5d999cd7e7"
+                "HVM64": "ami-062b6a674eb0c2e9c"
             },
             "us-west-2": {
-                "HVM64": "ami-0c2bf9db9c23d8ef2"
+                "HVM64": "ami-049f9274268d2ff88"
             },
             "ca-central-1": {
-                "HVM64": "ami-01d7e931190fb52e6"
+                "HVM64": "ami-0d4af3a718018c899"
             },
             "eu-north-1": {
-                "HVM64": "ami-023d4dfcbd33ca27f"
+                "HVM64": "ami-0b3a8c8ed376a9193"
             },
-            "eu-west-1": {
-                "HVM64": "ami-0a821a5026741f9ab"
+            
+	    "eu-west-1": {
+                "HVM64": "ami-0fb132ff756953f9a"
             },
             "eu-west-2": {
-                "HVM64": "ami-065e2aefc015c400b"
+                "HVM64": "ami-00c3f6ddb720e678c"
             },
             "eu-west-3": {
-                "HVM64": "ami-018e7f03ae7e26249"
+                "HVM64": "ami-027d2da40bb974cfb"
             },
             "eu-central-1": {
-                "HVM64": "ami-09e81852f8ff6976a"
+                "HVM64": "ami-03e573b07a13a8c31"
             },
             "ap-northeast-1": {
-                "HVM64": "ami-0b1e9431f015e6f51"
+                "HVM64": "ami-09f275ddde52139a7"
             },
             "ap-northeast-2": {
-                "HVM64": "ami-013ca7a32b575d108"
+                "HVM64": "ami-03a1fb3b705d0dd91"
             },
             "ap-northeast-3": {
-                "HVM64": "ami-067192b67be841c56"
+                "HVM64": "ami-0b01445f04bda9219"
             },
             "ap-south-1": {
-                "HVM64": "ami-0da7aecfb8496cab4"
+                "HVM64": "ami-0d6f41add7f1c62dd"
             },
             "ap-southeast-1": {
-                "HVM64": "ami-0fdb1e4f1e84cb2aa"
+                "HVM64": "ami-0825fcd346fb3babe"
             },
             "ap-southeast-2": {
-                "HVM64": "ami-014cf8441144f02d6"
+                "HVM64": "ami-09a4cfc5416a39c2c"
             },
             "sa-east-1": {
-                "HVM64": "ami-0c3e1fda0b6cd10a8"
+                "HVM64": "ami-037608508e4c078cd"
             }
-        }
-    },
-    "Conditions": {
-        "NoExistingOCPCluster": {
-            "Fn::Equals": [
-                {
-                    "Ref": "OpenShiftClusterApiUrl"
-                },
-                ""
-            ]
-        },
-        "ExistingOCPCluster": {
-            "Fn::Not": [
-                {
-                    "Fn::Equals": [
-                        {
-                            "Ref": "OpenShiftClusterApiUrl"
-                        },
-                        ""
-                    ]
-                }
-            ]
         }
     },
     "Resources": {
@@ -443,7 +399,7 @@
                                         "logs:CreateLogStream",
                                         "logs:PutLogEvents",
                                         "logs:DescribeLogStreams",
-                                        "secretsmanager:CreateSecret"
+					"secretsmanager:CreateSecret"
                                     ],
                                     "Resource": "*"
                                 }
@@ -861,25 +817,13 @@
                                 "' '",
                                 {
                                     "Ref": "ImportDemoData"
-                                },
-                                "' '",
-                                {
-                                    "Ref": "OpenShiftClusterApiUrl"
-                                },
-                                "' '",
-                                {
-                                    "Ref": "OpenShiftUser"
-                                },
-                                "' '",
-                                {
-                                    "Ref": "OpenShiftPassword"
-                                },
-                                "' '' '",
+                                },                                
+                                "' '' '' '' '' '",
                                 {
                                     "Ref": "EmailNotification"
                                 },
                                 "' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '",
-                                "' \"prod\" ",
+                                "' \"dev\" ",
                                 "2>&1 | tee mas-provisioning.log; "
                             ]
                         ]
@@ -934,7 +878,6 @@
         },
         "OpenShiftConsoleUrl": {
             "Description": "Url to login to OpenShift console",
-            "Condition": "NoExistingOCPCluster",
             "Value": {
                 "Fn::Join": [
                     "",
@@ -959,7 +902,6 @@
         },
         "OpenShiftApiUrl": {
             "Description": "Url to login to OpenShift Api",
-            "Condition": "NoExistingOCPCluster",
             "Value": {
                 "Fn::Join": [
                     "",
@@ -985,7 +927,6 @@
         },
         "MASInitialSetupUrl": {
             "Description": "Url to perform MAS initial setup, make sure you have imported the MAS public certificate into the browser",
-            "Condition": "NoExistingOCPCluster",
             "Value": {
                 "Fn::Join": [
                     "",
@@ -1018,7 +959,6 @@
         },
         "MASInitialSetupUrlLogin": {
             "Description": "Url to perform MAS initial setup, make sure you have imported the MAS public certificate into the browser",
-            "Condition": "ExistingOCPCluster",
             "Value": {
                 "Fn::Join": [
                     "",
@@ -1032,14 +972,16 @@
                         },
                         ".apps.",
                         {
-                            "Fn::Select": [
-                                "1",
-                                {
-                                    "Fn::Split": [
-                                        "api.",
-                                        {"Ref": "OpenShiftClusterApiUrl"}
-                                    ]
-                                }
+                            "Fn::GetAtt": [
+                                "CallLambdaRandomizer",
+                                "Lower_RandomString"
+                            ]
+                        },
+                        ".",
+                        {
+                            "Fn::GetAtt": [
+                                "CallLambdaGetHostedZoneName",
+                                "ZoneName"
                             ]
                         },
                         "/initialsetup"
@@ -1049,7 +991,6 @@
         },
         "MASAdminUrl": {
             "Description": "Url to login to MAS Admin UI, make sure you have imported the MAS public certificate into the browser",
-            "Condition": "NoExistingOCPCluster",
             "Value": {
                 "Fn::Join": [
                     "",
@@ -1081,28 +1022,29 @@
         },
         "MASAdminUrlLogin": {
             "Description": "Url to login to MAS Admin UI, make sure you have imported the MAS public certificate into the browser",
-            "Condition": "ExistingOCPCluster",
             "Value": {
                 "Fn::Join": [
                     "",
                     [
-                        "https://admin.mas-",
+                        "https://admin.",
                         {
                             "Fn::GetAtt": [
                                 "CallLambdaRandomizer",
                                 "Lower_RandomString"
                             ]
                         },
-                        ".apps.",
+                        ".apps.masocp-",
                         {
-                            "Fn::Select": [
-                                "1",
-                                {
-                                    "Fn::Split": [
-                                        "api.",
-                                        {"Ref": "OpenShiftClusterApiUrl"}
-                                    ]
-                                }
+                            "Fn::GetAtt": [
+                                "CallLambdaRandomizer",
+                                "Lower_RandomString"
+                            ]
+                        },
+                        ".",
+                        {
+                            "Fn::GetAtt": [
+                                "CallLambdaGetHostedZoneName",
+                                "ZoneName"
                             ]
                         }
                     ]
@@ -1111,7 +1053,6 @@
         },
         "MASWorkspaceUrl": {
             "Description": "Url to login to MAS Workspace, make sure you have imported the MAS public certificate into the browser",
-            "Condition": "NoExistingOCPCluster",
             "Value": {
                 "Fn::Join": [
                     "",
@@ -1143,7 +1084,6 @@
         },
         "MASWorkspaceUrlLogin": {
             "Description": "Url to login to MAS Workspace, make sure you have imported the MAS public certificate into the browser",
-            "Condition": "ExistingOCPCluster",
             "Value": {
                 "Fn::Join": [
                     "",
@@ -1157,14 +1097,16 @@
                         },
                         ".apps.",
                         {
-                            "Fn::Select": [
-                                "1",
-                                {
-                                    "Fn::Split": [
-                                        "api.",
-                                        {"Ref": "OpenShiftClusterApiUrl"}
-                                    ]
-                                }
+                            "Fn::GetAtt": [
+                                "CallLambdaRandomizer",
+                                "Lower_RandomString"
+                            ]
+                        },
+                        ".",
+                        {
+                            "Fn::GetAtt": [
+                                "CallLambdaGetHostedZoneName",
+                                "ZoneName"
                             ]
                         }
                     ]
