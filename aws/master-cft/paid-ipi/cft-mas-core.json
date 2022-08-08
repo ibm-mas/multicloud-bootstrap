@@ -239,7 +239,7 @@
             "sa-east-1": {
                 "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             }
-        
+
         }
     },
     "Resources": {
@@ -811,7 +811,7 @@
                                 "' '' '' '' '' '",
 
                                 {
-                                   
+
                                     "Ref": "EmailNotification"
                                 },
                                 "' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '",
@@ -923,7 +923,7 @@
                 "Fn::Join": [
                     "",
                     [
-                        "https://admin.mas-",
+                        "https://admin.",
                         {
                             "Fn::GetAtt": [
                                 "CallLambdaRandomizer",
@@ -955,7 +955,7 @@
                 "Fn::Join": [
                     "",
                     [
-                        "https://admin.mas-",
+                        "https://admin.",
                         {
                             "Fn::GetAtt": [
                                 "CallLambdaRandomizer",
@@ -987,7 +987,7 @@
                 "Fn::Join": [
                     "",
                     [
-                        "https://admin.mas-",
+                        "https://admin.",
                         {
                             "Fn::GetAtt": [
                                 "CallLambdaRandomizer",
@@ -1049,7 +1049,7 @@
                 "Fn::Join": [
                     "",
                     [
-                        "https://wsmasocp.home.mas-",
+                        "https://wsmasocp.home",
                         {
                             "Fn::GetAtt": [
                                 "CallLambdaRandomizer",
@@ -1080,7 +1080,7 @@
                 "Fn::Join": [
                     "",
                     [
-                        "https://wsmasocp.home.mas-",
+                        "https://wsmasocp.home",
                         {
                             "Fn::GetAtt": [
                                 "CallLambdaRandomizer",

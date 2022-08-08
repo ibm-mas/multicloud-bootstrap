@@ -212,7 +212,7 @@
             "eu-north-1": {
                 "HVM64": "ami-0b3a8c8ed376a9193"
             },
-            
+
 	    "eu-west-1": {
                 "HVM64": "ami-0fb132ff756953f9a"
             },
@@ -817,7 +817,7 @@
                                 "' '",
                                 {
                                     "Ref": "ImportDemoData"
-                                },                                
+                                },
                                 "' '' '' '' '' '",
                                 {
                                     "Ref": "EmailNotification"
@@ -931,7 +931,7 @@
                 "Fn::Join": [
                     "",
                     [
-                        "https://admin.mas-",
+                        "https://admin.",
                         {
                             "Fn::GetAtt": [
                                 "CallLambdaRandomizer",
@@ -963,7 +963,7 @@
                 "Fn::Join": [
                     "",
                     [
-                        "https://admin.mas-",
+                        "https://admin.",
                         {
                             "Fn::GetAtt": [
                                 "CallLambdaRandomizer",
@@ -995,7 +995,7 @@
                 "Fn::Join": [
                     "",
                     [
-                        "https://admin.mas-",
+                        "https://admin.",
                         {
                             "Fn::GetAtt": [
                                 "CallLambdaRandomizer",
@@ -1057,7 +1057,7 @@
                 "Fn::Join": [
                     "",
                     [
-                        "https://wsmasocp.home.mas-",
+                        "https://wsmasocp.home",
                         {
                             "Fn::GetAtt": [
                                 "CallLambdaRandomizer",
@@ -1088,7 +1088,7 @@
                 "Fn::Join": [
                     "",
                     [
-                        "https://wsmasocp.home.mas-",
+                        "https://wsmasocp.home",
                         {
                             "Fn::GetAtt": [
                                 "CallLambdaRandomizer",
