@@ -865,7 +865,7 @@
     "Outputs": {
         "MASCloudAutomationVersion": {
             "Description": "Version of the MAS automated deployment on Cloud",
-            "Value": "1.0"
+            "Value": "2.0"
         },
         "ClusterUniqueString": {
             "Description": "Unique string that is part of cluster resoutce names",

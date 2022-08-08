@@ -848,7 +848,7 @@
     "Outputs": {
         "MASCloudAutomationVersion": {
             "Description": "Version of the MAS automated deployment on Cloud",
-            "Value": "2.0-alpha.1"
+            "Value": "2.0"
         },
         "MASInitialSetupUrlLogin": {
             "Description": "Url to perform MAS initial setup, make sure you have imported the MAS public certificate into the browser",
