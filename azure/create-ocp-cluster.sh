@@ -4,7 +4,6 @@
 export ARM_SUBSCRIPTION_ID=$AZURE_SUBSC_ID
 export ARM_CLIENT_ID=$AZURE_SP_CLIENT_ID
 export ARM_CLIENT_SECRET=$AZURE_SP_CLIENT_PWD
-export ARM_TENANT_ID=$AZURE_TENANT_ID
 cd $GIT_REPO_HOME/azure/ocp-terraform/azure_infra
 rm -rf terraform.tfvars
 # Create tfvars file
@@ -12,7 +11,7 @@ cat <<EOT >> terraform.tfvars
 azure-client-id="$AZURE_SP_CLIENT_ID"
 azure-client-secret="$AZURE_SP_CLIENT_PWD"
 azure-subscription-id="$AZURE_SUBSC_ID"
-azure-tenant-id="$AZURE_TENANT_ID"
+azure-tenant-id="$TENANT_ID"
 resource-group          = "$RG_NAME"
 existing-resource-group = "yes"
 single-or-multi-zone    = "multi"

@@ -199,6 +199,10 @@ EOT
   fi
   set -e
   log "OCP cluster Terraform configuration backed up at $DEPLOYMENT_CONTEXT_UPLOAD_PATH in file $CLUSTER_NAME.zip"
+
+  # Create a secret in the Cloud to keep OCP access credentials
+  cd $GIT_REPO_HOME
+  ./create-secret.sh ocp
 else
   log "==== Existing OCP cluster provided, skipping the cluster creation, Bastion host creation and S3 upload of deployment context ===="
 fi

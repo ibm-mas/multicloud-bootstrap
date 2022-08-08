@@ -549,15 +549,17 @@ echo "---------------------------------------------"
 
 ## Delete secret in Secrets Manager
 echo "Checking for secret"
-SECRET=$(aws secretsmanager describe-secret --secret-id masocp-secret-$UNIQ_STR --region $REGION | jq ".Name" | tr -d '"')
-echo "SECRET = $SECRET"
-if [[ -n $SECRET ]]; then
-  # Delete secret
-  aws secretsmanager delete-secret --secret-id masocp-secret-$UNIQ_STR --region $REGION
-  echo "Deleted secret $SECRET"
-else
-  echo "No secret for this MAS instance"
-fi
+for secret in maximo-ocp-secret-$UNIQ_STR maximo-mas-secret-$UNIQ_STR; do
+  SECRET=$(aws secretsmanager describe-secret --secret-id $secret --region $REGION | jq ".Name" | tr -d '"')
+  echo "SECRET = $SECRET"
+  if [[ -n $SECRET ]]; then
+    # Delete secret
+    aws secretsmanager delete-secret --secret-id $secret --region $REGION
+    echo "Deleted secret $secret"
+  else
+    echo "No secret named $secret for this MAS instance"
+  fi
+done
 
 # Delete CloudFormation stack
 if [[ -n $STACK_NAME ]]; then

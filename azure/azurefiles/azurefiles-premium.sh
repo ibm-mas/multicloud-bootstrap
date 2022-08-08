@@ -4,7 +4,7 @@
 #set variables for deployment
 export deployRegion=${DEPLOY_REGION}
 export resourceGroupName="$(oc get machineset -n openshift-machine-api -o json | jq -r '.items[0].spec.template.spec.providerSpec.value.resourceGroup')"
-export tenantId=${AZURE_TENANT_ID}
+export tenantId=${TENANT_ID}
 export subscriptionId=${AZURE_SUBSC_ID}
 export clientId=${AZURE_SP_CLIENT_ID}
 export clientSecret=${AZURE_SP_CLIENT_PWD}
