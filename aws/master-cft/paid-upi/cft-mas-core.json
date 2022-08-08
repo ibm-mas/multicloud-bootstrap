@@ -49,7 +49,6 @@
             "Type": "String",
             "MinLength": "9",
             "MaxLength": "18",
-            "Default": "0.0.0.0/0",
             "AllowedPattern": "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})",
             "ConstraintDescription": "must be a valid IP CIDR range of the form w.x.y.z/a."
         },
@@ -229,7 +228,7 @@
                 },
                 {
                     "Label": {
-                        "default": "Choose the OCP cluster type  & existing VPC Details"
+                        "default": "Choose the OCP cluster type  & existing VPC Details "
                     },
                     "Parameters": [
                         "PrivateCluster",
@@ -868,7 +867,6 @@
                                 {
                                     "Ref": "PrivateCluster"
                                 },
-                                "' '",
                                 "' \"prod\" ",
                                 "2>&1 | tee mas-provisioning.log; "
                             ]
@@ -911,7 +909,7 @@
     "Outputs": {
         "MASCloudAutomationVersion": {
             "Description": "Version of the MAS automated deployment on Cloud",
-            "Value": "1.0"
+            "Value": "2.0"
         },
         "ClusterUniqueString": {
             "Description": "Unique string that is part of cluster resoutce names",
@@ -977,7 +975,7 @@
                 "Fn::Join": [
                     "",
                     [
-                        "https://admin.mas-",
+                        "https://admin.",
                         {
                             "Fn::GetAtt": [
                                 "CallLambdaRandomizer",
@@ -1009,7 +1007,7 @@
                 "Fn::Join": [
                     "",
                     [
-                        "https://admin.mas-",
+                        "https://admin.",
                         {
                             "Fn::GetAtt": [
                                 "CallLambdaRandomizer",
@@ -1040,7 +1038,7 @@
                 "Fn::Join": [
                     "",
                     [
-                        "https://wsmasocp.home.mas-",
+                        "https://wsmasocp.home.",
                         {
                             "Fn::GetAtt": [
                                 "CallLambdaRandomizer",

@@ -12,10 +12,6 @@
                 "MAS Core + Manage (no Cloud Pak for Data)"
             ]
         },
-        "PublicHostedZone": {
-            "Description": "Select the public hosted zone that you created in the AWS Route 53 service, for example: mas4aws.myorg.com",
-            "Type": "AWS::Route53::HostedZone::Id"
-        },
         "BootNodeVPCId": {
             "Description": "Enter the VPC Id to create the bootnode into. Default VPC created by AWS will be used if not specified. If existing OpenShift cluster is specified, make sure it is reachable from this VPC",
             "Type" : "AWS::EC2::VPC::Id"
@@ -31,6 +27,7 @@
             "MaxLength": "18",
             "AllowedPattern": "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})",
             "ConstraintDescription": "must be a valid IP CIDR range of the form w.x.y.z/a."
+
         },
         "OpenShiftClusterApiUrl": {
             "Description": "Enter the cluster's URL in the format https://api.<cluster_name>.<domain_name>. Do not specify the port number. For example,https://api.masocp.joalae.mas4aws.com",
@@ -139,14 +136,6 @@
                         "OpenShiftClusterApiUrl",
                         "OpenShiftUser",
                         "OpenShiftPassword"
-                    ]
-                },
-                {
-                    "Label": {
-                        "default": "Existing OpenShift cluster configuration details (you must complete this section)"
-                    },
-                    "Parameters": [
-                        "PublicHostedZone"
                     ]
                 },
                 {
@@ -559,23 +548,6 @@
                 }
             }
         },
-        "CallLambdaGetHostedZoneName": {
-            "Type": "Custom::CallLambdaGetHostedZoneName",
-            "Properties": {
-                "ServiceToken": {
-                    "Fn::GetAtt": [
-                        "LambdaFunctionGetHostedZoneName",
-                        "Arn"
-                    ]
-                },
-                "ZoneId": {
-                    "Ref": "PublicHostedZone"
-                },
-                "Region": {
-                    "Ref": "AWS::Region"
-                }
-            }
-        },
         "DeploymentConfigBucket": {
             "Type": "AWS::S3::Bucket",
             "Properties": {
@@ -754,13 +726,8 @@
                                     ]
                                 },
                                 "\" \"",
-                                {
-                                    "Fn::GetAtt": [
-                                        "CallLambdaGetHostedZoneName",
-                                        "ZoneName"
-                                    ]
-                                },
-                                "\" \"\" \"",
+                                "\" \"",
+                                "\" \"",
                                 {
                                     "Ref": "SSHKey"
                                 },
@@ -881,7 +848,7 @@
     "Outputs": {
         "MASCloudAutomationVersion": {
             "Description": "Version of the MAS automated deployment on Cloud",
-            "Value": "2.0-alpha.1"
+            "Value": "2.0"
         },
         "MASInitialSetupUrlLogin": {
             "Description": "Url to perform MAS initial setup, make sure you have imported the MAS public certificate into the browser",
