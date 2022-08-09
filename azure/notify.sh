@@ -23,7 +23,7 @@ if [[ $STATUS == "SUCCESS" ]]; then
   fi
   get_mas_creds $RANDOM_STR
   log " MAS_USER=$MAS_USER"
-  log " MAS_PASSWORD=$MAS_PASSWORD"
+  #log " MAS_PASSWORD=$MAS_PASSWORD"
 else
   certfile="status"
   echo "Deployment failed - $STATUS_MSG" > $certfile
