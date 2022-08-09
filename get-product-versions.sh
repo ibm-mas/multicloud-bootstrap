@@ -7,8 +7,8 @@ OpenshiftVersion=$(oc get clusterversion | awk  'NR==2 {print $2 }')
 log " OCP version is $OpenshiftVersion"
 
 # Cloud Pak foundation services
-cloud_pak=$(oc get subscription ibm-common-service-operator -n ibm-common-services  -o json | jq .status.installedCSV -r |  grep --perl-regexp '(?:(\d+)\.)?(?:(\d+)\.)?(?:(\d+)\.\d+)' --only-matching )
-log " MAS version is $cloud_pak" 
+cpfs_version=$(oc get subscription ibm-common-service-operator -n ibm-common-services  -o json | jq .status.installedCSV -r |  grep --perl-regexp '(?:(\d+)\.)?(?:(\d+)\.)?(?:(\d+)\.\d+)' --only-matching )
+log " Foundational services version is $cpfs_version" 
 
 # CP4D (if installed)
 # Cert Manager
@@ -35,6 +35,6 @@ log " MAS version is $mas_version"
 
 # Manage (if installed)
 if [[ $DEPLOY_MANAGE == "true" ]]; then
-managed_version=$(oc get subscription ibm-mas-manage -n mas-$MAS_INSTANCE_ID-$MAS_APP_ID  -o json | jq .status.installedCSV -r |  grep --perl-regexp '(?:(\d+)\.)?(?:(\d+)\.)?(?:(\d+)\.\d+)' --only-matching )
-log " Managed version is $managed_version"
+manage_version=$(oc get subscription ibm-mas-manage -n mas-$MAS_INSTANCE_ID-$MAS_APP_ID  -o json | jq .status.installedCSV -r |  grep --perl-regexp '(?:(\d+)\.)?(?:(\d+)\.)?(?:(\d+)\.\d+)' --only-matching )
+log " Manage version is $manage_version"
 fi
