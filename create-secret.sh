@@ -45,7 +45,7 @@ if [[ $CLUSTER_TYPE == "aws" ]]; then
   log "Secret for $SECRET_TYPE created in AWS Secrets Manager"
 elif [[ $CLUSTER_TYPE == "azure" ]]; then
   # Check if key vault already exists
-  vaultname=masocp-secret-$RANDOM_STR
+  vaultname=maximo-vault-$RANDOM_STR
   vault=$(az keyvault list --resource-group spedgedep2 | jq --arg vaultname $vaultname '.[] | select(.name == $vaultname).id' | tr -d '"')
   if [[ -z $vault ]]; then
     az keyvault create --no-self-perms --name $vaultname --resource-group "$RG_NAME" --location "$DEPLOY_REGION"
