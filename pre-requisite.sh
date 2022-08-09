@@ -46,6 +46,12 @@ if [[ $DEPLOY_CP4D == "true" ]]; then
 	if [[ $retcode -eq 29 ]]; then
 	return $retcode
 	fi
+	
+	getVersion Db2uCluster
+	retcode=$?
+	if [[ $retcode -eq 29 ]]; then
+	return $retcode
+	fi
 fi
 
 # Skip SLS check in case of paid offering
@@ -78,12 +84,6 @@ done
 # if [[ $retcode -eq 29 ]]; then
 # 	return $retcode
 # fi
-
-getVersion Db2uCluster
-retcode=$?
-if [[ $retcode -eq 29 ]]; then
-	return $retcode
-fi
 
 getKafkaVersion
 retcode=$?

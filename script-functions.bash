@@ -63,16 +63,22 @@ function getOPNamespace() {
 				export ${op_namespaces[${1}]}=$op_namespace
 			fi
 			if [[  $1 = "ibm-sls" ]]; then
-				export SLS_INSTANCE_NAME=$(oc get LicenseService  -n $SLS_NAMESPACE -o json | jq .items[0].metadata.name -r)
-				export SLS_REGISTRATION_KEY=$(oc get LicenseService  -n $SLS_NAMESPACE -o json | jq .items[0].status.registrationKey -r)
-				export SLS_LICENSE_ID=$(oc get LicenseService  -n $SLS_NAMESPACE -o json | jq .items[0].status.licenseId -r)
+				SLS_INSTANCE_NAME=$(oc get LicenseService  -n $SLS_NAMESPACE -o json | jq .items[0].metadata.name -r)
+				if [[ -n $SLS_INSTANCE_NAME  ]]; then
+					export SLS_INSTANCE_NAME
+					export SLS_REGISTRATION_KEY=$(oc get LicenseService  -n $SLS_NAMESPACE -o json | jq .items[0].status.registrationKey -r)
+					export SLS_LICENSE_ID=$(oc get LicenseService  -n $SLS_NAMESPACE -o json | jq .items[0].status.licenseId -r)
 
-				log " Debug: Existing SLS Details."
-				log " SLS_REGISTRATION_KEY: $SLS_REGISTRATION_KEY"
-				log " SLS_INSTANCE_NAME=$SLS_INSTANCE_NAME"
-				log " SLS_LICENSE_ID=$SLS_LICENSE_ID"
+					log " Debug: Existing SLS Details."
+					log " SLS_REGISTRATION_KEY: $SLS_REGISTRATION_KEY"
+					log " SLS_INSTANCE_NAME=$SLS_INSTANCE_NAME"
+					log " SLS_LICENSE_ID=$SLS_LICENSE_ID"
+				fi
 			elif  [[  $1 = "cpd-platform-operator" ]]; then
-				export CPD_INSTANCE_NAMESPACE=$(oc get ibmcpd --all-namespaces -o json | jq .items[0].metadata.namespace -r)	
+				CPD_INSTANCE_NAMESPACE=$(oc get ibmcpd --all-namespaces -o json | jq .items[0].metadata.namespace -r)
+				if [[ -n $CPD_INSTANCE_NAMESPACE  ]]; then
+					export CPD_INSTANCE_NAMESPACE
+				fi
 			fi
 
 		else
@@ -207,4 +213,19 @@ checkROSA(){
 		fi
 	fi
 
+}
+
+function getOPVersions() {
+	check_for_csv_success=$(oc get csv  --all-namespaces | awk -v pattern="$1" '$2 ~ pattern  { print }'  | awk -F' ' '{print $NF}')
+	if [[ $check_for_csv_success = "Succeeded" ]]; then
+		op_namespace=$(oc get csv  --all-namespaces | awk -v pattern="$1" '$2 ~ pattern  { print }'  | awk -F' ' '{print $1}')
+		op_version=$(oc get csv  --all-namespaces | awk -v pattern="$1" '$2 ~ pattern  { print }'  | awk -F' ' '{print $2}' |  grep --perl-regexp '(?:(\d+)\.)?(?:(\d+)\.)?(?:(\d+)\.\d+)' --only-matching )
+		log " $1 version is $op_version"
+	fi
+}
+
+function getMongoVersion() {
+	namespace=$(oc get $1  --all-namespaces | awk  'NR==2 {print $1 }')
+	currentVersion=$(oc get $1 -n ${namespace}  -o json | jq .items[0].spec.version -r)
+	log " $1 version is $currentVersion"
 }
