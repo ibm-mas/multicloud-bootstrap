@@ -79,6 +79,10 @@ az sig create --resource-group masocp-bootnode-image-rg-${UNIQSTR} --location ea
 az sig image-definition create --resource-group masocp-bootnode-image-rg-${UNIQSTR} --gallery-name masbyolimagegallery${UNIQSTR} --gallery-image-definition masocp-image-def-${UNIQSTR} --os-type Linux --publisher ibm-software --hyper-v-generation V2 --offer ibm-maximo-vm-offer --sku ibm-maximo-vm-offer-byol
 az sig image-version create --resource-group masocp-bootnode-image-rg-${UNIQSTR} --location eastus2 --gallery-name masbyolimagegallery${UNIQSTR} --gallery-image-definition masocp-image-def-${UNIQSTR} --gallery-image-version 1.0.0 --target-regions eastus2=1=standard_lrs --managed-image /subscriptions/${SUBID}/resourceGroups/masocp-bootnode-vm-rg-${UNIQSTR}/providers/Microsoft.Compute/images/masocp-bootnode-img-${UNIQSTR}
 
+# Replicate image to all supported regions
+az sig image-version update --resource-group masocp-bootnode-image-rg-${UNIQSTR} --gallery-name masbyolimagegallery${UNIQSTR} --gallery-image-definition masocp-image-def-${UNIQSTR} --gallery-image-version 1.0.0 --target-regions eastus eastus2 southcentralus westus2 westus3 australiaeast southeastasia northeurope swedencentral uksouth westeurope centralus southafricanorth centralindia eastasia japaneast koreacentral canadacentral francecentral germanywestcentral norwayeast brazilsouth &
+echo " Replicating the images to supported regions in the background, it may take around 30 minutes to complete. Please check the replication status from Azure portal."
+
 # Delete the VM resource group
 az group delete -y --name masocp-bootnode-vm-rg-${UNIQSTR}
 
