@@ -46,7 +46,7 @@ if [[ $DEPLOY_CP4D == "true" ]]; then
 	if [[ $retcode -eq 29 ]]; then
 	return $retcode
 	fi
-	
+
 	getVersion Db2uCluster
 	retcode=$?
 	if [[ $retcode -eq 29 ]]; then
@@ -93,7 +93,7 @@ fi
 
 log " KAFKA_NAMESPACE: $KAFKA_NAMESPACE"
 log " CPD_OPERATORS_NAMESPACE: $CPD_OPERATORS_NAMESPACE"
-log " CPD_INSTANCE_NAMESPACE=$CPD_INSTANCE_NAMESPACE"
+log " CPD_INSTANCE_NAMESPACE: $CPD_INSTANCE_NAMESPACE"
 log " SLS_NAMESPACE: $SLS_NAMESPACE"
 log " MONGODB_NAMESPACE: $MONGODB_NAMESPACE"
 
