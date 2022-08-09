@@ -63,9 +63,10 @@ function getOPNamespace() {
 				export ${op_namespaces[${1}]}=$op_namespace
 			fi
 			if [[  $1 = "ibm-sls" ]]; then
-				SLS_INSTANCE_NAME=$(oc get LicenseService  -n $SLS_NAMESPACE -o json | jq .items[0].metadata.name -r)
-				if [[ -n $SLS_INSTANCE_NAME  ]]; then
-					export SLS_INSTANCE_NAME
+				SLS_INSTANCE=$(oc get LicenseService  -n $SLS_NAMESPACE -o json | jq .items[0].metadata.name -r)
+				if [[ -n $SLS_INSTANCE  ]]; then
+					log " SLS Instance Present"
+					export SLS_INSTANCE_NAME=$SLS_INSTANCE
 					export SLS_REGISTRATION_KEY=$(oc get LicenseService  -n $SLS_NAMESPACE -o json | jq .items[0].status.registrationKey -r)
 					export SLS_LICENSE_ID=$(oc get LicenseService  -n $SLS_NAMESPACE -o json | jq .items[0].status.licenseId -r)
 
@@ -75,9 +76,10 @@ function getOPNamespace() {
 					log " SLS_LICENSE_ID=$SLS_LICENSE_ID"
 				fi
 			elif  [[  $1 = "cpd-platform-operator" ]]; then
-				CPD_INSTANCE_NAMESPACE=$(oc get ibmcpd --all-namespaces -o json | jq .items[0].metadata.namespace -r)
-				if [[ -n $CPD_INSTANCE_NAMESPACE  ]]; then
-					export CPD_INSTANCE_NAMESPACE
+				CPD_INSTANCE=$(oc get ibmcpd --all-namespaces -o json | jq .items[0].metadata.namespace -r)
+				if [[ -n $CPD_INSTANCE  ]]; then
+					log " CP4D Instance Present"
+					export CPD_INSTANCE_NAMESPACE=$CPD_INSTANCE
 				fi
 			fi
 
