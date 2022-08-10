@@ -147,7 +147,7 @@ else
         # Delete resources by INFRA_ID
         for restype in Microsoft.Compute/virtualMachines Microsoft.Compute/disks Microsoft.Network/loadBalancers Microsoft.Network/networkInterfaces Microsoft.ManagedIdentity/userAssignedIdentities Microsoft.Network/publicIPAddresses Microsoft.Compute/images Microsoft.Network/privateDnsZones/virtualNetworkLinks Microsoft.Storage/storageAccounts; do
           unset residtodelete
-          echo " Checking resource type $restype"
+          echo " Deleting by INFRA_ID, checking resource type $restype"
           for res in $(az resource list --resource-group $OCP_CLUSTER_RG_NAME --resource-type "$restype" | jq --arg INFRAID $INFRAID '.[] | select(.name | contains($INFRAID)) | .name,.id,":"' | tr -d '"' | tr '\n\r' ',' | tr ':' '\n' | sed 's/^,//g' | sed 's/,$//g'); do
             resname=$(echo $res | cut -f 1 -d ',')
             resid=$(echo $res | cut -f 2 -d ',')
@@ -168,7 +168,7 @@ else
         # Delete resources by UNIQUE_STR
         for restype in Microsoft.Network/privateDnsZones Microsoft.Storage/storageAccounts; do
           unset residtodelete
-          echo " Checking resource type $restype"
+          echo " Deleting by UNIQSTR, checking resource type $restype"
           for res in $(az resource list --resource-group $OCP_CLUSTER_RG_NAME --resource-type "$restype" | jq --arg UNIQSTR $UNIQUE_STR '.[] | select(.name | contains($UNIQSTR)) | .name,.id,":"' | tr -d '"' | tr '\n\r' ',' | tr ':' '\n' | sed 's/^,//g' | sed 's/,$//g'); do
             resname=$(echo $res | cut -f 1 -d ',')
             resid=$(echo $res | cut -f 2 -d ',')
