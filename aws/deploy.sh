@@ -272,11 +272,14 @@ if [[ (-z $SLS_URL) || (-z $SLS_REGISTRATION_KEY) || (-z $SLS_PUB_CERT_URL) ]]; 
   # Deploy SLS
   if [[ $PRODUCT_TYPE == "privatepublic" ]]; then
     # Create Products Configmap and CredetialsRequest in sls namespace for Paid Offering.
+    log "Configuring sls for paid offering"
     envsubst <"$GIT_REPO_HOME"/aws/products_template.yaml >"$GIT_REPO_HOME"/aws/products.yaml
     envsubst <"$GIT_REPO_HOME"/aws/CredentialsRequest_template.yaml >"$GIT_REPO_HOME"/aws/CredentialsRequest.yaml
     oc new-project "$SLS_NAMESPACE"
     oc create -f "$GIT_REPO_HOME"/aws/products.yaml -n "$SLS_NAMESPACE"
     oc create -f "$GIT_REPO_HOME"/aws/CredentialsRequest.yaml
+  else 
+    log "Configuring sls for byol offering"
   fi
 
   log "==== SLS deployment started ===="
