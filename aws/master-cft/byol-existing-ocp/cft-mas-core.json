@@ -244,7 +244,7 @@
                 "HVM64": "ami-xxxxxxxxxxxxxxxxx"
             },
             "ap-southeast-2": {
-                "HVM64": "ami-xxxxxxxxxxxxxxxxx"
+                "HVM64": "ami-09a4cfc5416a39c2c"
             },
             "sa-east-1": {
                 "HVM64": "ami-xxxxxxxxxxxxxxxxx"
