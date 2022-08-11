@@ -13,7 +13,7 @@
                 "type": "Microsoft.Common.TextBox",
                 "label": "SSH public key",
                 "defaultValue": "",
-                "toolTip": "Specifies the SSH rsa public key file as a string. Use \"ssh-keygen -t rsa -b 2048\" to generate your SSH key pairs.",
+                "toolTip": "Provide the public SSH key that you want to add to the bootnode, bastion host and cluster nodes.",
                 "constraints": {
                     "required": true,
                     "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
@@ -26,7 +26,7 @@
                 "type": "Microsoft.Common.TextBox",
                 "label": "Bootnode NSG Ingress CIDR IP range",
                 "defaultValue": "",
-                "toolTip": "Please set CIDR to x.x.x.x/32 to allow one specific IP address access, 0.0.0.0/0 to allow all IP addresses access, or another CIDR range to access Bootnode over SSH.",
+                "toolTip": "Use CIDR notation to enter the IP addresses that can access the bootnode. For example, 192.12.33.3/32. To allow access from all IP addresses, enter 0.0.0.0/0.",
                 "constraints": {
                     "required": true,
                     "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
@@ -39,7 +39,7 @@
                 "type": "Microsoft.Common.TextBox",
                 "label": "Azure service principal tenant Id",
                 "defaultValue": "",
-                "toolTip": "Azure service principal tenant Id.",
+                "toolTip": "Enter Azure service principal tenant id.",
                 "constraints": {
                     "required": true,
                     "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
@@ -52,7 +52,7 @@
                 "type": "Microsoft.Common.TextBox",
                 "label": "Azure service principal client Id",
                 "defaultValue": "",
-                "toolTip": "Azure service principal client Id.",
+                "toolTip": "Enter Azure service principal client Id.",
                 "constraints": {
                     "required": true,
                     "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
@@ -67,7 +67,7 @@
                     "password": "Azure service principal client secret",
                     "confirmPassword": "Confirm Azure service principal client secret"
                 },
-                "toolTip": "Azure service principal client secret.",
+                "toolTip": "Enter Azure service principal client secret.",
                 "constraints": {
                     "required": true
                 },
@@ -87,7 +87,7 @@
                         "type": "Microsoft.Common.DropDown",
                         "label": "Offering type",
                         "defaultValue": "MAS Core + Cloud Pak for Data",
-                        "toolTip": "Type of MAS offering.",
+                        "toolTip": "Select your preferred Suite offering type.",
                         "constraints": {
                             "allowedValues": [
                                 {
@@ -110,7 +110,7 @@
                             "password": "Entitled registry key",
                             "confirmPassword": "Confirm Entitled registry key"
                         },
-                        "toolTip": "Entitled registry key.",
+                        "toolTip": "Enter the registry key that you downloaded from the IBM Container Library.",
                         "constraints": {
                             "required": true
                         },
@@ -124,7 +124,7 @@
                         "type": "Microsoft.Common.TextBox",
                         "label": "MAS license URL",
                         "defaultValue": "",
-                        "toolTip": "Blob SAS Url URL of MAS license file. e.g. https://masocpstgaccount.blob.core.windows.net/masocpcontainer/entitlement.lic?<blob-sas-token> (Applicable only for BYOL product)",
+                        "toolTip": "Enter the URL (preferebly with SAS token) of your Suite license key file kept on the Blob storage, for example: https://masocpstgaccount.blob.core.windows.net/masocpcontainer/entitlement.lic?[blob-sas-token] (Applicable only for BYOL product)",
                         "constraints": {
                             "required": true,
                             "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
@@ -185,7 +185,7 @@
                         "type": "Microsoft.Common.TextBox",
                         "label": "SLS endpoint URL",
                         "defaultValue": "",
-                        "toolTip": "SLS endpoint URL. Must be accessible to the deployment. It can be retrieved from the OCP route named 'sls-*' in the namespace where SLS is deployed.",
+                        "toolTip": "Enter the endpoint URL that you retrieved from the 'masocp-<unique-string>' OpenShift route in the SLS namespace (ibm-sls-<unique-string>).",
                         "constraints": {
                             "required": "[or(not(empty(steps('ExistingInfrastructure').slsRegistrationKey)), not(empty(steps('ExistingInfrastructure').slsPublicCertificateUrl)))]",
                             "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
@@ -198,7 +198,7 @@
                         "type": "Microsoft.Common.TextBox",
                         "label": "SLS registration key",
                         "defaultValue": "",
-                        "toolTip": "SLS registration key, normally available as a key 'status.registrationKey' in 'License Service' instance YAML in the SLS deployed namespace.",
+                        "toolTip": "Enter the 'status.registrationKey' value that you retrieved from the LicenseService instance YAML in the SLS namespace (ibm-sls-<unique-string>).",
                         "constraints": {
                             "required": "[or(not(empty(steps('ExistingInfrastructure').slsEndpointUrl)), not(empty(steps('ExistingInfrastructure').slsPublicCertificateUrl)))]",
                             "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
@@ -211,7 +211,7 @@
                         "type": "Microsoft.Common.TextBox",
                         "label": "SLS public certificate URL",
                         "defaultValue": "",
-                        "toolTip": "Blob SAS Url URL of SLS public certificate file. e.g. https://masocpstgaccount.blob.core.windows.net/masocpcontainer/sls.crt?<blob-sas-token>",
+                        "toolTip": "Enter the URL (preferebly with SAS token) of the service's public certificate that you retrieved from the 'ca.crt' file in the '<unique-string>-sls-cfg' secret in the MAS core namespace (mas-<unique-string>-core).",
                         "constraints": {
                             "required": "[or(not(empty(steps('ExistingInfrastructure').slsEndpointUrl)), not(empty(steps('ExistingInfrastructure').slsRegistrationKey)))]",
                             "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
@@ -224,7 +224,7 @@
                         "type": "Microsoft.Common.TextBox",
                         "label": "UDS endpoint URL",
                         "defaultValue": "",
-                        "toolTip": "UDS endpoint URL. Must be accessible to the deployment. It can be retrieved from the OCP route named 'uds-endpoint' in the namespace where UDS is deployed.",
+                        "toolTip": "Enter the endpoint URL that you retrieved from the 'uds-endpoint' OpenShift route in the ibm-common-services namespace.",
                         "constraints": {
                             "required": "[or(not(empty(steps('ExistingInfrastructure').udsAPIKey)), not(empty(steps('ExistingInfrastructure').udsPublicCertificateUrl)))]",
                             "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
@@ -237,7 +237,7 @@
                         "type": "Microsoft.Common.TextBox",
                         "label": "UDS API key",
                         "defaultValue": "",
-                        "toolTip": "UDS API key, normally available in OCP secret 'uds-api-key' in the UDS deployed namespace.",
+                        "toolTip": "Enter the service's API key that you retrieved from the 'uds-api-key' secret in the ibm-common-services namespace.",
                         "constraints": {
                             "required": "[or(not(empty(steps('ExistingInfrastructure').udsEndpointUrl)), not(empty(steps('ExistingInfrastructure').udsPublicCertificateUrl)))]",
                             "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
@@ -250,7 +250,7 @@
                         "type": "Microsoft.Common.TextBox",
                         "label": "UDS public certificate URL",
                         "defaultValue": "",
-                        "toolTip": "Blob SAS Url URL of UDS public certificate file. e.g. https://masocpstgaccount.blob.core.windows.net/masocpcontainer/uds.crt?<blob-sas-token>",
+                        "toolTip": "Enter the URL (preferebly with SAS token) of the service's public certificate that you retrieved from the 'ca-bundle.pem' file in the '<unique-string>-uds-cfg' route in the MAS core namespace.",
                         "constraints": {
                             "required": "[or(not(empty(steps('ExistingInfrastructure').udsEndpointUrl)), not(empty(steps('ExistingInfrastructure').udsAPIKey)))]",
                             "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
@@ -269,7 +269,7 @@
                         "type": "Microsoft.Common.TextBox",
                         "label": "MAS Manage DB user",
                         "defaultValue": "",
-                        "toolTip": "User name for the database to be configured with MAS Manage app. (Applicable only if OfferingType is 'MAS Core + Manage') e.g. db2inst1",
+                        "toolTip": "Enter the username that the Maximo Manage application uses to connect to the database.",
                         "constraints": {
                             "required": "[or(not(empty(steps('DatabaseSettings').masManageDBPassword)), not(empty(steps('DatabaseSettings').masManageDBJdbcUrl)), not(empty(steps('DatabaseSettings').masManageDBCertificateUrl)))]",
                             "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
@@ -284,7 +284,7 @@
                             "password": "MAS manage DB password",
                             "confirmPassword": "Confirm MAS manage DB password"
                         },
-                        "toolTip": "Password for the database to be configured with MAS Manage app. (Applicable only if OfferingType is 'MAS Core + Manage')",
+                        "toolTip": "Enter the password that the Maximo Manage application uses to connect to the database.",
                         "options": {
                             "hideConfirmation": false
                         },
@@ -298,7 +298,7 @@
                         "type": "Microsoft.Common.TextBox",
                         "label": "MAS Manage DB JDBC URL",
                         "defaultValue": "",
-                        "toolTip": "JDBC URL for the database to be configured with MAS Manage app. (Applicable only if OfferingType is 'MAS Core + Manage') e.g. jdbc:db2://1.2.3.4:50051/FTMDB:sslConnection=true;",
+                        "toolTip": "Enter the URL location of the database that the Maximo Manage application connects to, for example: jdbc:db2://1.2.3.4:50051/FTMDB:sslConnection=true;",
                         "constraints": {
                             "required": "[or(not(empty(steps('DatabaseSettings').masManageDBUser)), not(empty(steps('DatabaseSettings').masManageDBPassword)), not(empty(steps('DatabaseSettings').masManageDBCertificateUrl)))]",
                             "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
@@ -311,7 +311,7 @@
                         "type": "Microsoft.Common.TextBox",
                         "label": "MAS Manage DB certificate URL",
                         "defaultValue": "",
-                        "toolTip": "HTTP or S3 URL of database public certificate file. (Applicable only if OfferingType is 'MAS Core + Manage') e.g. s3://masocp-license/db-certificate.crt",
+                        "toolTip": "Enter the Blob SAS location of the database's public certificate, for example: s3://masocp-license/db-certificate.crt",
                         "constraints": {
                             "required": "[or(not(empty(steps('DatabaseSettings').masManageDBUser)), not(empty(steps('DatabaseSettings').masManageDBPassword)), not(empty(steps('DatabaseSettings').masManageDBJdbcUrl)))]",
                             "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
@@ -324,7 +324,7 @@
                         "type": "Microsoft.Common.DropDown",
                         "label": "Import demo data",
                         "defaultValue": "false",
-                        "toolTip": "Whether or not to import demo data in the MAS database.",
+                        "toolTip": "Indicate whether you want to import demo data into the database. This might be useful for development or test environments.",
                         "constraints": {
                             "allowedValues": [
                                 {
@@ -350,7 +350,7 @@
                         "type": "Microsoft.Common.DropDown",
                         "label": "Email Notification",
                         "defaultValue": "false",
-                        "toolTip": "Indicate whether you want to receive emails that contain the connection details and credentials for the Suite.",
+                        "toolTip": "Indicate whether you want to receive emails that contain the connection details and credentials for the Suite. These emails are sent using the provided SMTP server details.",
                         "constraints": {
                             "allowedValues": [
                                 {
@@ -443,14 +443,9 @@
             "azureServicePrincipalTenantId": "[basics('azureServicePrincipalTenantId')]",
             "azureServicePrincipalClientId": "[basics('azureServicePrincipalClientId')]",
             "azureServicePrincipalClientSecret": "[basics('azureServicePrincipalClientSecret')]",
-
-
-
             "offeringType": "[steps('ApplicationSettings').offeringType]",
             "entitledRegistryKey": "[steps('ApplicationSettings').entitledRegistryKey]",
             "masLicenseUrl": "[steps('ApplicationSettings').masLicenseUrl]",
-
-            
             "openShiftClusterApiUrl": "[steps('ExistingInfrastructure').openShiftClusterApiUrl]",
             "openShiftUser": "[steps('ExistingInfrastructure').openShiftUser]",
             "openShiftPwd": "[steps('ExistingInfrastructure').openShiftPwd]",
