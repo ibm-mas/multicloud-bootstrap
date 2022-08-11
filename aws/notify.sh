@@ -26,7 +26,7 @@ if [[ $STATUS == "SUCCESS" ]]; then
   fi
   get_mas_creds $RANDOM_STR
   log " MAS_USER=$MAS_USER"
-  log " MAS_PASSWORD=$MAS_PASSWORD"
+  #log " MAS_PASSWORD=$MAS_PASSWORD"
 fi
 # Get list of senders from SES configuration
 for item in `aws ses list-identities --region $DEPLOY_REGION | jq '.Identities' | grep -v '\[\|\]' | tr -d ' ' | tr -d '"' | tr -d ','`; do
