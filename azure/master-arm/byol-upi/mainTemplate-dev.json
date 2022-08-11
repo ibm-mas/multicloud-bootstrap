@@ -136,21 +136,21 @@
     "slsEndpointUrl": {
       "type": "string",
       "metadata": {
-        "description": "Enter the endpoint URL that you retrieved from the 'sls-*' OpenShift route in the cluster namespace where SLS is installed."
+        "description": "Enter the endpoint URL that you retrieved from the 'masocp-<unique-string>' OpenShift route in the SLS namespace (ibm-sls-<unique-string>)."
       },
       "defaultValue": ""
     },
     "slsRegistrationKey": {
       "type": "string",
       "metadata": {
-        "description": "Enter the 'status.registrationKey' value that you retrieved from the LicenseService YAML file in the SLS namespace."
+        "description": "Enter the 'status.registrationKey' value that you retrieved from the LicenseService instance YAML in the SLS namespace (ibm-sls-<unique-string>)."
       },
       "defaultValue": ""
     },
     "slsPublicCertificateUrl": {
       "type": "string",
       "metadata": {
-        "description": "Enter the URL (preferebly with SAS token) of the service's public certificate that you retrieved from the 'ca.crt' file in the 'mas-*-sls-cfg' route in the MAS core namespace."
+        "description": "Enter the URL (preferebly with SAS token) of the service's public certificate that you retrieved from the 'ca.crt' file in the '<unique-string>-sls-cfg' secret in the MAS core namespace (mas-<unique-string>-core)."
       },
       "defaultValue": ""
     },
@@ -171,7 +171,7 @@
     "udsPublicCertificateUrl": {
       "type": "string",
       "metadata": {
-        "description": "Enter the URL (preferebly with SAS token) of the service's public certificate that you retrieved from the 'ca.crt' file in the 'mas-*-uds-cfg' route in the MAS core namespace."
+        "description": "Enter the URL (preferebly with SAS token) of the service's public certificate that you retrieved from the 'ca-bundle.pem' file in the '<unique-string>-uds-cfg' route in the MAS core namespace."
       },
       "defaultValue": ""
     },
@@ -179,27 +179,27 @@
       "type": "string",
       "defaultValue": "1bc717ac-ea87-4011-ac59-21e6942a2e2f",
       "metadata": {
-        "description": "Azure service principal client Id."
+        "description": "Enter Azure service principal client Id."
       }
     },
     "azureServicePrincipalClientSecret": {
       "type": "secureString",
       "defaultValue": "",
       "metadata": {
-        "description": "Azure service principal client secret."
+        "description": "Enter Azure service principal client secret."
       }
     },
     "azureServicePrincipalTenantId": {
       "type": "string",
       "defaultValue": "",
       "metadata": {
-        "description": "Azure service principal tenant id."
+        "description": "Enter Azure service principal tenant id."
       }
     },
     "emailNotification": {
       "type": "string",
       "metadata": {
-        "description": "Indicate whether you want to receive emails that contain the connection details and credentials for the Suite. These emails are sent only to the verified email addresses that you configured in the Amazon SES service."
+        "description": "Indicate whether you want to receive emails that contain the connection details and credentials for the Suite. These emails are sent using the provided SMTP server details."
       },
       "defaultValue": "false",
       "allowedValues": [
@@ -247,7 +247,7 @@
       "metadata": {
         "description": "Email address to send email to. If empty, no email will be sent."
       },
-      "defaultValue": "santoshjpawar@gmail.com"
+      "defaultValue": ""
     }
   },
   "variables": {
