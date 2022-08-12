@@ -59,7 +59,7 @@ elif [[ $CLUSTER_TYPE == "azure" ]]; then
     log "OID = $oid"
     az keyvault set-policy --name $vaultname --object-id "$oid" --secret-permissions all --key-permissions all --certificate-permissions all
     sleep 5
-    az keyvault secret set --name maximo-$SECRET_TYPE-secret --vault-name $vaultname --file $SECRETFILE
+    az keyvault secret set --name maximo-$SECRET_TYPE-secret --vault-name $vaultname --file $SECRETFILE 2>&1
   fi
   # az keyvault secret show --name maximo-$SECRET_TYPE-secret --vault-name $vaultname
   log "Secret created in Azure Key Vault"

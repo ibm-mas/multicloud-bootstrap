@@ -219,7 +219,7 @@
                         "type": "Microsoft.Common.TextBox",
                         "label": "SLS endpoint URL",
                         "defaultValue": "",
-                        "toolTip": "Enter the endpoint URL that you retrieved from the 'masocp-<unique-string>' OpenShift route in the SLS namespace (ibm-sls-<unique-string>).",
+                        "toolTip": "Enter the endpoint URL that you retrieved from the 'masocp-<unique-string>' OpenShift route in the SLS namespace (ibm-sls-<unique-string>). URL should not have slash (/) at the end.",
                         "constraints": {
                             "required": "[or(not(empty(steps('ExistingInfrastructure').slsRegistrationKey)), not(empty(steps('ExistingInfrastructure').slsPublicCertificateUrl)))]",
                             "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
@@ -258,7 +258,7 @@
                         "type": "Microsoft.Common.TextBox",
                         "label": "UDS endpoint URL",
                         "defaultValue": "",
-                        "toolTip": "Enter the endpoint URL that you retrieved from the 'uds-endpoint' OpenShift route in the ibm-common-services namespace.",
+                        "toolTip": "Enter the endpoint URL that you retrieved from the 'uds-endpoint' OpenShift route in the ibm-common-services namespace. URL should not have slash (/) at the end.",
                         "constraints": {
                             "required": "[or(not(empty(steps('ExistingInfrastructure').udsAPIKey)), not(empty(steps('ExistingInfrastructure').udsPublicCertificateUrl)))]",
                             "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
