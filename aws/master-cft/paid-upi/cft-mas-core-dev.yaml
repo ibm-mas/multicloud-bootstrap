@@ -119,10 +119,10 @@ Parameters:
     Type: 'AWS::EC2::KeyPair::KeyName'
     Description: Select the public SSH key that you uploaded to the Amazon EC2 service.
   SLSEndpointUrl:
-    Description: >-
-      Enter the endpoint URL that you retrieved from the 'sls-*' OpenShift route
-      in the cluster namespace where SLS is installed.
-    Type: String
+      Description: >-
+          Enter the endpoint URL that you retrieved from the 'sls-*' OpenShift route
+          in the cluster namespace where SLS is installed. URL should not have slash (/) at the end.
+      Type: String
   SLSRegistrationKey:
     Description: >-
       Enter the 'status.registrationKey' value that you retrieved from the
@@ -137,7 +137,7 @@ Parameters:
   UDSEndpointUrl:
     Description: >-
       Enter the endpoint URL that you retrieved from the 'uds-endpoint'
-      OpenShift route in the ibm-common-services namespace.
+      OpenShift route in the ibm-common-services namespace. URL should not have slash (/) at the end.
     Type: String
   UDSAPIKey:
     Description: >-
@@ -222,7 +222,7 @@ Metadata:
         Parameters:
           - EmailNotification
       - Label:
-          default: 'Choose the OCP cluster type  & existing VPC Details '
+          default: Choose the OCP cluster type and existing VPC Details
         Parameters:
           - PrivateCluster
           - ExistingVPCId

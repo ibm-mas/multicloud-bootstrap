@@ -157,7 +157,7 @@
     "slsEndpointUrl": {
       "type": "string",
       "metadata": {
-        "description": "Enter the endpoint URL that you retrieved from the 'masocp-<unique-string>' OpenShift route in the SLS namespace (ibm-sls-<unique-string>)."
+        "description": "Enter the endpoint URL that you retrieved from the 'masocp-<unique-string>' OpenShift route in the SLS namespace (ibm-sls-<unique-string>). URL should not have slash (/) at the end."
       },
       "defaultValue": ""
     },
@@ -178,7 +178,7 @@
     "udsEndpointUrl": {
       "type": "string",
       "metadata": {
-        "description": "Enter the endpoint URL that you retrieved from the 'uds-endpoint' OpenShift route in the ibm-common-services namespace."
+        "description": "Enter the endpoint URL that you retrieved from the 'uds-endpoint' OpenShift route in the ibm-common-services namespace. URL should not have slash (/) at the end."
       },
       "defaultValue": ""
     },
@@ -592,15 +592,15 @@
     },
     "masInitialSetupUrl": {
       "type": "string",
-      "value": "[uri(concat('https://admin.mas-', variables('projectName'), '.apps.', last(split(parameters('openShiftClusterApiUrl'),'api.')), '/initialsetup'), '')]"
+      "value": "[uri(concat('https://admin.', variables('projectName'), '.apps.', last(split(parameters('openShiftClusterApiUrl'),'api.')), '/initialsetup'), '')]"
     },
     "masAdminUrl": {
       "type": "string",
-      "value": "[uri(concat('https://admin.mas-', variables('projectName'), '.apps.', last(split(parameters('openShiftClusterApiUrl'),'api.'))), '')]"
+      "value": "[uri(concat('https://admin.', variables('projectName'), '.apps.', last(split(parameters('openShiftClusterApiUrl'),'api.'))), '')]"
     },
     "masWorkspaceUrl": {
       "type": "string",
-      "value": "[uri(concat('https://wsmasocp.home.mas-', variables('projectName'), '.apps.', last(split(parameters('openShiftClusterApiUrl'),'api.'))), '')]"
+      "value": "[uri(concat('https://wsmasocp.home.', variables('projectName'), '.apps.', last(split(parameters('openShiftClusterApiUrl'),'api.'))), '')]"
     }
   }
 }
