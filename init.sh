@@ -410,7 +410,7 @@ if [[ $PRE_VALIDATION == "pass" ]]; then
       log "Prerequisite checks failed"
       PRE_VALIDATION=fail
       log "Debug: Pre-requisite validation failed. Proceed to create new OCP cluster later"
-      mark_provisioning_failed $retcode
+      mark_provisioning_failed $retcode "$SERVICE_NAME"
     else
       log "Prerequisite checks successful"
     fi
