@@ -421,7 +421,7 @@ if [[ $PRE_VALIDATION == "pass" ]]; then
     export OPENSHIFT_USER_PROVIDE="false"
   fi
 fi
-  log " OPENSHIFT_USER_PROVIDE=$OPENSHIFT_USER_PROVIDE"
+log " OPENSHIFT_USER_PROVIDE=$OPENSHIFT_USER_PROVIDE"
 
 if [[ $PRE_VALIDATION == "pass" ]]; then
   # Create Red Hat pull secret
@@ -472,6 +472,9 @@ if [[ $PRE_VALIDATION == "pass" ]]; then
     export MAS_URL_WORKSPACE="https:\/\/$MAS_WORKSPACE_ID.home.${RANDOM_STR}.apps.${CLUSTER_NAME}.${BASE_DOMAIN}"
     cd ../
     ./get-product-versions.sh  #Execute the script to get the versions of various products
+    # Create a secret in the Cloud to keep MAS access credentials
+    cd $GIT_REPO_HOME
+    ./create-secret.sh mas
     RESP_CODE=0
   else
     mark_provisioning_failed $retcode
@@ -498,11 +501,6 @@ if [[ $EMAIL_NOTIFICATION == "true" ]]; then
 else
   log "Buyer chose to not send email notification"
 fi
-
-# Create a secret in the Cloud to keep MAS access credentials
-cd $GIT_REPO_HOME
-./create-secret.sh mas
-
 
 # Delete temporary password files
 rm -rf /tmp/*password*

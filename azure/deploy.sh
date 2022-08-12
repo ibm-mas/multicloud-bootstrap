@@ -77,13 +77,13 @@ if [[ $OPENSHIFT_USER_PROVIDE == "false" ]]; then
   if [[ $retcode -ne 0 ]]; then
       log "OCP cluster creation failed"
       exit 21
+  else
+    # Create a secret in the Cloud to keep OCP access credentials
+    cd $GIT_REPO_HOME
+    ./create-secret.sh ocp
   fi
   set -e
 
-  # Create a secret in the Cloud to keep OCP access credentials
-  cd $GIT_REPO_HOME
-  ./create-secret.sh ocp
-  
   oc login -u $OCP_USERNAME -p $OCP_PASSWORD --server=https://api.${CLUSTER_NAME}.${BASE_DOMAIN}:6443 --insecure-skip-tls-verify=true
   log "==== Adding PID limits to worker nodes ===="
   oc create -f $GIT_REPO_HOME/templates/container-runtime-config.yml
