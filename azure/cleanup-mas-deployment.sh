@@ -153,39 +153,25 @@ else
             resid=$(echo $res | cut -f 2 -d ',')
             residtodelete="$residtodelete $resid"
             if [[ ($res == "$INFRAID-vnet" ) || ($res == "$INFRAID-nsg" ) ]]; then
-              echo " Existing VNet RG resource $resname skipping deletion"
+              echo " Existing resource $resname skipping deletion"
             else
-              echo " Existing VNet RG resource $resname deleting"
+              echo " Existing resource $resname deleting"
             fi
           done
-          echo "residtodelete=$residtodelete"
+          echo " Resource IDs to delete: $residtodelete"
           if [[ -n $residtodelete ]]; then
             az resource delete --resource-group $OCP_CLUSTER_RG_NAME --resource-type "$restype" --ids $residtodelete > /dev/null
           else
             echo " No resources of type $restype found"
           fi
         done
-        # Delete resources by UNIQUE_STR
-        for restype in Microsoft.Network/privateDnsZones Microsoft.Storage/storageAccounts; do
-          unset residtodelete
-          echo " Deleting by UNIQSTR, checking resource type $restype"
-          for res in $(az resource list --resource-group $OCP_CLUSTER_RG_NAME --resource-type "$restype" | jq --arg UNIQSTR $UNIQUE_STR '.[] | select(.name | contains($UNIQSTR)) | .name,.id,":"' | tr -d '"' | tr '\n\r' ',' | tr ':' '\n' | sed 's/^,//g' | sed 's/,$//g'); do
-            resname=$(echo $res | cut -f 1 -d ',')
-            resid=$(echo $res | cut -f 2 -d ',')
-            residtodelete="$residtodelete $resid"
-            if [[ ($res == "$INFRAID-vnet" ) || ($res == "$INFRAID-nsg" ) ]]; then
-              echo " Existing VNet RG resource $resname skipping deletion"
-            else
-              echo " Existing VNet RG resource $resname deleting"
-            fi
-          done
-          echo "residtodelete=$residtodelete"
-          if [[ -n $residtodelete ]]; then
-            az resource delete --resource-group $OCP_CLUSTER_RG_NAME --resource-type "$restype" --ids $residtodelete > /dev/null
-          else
-            echo " No resources of type $restype found"
-          fi
-        done
+        # Delete the storage account created for this deployment
+        stgacnt=$(az storage account list --resource-group $OCP_CLUSTER_RG_NAME | jq --arg NAME masocp${UNIQUE_STR}sa '.[] | select(.name==$NAME).id' | tr -d '"')
+        echo " Storage account to delete: $stgacnt"
+        if [[ -n $stgacnt ]]; then
+          az storage account delete --ids $stgacnt
+          echo " Deleted storage account masocp${UNIQUE_STR}sa"
+        fi
         echo "Deleted OCP cluster related resources"
       fi
     fi
