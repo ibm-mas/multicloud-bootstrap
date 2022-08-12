@@ -20,7 +20,10 @@ Parameters:
       For example, 192.12.33.3/32. To allow access from all IP addresses, enter
       0.0.0.0/0.
     Type: String
-    MinLength: '1'
+    MinLength: '9'
+    MaxLength: '18'
+    AllowedPattern: '(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})/(\d{1,2})'
+    ConstraintDescription: must be a valid IP CIDR range of the form w.x.y.z/a.
   ClusterSize:
     Description: >-
       Select your preferred cluster size. All master nodes (M) are m5.2xlarge
@@ -83,7 +86,8 @@ Parameters:
   SLSEndpointUrl:
     Description: >-
       Enter the endpoint URL that you retrieved from the 'sls-*' OpenShift route
-      in the cluster namespace where SLS is installed.
+      in the cluster namespace where SLS is installed. URL should not have slash
+      (/) at the end.
     Type: String
   SLSRegistrationKey:
     Description: >-
@@ -99,7 +103,8 @@ Parameters:
   UDSEndpointUrl:
     Description: >-
       Enter the endpoint URL that you retrieved from the 'uds-endpoint'
-      OpenShift route in the ibm-common-services namespace. URL should not have slash (/) at the end.
+      OpenShift route in the ibm-common-services namespace. URL should not have
+      slash (/) at the end.
     Type: String
   UDSAPIKey:
     Description: >-
@@ -130,9 +135,7 @@ Metadata:
         Parameters:
           - OfferingType
       - Label:
-          default: >-
-            New OpenShift cluster configuration details (complete this section
-            only if you want to create a new cluster)
+          default: New OpenShift cluster configuration details
         Parameters:
           - PublicHostedZone
           - ClusterSize
@@ -701,7 +704,7 @@ Outputs:
         - !GetAtt
           - CallLambdaRandomizer
           - Lower_RandomString
-        - .apps.masocp-
+        - .apps.
         - !GetAtt
           - CallLambdaRandomizer
           - Lower_RandomString
@@ -715,7 +718,7 @@ Outputs:
       certificate into the browser
     Value: !Join
       - ''
-      - - 'https://wsmasocp.home'
+      - - 'https://wsmasocp.home.'
         - !GetAtt
           - CallLambdaRandomizer
           - Lower_RandomString
@@ -733,7 +736,7 @@ Outputs:
       certificate into the browser
     Value: !Join
       - ''
-      - - 'https://wsmasocp.home'
+      - - 'https://wsmasocp.home.'
         - !GetAtt
           - CallLambdaRandomizer
           - Lower_RandomString
