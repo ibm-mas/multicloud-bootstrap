@@ -124,7 +124,7 @@ mark_provisioning_failed() {
   elif [[ $retcode -eq 28 ]]; then
     export STATUS_MSG="Missing or Invalid Product Code."
   elif [[ $retcode -eq 29 ]]; then
-    export STATUS_MSG="User provided existing OpenShift cluster did not pass the pre-requisites check. Please select option to create a new cluster in a new deployment. (Check provisioning logs for more details)"
+    export STATUS_MSG="User provided existing OpenShift cluster did not pass the pre-requisites check. The deployment failed due to $2. Please select option to create a new cluster in a new deployment. (Check provisioning logs for more details)"
   elif [[ $retcode -eq 30 ]]; then
     export STATUS_MSG="MAS+CP4D offering is not supported on ROSA cluster. Please select option to create a new cluster in a new deployment or provide a self-managed cluster."
   fi
