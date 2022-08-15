@@ -47,7 +47,7 @@ elif [[ $CLUSTER_TYPE == "azure" ]]; then
   # Check if key vault already exists
   vaultname=maximo-vault-$RANDOM_STR
   vault=$(az keyvault list --resource-group spedgedep2 | jq --arg vaultname $vaultname '.[] | select(.name == $vaultname).id' | tr -d '"')
-  if [[ (-z $vault) ]]; then
+  if [[ -z $vault ]]; then
     az keyvault create --no-self-perms --name $vaultname --resource-group "$RG_NAME" --location "$DEPLOY_REGION"
   else
     echo "Vault with name $vaultname already exists"
