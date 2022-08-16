@@ -666,25 +666,6 @@ Outputs:
           - CallLambdaGetHostedZoneName
           - ZoneName
         - /initialsetup
-  MASInitialSetupUrlLogin:
-    Description: >-
-      Url to perform MAS initial setup, make sure you have imported the MAS
-      public certificate into the browser
-    Value: !Join 
-      - ''
-      - - 'https://admin.'
-        - !GetAtt 
-          - CallLambdaRandomizer
-          - Lower_RandomString
-        - .apps.
-        - !GetAtt 
-          - CallLambdaRandomizer
-          - Lower_RandomString
-        - .
-        - !GetAtt 
-          - CallLambdaGetHostedZoneName
-          - ZoneName
-        - /initialsetup
   MASAdminUrl:
     Description: >-
       Url to login to MAS Admin UI, make sure you have imported the MAS public
@@ -703,24 +684,6 @@ Outputs:
         - !GetAtt 
           - CallLambdaGetHostedZoneName
           - ZoneName
-  MASAdminUrlLogin:
-    Description: >-
-      Url to login to MAS Admin UI, make sure you have imported the MAS public
-      certificate into the browser
-    Value: !Join 
-      - ''
-      - - 'https://admin.'
-        - !GetAtt 
-          - CallLambdaRandomizer
-          - Lower_RandomString
-        - .apps.
-        - !GetAtt 
-          - CallLambdaRandomizer
-          - Lower_RandomString
-        - .
-        - !GetAtt 
-          - CallLambdaGetHostedZoneName
-          - ZoneName
   MASWorkspaceUrl:
     Description: >-
       Url to login to MAS Workspace, make sure you have imported the MAS public
@@ -732,24 +695,6 @@ Outputs:
           - CallLambdaRandomizer
           - Lower_RandomString
         - .apps.masocp-
-        - !GetAtt 
-          - CallLambdaRandomizer
-          - Lower_RandomString
-        - .
-        - !GetAtt 
-          - CallLambdaGetHostedZoneName
-          - ZoneName
-  MASWorkspaceUrlLogin:
-    Description: >-
-      Url to login to MAS Workspace, make sure you have imported the MAS public
-      certificate into the browser
-    Value: !Join 
-      - ''
-      - - 'https://wsmasocp.home.'
-        - !GetAtt 
-          - CallLambdaRandomizer
-          - Lower_RandomString
-        - .apps.
         - !GetAtt 
           - CallLambdaRandomizer
           - Lower_RandomString
