@@ -14,7 +14,7 @@ found=false
 sentence=${SUPPORTED_REGIONS//;/$'\n'}
 for reg in $sentence
 do
-  if [[ $REGION == $reg ]]; then
+  if [[ $DEPLOY_REGION == $reg ]]; then
     found=true
 	break
   fi
