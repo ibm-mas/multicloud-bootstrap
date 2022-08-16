@@ -10,7 +10,17 @@ elif [[ $CLUSTER_TYPE == "azure" ]]; then
 else
     SUPPORTED_REGIONS=$DEPLOY_REGION
 fi
-if [[ ${SUPPORTED_REGIONS,,} =~ $DEPLOY_REGION ]]; then
+found=false
+sentence=${SUPPORTED_REGIONS//;/$'\n'}
+for reg in $sentence
+do
+  if [[ $REGION == $reg ]]; then
+    found=true
+	break
+  fi
+done
+log "Region found: $found"
+if [[ $found == true ]]; then
     log "Supported region = PASS"
 else
     log "ERROR: Supported region = FAIL"
