@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # This script should be executed from the machine where az login is already done. It creates all necessary resources and
-# finally creates the SAS URL for VHD file to be used in the VM image offer
+# finally creates the SAS URL for VHD file to be used in the VM image offer.
 #
 # This script is for the developers to create the VHD image to be used for VM image offer in the Partner Center.
 #
@@ -9,7 +9,7 @@
 #
 # Prereqs:
 # - Make sure you have executed the bootnode-image-step-1.sh script to create the image resource group 
-#   containing Azure compute gallery
+#   containing Azure compute gallery.
 #
 # Parameters:
 #   SUBID: Azure subscription Id.
@@ -30,7 +30,7 @@ UNIQSTR=$2
 
 echo "Script parameters:"
 echo "SUBID=$SUBID"
-echo "UNISTR=$UNIQSTR"
+echo "UNIQSTR=$UNIQSTR"
 
 if [[ (-z $SUBID) || (-z $UNIQSTR) ]]; then
   echo "ERR: Subscription ID and unique string are required parameters"
@@ -43,7 +43,7 @@ echo "Managed disk created"
 
 # Generate SAS URL for managed disk
 disksasurl=$(az disk grant-access --resource-group masocp-bootnode-image-rg-${UNIQSTR} --name masocp-bootnode-image-${UNIQSTR} --duration-in-seconds 18000 --access-level Read | jq '.accessSas' | tr -d '"')
-echo "SAS URL created - $disksasurl"
+echo "Read access granted to the disk using SAS URL - $disksasurl"
 
 # Create storage account
 az storage account create --resource-group masocp-bootnode-image-rg-${UNIQSTR} --name masstgacnt${UNIQSTR} --location eastus2 --sku Standard_LRS --kind StorageV2 --access-tier Hot
@@ -62,6 +62,11 @@ echo "Created storage writable SAS token - $sastoken"
 targetsasurl="https://masstgacnt${UNIQSTR}.blob.core.windows.net/container/masocp-bootnode-image-${UNIQSTR}.vhd?${sastoken}"
 echo "Target SAS URL - $targetsasurl"
 azcopy copy "$disksasurl" "https://masstgacnt${UNIQSTR}.blob.core.windows.net/container/masocp-bootnode-image-${UNIQSTR}.vhd?${sastoken}" --blob-type PageBlob
+sleep 5
+
+# Revoke the disks read access
+az disk revoke-access --name masocp-bootnode-image-${UNIQSTR} --resource-group masocp-bootnode-image-rg-${UNIQSTR}
+echo "Read access revoked from the disk"
 
 # Generate SAS for vhd
 expiry=$(date +%Y-%m-%d --date="7 days")T23:59:59Z
