@@ -145,7 +145,7 @@ fi
 
 echoBlue "\n==== Execution started at `date` ===="
 
-export MAS_INSTANCE_ID="mas-${UNIQ_STR}"
+export MAS_INSTANCE_ID="${UNIQ_STR}"
 export MAS_WORKSPACE_ID="wsmasocp"
 
 # CP4D variables
