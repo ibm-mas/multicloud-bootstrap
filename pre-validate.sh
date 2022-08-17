@@ -39,7 +39,7 @@ fi
 # Check if provided hosted zone is public
 if [[ ($CLUSTER_TYPE == "aws") && (-n $BASE_DOMAIN) ]]; then
 
-    if [[ $PrivateCluster == "false" ]]; then
+    if [[ $PRIVATE_CLUSTER == "false" ]]; then
         aws route53 list-hosted-zones --output text --query 'HostedZones[*].[Config.PrivateZone,Name,Id]' --output text | grep $BASE_DOMAIN | grep False
     else
         aws route53 list-hosted-zones --output text --query 'HostedZones[*].[Config.PrivateZone,Name,Id]' --output text | grep $BASE_DOMAIN | grep True
