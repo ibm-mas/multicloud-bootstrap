@@ -58,17 +58,33 @@ fi
 
 # Skip SLS check in case of paid offering
 if [[ $PRODUCT_TYPE != "privatepublic" ]]; then
-	getOPNamespace ibm-sls
-	retcode=$?
-	if [[ $retcode -eq 29 ]]; then
-		return $retcode
+	# Skip SLS check in case of external SLS details are provided
+	if [[ (-z $SLS_URL) || (-z $SLS_REGISTRATION_KEY) || (-z $SLS_PUB_CERT_URL) ]]; then
+		getOPNamespace ibm-sls
+		retcode=$?
+		if [[ $retcode -eq 29 ]]; then
+			return $retcode
+		fi
+	else
+  		log "=== Using External SLS Deployment ==="
 	fi
 fi
 
 export SLS_MONGODB_CFG_FILE="${MAS_CONFIG_DIR}/mongo-${MONGODB_NAMESPACE}.yml"
 log " SLS_MONGODB_CFG_FILE: $SLS_MONGODB_CFG_FILE"
 
-arr=(ibm-cert-manager-operator user-data-services-operator)
+# Skip UDS check in case of external UDS details are provided
+if [[ (-z $UDS_API_KEY) || (-z $UDS_ENDPOINT_URL) || (-z $UDS_PUB_CERT_URL) ]]; then
+	getOPNamespace user-data-services-operator
+	retcode=$?
+	if [[ $retcode -eq 29 ]]; then
+    	return $retcode
+	fi
+else
+  log "=== Using External UDS Deployment ==="
+fi
+
+arr=(ibm-cert-manager-operator)
 i=0
 
 while [ $i -lt ${#arr[@]} ]
