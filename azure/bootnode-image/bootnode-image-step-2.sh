@@ -69,7 +69,7 @@ az disk revoke-access --name masocp-bootnode-image-${UNIQSTR} --resource-group m
 echo "Read access revoked from the disk"
 
 # Generate SAS for vhd
-expiry=$(date +%Y-%m-%d --date="7 days")T23:59:59Z
+expiry=$(date +%Y-%m-%d --date="20 days")T23:59:59Z
 echo "VHD SAS URL expiry $expiry"
 sastoken=$(az storage container generate-sas --account-name masstgacnt${UNIQSTR} --name container --permissions rl --expiry "$expiry" | tr -d '"' | tr -d '\n' | tr -d '\r')
 echo "Created VHD SAS token - $sastoken"
