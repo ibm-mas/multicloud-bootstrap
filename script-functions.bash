@@ -94,9 +94,9 @@ function getWorkerNodeDetails(){
 		log " CPU : ${cpu}"
 		log " Memory : ${memory}"
 
-		if [[ $CLUSTER_TYPE == "aws" ]]; then
+		if [[ $ROSA == "true" ]]; then
 			memory=${memory::-1}
-		elif [[ $CLUSTER_TYPE == "azure" ]]; then
+		else
 			memory=${memory::-2}
 		fi
 		
