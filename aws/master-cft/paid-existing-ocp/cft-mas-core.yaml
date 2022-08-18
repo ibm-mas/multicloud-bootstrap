@@ -374,6 +374,8 @@ Resources:
                   string_characters = string.ascii_letters + string.digits
                   number_characters = string.digits
                   responseData['RandomString']  = ''.join(random.choice(string_characters) for i in range(int(event["ResourceProperties"]["length"])))
+                  while responseData['RandomString'][0].isdigit():
+                      responseData['RandomString']  = ''.join(random.choice(string_characters) for i in range(int(event["ResourceProperties"]["length"])))
                   responseData['RandomNumber']  = ''.join(random.choice(number_characters) for i in range(int(event["ResourceProperties"]["length"])))
                   responseData['Lower_RandomString'] = responseData['RandomString'].lower()
                   responseData['UpperRandomString'] = responseData['RandomString'].upper()
