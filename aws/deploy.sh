@@ -89,7 +89,7 @@ aws iam attach-user-policy --user-name ${IAM_USER_NAME} --policy-arn $policyarn
 accessdetails=$(aws iam create-access-key --user-name ${IAM_USER_NAME})
 export AWS_ACCESS_KEY_ID=$(echo $accessdetails | jq '.AccessKey.AccessKeyId' | tr -d "\"")
 export AWS_SECRET_ACCESS_KEY=$(echo $accessdetails | jq '.AccessKey.SecretAccessKey' | tr -d "\"")
-echo " AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID"
+log " AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID"
 # Put some delay for IAM permissions to be applied in the backend
 sleep 60
 
@@ -232,7 +232,7 @@ export ROLE_NAME=cert_manager && ansible-playbook ibm.mas_devops.run_role
 if [[ $? -ne 0 ]]; then
   # One reason for this failure is catalog sources not having required state information, so recreate the catalog-operator pod
   # https://bugzilla.redhat.com/show_bug.cgi?id=1807128
-  echo "Deleting catalog-operator pod"
+  log "Deleting catalog-operator pod"
   podname=$(oc get pods -n openshift-operator-lifecycle-manager | grep catalog-operator | awk {'print $1'})
   oc logs $podname -n openshift-operator-lifecycle-manager
   oc delete pod $podname -n openshift-operator-lifecycle-manager
@@ -279,7 +279,21 @@ if [[ (-z $SLS_URL) || (-z $SLS_REGISTRATION_KEY) || (-z $SLS_PUB_CERT_URL) ]]; 
     oc create -f "$GIT_REPO_HOME"/aws/products.yaml -n "$SLS_NAMESPACE"
     if [[ $ROSA == "true" ]]; then
       log "Given cluster is of ROSA type, Creating Secret directly"
-      oc create secret generic "$SLS_INSTANCE_NAME"-aws-access --from-literal=aws_access_key_id="$AWS_ACCESS_KEY_ID" --from-literal=aws_secret_access_key="$AWS_SECRET_ACCESS_KEY" -n "$SLS_NAMESPACE"
+      # IAM variables
+      IAM_POLICY_NAME_ROSA="masocp-policy-rosa-${RANDOM_STR}"
+      IAM_USER_NAME_ROSA="masocp-user-rosa-${RANDOM_STR}"
+      # Create IAM policy
+      policyarn=$(aws iam create-policy --policy-name ${IAM_POLICY_NAME_ROSA} --policy-document file://${GIT_REPO_HOME}/aws/iam/policy-rosa.json | jq '.Policy.Arn' | tr -d "\"")
+      # Create IAM user
+      aws iam create-user --user-name ${IAM_USER_NAME_ROSA}
+      aws iam attach-user-policy --user-name ${IAM_USER_NAME_ROSA} --policy-arn $policyarn
+      accessdetails=$(aws iam create-access-key --user-name ${IAM_USER_NAME_ROSA})
+      AWS_ACCESS_KEY_ID_ROSA=$(echo $accessdetails | jq '.AccessKey.AccessKeyId' | tr -d "\"")
+      AWS_SECRET_ACCESS_KEY_ROSA=$(echo $accessdetails | jq '.AccessKey.SecretAccessKey' | tr -d "\"")
+      log " AWS_ACCESS_KEY_ID_ROSA: $AWS_ACCESS_KEY_ID_ROSA"
+      # Put some delay for IAM permissions to be applied in the backend
+      sleep 60
+      oc create secret generic "$SLS_INSTANCE_NAME"-aws-access --from-literal=aws_access_key_id="$AWS_ACCESS_KEY_ID_ROSA" --from-literal=aws_secret_access_key="$AWS_SECRET_ACCESS_KEY_ROSA" -n "$SLS_NAMESPACE"
     else
       log "Given cluster is not ROSA, Creating Secret via CredentialRequest"
       oc create -f "$GIT_REPO_HOME"/aws/CredentialsRequest.yaml

@@ -130,7 +130,7 @@ fi
 export CLUSTER_NAME="masocp-${RANDOM_STR}"
 export OCP_USERNAME="masocpuser"
 export OCP_PASSWORD="mas${RANDOM_STR:3:3}`date +%H%M%S`${RANDOM_STR:0:3}"
-if [[ (! -z $EXS_OCP_URL) && (! -z $EXS_OCP_USER) && (! -z $EXS_OCP_PWD) ]]; then    
+if [[ (! -z $EXS_OCP_URL) && (! -z $EXS_OCP_USER) && (! -z $EXS_OCP_PWD) ]]; then
     export OCP_USERNAME=${EXS_OCP_USER}
     export OCP_PASSWORD=${EXS_OCP_PWD}
 fi
@@ -214,7 +214,7 @@ export MAS_JDBC_CERT_LOCAL_FILE=$GIT_REPO_HOME/db.crt
 export MAS_CLOUD_AUTOMATION_VERSION=1.0
 export MAS_DEVOPS_COLLECTION_VERSION=11.0.0
 export MAS_APP_CHANNEL=8.4.x
-if [ -z "$EXISTING_NETWORK" ]; then
+if [ (-z "$EXISTING_NETWORK") && (-z "$EXS_OCP_URL" )  ]; then
   export new_or_existing_vpc_subnet="new"
   export enable_permission_quota_check=true
   export PRIVATE_CLUSTER=false
