@@ -277,8 +277,14 @@ if [[ (-z $SLS_URL) || (-z $SLS_REGISTRATION_KEY) || (-z $SLS_PUB_CERT_URL) ]]; 
     envsubst <"$GIT_REPO_HOME"/aws/CredentialsRequest_template.yaml >"$GIT_REPO_HOME"/aws/CredentialsRequest.yaml
     oc new-project "$SLS_NAMESPACE"
     oc create -f "$GIT_REPO_HOME"/aws/products.yaml -n "$SLS_NAMESPACE"
-    oc create -f "$GIT_REPO_HOME"/aws/CredentialsRequest.yaml
-  else 
+    if [[ $ROSA == "true" ]]; then
+      log "Given cluster is of ROSA type, Creating Secret directly"
+      oc create secret generic "$SLS_INSTANCE_NAME"-aws-access --from-literal=aws_access_key_id="$AWS_ACCESS_KEY_ID" --from-literal=aws_secret_access_key="$AWS_SECRET_ACCESS_KEY" -n "$SLS_NAMESPACE"
+    else
+      log "Given cluster is not ROSA, Creating Secret via CredentialRequest"
+      oc create -f "$GIT_REPO_HOME"/aws/CredentialsRequest.yaml
+    fi
+  else
     log "Configuring sls for byol offering"
   fi
 
