@@ -33,7 +33,7 @@ filter {
 
 resource "aws_instance" "masocp-bastion-host" {
   ami = data.aws_instance.bootnode_details.ami
-  instance_type = "t3.micro"
+  instance_type = "t3.small"
   associate_public_ip_address = true
   subnet_id = var.subnet_id
   key_name = var.key_name
