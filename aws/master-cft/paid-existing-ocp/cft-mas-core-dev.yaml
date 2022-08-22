@@ -506,7 +506,7 @@ Resources:
         - RegionMap
         - !Ref 'AWS::Region'
         - HVM64
-      InstanceType: t3.micro
+      InstanceType: t3.small
       KeyName: !Ref SSHKey
       SecurityGroupIds:
         - !Ref BootnodeSecurityGroup

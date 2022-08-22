@@ -172,7 +172,7 @@ EOT
   ## Create bastion host
   cd $GIT_REPO_HOME/aws
   set +e
-  if [[ new_or_existing_vpc_subnet == "new" ]]; then
+  if [[ ($new_or_existing_vpc_subnet == "new") && ($OPENSHIFT_USER_PROVIDE == "false") ]]; then
     ./create-bastion-host.sh
     retcode=$?
     if [[ $retcode -ne 0 ]]; then
