@@ -269,7 +269,7 @@
     "seller_resource_group": "EdgeTest",
     "seller_compute_gallery_name": "masbyolimagegallery20220808082537",
     "seller_image_definition": "masocp-image-def-20220808082537",
-    "projectName": "[substring(uniqueString(resourceGroup().id, deployment().name), 0, 6)]",
+    "projectName": "[concat('e',substring(uniqueString(resourceGroup().id, deployment().name), 0, 5))]",
     "rgName": "[resourceGroup().name]",
     "vNetName": "[concat(variables('projectName'), '-vnet')]",
     "vNetAddressPrefixes": "10.0.0.0/16",

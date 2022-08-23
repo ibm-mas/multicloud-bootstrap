@@ -120,6 +120,7 @@
       },
       "name" : "[variables('vmNames')[copyIndex()]]",
       "location" : "[variables('location')]",
+      "zones": "[array(string(add(mod(copyIndex(),3),1)))]",
       "identity" : {
         "type" : "userAssigned",
         "userAssignedIdentities" : {

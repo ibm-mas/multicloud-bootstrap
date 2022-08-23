@@ -4,13 +4,23 @@ compute:
 - architecture: amd64
   hyperthreading: Enabled
   name: worker
-  platform: {}
+  platform:
+    azure:
+      zones: 
+      - "1"
+      - "2"
+      - "3"
   replicas: 0
 controlPlane:
   architecture: amd64
   hyperthreading: Enabled
   name: master
-  platform: {}
+  platform: 
+    azure:
+      zones: 
+      - "1"
+      - "2"
+      - "3"
   replicas: 3
 metadata:
   creationTimestamp: null
