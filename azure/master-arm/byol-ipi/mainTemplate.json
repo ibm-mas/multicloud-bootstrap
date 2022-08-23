@@ -245,7 +245,7 @@
   },
   "variables": {
     "seller_subscription_id": "b2ca5467-2502-4b05-b78e-744604c6531d",
-    "projectName": "[substring(uniqueString(resourceGroup().id, deployment().name), 0, 6)]",
+    "projectName": "[concat('i',substring(uniqueString(resourceGroup().id, deployment().name), 0, 5))]",
     "rgName": "[resourceGroup().name]",
     "vNetName": "[concat(variables('projectName'), '-vnet')]",
     "vNetAddressPrefixes": "10.0.0.0/16",
