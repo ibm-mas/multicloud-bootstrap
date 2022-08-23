@@ -103,6 +103,7 @@
               "type" : "Microsoft.Compute/virtualMachines",
               "name" : "[variables('vmNames')[copyIndex()]]",
               "location" : "[variables('location')]",
+              "zones": "[array(string(add(mod(copyIndex(),3),1)))]",
               "tags" : {
                 "kubernetes.io-cluster-ffranzupi": "owned"
               },
