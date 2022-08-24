@@ -52,8 +52,8 @@ export EXISTING_PRIVATE_SUBNET3_ID=${45}
 export EXISTING_PUBLIC_SUBNET1_ID=${46}
 export EXISTING_PUBLIC_SUBNET2_ID=${47}
 export EXISTING_PUBLIC_SUBNET3_ID=${48}
-export PRIVATE_CLUSTER=true
-export ENV_TYPE=prod
+export PRIVATE_CLUSTER=${49}
+export ENV_TYPE=${50}
 export GIT_REPO_HOME=$(pwd)
 # Load helper functions
 . helper.sh
@@ -221,7 +221,7 @@ fi
 if [ -z "$EXISTING_NETWORK" ]; then
   export new_or_existing_vpc_subnet="new"
   export enable_permission_quota_check=true
-
+  
 else
    export new_or_existing_vpc_subnet="exist"
    export enable_permission_quota_check=false

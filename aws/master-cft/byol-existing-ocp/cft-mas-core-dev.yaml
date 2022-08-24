@@ -128,6 +128,13 @@ Parameters:
     AllowedValues:
       - true
       - false
+  PrivateCluster:
+    Description: Select true to create a private OpenShift cluster
+    Default: false
+    Type: String
+    AllowedValues:
+      - true
+      - false
 Metadata:
   'AWS::CloudFormation::Interface':
     ParameterGroups:
@@ -143,6 +150,7 @@ Metadata:
           - OpenShiftClusterApiUrl
           - OpenShiftUser
           - OpenShiftPassword
+          - PrivateCluster
       - Label:
           default: Cluster and bootnode access (you must complete this section)
         Parameters:
@@ -185,40 +193,41 @@ Metadata:
           default: Email notification
         Parameters:
           - EmailNotification
-Mappings:
-  RegionMap:
-    us-east-1:
-      HVM64: ami-0ef2a204a69167b2e
-    us-east-2:
-      HVM64: ami-062b6a674eb0c2e9c
-    us-west-2:
-      HVM64: ami-049f9274268d2ff88
-    ca-central-1:
-      HVM64: ami-0d4af3a718018c899
-    eu-north-1:
-      HVM64: ami-0b3a8c8ed376a9193
-    eu-west-1:
-      HVM64: ami-0fb132ff756953f9a
-    eu-west-2:
-      HVM64: ami-00c3f6ddb720e678c
-    eu-west-3:
-      HVM64: ami-027d2da40bb974cfb
-    eu-central-1:
-      HVM64: ami-03e573b07a13a8c31
-    ap-northeast-1:
+Mappings: 
+  RegionMap: 
+    ap-northeast-1: 
       HVM64: ami-09f275ddde52139a7
-    ap-northeast-2:
+    ap-northeast-2: 
       HVM64: ami-03a1fb3b705d0dd91
-    ap-northeast-3:
+    ap-northeast-3: 
       HVM64: ami-0b01445f04bda9219
-    ap-south-1:
+    ap-south-1: 
       HVM64: ami-0d6f41add7f1c62dd
-    ap-southeast-1:
+    ap-southeast-1: 
       HVM64: ami-0825fcd346fb3babe
-    ap-southeast-2:
+    ap-southeast-2: 
       HVM64: ami-09a4cfc5416a39c2c
-    sa-east-1:
+    ca-central-1: 
+      HVM64: ami-0d4af3a718018c899
+    eu-central-1: 
+      HVM64: ami-03e573b07a13a8c31
+    eu-north-1: 
+      HVM64: ami-0b3a8c8ed376a9193
+    eu-west-1: 
+      HVM64: ami-0fb132ff756953f9a
+    eu-west-2: 
+      HVM64: ami-00c3f6ddb720e678c
+    eu-west-3: 
+      HVM64: ami-027d2da40bb974cfb
+    sa-east-1: 
       HVM64: ami-037608508e4c078cd
+    us-east-1: 
+      HVM64: ami-0ef2a204a69167b2e
+    us-east-2: 
+      HVM64: ami-062b6a674eb0c2e9c
+    us-west-2: 
+      HVM64: ami-049f9274268d2ff88
+
 Resources:
   DeployWaitConditionHandle:
     Type: 'AWS::CloudFormation::WaitConditionHandle'
@@ -530,7 +539,7 @@ Resources:
             - 'git clone https://github.com/ibm-mas/ansible-devops.git;'
             - cd ansible-devops;
             - rm -rf multicloud-bootstrap 1>/dev/null 2>&1;
-            - 'git clone https://github.com/ibm-mas/multicloud-bootstrap.git;'
+            - 'git clone -b issue9974 https://github.com/ibm-mas/multicloud-bootstrap.git;'
             - cd multicloud-bootstrap;
             - 'find . -type f -name "*.sh" -exec chmod +x {} \;;'
             - ./init.sh "aws" "
@@ -586,8 +595,10 @@ Resources:
             - !Ref OpenShiftPassword
             - ''' '''' '''
             - !Ref EmailNotification
-            - ''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''
-            - ''' "dev" '
+            - ''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''
+            - !Ref PrivateCluster
+            -  ''' '''
+            - ''' "prod" '
             - '2>&1 | tee mas-provisioning.log; '
       Tags:
         - Key: Name
