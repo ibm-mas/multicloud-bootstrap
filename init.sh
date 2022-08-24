@@ -69,6 +69,8 @@ export -f validate_prouduct_type
 
 export GIT_REPO_HOME=$(pwd)
 
+log "PRIVATE_CLUSTER=$PRIVATE_CLUSTER"
+
 ## Configure CloudWatch agent
 if [[ $CLUSTER_TYPE == "aws" ]]; then
   log "Configuring CloudWatch logs agent"
