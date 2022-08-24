@@ -11,12 +11,11 @@ Parameters:
       - MAS Core + Manage (no Cloud Pak for Data)
   BootNodeVPCId:
     Description: >-
-      Enter the VPC Id to create the bootnode into. Default VPC created by AWS
-      will be used if not specified. If existing OpenShift cluster is specified,
-      make sure it is reachable from this VPC
+      Select the VPC Id where bootnode needs to be created. If existing
+      OpenShift cluster is specified, make sure it is reachable from this VPC
     Type: 'AWS::EC2::VPC::Id'
   BootNodeSubnetId:
-    Description: Enter the subnet ID from the bootnode VPC to be used for the bootnode.
+    Description: Select the subnet Id from the bootnode VPC to be used for the bootnode.
     Type: 'AWS::EC2::Subnet::Id'
   BootnodeSGIngressCidrIp:
     Description: >-
@@ -89,7 +88,8 @@ Parameters:
   SLSEndpointUrl:
     Description: >-
       Enter the endpoint URL that you retrieved from the 'sls-*' OpenShift route
-      in the cluster namespace where SLS is installed. URL should not have slash (/) at the end.
+      in the cluster namespace where SLS is installed. URL should not have slash
+      (/) at the end.
     Type: String
   SLSRegistrationKey:
     Description: >-
@@ -105,7 +105,8 @@ Parameters:
   UDSEndpointUrl:
     Description: >-
       Enter the endpoint URL that you retrieved from the 'uds-endpoint'
-      OpenShift route in the ibm-common-services namespace. URL should not have slash (/) at the end.
+      OpenShift route in the ibm-common-services namespace. URL should not have
+      slash (/) at the end.
     Type: String
   UDSAPIKey:
     Description: >-
@@ -129,7 +130,7 @@ Parameters:
       - true
       - false
   PrivateCluster:
-    Description: Select true to create a private OpenShift cluster
+    Description: Select true for private OpenShift cluster
     Default: false
     Type: String
     AllowedValues:
@@ -595,9 +596,9 @@ Resources:
             - !Ref OpenShiftPassword
             - ''' '''' '''
             - !Ref EmailNotification
-            - ''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''
+            - ''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''
             - !Ref PrivateCluster
-            -  ''' '''
+            - ''' '''
             - ''' "prod" '
             - '2>&1 | tee mas-provisioning.log; '
       Tags:
