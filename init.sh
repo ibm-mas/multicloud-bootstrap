@@ -218,7 +218,7 @@ export MAS_DEVOPS_COLLECTION_VERSION=11.0.0
 export MAS_APP_CHANNEL=8.4.x
 
 log "PRIVATE_CLUSTER value at 2nd place=$PRIVATE_CLUSTER"
-if [[ -n $PRIVATE_CLUSTER ]]; then
+if [ -z $PRIVATE_CLUSTER ]; then
   export PRIVATE_CLUSTER=false
 fi
 
