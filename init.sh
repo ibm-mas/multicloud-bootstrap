@@ -69,7 +69,7 @@ export -f validate_prouduct_type
 
 export GIT_REPO_HOME=$(pwd)
 
-log "PRIVATE_CLUSTER=$PRIVATE_CLUSTER"
+log "PRIVATE_CLUSTER value at first place is=$PRIVATE_CLUSTER"
 
 ## Configure CloudWatch agent
 if [[ $CLUSTER_TYPE == "aws" ]]; then
@@ -217,12 +217,12 @@ export MAS_CLOUD_AUTOMATION_VERSION=1.0
 export MAS_DEVOPS_COLLECTION_VERSION=11.0.0
 export MAS_APP_CHANNEL=8.4.x
 
-log "PRIVATE_CLUSTER=$PRIVATE_CLUSTER"
+log "PRIVATE_CLUSTER value at 2nd place=$PRIVATE_CLUSTER"
 if [[ -n $PRIVATE_CLUSTER ]]; then
   export PRIVATE_CLUSTER=false
 fi
 
-log "PRIVATE_CLUSTER=$PRIVATE_CLUSTER"
+log "PRIVATE_CLUSTER at 3rd place=$PRIVATE_CLUSTER"
 
 if [ -z "$EXISTING_NETWORK" ]; then
   export new_or_existing_vpc_subnet="new"
