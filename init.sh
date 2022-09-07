@@ -59,7 +59,8 @@ export artifactory_apikey=${51}
 export GIT_REPO_HOME=$(pwd)
 
 
-  export mas_catalog_source=ibm-mas-operators
+  #export mas_catalog_source=ibm-mas-operators
+  export mas_catalog_source=ibm-operator-catalog
   export artifactory_username=pakosal1@in.ibm.com
 
   export mas_channel=m2dev89
@@ -69,7 +70,8 @@ export GIT_REPO_HOME=$(pwd)
   export mas_entitlement_key=$artifactory_apikey
   
   
-  export MAS_CATALOG_SOURCE=ibm-mas-operators
+  #export MAS_CATALOG_SOURCE=ibm-mas-operators
+  export MAS_CATALOG_SOURCE=ibm-operator-catalog
   export ARTIFACTORY_USERNAME=pakosal1@in.ibm.com
   export ARTIFACTORY_APIKEY=$artifactory_apikey
   export MAS_CHANNEL=m2dev89
@@ -380,7 +382,6 @@ log " DEPLOY_MANAGE: $DEPLOY_MANAGE"
 
 log " OPERATIONAL_MODE: $OPERATIONAL_MODE"
 log " artifactory_apikey: $artifactory_apikey"
-
 
 if [[ $CLUSTER_TYPE == "azure" ]]; then
   # Perform az login
