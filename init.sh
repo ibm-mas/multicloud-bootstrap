@@ -378,6 +378,10 @@ export DEPLOY_MANAGE=$(echo $DEPLOY_MANAGE | cut -d '=' -f 2)
 log " DEPLOY_CP4D: $DEPLOY_CP4D"
 log " DEPLOY_MANAGE: $DEPLOY_MANAGE"
 
+log " OPERATIONAL_MODE: $OPERATIONAL_MODE"
+log " artifactory_apikey: $artifactory_apikey"
+
+
 if [[ $CLUSTER_TYPE == "azure" ]]; then
   # Perform az login
   az login --service-principal -u ${AZURE_SP_CLIENT_ID} -p ${AZURE_SP_CLIENT_PWD} --tenant ${TENANT_ID}
