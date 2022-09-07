@@ -38,6 +38,11 @@ log " IAM_USER_NAME: $IAM_USER_NAME"
 log " SLS_STORAGE_CLASS: $SLS_STORAGE_CLASS"
 log " CPD_METADB_BLOCK_STORAGE_CLASS: $CPD_METADB_BLOCK_STORAGE_CLASS"
 log " SSH_PUB_KEY: $SSH_PUB_KEY"
+log " MAS_ENTITLEMENT_KEY: $MAS_ENTITLEMENT_KEY"
+
+if [[ -f entitlement.lic ]]; then
+  chmod 600 entitlement.lic
+fi
 
 ## Download files from S3 bucket
 # Download SLS certificate

@@ -55,31 +55,16 @@ export EXISTING_PUBLIC_SUBNET3_ID=${48}
 export PRIVATE_CLUSTER=${49}
 export OPERATIONAL_MODE=${50}
 export ENV_TYPE=${52}
-export artifactory_apikey=${51}
+export ARTIFACTORY_APIKEY=${51}
 export GIT_REPO_HOME=$(pwd)
 
-
-  #export mas_catalog_source=ibm-mas-operators
-  export mas_catalog_source=ibm-operator-catalog
-  export artifactory_username=pakosal1@in.ibm.com
-
-  export mas_channel=m2dev89
-  export mas_icr_cp=wiotp-docker-local.artifactory.swg-devops.com
-  export mas_icr_cpopen=wiotp-docker-local.artifactory.swg-devops.com
-  export mas_entitlement_username=pakosal1@in.ibm.com
-  export mas_entitlement_key=$artifactory_apikey
-  
-  
-  #export MAS_CATALOG_SOURCE=ibm-mas-operators
-  export MAS_CATALOG_SOURCE=ibm-operator-catalog
-  export ARTIFACTORY_USERNAME=pakosal1@in.ibm.com
-  export ARTIFACTORY_APIKEY=$artifactory_apikey
-  export MAS_CHANNEL=m2dev89
-  export MAS_ICR_CP=wiotp-docker-local.artifactory.swg-devops.com
-  export MAS_ICR_CPOPEN=wiotp-docker-local.artifactory.swg-devops.com
-  export MAS_ENTITLEMENT_USERNAME=pakosal1@in.ibm.com
-  export MAS_ENTITLEMENT_KEY=$artifactory_apikey
-  
+export ARTIFACTORY_USERNAME=shajsyed@in.ibm.com
+export MAS_ICR_CP=wiotp-docker-local.artifactory.swg-devops.com
+export MAS_ICR_CPOPEN=wiotp-docker-local.artifactory.swg-devops.com
+export MAS_ENTITLEMENT_USERNAME=shajsyed@in.ibm.com
+export MAS_ENTITLEMENT_KEY=$ARTIFACTORY_APIKEY
+export MAS_CATALOG_SOURCE=ibm-mas-operators
+export MAS_CHANNEL=m2dev89
 
 
   
