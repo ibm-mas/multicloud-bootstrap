@@ -143,11 +143,6 @@ Parameters:
     AllowedValues:
       - production
       - nonproduction
-  ApiKey:
-    Description: Enter the Api key.
-    Type: String
-    NoEcho: true
-    MinLength: '1'      
 Metadata:
   'AWS::CloudFormation::Interface':
     ParameterGroups:
@@ -205,7 +200,6 @@ Metadata:
           default: Operational Mode
         Parameters:
           - OperationalMode
-          - ApiKey
 Mappings:
   RegionMap:
     us-east-1:
@@ -563,7 +557,7 @@ Resources:
             - 'git clone https://github.com/ibm-mas/ansible-devops.git;'
             - cd ansible-devops;
             - rm -rf multicloud-bootstrap 1>/dev/null 2>&1;
-            - 'git clone -b pk9773v2 https://github.com/ibm-mas/multicloud-bootstrap.git;'
+            - 'git clone https://github.com/ibm-mas/multicloud-bootstrap.git;'
             - cd multicloud-bootstrap;
             - 'find . -type f -name "*.sh" -exec chmod +x {} \;;'
             - ./init.sh "aws" "
@@ -618,10 +612,8 @@ Resources:
             - ''' '''' '''' '''' '''' '''
             - !Ref EmailNotification
             - ''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''
-            - ''' '''            
+            - ''' '''
             - !Ref OperationalMode
-            - ''' '''            
-            - !Ref ApiKey            
             - ''' "dev" '
             - '2>&1 | tee mas-provisioning.log; '
       Tags:

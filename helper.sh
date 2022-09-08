@@ -187,11 +187,10 @@ validate_prouduct_type() {
   product_code_metadata="$(curl http://169.254.169.254/latest/meta-data/product-codes)"
   # Hardcoding product_code_metadata for testing purpose until ami gets created for paid product.
   # product_code_metadata="1905n4jwbijcylk3xm02poizl" #privatepublic
-  product_code_metadata="9i61mljzpi48oygb8h47a0k0j" #byol
   if [[ -n "$product_code_metadata" ]]; then
     log "Product Code: $product_code_metadata"
     if echo "$product_code_metadata" | grep -Ei '404\s+-\s+Not\s+Found' 1>/dev/null 2>&1; then
-      log "updated: MAS product code not found in metadata, skipping custom annotations for Suite CR"
+      log "MAS product code not found in metadata, skipping custom annotations for Suite CR"
     else
       aws_product_codes_config_file="$GIT_REPO_HOME/aws/aws-product-codes.config"
       log "Checking for product type corrosponding to $product_code_metadata from file $aws_product_codes_config_file"
@@ -200,7 +199,7 @@ validate_prouduct_type() {
         export PRODUCT_NAME="$(grep -E "^$product_code_metadata:" $aws_product_codes_config_file | cut -f 4 -d ":")"
         log "PRODUCT_NAME: $PRODUCT_NAME"
         log "PRODUCT_TYPE: $PRODUCT_TYPE"
-        log "updated: OPERATIONAL_MODE : $OPERATIONAL_MODE"
+        log "OPERATIONAL_MODE : $OPERATIONAL_MODE"
         if [[ $PRODUCT_TYPE == "byol" ]]; then
           export MAS_ANNOTATIONS="mas.ibm.com/hyperscalerProvider=aws,mas.ibm.com/hyperscalerFormat=byol,mas.ibm.com/hyperscalerChannel=ibm"
           if [[ $OPERATIONAL_MODE == "nonproduction"  ]]; then

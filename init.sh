@@ -54,35 +54,9 @@ export EXISTING_PUBLIC_SUBNET2_ID=${47}
 export EXISTING_PUBLIC_SUBNET3_ID=${48}
 export PRIVATE_CLUSTER=${49}
 export OPERATIONAL_MODE=${50}
-export ENV_TYPE=${52}
-export artifactory_apikey=${51}
+export ENV_TYPE=${51}
 export GIT_REPO_HOME=$(pwd)
 
-
-  #export mas_catalog_source=ibm-mas-operators
-  export mas_catalog_source=ibm-operator-catalog
-  export artifactory_username=pakosal1@in.ibm.com
-
-  export mas_channel=m2dev89
-  export mas_icr_cp=wiotp-docker-local.artifactory.swg-devops.com
-  export mas_icr_cpopen=wiotp-docker-local.artifactory.swg-devops.com
-  export mas_entitlement_username=pakosal1@in.ibm.com
-  export mas_entitlement_key=$artifactory_apikey
-  
-  
-  #export MAS_CATALOG_SOURCE=ibm-mas-operators
-  export MAS_CATALOG_SOURCE=ibm-operator-catalog
-  export ARTIFACTORY_USERNAME=pakosal1@in.ibm.com
-  export ARTIFACTORY_APIKEY=$artifactory_apikey
-  export MAS_CHANNEL=m2dev89
-  export MAS_ICR_CP=wiotp-docker-local.artifactory.swg-devops.com
-  export MAS_ICR_CPOPEN=wiotp-docker-local.artifactory.swg-devops.com
-  export MAS_ENTITLEMENT_USERNAME=pakosal1@in.ibm.com
-  export MAS_ENTITLEMENT_KEY=$artifactory_apikey
-  
-
-
-  
 # Load helper functions
 . helper.sh
 export -f log
@@ -96,8 +70,8 @@ export -f get_uds_api_key
 export -f validate_prouduct_type
 
 export GIT_REPO_HOME=$(pwd)
-log " OPERATIONAL_MODE in init.sh -$OPERATIONAL_MODE -"
-log " ENV_TYPE in init.sh -$ENV_TYPE -"
+log " OPERATIONAL_MODE $OPERATIONAL_MODE"
+log " ENV_TYPE $ENV_TYPE"
 
 
 
@@ -215,7 +189,7 @@ export UDS_TLS_CERT_LOCAL_FILE_PATH="${GIT_REPO_HOME}/uds.crt"
 # CP4D variables
 export CPD_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
 export CPD_VERSION=cpd40
-export MAS_CHANNEL=m2dev89
+export MAS_CHANNEL=8.8.x
 if [[ $CLUSTER_TYPE == "aws" ]]; then
   export CPD_PRIMARY_STORAGE_CLASS="ocs-storagecluster-cephfs"
 elif [[ $CLUSTER_TYPE == "azure" ]]; then
@@ -380,8 +354,7 @@ export DEPLOY_MANAGE=$(echo $DEPLOY_MANAGE | cut -d '=' -f 2)
 log " DEPLOY_CP4D: $DEPLOY_CP4D"
 log " DEPLOY_MANAGE: $DEPLOY_MANAGE"
 
-log " OPERATIONAL_MODE: $OPERATIONAL_MODE"
-log " artifactory_apikey: $artifactory_apikey"
+
 
 if [[ $CLUSTER_TYPE == "azure" ]]; then
   # Perform az login
