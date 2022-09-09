@@ -115,6 +115,17 @@
         "description": "Enter the Blob SAS location of your Suite license key file, for example: https://masocpstgaccount.blob.core.windows.net/masocpcontainer/entitlement.lic?[blob-sas-token] (Applicable only for BYOL product)"
       }
     },
+    "operationalMode": {
+      "type": "string",
+      "defaultValue": "production",
+      "metadata": {
+        "description": "Non-production environments can be used for internal development and testing activities only. Select nonproduction option only for Non-production environments"
+      },
+      "allowedValues": [
+        "production",
+        "nonproduction"
+      ]
+    },	
     "masManageDBUser": {
       "type": "string",
       "metadata": {
@@ -578,7 +589,7 @@
             "typeHandlerVersion": "2.0",
             "autoUpgradeMinorVersion": true,
             "protectedSettings": {
-              "commandToExecute": "[concat('sleep 120;', 'cd /root/ansible-devops/multicloud-bootstrap;', './init-async.sh azure ''', parameters('offeringType'), ''' ''', parameters('location'), ''' null ''', parameters('clusterSize'), ''' ''', variables('projectName'), ''' ''', parameters('publicDomain'), ''' ''', parameters('publicDomainResourceGroup'), ''' ''', parameters('sshPublicKey'), ''' null ''', parameters('entitledRegistryKey'), ''' ''', parameters('openShiftPullSecret'), ''' ''', parameters('masLicenseUrl'), ''' ''', parameters('slsEndpointUrl'), ''' ''', parameters('slsRegistrationKey'), ''' ''', parameters('slsPublicCertificateUrl'), ''' ''', parameters('udsEndpointUrl'), ''' ''', parameters('udsAPIKey'), ''' ''', parameters('udsPublicCertificateUrl'), ''' ''', parameters('masManageDBUser'), ''' ''', parameters('masManageDBPassword'), ''' ''', parameters('masManageDBJdbcUrl'), ''' ''', parameters('masManageDBCertificateUrl'), ''' ''', parameters('importDemoData'), ''' ''', parameters('openShiftClusterApiUrl'), ''' ''', parameters('openShiftUser'), ''' ''', parameters('openShiftPwd'), ''' ''', variables('rgName'), ''' ''', parameters('notificattionEmailAddress'), ''' ''', parameters('smtpHost'), ''' ''', parameters('smtpPort'), ''' ''', parameters('smtpUsername'), ''' ''', parameters('smtpPassword'), ''' ''', parameters('azureServicePrincipalClientId'), ''' ''', parameters('azureServicePrincipalClientSecret'), ''' ''', variables('seller_subscription_id'), ''' ''', variables('seller_resource_group'), ''' ''', variables('seller_compute_gallery_name'), ''' ''', variables('seller_image_definition'), ''' ''', parameters('emailNotification'), ''' dev ''', ''' > mas-provisioning.log 2>&1;')]"
+              "commandToExecute": "[concat('sleep 120;', 'cd /root/ansible-devops/multicloud-bootstrap;', './init-async.sh azure ''', parameters('offeringType'), ''' ''', parameters('location'), ''' null ''', parameters('clusterSize'), ''' ''', variables('projectName'), ''' ''', parameters('publicDomain'), ''' ''', parameters('publicDomainResourceGroup'), ''' ''', parameters('sshPublicKey'), ''' null ''', parameters('entitledRegistryKey'), ''' ''', parameters('openShiftPullSecret'), ''' ''', parameters('masLicenseUrl'), ''' ''', parameters('slsEndpointUrl'), ''' ''', parameters('slsRegistrationKey'), ''' ''', parameters('slsPublicCertificateUrl'), ''' ''', parameters('udsEndpointUrl'), ''' ''', parameters('udsAPIKey'), ''' ''', parameters('udsPublicCertificateUrl'), ''' ''', parameters('masManageDBUser'), ''' ''', parameters('masManageDBPassword'), ''' ''', parameters('masManageDBJdbcUrl'), ''' ''', parameters('masManageDBCertificateUrl'), ''' ''', parameters('importDemoData'), ''' ''', parameters('openShiftClusterApiUrl'), ''' ''', parameters('openShiftUser'), ''' ''', parameters('openShiftPwd'), ''' ''', variables('rgName'), ''' ''', parameters('notificattionEmailAddress'), ''' ''', parameters('smtpHost'), ''' ''', parameters('smtpPort'), ''' ''', parameters('smtpUsername'), ''' ''', parameters('smtpPassword'), ''' ''', parameters('azureServicePrincipalClientId'), ''' ''', parameters('azureServicePrincipalClientSecret'), ''' ''', variables('seller_subscription_id'), ''' ''', variables('seller_resource_group'), ''' ''', variables('seller_compute_gallery_name'), ''' ''', variables('seller_image_definition'), ''' ''', parameters('emailNotification'), ''' ''', parameters('operationalMode'), ''' dev ''', ''' > mas-provisioning.log 2>&1;')]"
             }
           }
         }

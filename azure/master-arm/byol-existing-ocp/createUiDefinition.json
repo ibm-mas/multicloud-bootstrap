@@ -131,6 +131,27 @@
                             "validationMessage": "Contain letters, numbers and special characters only."
                         },
                         "visible": true
+                    },
+                    {
+                        "name": "operationalMode",
+                        "type": "Microsoft.Common.DropDown",
+                        "label": "Operational Mode",
+                        "defaultValue": "production",
+                        "toolTip": "Non-production environments can be used for internal development and testing activities only. Select nonproduction option only for Non-production environments",
+                        "constraints": {
+                            "allowedValues": [
+                                {
+                                    "label": "Production",
+                                    "value": "production"
+                                },
+                                {
+                                    "label": "Non Production",
+                                    "value": "nonproduction"
+                                }
+                            ],
+                            "required": true
+                        },
+                        "visible": true
                     }
                 ]
             },
@@ -446,6 +467,7 @@
             "offeringType": "[steps('ApplicationSettings').offeringType]",
             "entitledRegistryKey": "[steps('ApplicationSettings').entitledRegistryKey]",
             "masLicenseUrl": "[steps('ApplicationSettings').masLicenseUrl]",
+			"operationalMode": "[steps('ApplicationSettings').operationalMode]",
             "openShiftClusterApiUrl": "[steps('ExistingInfrastructure').openShiftClusterApiUrl]",
             "openShiftUser": "[steps('ExistingInfrastructure').openShiftUser]",
             "openShiftPwd": "[steps('ExistingInfrastructure').openShiftPwd]",
