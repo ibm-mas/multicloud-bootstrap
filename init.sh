@@ -480,7 +480,21 @@ if [[ $PRE_VALIDATION == "pass" ]]; then
     RESP_CODE=0
   else
     mark_provisioning_failed $retcode
+     if [[ $retcode -eq 2 ]]; then
+          log "OCP Creation Successful ,Suite Deployment failed"
+          log "===== PROVISIONING COMPLETED ====="
+          export STATUS=FAILURE
+          export STATUS_MSG="OCP Creation Successful,Failed in the Ansible playbook execution"
+          export MESSAGE_TEXT="Please import the attached certificate into the browser to access MAS UI."
+          export OPENSHIFT_CLUSTER_CONSOLE_URL="https:\/\/console-openshift-console.apps.${CLUSTER_NAME}.${BASE_DOMAIN}"
+          export OPENSHIFT_CLUSTER_API_URL="https:\/\/api.${CLUSTER_NAME}.${BASE_DOMAIN}:6443"
+          export MAS_URL_INIT_SETUP="NA"
+          export MAS_URL_ADMIN="NA"
+          export MAS_URL_WORKSPACE="NA"
+          RESP_CODE=2
+        fi
   fi
+
 fi
 
 log " STATUS=$STATUS"

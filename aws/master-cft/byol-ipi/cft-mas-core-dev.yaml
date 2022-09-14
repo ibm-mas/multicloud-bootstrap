@@ -652,5 +652,5 @@ Outputs:
   DeploymentDescription:
     Description: >-
       Status description of the deployment.
-    Value: !Select [ 1, !Split [ "\"", !Select [ 1, !Split [ ":", !Select [ 0, !Split [ "#", !GetAtt DeployWaitCondition.Data ] ] ] ] ] ]
+    Value: !Select [1, !Split ["#", !GetAtt DeployWaitCondition.Data]]
 
