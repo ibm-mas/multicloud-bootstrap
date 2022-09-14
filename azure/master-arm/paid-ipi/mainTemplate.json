@@ -245,8 +245,6 @@
   },
   "variables": {
     "seller_subscription_id": "b2ca5467-2502-4b05-b78e-744604c6531d",
-    "seller_compute_gallery_name": "masbyolimagegallery20220908125406",
-    "seller_image_definition": "masocp-image-def-20220908125406",
     "projectName": "[concat('i',substring(uniqueString(resourceGroup().id, deployment().name), 0, 5))]",
     "rgName": "[resourceGroup().name]",
     "vNetName": "[concat(variables('projectName'), '-vnet')]",
@@ -447,6 +445,11 @@
       "dependsOn": [
         "[resourceId('Microsoft.Network/networkInterfaces', variables('networkInterfaceName'))]"
       ],
+      "plan": {
+          "name": "ibm-maximo-vm-offer-byol",
+          "publisher": "ibm-usa-ny-armonk-hq-6275750-ibmcloud-asperia",
+          "product": "ibm-maximo-vm-offer"
+          },
       "properties": {
         "hardwareProfile": {
           "vmSize": "[parameters('vmSize')]"
@@ -467,9 +470,12 @@
           }
         },
         "storageProfile": {
-           "imageReference": {
-            "id": "[resourceId('Microsoft.Compute/galleries/images/versions', variables('seller_compute_gallery_name'), variables('seller_image_definition'), 'latest')]"
-          },
+          "imageReference": {
+                "offer": "ibm-maximo-vm-offer",
+                "publisher": "ibm-usa-ny-armonk-hq-6275750-ibmcloud-asperia",
+                "sku": "ibm-maximo-vm-offer-byol",
+                "version": "latest"
+            },
           "osDisk": {
             "createOption": "fromImage"
           }
