@@ -3,6 +3,13 @@
 # It will delete the resource group which in turn deletes all the resources from that resource group."
 # Hence, make sure you do not have any other resources created in the same resource group.
 #
+# Parameters:
+#   -r RG_NAME: Bootnode resource group name. The cleanup process will find the OpenShift resource group automatically. 
+#     This is an optional parameter.
+#   -u UNIQUE_STR: Unique string using which the OpenShift resource group to be deleted.
+#     This is an optional parameter.
+#   Both the parameters cannot be passed. Cleanup will happen either using the RG_NAME or UNIQUE_STR. Hence, either of these parameters is required.
+#
 
 # Fail the script if any of the steps fail
 set -e
@@ -116,7 +123,7 @@ else
 fi
 echo "UNIQ_STR: $UNIQ_STR"
 if [[ ($UNIQ_STR == "null") || (-z $UNIQ_STR) ]]; then
-  echo "Could not retrieve the unique string from the resource group. Could not find output param 'clusterUniqueString' in the deployment within resource group."
+  echo "Could not retrieve the unique string from the resource group. Could not find output param 'clusterUniqueString' in the deployment within the resource group."
   echo "Skipping the deletion of OCP cluster resources, will continue to delete the bootnode resource group"
 else
   # Get the OCP cluster resource group name
