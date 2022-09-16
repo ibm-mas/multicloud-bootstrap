@@ -530,7 +530,7 @@ Resources:
             - 'git clone https://github.com/ibm-mas/ansible-devops.git;'
             - cd ansible-devops;
             - rm -rf multicloud-bootstrap 1>/dev/null 2>&1;
-            - 'git clone https://github.com/ibm-mas/multicloud-bootstrap.git;'
+            - 'git clone -b OutputValues https://github.com/ibm-mas/multicloud-bootstrap.git;'
             - cd multicloud-bootstrap;
             - 'find . -type f -name "*.sh" -exec chmod +x {} \;;'
             - ./init.sh "aws" "
@@ -605,11 +605,30 @@ Resources:
       Handle: !Ref DeployWaitConditionHandle
       Timeout: 36000
 Outputs:
+  MASCloudAutomationVersion:
+    Description: Version of the MAS automated deployment on Cloud
+    Value: '2.0'
+  MASInitialSetupUrlLogin:
+    Description: >-
+      Url to perform MAS initial setup, make sure you have imported the MAS
+      public certificate into the browser
+    Value: !Select [4, !Split ["#", !GetAtt DeployWaitCondition.Data]]
+  MASAdminUrl:
+    Description: >-
+      Url to login to MAS Admin UI, make sure you have imported the MAS public
+      certificate into the browser
+    Value: !Select [5, !Split ["#", !GetAtt DeployWaitCondition.Data]]
+  MASWorkspaceUrl:
+    Description: >-
+      Url to login to MAS Workspace, make sure you have imported the MAS public
+      certificate into the browser
+    Value: !Select [0, !Split ["\"",!Select [0, !Split ["}",!Select [6, !Split ["#", !GetAtt DeployWaitCondition.Data]]]]]]
   DeploymentStatus:
     Description: >-
-      Status of the deployment. Value will be a JSON string in the format
-      {"[signal-unique-id]":"SUCCESS/FAILURE#[message]"}.
-    Value: !GetAtt
-      - DeployWaitCondition
-      - Data
+      Status of the deployment.
+    Value:  !Select [1, !Split ["\"", !Select [1, !Split [":", !Select [0, !Split ["#", !GetAtt DeployWaitCondition.Data]]]]]]
+  DeploymentDescription:
+    Description: >-
+      Status description of the deployment.
+    Value: !Select [1, !Split ["#", !GetAtt DeployWaitCondition.Data]]
 
