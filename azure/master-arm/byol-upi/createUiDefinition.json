@@ -190,17 +190,17 @@
                         "name": "operationalMode",
                         "type": "Microsoft.Common.DropDown",
                         "label": "Operational Mode",
-                        "defaultValue": "production",
-                        "toolTip": "Non-production environments can be used for internal development and testing activities only. Select nonproduction option only for Non-production environments",
+                        "defaultValue": "Production",
+                        "toolTip": "Non-production installations can be used for internal development and testing activities only.",
                         "constraints": {
                             "allowedValues": [
                                 {
                                     "label": "Production",
-                                    "value": "production"
+                                    "value": "Production"
                                 },
                                 {
-                                    "label": "Non Production",
-                                    "value": "nonproduction"
+                                    "label": "Non-production",
+                                    "value": "Non-production"
                                 }
                             ],
                             "required": true

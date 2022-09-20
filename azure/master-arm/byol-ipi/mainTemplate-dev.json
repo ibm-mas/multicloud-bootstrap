@@ -89,13 +89,13 @@
     },
     "operationalMode": {
       "type": "string",
-      "defaultValue": "production",
+      "defaultValue": "Production",
       "metadata": {
-        "description": "Non-production environments can be used for internal development and testing activities only. Select nonproduction option only for Non-production environments"
+        "description": "Non-production installations can be used for internal development and testing activities only."
       },
       "allowedValues": [
-        "production",
-        "nonproduction"
+        "Production",
+        "Non-production"
       ]
     },    
     "masManageDBUser": {

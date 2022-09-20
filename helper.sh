@@ -202,16 +202,16 @@ validate_prouduct_type() {
         log "OPERATIONAL_MODE : $OPERATIONAL_MODE"
         if [[ $PRODUCT_TYPE == "byol" ]]; then
           export MAS_ANNOTATIONS="mas.ibm.com/hyperscalerProvider=aws,mas.ibm.com/hyperscalerFormat=byol,mas.ibm.com/hyperscalerChannel=ibm"
-          if [[ $OPERATIONAL_MODE == "nonproduction"  ]]; then
+          if [[ $OPERATIONAL_MODE == "Non-production"  ]]; then
            export MAS_ANNOTATIONS="mas.ibm.com/operationalMode=nonproduction,mas.ibm.com/hyperscalerProvider=aws,mas.ibm.com/hyperscalerFormat=byol,mas.ibm.com/hyperscalerChannel=ibm"
           fi
-          log "MAS_ANNOTATIONS updated-2: $MAS_ANNOTATIONS"
+
         elif [[ $PRODUCT_TYPE == "privatepublic" ]]; then
           export MAS_ANNOTATIONS="mas.ibm.com/hyperscalerProvider=aws,mas.ibm.com/hyperscalerFormat=privatepublic,mas.ibm.com/hyperscalerChannel=aws"
-          if [[ $OPERATIONAL_MODE == "nonproduction"  ]]; then
+          if [[ $OPERATIONAL_MODE == "Non-production"  ]]; then
            export MAS_ANNOTATIONS="mas.ibm.com/operationalMode=nonproduction,mas.ibm.com/hyperscalerProvider=aws,mas.ibm.com/hyperscalerFormat=privatepublic,mas.ibm.com/hyperscalerChannel=aws"
           fi
-          log "MAS_ANNOTATIONS updated-3: $MAS_ANNOTATIONS"        
+
         else
           log "Invalid product type : $PRODUCT_TYPE"
           SCRIPT_STATUS=28
@@ -224,5 +224,5 @@ validate_prouduct_type() {
   else
     log "MAS product code not found, skipping custom annotations for Suite CR"
   fi
-  log "MAS_ANNOTATIONS updated-4:: $MAS_ANNOTATIONS"
+  log "MAS_ANNOTATIONS :: $MAS_ANNOTATIONS"
 }
