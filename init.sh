@@ -53,7 +53,8 @@ export EXISTING_PUBLIC_SUBNET1_ID=${46}
 export EXISTING_PUBLIC_SUBNET2_ID=${47}
 export EXISTING_PUBLIC_SUBNET3_ID=${48}
 export PRIVATE_CLUSTER=${49}
-export ENV_TYPE=${50}
+export OPERATIONAL_MODE=${50}
+export ENV_TYPE=${51}
 export GIT_REPO_HOME=$(pwd)
 # Load helper functions
 . helper.sh
@@ -68,6 +69,8 @@ export -f get_uds_api_key
 export -f validate_prouduct_type
 
 export GIT_REPO_HOME=$(pwd)
+log " OPERATIONAL_MODE $OPERATIONAL_MODE"
+log " ENV_TYPE $ENV_TYPE"
 
 ## Configure CloudWatch agent
 if [[ $CLUSTER_TYPE == "aws" ]]; then
@@ -182,7 +185,7 @@ export UDS_TLS_CERT_LOCAL_FILE_PATH="${GIT_REPO_HOME}/uds.crt"
 # CP4D variables
 export CPD_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
 export CPD_VERSION=cpd40
-export MAS_CHANNEL=8.8.x
+export MAS_CHANNEL=8.9.x
 if [[ $CLUSTER_TYPE == "aws" ]]; then
   export CPD_PRIMARY_STORAGE_CLASS="ocs-storagecluster-cephfs"
 elif [[ $CLUSTER_TYPE == "azure" ]]; then
