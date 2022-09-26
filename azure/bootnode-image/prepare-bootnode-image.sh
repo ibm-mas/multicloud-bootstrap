@@ -43,11 +43,11 @@ pip3 install yq
 sudo yum install -y jq
 python3 -m pip install dotmap
 python3 -m pip install yq 
-#Install openshift-install 4.8.46
-wget https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/4.8.46/openshift-install-linux-4.8.46.tar.gz
-tar xzvf openshift-install-linux-4.8.46.tar.gz
+#Install openshift-install 4.10.34
+wget https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/4.10.34/openshift-install-linux-4.10.34.tar.gz
+tar xzvf openshift-install-linux-4.10.34.tar.gz
 mv openshift-install /usr/local/bin/
-rm -rf ./openshift-install-linux-4.8.46.tar.gz
+rm -rf ./openshift-install-linux-4.10.34.tar.gz
 
 
 # Install Azure cli
@@ -76,12 +76,12 @@ mv jq /usr/local/bin
 dnf module install -y container-tools
 
 ## Download Openshift CLI and move to /usr/local/bin
-wget -q "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.8.46/openshift-client-linux-4.8.46.tar.gz"
-tar -xvf openshift-client-linux-4.8.46.tar.gz
+wget -q "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.10.34/openshift-client-linux-4.10.34.tar.gz"
+tar -xvf openshift-client-linux-4.10.34.tar.gz
 chmod u+x oc kubectl
 mv oc /usr/local/bin
 mv kubectl /usr/local/bin
-rm -rf openshift-client-linux-4.8.46.tar.gz
+rm -rf openshift-client-linux-4.10.34.tar.gz
 
 ## Install terraform
 TERRAFORM_VER=`curl -s https://api.github.com/repos/hashicorp/terraform/releases/latest |  grep tag_name | cut -d: -f2 | tr -d \"\,\v | awk '{$1=$1};1'`

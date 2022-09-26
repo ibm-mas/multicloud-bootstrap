@@ -142,27 +142,3 @@ module "ocp" {
   ]
 }
 
-module "ocs" {
-  count               = var.ocs.enable ? 1 : 0
-  source              = "./ocs"
-  openshift_api       = local.openshift_api
-  openshift_username  = local.openshift_username
-  openshift_password  = local.openshift_password
-  openshift_token     = var.existing_openshift_token
-  installer_workspace = local.installer_workspace
-  ocs = {
-    enable                       = var.ocs.enable
-    dedicated_nodes              = true
-    ami_id                       = var.ocs.ami_id
-    dedicated_node_instance_type = var.ocs.dedicated_node_instance_type
-    dedicated_node_zones         = var.az == "single_zone" ? [local.availability_zone1] : [local.availability_zone1, local.availability_zone2, local.availability_zone3]
-    dedicated_node_subnet_ids    = var.az == "single_zone" ? local.single_zone_subnets : local.multi_zone_subnets
-  }
-  region = var.region
-
-  depends_on = [
-    module.ocp,
-    module.network,
-    null_resource.aws_configuration,
-  ]
-}
