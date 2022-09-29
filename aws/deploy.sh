@@ -301,11 +301,9 @@ if [[ (-z $SLS_URL) || (-z $SLS_REGISTRATION_KEY) || (-z $SLS_PUB_CERT_URL) ]]; 
   else
     log "Configuring sls for byol offering"
   fi
-
   log "==== SLS deployment started ===="
   export ROLE_NAME=sls && ansible-playbook ibm.mas_devops.run_role
   log "==== SLS deployment completed ===="
-
 else
   log "=== Using Existing SLS Deployment ==="
   export ROLE_NAME=sls && ansible-playbook ibm.mas_devops.run_role

@@ -506,8 +506,7 @@ if [[ $CLUSTER_TYPE == "aws" ]]; then
   cd $GIT_REPO_HOME/$CLUSTER_TYPE
   # Complete the CFT stack creation successfully
   log "Sending completion signal to CloudFormation stack."
-  #curl -k -X PUT -H 'Content-Type:' --data-binary "{\"Status\":\"SUCCESS\",\"Reason\":\"MAS deployment complete\",\"UniqueId\":\"ID-$CLUSTER_TYPE-$CLUSTER_SIZE-$CLUSTER_NAME\",\"Data\":\"${STATUS}#${STATUS_MSG}\"}" "$DEPLOY_WAIT_HANDLE"
-  curl -k -X PUT -H 'Content-Type:' --data-binary "{\"Status\":\"SUCCESS\",\"Reason\":\"MAS deployment complete\",\"UniqueId\":\"ID-$CLUSTER_TYPE-$CLUSTER_SIZE-$CLUSTER_NAME\",\"Data\":\"${STATUS}#${STATUS_MSG}#${OPENSHIFT_CLUSTER_CONSOLE_URL}#${OPENSHIFT_CLUSTER_API_URL}#${MAS_URL_INIT_SETUP}#${MAS_URL_ADMIN}#${MAS_URL_WORKSPACE}\"}" "$DEPLOY_WAIT_HANDLE"
+   curl -k -X PUT -H 'Content-Type:' --data-binary "{\"Status\":\"SUCCESS\",\"Reason\":\"MAS deployment complete\",\"UniqueId\":\"ID-$CLUSTER_TYPE-$CLUSTER_SIZE-$CLUSTER_NAME\",\"Data\":\"${STATUS}#${STATUS_MSG}#${OPENSHIFT_CLUSTER_CONSOLE_URL}#${OPENSHIFT_CLUSTER_API_URL}#${MAS_URL_INIT_SETUP}#${MAS_URL_ADMIN}#${MAS_URL_WORKSPACE}\"}" "$DEPLOY_WAIT_HANDLE"
 fi
 
 # Send email notification

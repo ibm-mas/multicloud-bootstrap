@@ -226,10 +226,10 @@ Resources:
   DeploymentRole:
     Type: 'AWS::IAM::Role'
     Properties:
-      RoleName: !Join 
+      RoleName: !Join
         - '-'
         - - masocp-deploy-role
-          - !GetAtt 
+          - !GetAtt
             - CallLambdaRandomizer
             - Lower_RandomString
       AssumeRolePolicyDocument:
@@ -259,7 +259,7 @@ Resources:
                   - 'ses:SendEmail'
                   - 'ses:SendRawEmail'
                 Resource:
-                  - !Join 
+                  - !Join
                     - ':'
                     - - arn
                       - aws
@@ -267,7 +267,7 @@ Resources:
                       - ''
                       - !Ref 'AWS::AccountId'
                       - user/*
-                  - !Join 
+                  - !Join
                     - ':'
                     - - arn
                       - aws
@@ -275,7 +275,7 @@ Resources:
                       - ''
                       - !Ref 'AWS::AccountId'
                       - policy/*
-                  - !Join 
+                  - !Join
                     - ':'
                     - - arn
                       - aws
@@ -283,7 +283,7 @@ Resources:
                       - ''
                       - ''
                       - '*/*'
-                  - !Join 
+                  - !Join
                     - ':'
                     - - arn
                       - aws
@@ -291,7 +291,7 @@ Resources:
                       - '*'
                       - !Ref 'AWS::AccountId'
                       - configuration-set/*
-                  - !Join 
+                  - !Join
                     - ':'
                     - - arn
                       - aws
@@ -318,10 +318,10 @@ Resources:
   DeploymentRoleProfile:
     Type: 'AWS::IAM::InstanceProfile'
     Properties:
-      InstanceProfileName: !Join 
+      InstanceProfileName: !Join
         - '-'
         - - masocp-deploy-instance-profile
-          - !GetAtt 
+          - !GetAtt
             - CallLambdaRandomizer
             - Lower_RandomString
       Path: /
@@ -330,7 +330,7 @@ Resources:
   LambdaRole:
     Type: 'AWS::IAM::Role'
     Properties:
-      RoleName: !Join 
+      RoleName: !Join
         - '-'
         - - masocp-lambda-role
           - !Ref 'AWS::Region'
@@ -363,7 +363,7 @@ Resources:
     Type: 'AWS::Lambda::Function'
     Properties:
       Handler: index.lambda_handler
-      Role: !GetAtt 
+      Role: !GetAtt
         - LambdaRole
         - Arn
       Runtime: python3.7
@@ -394,7 +394,7 @@ Resources:
   CallLambdaRandomizer:
     Type: 'Custom::CallLambdaRandomizer'
     Properties:
-      ServiceToken: !GetAtt 
+      ServiceToken: !GetAtt
         - LambdaFunctionRandomizer
         - Arn
       length: 6
@@ -402,7 +402,7 @@ Resources:
     Type: 'AWS::Lambda::Function'
     Properties:
       Handler: index.lambda_handler
-      Role: !GetAtt 
+      Role: !GetAtt
         - LambdaRole
         - Arn
       Runtime: python3.7
@@ -424,7 +424,7 @@ Resources:
   CallLambdaGetHostedZoneName:
     Type: 'Custom::CallLambdaGetHostedZoneName'
     Properties:
-      ServiceToken: !GetAtt 
+      ServiceToken: !GetAtt
         - LambdaFunctionGetHostedZoneName
         - Arn
       ZoneId: !Ref PublicHostedZone
@@ -432,10 +432,10 @@ Resources:
   DeploymentConfigBucket:
     Type: 'AWS::S3::Bucket'
     Properties:
-      BucketName: !Join 
+      BucketName: !Join
         - '-'
         - - masocp
-          - !GetAtt 
+          - !GetAtt
             - CallLambdaRandomizer
             - Lower_RandomString
           - bucket
@@ -449,7 +449,7 @@ Resources:
     Type: 'AWS::Lambda::Function'
     Properties:
       Handler: index.lambda_handler
-      Role: !GetAtt 
+      Role: !GetAtt
         - LambdaRole
         - Arn
       Runtime: python3.7
@@ -485,7 +485,7 @@ Resources:
   CallLambdaFunctionGetSubnetForBootnode:
     Type: 'Custom::CallLambdaFunctionGetSubnetForBootnode'
     Properties:
-      ServiceToken: !GetAtt 
+      ServiceToken: !GetAtt
         - LambdaFunctionGetSubnetForBootnode
         - Arn
       Region: !Ref 'AWS::Region'
@@ -505,24 +505,24 @@ Resources:
       SecurityGroupEgress:
         - IpProtocol: '-1'
           CidrIp: 0.0.0.0/0
-      VpcId: !GetAtt 
+      VpcId: !GetAtt
         - CallLambdaFunctionGetSubnetForBootnode
         - DefaultVPCId
       Tags:
         - Key: Name
-          Value: !Join 
+          Value: !Join
             - '-'
             - - masocp-bootnode-sg
-              - !GetAtt 
+              - !GetAtt
                 - CallLambdaRandomizer
                 - Lower_RandomString
   Bootnode:
     Type: 'AWS::EC2::Instance'
     Properties:
-      SubnetId: !GetAtt 
+      SubnetId: !GetAtt
         - CallLambdaFunctionGetSubnetForBootnode
         - DefaultVPCAz1SubnetId
-      ImageId: !FindInMap 
+      ImageId: !FindInMap
         - RegionMap
         - !Ref 'AWS::Region'
         - HVM64
@@ -531,7 +531,7 @@ Resources:
       SecurityGroupIds:
         - !Ref BootnodeSecurityGroup
       IamInstanceProfile: !Ref DeploymentRoleProfile
-      UserData: !Base64 
+      UserData: !Base64
         'Fn::Join':
           - ''
           - - |
@@ -555,11 +555,11 @@ Resources:
             - '" "'
             - !Ref ClusterSize
             - '" "'
-            - !GetAtt 
+            - !GetAtt
               - CallLambdaRandomizer
               - Lower_RandomString
             - '" "'
-            - !GetAtt 
+            - !GetAtt
               - CallLambdaGetHostedZoneName
               - ZoneName
             - '" "" "'
@@ -602,10 +602,10 @@ Resources:
             - '2>&1 | tee mas-provisioning.log; '
       Tags:
         - Key: Name
-          Value: !Join 
+          Value: !Join
             - '-'
             - - masocp
-              - !GetAtt 
+              - !GetAtt
                 - CallLambdaRandomizer
                 - Lower_RandomString
               - bootnode
@@ -621,7 +621,7 @@ Outputs:
     Value: '2.0'
   ClusterUniqueString:
     Description: Unique string that is part of cluster resoutce names
-    Value: !GetAtt 
+    Value: !GetAtt
       - CallLambdaRandomizer
       - Lower_RandomString
   OpenShiftConsoleUrl:
@@ -653,4 +653,3 @@ Outputs:
     Description: >-
       Status description of the deployment.
     Value: !Select [1, !Split ["#", !GetAtt DeployWaitCondition.Data]]
-
