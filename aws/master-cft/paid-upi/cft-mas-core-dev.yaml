@@ -175,9 +175,7 @@ Metadata:
         Parameters:
           - OfferingType
       - Label:
-          default: >-
-            New OpenShift cluster configuration details (complete this section
-            only if you want to create a new cluster)
+          default: New OpenShift cluster configuration details
         Parameters:
           - HostedZone
           - ClusterSize
@@ -722,3 +720,4 @@ Outputs:
     Value: !GetAtt
       - DeployWaitCondition
       - Data
+      
