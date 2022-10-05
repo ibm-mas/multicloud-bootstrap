@@ -39,14 +39,13 @@ Parameters:
       - large
   RedHatSubscription:
     Description: >-
-      Indicate whether you have a valid Red Hat subscription to cover the OpenShift cluster created during the deployment.
-    Default: no
+      Indicate whether you have a valid and active Red Hat subscription to cover the OpenShift cluster created during the deployment.
     Type: String
     AllowedValues:
-      - yes
-      - no
-    AllowedPattern: 'yes'
-    ConstraintDescription: must have a valid Red Hat subscription.
+      - Yes, I have
+      - No, I don't have
+    AllowedPattern: 'Yes.*'
+    ConstraintDescription: must have a valid and active Red Hat subscription.
   EntitledRegistryKey:
     Description: Enter the registry key that you downloaded from the IBM Container Library.
     Type: String
