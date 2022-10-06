@@ -74,11 +74,11 @@ Parameters:
       - large
   RedHatSubscription:
     Description: >-
-      Indicate whether you have a valid and active Red Hat subscription to cover the OpenShift cluster created during the deployment.
+      Do you have a valid and active Red Hat subscription for the OpenShift cluster deployment?
     Type: String
     AllowedValues:
-      - Yes, I have
-      - No, I don't have
+      - Yes, I have a valid and active Red Hat subscription
+      - No, I don't have a valid and active Red Hat subscription
     AllowedPattern: 'Yes.*'
     ConstraintDescription: must have a valid and active Red Hat subscription.
   EntitledRegistryKey:
