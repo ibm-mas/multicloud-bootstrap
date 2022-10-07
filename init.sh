@@ -226,9 +226,15 @@ log " new_or_existing_vpc_subnet=$new_or_existing_vpc_subnet"
 log " enable_permission_quota_check=$enable_permission_quota_check"
 
 if [[ -z "$EXISTING_NETWORK" && $CLUSTER_TYPE == "azure" ]]; then
+
   export INSTALLATION_MODE="IPI"
 else
   export INSTALLATION_MODE="UPI"
+  #shajeena
+   VNET_NAME=$EXISTING_NETWORK
+      export EXISTING_NETWORK_RG=`az network vnet list | jq --arg VNET_NAME $VNET_NAME '.[] | select(.name==$VNET_NAME).resourceGroup' | tr -d '"'`
+      log " EXISTING_NETWORK_RG: $EXISTING_NETWORK_RG"
+      export new_or_existing_vpc_subnet="exist"
 fi
 log "==== INSTALLATION MODE: ${INSTALLATION_MODE}"
 
@@ -359,11 +365,10 @@ if [[ $CLUSTER_TYPE == "azure" ]]; then
   export BASE_DOMAIN_RG_NAME=`az network dns zone list | jq --arg DNS_ZONE $DNS_ZONE '.[] | select(.name==$DNS_ZONE).resourceGroup' | tr -d '"'`
   log " BASE_DOMAIN_RG_NAME: $BASE_DOMAIN_RG_NAME"
   # Get VNet RG name for UPI based installation
-  if [[ $INSTALLATION_MODE == "UPI" ]]; then
-    VNET_NAME=$EXISTING_NETWORK
-    export EXISTING_NETWORK_RG=`az network vnet list | jq --arg VNET_NAME $VNET_NAME '.[] | select(.name==$VNET_NAME).resourceGroup' | tr -d '"'`
-    log " EXISTING_NETWORK_RG: $EXISTING_NETWORK_RG"
-  fi
+  #shajeena
+  #if [[ $INSTALLATION_MODE == "UPI" ]]; then
+
+  #fi
 fi
 
 cd $GIT_REPO_HOME
