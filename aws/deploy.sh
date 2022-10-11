@@ -330,6 +330,8 @@ if [[ $DEPLOY_CP4D == "true" ]]; then
   log "==== CP4D deployment started ===="
   export ROLE_NAME=cp4d && ansible-playbook ibm.mas_devops.run_role
   export ROLE_NAME=db2 && ansible-playbook ibm.mas_devops.run_role
+  export CPD_INSTANCE_NAMESPACE="ibm-cpd-${RANDOM_STR}"
+    oc adm policy add-cluster-role-to-user system:controller:persistent-volume-binder system:serviceaccount:${CPD_INSTANCE_NAMESPACE}:zen-databases-sa
   log "==== CP4D deployment completed ===="
 fi
 
