@@ -10,7 +10,7 @@ dnf -y remove polkit
 dnf update -y
 
 ## Install pre-reqs
-dnf install git httpd-tools java python36 unzip wget zip -y
+dnf install git httpd-tools java python38 unzip wget zip -y
 ln -s --force /usr/bin/python3 /usr/bin/python
 ln -s --force /usr/bin/pip3 /usr/bin/pip
 pip install awscli --upgrade --user
@@ -33,13 +33,13 @@ mv jq /usr/local/bin
 dnf module install -y container-tools
 
 ## Download Openshift CLI and move to /usr/local/bin
-wget "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.8.46/openshift-client-linux-4.8.46.tar.gz"
-tar -xvf openshift-client-linux-4.8.46.tar.gz
+wget "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.10.37/openshift-client-linux-4.10.37.tar.gz"
+tar -xvf openshift-client-linux-4.10.37.tar.gz
 chmod u+x oc kubectl
 mv oc /usr/local/bin
 mv kubectl /usr/local/bin
 oc version
-rm -rf openshift-client-linux-4.8.46.tar.gz
+rm -rf openshift-client-linux-4.10.37.tar.gz
 
 ## Install terraform
 TERRAFORM_VER=`curl -s https://api.github.com/repos/hashicorp/terraform/releases/latest |  grep tag_name | cut -d: -f2 | tr -d \"\,\v | awk '{$1=$1};1'`
