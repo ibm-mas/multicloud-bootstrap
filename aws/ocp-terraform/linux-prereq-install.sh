@@ -2,7 +2,7 @@
 
 ## Install wget, htpasswd, python3 and aws CLIs
 
-yum install wget httpd-tools python36 -y
+yum install wget httpd-tools python38 -y
 ln -s /usr/bin/python3 /usr/bin/python
 ln -s /usr/bin/pip3 /usr/bin/pip
 pip install awscli --upgrade --user

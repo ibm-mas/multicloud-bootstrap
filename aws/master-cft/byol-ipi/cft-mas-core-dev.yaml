@@ -366,7 +366,7 @@ Resources:
       Role: !GetAtt 
         - LambdaRole
         - Arn
-      Runtime: python3.7
+      Runtime: python3.8
       Tags:
         - Key: Name
           Value: RandomizerLambda
@@ -405,7 +405,7 @@ Resources:
       Role: !GetAtt 
         - LambdaRole
         - Arn
-      Runtime: python3.7
+      Runtime: python3.8
       Code:
         ZipFile: |
           import boto3
@@ -452,7 +452,7 @@ Resources:
       Role: !GetAtt 
         - LambdaRole
         - Arn
-      Runtime: python3.7
+      Runtime: python3.8
       Code:
         ZipFile: |
           import boto3
