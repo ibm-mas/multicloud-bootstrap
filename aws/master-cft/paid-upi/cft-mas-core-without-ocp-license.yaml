@@ -72,6 +72,15 @@ Parameters:
       - small
       - medium
       - large
+  RedHatSubscription:
+    Description: >-
+      Do you have a valid and active Red Hat subscription for the OpenShift cluster deployment?
+    Type: String
+    AllowedValues:
+      - Yes, I have a valid and active Red Hat subscription
+      - No, I don't have a valid and active Red Hat subscription
+    AllowedPattern: 'Yes.*'
+    ConstraintDescription: must have a valid and active Red Hat subscription.
   EntitledRegistryKey:
     Description: Enter the registry key that you downloaded from the IBM Container Library.
     Type: String
@@ -179,6 +188,7 @@ Metadata:
         Parameters:
           - HostedZone
           - ClusterSize
+          - RedHatSubscription
       - Label:
           default: Cluster and bootnode access (you must complete this section)
         Parameters:
