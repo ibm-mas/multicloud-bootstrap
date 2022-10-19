@@ -99,7 +99,7 @@ if [[ $DEPLOY_MANAGE == "true" ]]; then
                     aws s3 cp "$MAS_JDBC_CERT_URL" db.crt --region us-east-1
                     ret=$?
         		if [ $ret -ne 0 ]; then
-        			mas_license=$(aws s3 cp "$MAS_JDBC_CERT_URL" db.crt --region $DEPLOY_REGION
+        			aws s3 cp "$MAS_JDBC_CERT_URL" db.crt --region $DEPLOY_REGION
         			ret=$?
         		if [ $ret -ne 0 ]; then
             		log "Invalid DB certificate URL"
