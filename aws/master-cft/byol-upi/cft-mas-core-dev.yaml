@@ -273,6 +273,18 @@ Mappings:
             HVM64: ami-09a4cfc5416a39c2c
         sa-east-1:
             HVM64: ami-037608508e4c078cd
+        af-south-1:
+            HVM64: ami-0e296bc6ff57c6224
+        ap-east-1:
+            HVM64: ami-09db5ff6b57821167
+        ap-southeast-3:
+            HVM64: ami-0ced3df877f5a3530
+        eu-south-1:
+            HVM64: ami-0a5d12139b7860a6d
+        me-south-1:
+            HVM64: ami-0786491c0f1346ded
+        me-central-1:
+            HVM64: ami-0d970767e878b6caa
 Resources:
     DeployWaitConditionHandle:
         Type: 'AWS::CloudFormation::WaitConditionHandle'
@@ -548,7 +560,7 @@ Resources:
                       - 'git clone https://github.com/ibm-mas/ansible-devops.git;'
                       - cd ansible-devops;
                       - rm -rf multicloud-bootstrap 1>/dev/null 2>&1;
-                      - 'git clone https://github.com/ibm-mas/multicloud-bootstrap.git;'
+                      - 'git clone -b newRegions2 https://github.com/ibm-mas/multicloud-bootstrap.git;'
                       - cd multicloud-bootstrap;
                       - 'find . -type f -name "*.sh" -exec chmod +x {} \;;'
                       - ./init.sh "aws" "
