@@ -1,0 +1,17 @@
+odf_channel: "{{ lookup('env', 'ODF_CHANNEL') | default('stable-4.10', true) }}"
+odf_namespace: "{{ lookup('env', 'ODF_NAMESPACE') | default('openshift-storage', true) }}"
+odf_operator: "{{ lookup('env', 'ODF_OPERATOR') | default('odf-operator', true) }}"
+odf_startingcsv: "{{ lookup('env', 'ODF_STARTINGCSV') | default('odf-operator.v4.10.6', true) }}"
+
+#StorageSystem variables
+odf_storagesystem_name: "{{ lookup('env', 'ODF_STORAGESYSTEM') | default('ocs-storagecluster-storagesystem', true) }}"
+
+#OCS StorageCluster variables 
+ocs_storagecluster_name: "{{ lookup('env', 'OCS_STORAGECLUSTER') | default('ocs-storagecluster', true) }}"
+ocs_storagecluster_storage_size: "{{ lookup('env', 'OCS_STORAGECLUSTER_SIZE') | default('512Gi', true) }}"
+ocs_storagecluster_deviceset_name: "{{ lookup('env', 'OCS_STORAGECLUSTER_DEVICESET') | default('ocs-deviceset-managed-premium', true) }}"
+ocs_storagecluster_storageclass_name: "{{ lookup('env', 'OCS_STORAGECLUSTER_STORAGECLASS') | default('managed-premium', true) }}"
+ocs_storagecluster_version: "{{ lookup('env', 'OCS_STORAGECLUSTER_VERSION') | default('4.10.0', true) }}"
+ocs_storagecluster_replicas: "{{ lookup('env', 'OCS_STORAGECLUSTER_REPLICA') | default(3, true) }}"
+ocs_storagecluster_accessmode: "{{ lookup('env', 'OCS_STORAGECLUSTER_ACCESSMODE') | default('ReadWriteOnce', true) }}"
+
