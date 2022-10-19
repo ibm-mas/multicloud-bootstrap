@@ -75,6 +75,9 @@ variable "aws_amis" {
     "me-south-1": {
         "hvm": "ami-0e5d014111ee32e16"
     },
+    "me-central-1": {
+        "hvm": "ami-0d970767e878b6caa"
+    },
     "sa-east-1": {
         "hvm": "ami-0dd8411ece8c06dae"
     },
@@ -89,6 +92,9 @@ variable "aws_amis" {
     },
     "us-west-2": {
         "hvm": "ami-0617611237b58ac93"
+    },
+    "ap-southeast-3": {
+        "hvm": "ami-0ced3df877f5a3530"
     }
   }
 }

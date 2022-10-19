@@ -219,16 +219,28 @@ Mappings:
       HVM64: ami-09a4cfc5416a39c2c
     sa-east-1:
       HVM64: ami-037608508e4c078cd
+    af-south-1:
+      HVM64: ami-0e296bc6ff57c6224
+    ap-east-1:
+      HVM64: ami-09db5ff6b57821167
+    ap-southeast-3:
+      HVM64: ami-0ced3df877f5a3530
+    eu-south-1:
+      HVM64: ami-0a5d12139b7860a6d
+    me-south-1:
+      HVM64: ami-0786491c0f1346ded
+    me-central-1:
+      HVM64: ami-0d970767e878b6caa
 Resources:
   DeployWaitConditionHandle:
     Type: 'AWS::CloudFormation::WaitConditionHandle'
   DeploymentRole:
     Type: 'AWS::IAM::Role'
     Properties:
-      RoleName: !Join 
+      RoleName: !Join
         - '-'
         - - masocp-deploy-role
-          - !GetAtt 
+          - !GetAtt
             - CallLambdaRandomizer
             - Lower_RandomString
       AssumeRolePolicyDocument:
@@ -258,7 +270,7 @@ Resources:
                   - 'ses:SendEmail'
                   - 'ses:SendRawEmail'
                 Resource:
-                  - !Join 
+                  - !Join
                     - ':'
                     - - arn
                       - aws
@@ -266,7 +278,7 @@ Resources:
                       - ''
                       - !Ref 'AWS::AccountId'
                       - user/*
-                  - !Join 
+                  - !Join
                     - ':'
                     - - arn
                       - aws
@@ -274,7 +286,7 @@ Resources:
                       - ''
                       - !Ref 'AWS::AccountId'
                       - policy/*
-                  - !Join 
+                  - !Join
                     - ':'
                     - - arn
                       - aws
@@ -282,7 +294,7 @@ Resources:
                       - ''
                       - ''
                       - '*/*'
-                  - !Join 
+                  - !Join
                     - ':'
                     - - arn
                       - aws
@@ -290,7 +302,7 @@ Resources:
                       - '*'
                       - !Ref 'AWS::AccountId'
                       - configuration-set/*
-                  - !Join 
+                  - !Join
                     - ':'
                     - - arn
                       - aws
@@ -317,10 +329,10 @@ Resources:
   DeploymentRoleProfile:
     Type: 'AWS::IAM::InstanceProfile'
     Properties:
-      InstanceProfileName: !Join 
+      InstanceProfileName: !Join
         - '-'
         - - masocp-deploy-instance-profile
-          - !GetAtt 
+          - !GetAtt
             - CallLambdaRandomizer
             - Lower_RandomString
       Path: /
@@ -329,7 +341,7 @@ Resources:
   LambdaRole:
     Type: 'AWS::IAM::Role'
     Properties:
-      RoleName: !Join 
+      RoleName: !Join
         - '-'
         - - masocp-lambda-role
           - !Ref 'AWS::Region'
@@ -362,7 +374,7 @@ Resources:
     Type: 'AWS::Lambda::Function'
     Properties:
       Handler: index.lambda_handler
-      Role: !GetAtt 
+      Role: !GetAtt
         - LambdaRole
         - Arn
       Runtime: python3.7
@@ -393,7 +405,7 @@ Resources:
   CallLambdaRandomizer:
     Type: 'Custom::CallLambdaRandomizer'
     Properties:
-      ServiceToken: !GetAtt 
+      ServiceToken: !GetAtt
         - LambdaFunctionRandomizer
         - Arn
       length: 6
@@ -401,7 +413,7 @@ Resources:
     Type: 'AWS::Lambda::Function'
     Properties:
       Handler: index.lambda_handler
-      Role: !GetAtt 
+      Role: !GetAtt
         - LambdaRole
         - Arn
       Runtime: python3.7
@@ -423,10 +435,10 @@ Resources:
   DeploymentConfigBucket:
     Type: 'AWS::S3::Bucket'
     Properties:
-      BucketName: !Join 
+      BucketName: !Join
         - '-'
         - - masocp
-          - !GetAtt 
+          - !GetAtt
             - CallLambdaRandomizer
             - Lower_RandomString
           - bucket
@@ -440,7 +452,7 @@ Resources:
     Type: 'AWS::Lambda::Function'
     Properties:
       Handler: index.lambda_handler
-      Role: !GetAtt 
+      Role: !GetAtt
         - LambdaRole
         - Arn
       Runtime: python3.7
@@ -476,7 +488,7 @@ Resources:
   CallLambdaFunctionGetSubnetForBootnode:
     Type: 'Custom::CallLambdaFunctionGetSubnetForBootnode'
     Properties:
-      ServiceToken: !GetAtt 
+      ServiceToken: !GetAtt
         - LambdaFunctionGetSubnetForBootnode
         - Arn
       Region: !Ref 'AWS::Region'
@@ -499,17 +511,17 @@ Resources:
       VpcId: !Ref BootNodeVPCId
       Tags:
         - Key: Name
-          Value: !Join 
+          Value: !Join
             - '-'
             - - masocp-bootnode-sg
-              - !GetAtt 
+              - !GetAtt
                 - CallLambdaRandomizer
                 - Lower_RandomString
   Bootnode:
     Type: 'AWS::EC2::Instance'
     Properties:
       SubnetId: !Ref BootNodeSubnetId
-      ImageId: !FindInMap 
+      ImageId: !FindInMap
         - RegionMap
         - !Ref 'AWS::Region'
         - HVM64
@@ -518,7 +530,7 @@ Resources:
       SecurityGroupIds:
         - !Ref BootnodeSecurityGroup
       IamInstanceProfile: !Ref DeploymentRoleProfile
-      UserData: !Base64 
+      UserData: !Base64
         'Fn::Join':
           - ''
           - - |
@@ -541,7 +553,7 @@ Resources:
             - !Ref 'AWS::AccountId'
             - '" "'
             - '" "'
-            - !GetAtt 
+            - !GetAtt
               - CallLambdaRandomizer
               - Lower_RandomString
             - '" "'
@@ -591,10 +603,10 @@ Resources:
             - '2>&1 | tee mas-provisioning.log; '
       Tags:
         - Key: Name
-          Value: !Join 
+          Value: !Join
             - '-'
             - - masocp
-              - !GetAtt 
+              - !GetAtt
                 - CallLambdaRandomizer
                 - Lower_RandomString
               - bootnode
@@ -612,16 +624,16 @@ Outputs:
     Description: >-
       Url to perform MAS initial setup, make sure you have imported the MAS
       public certificate into the browser
-    Value: !Join 
+    Value: !Join
       - ''
       - - 'https://admin.'
-        - !GetAtt 
+        - !GetAtt
           - CallLambdaRandomizer
           - Lower_RandomString
         - .apps.
-        - !Select 
+        - !Select
           - '1'
-          - !Split 
+          - !Split
             - api.
             - !Ref OpenShiftClusterApiUrl
         - /initialsetup
@@ -629,38 +641,38 @@ Outputs:
     Description: >-
       Url to login to MAS Admin UI, make sure you have imported the MAS public
       certificate into the browser
-    Value: !Join 
+    Value: !Join
       - ''
       - - 'https://admin.'
-        - !GetAtt 
+        - !GetAtt
           - CallLambdaRandomizer
           - Lower_RandomString
         - .apps.
-        - !Select 
+        - !Select
           - '1'
-          - !Split 
+          - !Split
             - api.
             - !Ref OpenShiftClusterApiUrl
   MASWorkspaceUrlLogin:
     Description: >-
       Url to login to MAS Workspace, make sure you have imported the MAS public
       certificate into the browser
-    Value: !Join 
+    Value: !Join
       - ''
       - - 'https://wsmasocp.home.'
-        - !GetAtt 
+        - !GetAtt
           - CallLambdaRandomizer
           - Lower_RandomString
         - .apps.
-        - !Select 
+        - !Select
           - '1'
-          - !Split 
+          - !Split
             - api.
             - !Ref OpenShiftClusterApiUrl
   DeploymentStatus:
     Description: >-
       Status of the deployment. Value will be a JSON string in the format
       {"[signal-unique-id]":"SUCCESS/FAILURE#[message]"}.
-    Value: !GetAtt 
+    Value: !GetAtt
       - DeployWaitCondition
       - Data
