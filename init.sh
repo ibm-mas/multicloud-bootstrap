@@ -182,7 +182,17 @@ export UDS_TLS_CERT_LOCAL_FILE_PATH="${GIT_REPO_HOME}/uds.crt"
 # CP4D variables
 export CPD_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
 export CPD_VERSION=cpd40
-export MAS_CHANNEL=8.8.x
+#export MAS_CHANNEL=8.8.x
+
+export MAS_CATALOG_SOURCE=ibm-operator-catalog
+export MAS_CHANNEL=m4dev89
+export SLS_CHANNEL=dev
+export ARTIFACTORY_USERNAME=pakosal1@in.ibm.com
+export MAS_ENTITLEMENT_USERNAME=pakosal1@in.ibm.com
+export MAS_ICR_CP=wiotp-docker-local.artifactory.swg-devops.com
+export MAS_ICR_CPOPEN=wiotp-docker-local.artifactory.swg-devops.com``
+#export MAS_ENTITLEMENT_KEY=$ARTIFACTORY_APIKEY
+
 if [[ $CLUSTER_TYPE == "aws" ]]; then
   export CPD_PRIMARY_STORAGE_CLASS="ocs-storagecluster-cephfs"
 elif [[ $CLUSTER_TYPE == "azure" ]]; then
