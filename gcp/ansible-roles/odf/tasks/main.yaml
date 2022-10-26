@@ -1,29 +1,47 @@
+#  - name: Get worker nodes
+#    shell: 
+#      cmd: oc get nodes -l node-role.kubernetes.io/worker -l '!node-role.kubernetes.io/master' | awk  '{print $1}' | grep worker
+#    register: worker 
 
-- name: Get worker nodes
-  shell: 
-    cmd: oc get nodes -l node-role.kubernetes.io/worker -l '!node-role.kubernetes.io/master' | awk  '{print $1}' | grep worker
-  register: worker 
+#  # Create new machinecode
+#  - name: Worker nodes
+#    debug:
+#      msg: "{{ item }}"
+#    loop: "{{worker.stdout_lines }}"
 
-#Create new machinecode
-- name: Worker nodes
-  debug:
-    msg: "{{ item }}"
-  loop: "{{worker.stdout_lines }}"
+#  - name: Add label in each worker node
+#    kubernetes.core.k8s:
+#      state: present
+#      definition:
+#        apiVersion: v1
+#        kind: Node
+#        metadata:
+#          name: "{{ item }}"
+#          labels:
+#            cluster.ocs.openshift.io/openshift-storage: ''
+#    loop: "{{ worker.stdout_lines }}"
+#    when: worker.stdout_lines is defined
 
-- name: Add label in each worker node
+
+# Crate OCS Machine set for Azure cluster 
+- name: Create OCS machineset (Azure)
   kubernetes.core.k8s:
-    state: present
-    definition:
-      apiVersion: v1
-      kind: Node
-      metadata:
-        name: "{{ item }}"
-        labels:
-          cluster.ocs.openshift.io/openshift-storage: ''
-  loop: "{{ worker.stdout_lines }}"
-  when: worker.stdout_lines is defined
+    apply: yes
+    definition: "{{ lookup('template', 'templates/azure/ocs-machineset.yaml.j2') }}"
+    wait: yes
+  when: ipi_platform == "azure"
 
-#Create NS 
+- name: Create OCS machineset (GCP)
+  kubernetes.core.k8s:
+    apply: yes
+    definition: "{{ lookup('template', 'templates/gcp/ocs-machineset.yaml.j2') }}"
+    wait: yes
+  when: ipi_platform == "gcp"
+- name: Sleep for 10 minutes
+  shell: 
+    cmd: sleep 600
+
+# Create NS 
 - name: create Namespace Openshift-Storage
   kubernetes.core.k8s:
     definition:
@@ -37,8 +55,8 @@
           openshift.io/node-selector: ''
 
 
-#Create Operator Group if not present
-# part 1: Check for OG
+# Create Operator Group if not present
+#  part 1: Check for OG
 - name: Check if Operator Group is present
   kubernetes.core.k8s_info:
     api_version: operators.coreos.com/v1
@@ -46,20 +64,20 @@
     kind: OperatorGroup
   register: operator_grp_res
 
-#Part 2: Create OG if not present
+# Part 2: Create OG if not present
 - name: "Create Operator Group if not present "
   kubernetes.core.k8s:
     apply: yes
     definition: "{{ lookup('template', 'templates/operatorgroup.yaml.j2') }}"
   when: operator_grp_res.resources[0] is not defined
 
-#Subscribe to ODF operator 
+# Subscribe to ODF operator 
 - name: "Create ODF operator subscription"
   kubernetes.core.k8s:
     apply: yes
     definition: "{{ lookup('template', 'templates/odfsubscribe.yaml.j2') }}"
 
-#Wait untill storagesystems CRD is available 
+# Wait untill storagesystems CRD is available 
 - name: "Wait until the StorageSystem CRD is available"
   kubernetes.core.k8s_info:
     api_version: apiextensions.k8s.io/v1
@@ -82,7 +100,7 @@
   shell:
     cmd: sleep 10
   
-#Create StorageSystem CR
+# Create StorageSystem CR
 - name: "Create StorageSystem"
   kubernetes.core.k8s:
     apply: yes
@@ -98,7 +116,7 @@
     apply: yes
     definition: "{{ lookup('template', 'templates/storagecluster.yaml.j2') }}"
 
-# #Wait for StorageCluster to be ready
+#  # Wait for StorageCluster to be ready
 - name: "Wait for StorageCluster to be ready (60s delay)"
   kubernetes.core.k8s_info:
     api_version: ocs.openshift.io/v1
@@ -111,11 +129,11 @@
     - storagecluster_cr_result.resources[0].status is defined
     - storagecluster_cr_result.resources[0].status.conditions is defined
     - storagecluster_cr_result.resources[0].status.conditions[1].type == 'Available' and storagecluster_cr_result.resources[0].status.conditions[1].status == 'True'
-  retries: 45 # approx 45 minutes before we give up
-  delay: 60 # 1 minute
+  retries: 45 #  approx 45 minutes before we give up
+  delay: 60 #  1 minute
 
 
-#Wait for StorageSystem to be ready
+# Wait for StorageSystem to be ready
 - name: "Wait for StorageSystem to be ready (60s delay)"
   kubernetes.core.k8s_info:
     api_version: odf.openshift.io/v1alpha1
@@ -129,10 +147,10 @@
     - storagesystem_cr_result.resources[0].status.conditions is defined
     - storagesystem_cr_result.resources[0].status.conditions[0].type == 'Available' and storagesystem_cr_result.resources[0].status.conditions[0].status == 'True'
     - storagesystem_cr_result.resources[0].status.conditions[2].type == 'StorageSystemInvalid' and storagesystem_cr_result.resources[0].status.conditions[2].status == 'False'
-  retries: 45 # approx 45 minutes before we give up
-  delay: 60 # 1 minute
+  retries: 45 #  approx 45 minutes before we give up
+  delay: 60 #  1 minute
 
-# #enable console 
+#  # enable console 
 - name: "Enable console plugin"
   kubernetes.core.k8s_json_patch:
     api_version: operator.openshift.io/v1
