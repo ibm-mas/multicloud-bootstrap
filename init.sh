@@ -18,17 +18,16 @@ export SLS_ENTITLEMENT_KEY=${11}
 #sperated it with -DEV-
 export PROD_ENTITLEMENT_KEY=${SLS_ENTITLEMENT_KEY%-DEV-*}
 export DEV_ENTITLEMENT_KEY=${SLS_ENTITLEMENT_KEY#*-DEV-}
-echo 
-echo $PROD_ENTITLEMENT_KEY
-echo $DEV_ENTITLEMENT_KEY
 
 if [[ (-n $PROD_ENTITLEMENT_KEY) ]]; then
   export SLS_ENTITLEMENT_KEY=$PROD_ENTITLEMENT_KEY
 fi
 if [[ (-n $DEV_ENTITLEMENT_KEY) ]]; then
     export MAS_ENTITLEMENT_KEY=$DEV_ENTITLEMENT_KEY
+    echo 'setting DEV_ENTITLEMENT_KEY'
 else
     export MAS_ENTITLEMENT_KEY=$PROD_ENTITLEMENT_KEY
+    echo 'setting PROD_ENTITLEMENT_KEY'
 fi
 
 export OCP_PULL_SECRET=${12}
@@ -204,7 +203,6 @@ export CPD_VERSION=cpd40
 
 export MAS_CATALOG_SOURCE=ibm-operator-catalog
 export MAS_CHANNEL=m4dev89
-export SLS_CHANNEL=dev
 export ARTIFACTORY_USERNAME=pakosal1@in.ibm.com
 export MAS_ENTITLEMENT_USERNAME=pakosal1@in.ibm.com
 export MAS_ICR_CP=wiotp-docker-local.artifactory.swg-devops.com
