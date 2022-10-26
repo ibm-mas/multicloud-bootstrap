@@ -277,6 +277,7 @@ esac
 
 # STARTS
 export ARTIFACTORY_USERNAME=pakosal1@in.ibm.com
+export ARTIFACTORY_APIKEY=$DEV_ENTITLEMENT_KEY
 #export SLS_ICR_CP=wiotp-docker-local.artifactory.swg-devops.com
 #export SLS_ICR_CPOPEN=wiotp-docker-local.artifactory.swg-devops.com
 #export SLS_ENTITLEMENT_USERNAME=pakosal1@in.ibm.com
