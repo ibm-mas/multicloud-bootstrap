@@ -20,9 +20,10 @@ export PROD_ENTITLEMENT_KEY=${SLS_ENTITLEMENT_KEY%-DEV-*}
 export DEV_ENTITLEMENT_KEY=${SLS_ENTITLEMENT_KEY#*-DEV-}
 export SLS_ENTITLEMENT_KEY=$PROD_ENTITLEMENT_KEY
 
-echo 'setting DEV_ENTITLEMENT_KEY $DEV_ENTITLEMENT_KEY'
-echo 'setting PROD_ENTITLEMENT_KEY $PROD_ENTITLEMENT_KEY'
-echo 'setting SLS_ENTITLEMENT_KEY $SLS_ENTITLEMENT_KEY'
+echo $DEV_ENTITLEMENT_KEY
+echo $PROD_ENTITLEMENT_KEY
+echo $SLS_ENTITLEMENT_KEY
+
 
 export OCP_PULL_SECRET=${12}
 export MAS_LICENSE_URL=${13}
@@ -276,11 +277,11 @@ esac
 
 # STARTS
 export ARTIFACTORY_USERNAME=pakosal1@in.ibm.com
-export SLS_ICR_CP=wiotp-docker-local.artifactory.swg-devops.com
-export SLS_ICR_CPOPEN=wiotp-docker-local.artifactory.swg-devops.com
-export SLS_ENTITLEMENT_USERNAME=pakosal1@in.ibm.com
-export SLS_ENTITLEMENT_KEY=$DEV_ENTITLEMENT_KEY
-export SLS_CHANNEL=stable
+#export SLS_ICR_CP=wiotp-docker-local.artifactory.swg-devops.com
+#export SLS_ICR_CPOPEN=wiotp-docker-local.artifactory.swg-devops.com
+#export SLS_ENTITLEMENT_USERNAME=pakosal1@in.ibm.com
+#export SLS_ENTITLEMENT_KEY=$DEV_ENTITLEMENT_KEY
+#export SLS_CHANNEL=stable
 
 export MAS_CHANNEL=m4dev89
 export MAS_CATALOG_VERSION=v8-master-amd64
@@ -288,9 +289,9 @@ export MAS_ICR_CP=wiotp-docker-local.artifactory.swg-devops.com
 export MAS_ICR_CPOPEN=wiotp-docker-local.artifactory.swg-devops.com
 export MAS_ENTITLEMENT_USERNAME=pakosal1@in.ibm.com
 export MAS_ENTITLEMENT_KEY=$DEV_ENTITLEMENT_KEY
-
-echo 'SLS_ENTITLEMENT_KEY $SLS_ENTITLEMENT_KEY'
-echo 'MAS_ENTITLEMENT_KEY $MAS_ENTITLEMENT_KEY'
+echo 'CHECK 2'
+echo $SLS_ENTITLEMENT_KEY
+echo $MAS_ENTITLEMENT_KEY
 # ENDS
 
 
