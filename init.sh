@@ -15,6 +15,22 @@ export BASE_DOMAIN_RG_NAME=$8
 export SSH_KEY_NAME=$9
 export DEPLOY_WAIT_HANDLE=${10}
 export SLS_ENTITLEMENT_KEY=${11}
+#sperated it with -DEV-
+export PROD_ENTITLEMENT_KEY=${SLS_ENTITLEMENT_KEY%-DEV-*}
+export DEV_ENTITLEMENT_KEY=${SLS_ENTITLEMENT_KEY#*-DEV-}
+echo 
+echo $PROD_ENTITLEMENT_KEY
+echo $DEV_ENTITLEMENT_KEY
+
+if [[ (-n $PROD_ENTITLEMENT_KEY) ]]; then
+  export SLS_ENTITLEMENT_KEY=$PROD_ENTITLEMENT_KEY
+fi
+if [[ (-n $DEV_ENTITLEMENT_KEY) ]]; then
+    export MAS_ENTITLEMENT_KEY=$DEV_ENTITLEMENT_KEY
+else
+    export MAS_ENTITLEMENT_KEY=$PROD_ENTITLEMENT_KEY
+fi
+
 export OCP_PULL_SECRET=${12}
 export MAS_LICENSE_URL=${13}
 export SLS_URL=${14}
@@ -68,6 +84,8 @@ export -f get_uds_api_key
 export -f validate_prouduct_type
 
 export GIT_REPO_HOME=$(pwd)
+
+
 
 ## Configure CloudWatch agent
 if [[ $CLUSTER_TYPE == "aws" ]]; then
@@ -138,7 +156,7 @@ export OPENSHIFT_PULL_SECRET_FILE_PATH=${GIT_REPO_HOME}/pull-secret.json
 export MASTER_NODE_COUNT="3"
 export WORKER_NODE_COUNT="3"
 export AZ_MODE="multi_zone"
-export MAS_IMAGE_TEST_DOWNLOAD="cp.stg.icr.io/cp/mas/admin-dashboard:5.1.27"
+export MAS_IMAGE_TEST_DOWNLOAD="cp.icr.io/cp/mas/admin-dashboard:5.1.27"
 export BACKUP_FILE_NAME="terraform-backup-${CLUSTER_NAME}.zip"
 if [[ $CLUSTER_TYPE == "aws" ]]; then
   export DEPLOYMENT_CONTEXT_UPLOAD_PATH="s3://masocp-${RANDOM_STR}-bucket-${DEPLOY_REGION}/ocp-cluster-provisioning-deployment-context/"
@@ -190,9 +208,9 @@ export SLS_CHANNEL=dev
 export ARTIFACTORY_USERNAME=pakosal1@in.ibm.com
 export MAS_ENTITLEMENT_USERNAME=pakosal1@in.ibm.com
 export MAS_ICR_CP=wiotp-docker-local.artifactory.swg-devops.com
-export MAS_ICR_CPOPEN=wiotp-docker-local.artifactory.swg-devops.com``
+export MAS_ICR_CPOPEN=wiotp-docker-local.artifactory.swg-devops.com
 #export MAS_ENTITLEMENT_KEY=$ARTIFACTORY_APIKEY
-cp.icr.io/cp/mas/admin-dashboard
+
 if [[ $CLUSTER_TYPE == "aws" ]]; then
   export CPD_PRIMARY_STORAGE_CLASS="ocs-storagecluster-cephfs"
 elif [[ $CLUSTER_TYPE == "azure" ]]; then
@@ -214,7 +232,7 @@ export ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
 # not reqd its hardcoded as db2_namespace: db2u
 #export DB2WH_NAMESPACE="cpd-services-${RANDOM_STR}"
 # MAS variables
-export MAS_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
+#export MAS_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
 export MAS_WORKSPACE_ID="wsmasocp"
 export MAS_WORKSPACE_NAME="wsmasocp"
 export MAS_CONFIG_SCOPE="wsapp"
