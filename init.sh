@@ -42,18 +42,20 @@ export AZURE_SP_CLIENT_ID=${35}
 export AZURE_SP_CLIENT_PWD=${36}
 export SELLER_SUBSCRIPTION_ID=${37}
 export TENANT_ID=${38}
-export BOOTNODE_VPC_ID=${39}
-export BOOTNODE_SUBNET_ID=${40}
-export EXISTING_NETWORK=${41}
-export EXISTING_NETWORK_RG=${42}
-export EXISTING_PRIVATE_SUBNET1_ID=${43}
-export EXISTING_PRIVATE_SUBNET2_ID=${44}
-export EXISTING_PRIVATE_SUBNET3_ID=${45}
-export EXISTING_PUBLIC_SUBNET1_ID=${46}
-export EXISTING_PUBLIC_SUBNET2_ID=${47}
-export EXISTING_PUBLIC_SUBNET3_ID=${48}
-export PRIVATE_CLUSTER=${49}
-export ENV_TYPE=${50}
+export GOOGLE_PROJECTID=${39}
+export GOOGLE_APPLICATION_CREDENTIALS_DATA=${40}
+export BOOTNODE_VPC_ID=${41}
+export BOOTNODE_SUBNET_ID=${42}
+export EXISTING_NETWORK=${43}
+export EXISTING_NETWORK_RG=${44}
+export EXISTING_PRIVATE_SUBNET1_ID=${45}
+export EXISTING_PRIVATE_SUBNET2_ID=${46}
+export EXISTING_PRIVATE_SUBNET3_ID=${47}
+export EXISTING_PUBLIC_SUBNET1_ID=${48}
+export EXISTING_PUBLIC_SUBNET2_ID=${49}
+export EXISTING_PUBLIC_SUBNET3_ID=${50}
+export PRIVATE_CLUSTER=${52}
+export ENV_TYPE=${53}
 export GIT_REPO_HOME=$(pwd)
 # Load helper functions
 . helper.sh
@@ -104,9 +106,22 @@ EOT
   cd -
 fi
 
+## Configure Ops agent
+if [[ $CLUSTER_TYPE == "gcp" ]]; then
+  log "Configuring Ops agent"
+  
+  # Update config file
+  sed -i "s/\[UNIQID\]/$RANDOM_STR/g" /etc/google-cloud-ops-agent/config.yaml
+  
+  # Start Ops agent service
+  service google-cloud-ops-agent restart
+  sleep 60
+  cd -
+fi
+
 # Check for input parameters
-if [[ (-z $CLUSTER_TYPE) || (-z $DEPLOY_REGION) || (-z $ACCOUNT_ID) \
-   || (-z $RANDOM_STR) || (-z $SSH_KEY_NAME) || (-z $DEPLOY_WAIT_HANDLE) ]]; then
+if [[ (-z $CLUSTER_TYPE) || (-z $DEPLOY_REGION) || (-z $RANDOM_STR) || (-z $CLUSTER_SIZE) || (-z $SLS_ENTITLEMENT_KEY) \
+   || (-z $SSH_KEY_NAME) ]]; then
   log "ERROR: Required parameter not specified, please provide all the required inputs to the script."
   PRE_VALIDATION=fail
 fi
@@ -301,6 +316,8 @@ log " SMTP_USERNAME=$SMTP_USERNAME"
 log " AZURE_SP_CLIENT_ID=$AZURE_SP_CLIENT_ID"
 log " SELLER_SUBSCRIPTION_ID=$SELLER_SUBSCRIPTION_ID"
 log " TENANT_ID=$TENANT_ID"
+log " GOOGLE_PROJECTID=$GOOGLE_PROJECTID"
+log " GOOGLE_APPLICATION_CREDENTIALS_DATA=$GOOGLE_APPLICATION_CREDENTIALS_DATA"
 log " EMAIL_NOTIFICATION: $EMAIL_NOTIFICATION"
 log " EXISTING_NETWORK=$EXISTING_NETWORK"
 log " EXISTING_NETWORK_RG=$EXISTING_NETWORK_RG"

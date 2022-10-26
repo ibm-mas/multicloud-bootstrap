@@ -602,7 +602,7 @@ Resources:
                       - !Ref ImportDemoData
                       - ''' '''' '''' '''' '''' '''
                       - !Ref EmailNotification
-                      - ''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''
+                      - ''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''
                       - !Ref ExistingVPCId
                       - ''' '''' '''
                       - !Ref ExistingPrivateSubnet1Id

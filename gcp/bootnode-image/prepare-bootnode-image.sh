@@ -41,13 +41,13 @@ logging:
   receivers:
     masocp_deployment_receiver_[UNIQID]:
       type: files
-      include_paths: [/tmp/mas-provisioning.log]
+      include_paths: [/root/ansible-devops/multicloud-bootstrap/mas-provisioning.log]
       record_log_file_path: true
   service:
     pipelines:
       masocp_deployment_pipeline_[UNIQID]:
         receivers:
-        - masocp_deployment_receiver
+        - masocp_deployment_receiver_[UNIQID]
 EOT
 
 # Remove the SSH keys
