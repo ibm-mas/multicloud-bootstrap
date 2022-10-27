@@ -43,7 +43,7 @@ export AZURE_SP_CLIENT_PWD=${36}
 export SELLER_SUBSCRIPTION_ID=${37}
 export TENANT_ID=${38}
 export GOOGLE_PROJECTID=${39}
-export GOOGLE_APPLICATION_CREDENTIALS_DATA=${40}
+export GOOGLE_APPLICATION_CREDENTIALS_FILE=${40}
 export BOOTNODE_VPC_ID=${41}
 export BOOTNODE_SUBNET_ID=${42}
 export EXISTING_NETWORK=${43}
@@ -54,8 +54,8 @@ export EXISTING_PRIVATE_SUBNET3_ID=${47}
 export EXISTING_PUBLIC_SUBNET1_ID=${48}
 export EXISTING_PUBLIC_SUBNET2_ID=${49}
 export EXISTING_PUBLIC_SUBNET3_ID=${50}
-export PRIVATE_CLUSTER=${52}
-export ENV_TYPE=${53}
+export PRIVATE_CLUSTER=${51}
+export ENV_TYPE=${52}
 export GIT_REPO_HOME=$(pwd)
 # Load helper functions
 . helper.sh
@@ -115,7 +115,7 @@ if [[ $CLUSTER_TYPE == "gcp" ]]; then
   
   # Start Ops agent service
   service google-cloud-ops-agent restart
-  sleep 60
+  sleep 5
   cd -
 fi
 
@@ -153,6 +153,8 @@ export OPENSHIFT_PULL_SECRET_FILE_PATH=${GIT_REPO_HOME}/pull-secret.json
 export MASTER_NODE_COUNT="3"
 export WORKER_NODE_COUNT="3"
 export AZ_MODE="multi_zone"
+export OCP_VERSION="4.10.35"
+
 export MAS_IMAGE_TEST_DOWNLOAD="cp.icr.io/cp/mas/admin-dashboard:5.1.27"
 export BACKUP_FILE_NAME="terraform-backup-${CLUSTER_NAME}.zip"
 if [[ $CLUSTER_TYPE == "aws" ]]; then
@@ -160,6 +162,8 @@ if [[ $CLUSTER_TYPE == "aws" ]]; then
 elif [[ $CLUSTER_TYPE == "azure" ]]; then
   export DEPLOYMENT_CONTEXT_UPLOAD_PATH="ocp-cluster-provisioning-deployment-context/${BACKUP_FILE_NAME}"
   export STORAGE_ACNT_NAME="masocp${RANDOM_STR}stgaccount"
+elif [[ $CLUSTER_TYPE == "gcp" ]]; then
+  export DEPLOYMENT_CONTEXT_UPLOAD_PATH="gs://masocp-${RANDOM_STR}-bucket/ocp-cluster-provisioning-deployment-context/"
 fi
 # Mongo variables
 export MAS_INSTANCE_ID="${RANDOM_STR}"
@@ -176,7 +180,9 @@ export SLS_MONGODB_CFG_FILE="${MAS_CONFIG_DIR}/mongo-${MONGODB_NAMESPACE}.yml"
 
 # Exporting SLS_LICENSE_FILE only when product type is different than privatepublic(i.e. Paid offering)
 # Paid offering does not require entitlement.lic i.e. MAS license file.
-validate_prouduct_type
+if [[ $CLUSTER_TYPE == "aws" ]]; then
+  validate_prouduct_type
+fi
 if [[ ($PRODUCT_TYPE == "privatepublic") && ($CLUSTER_TYPE == "aws") ]];then
   log "Product type is privatepublic hence not exporting SLS_LICENSE_FILE variable"
 else
@@ -240,13 +246,14 @@ fi
 log " new_or_existing_vpc_subnet=$new_or_existing_vpc_subnet"
 log " enable_permission_quota_check=$enable_permission_quota_check"
 
-if [[ -z "$EXISTING_NETWORK" && $CLUSTER_TYPE == "azure" ]]; then
-  export INSTALLATION_MODE="IPI"
-else
-  export INSTALLATION_MODE="UPI"
+if [[ $CLUSTER_TYPE == "azure" ]]; then
+  if [[ -z "$EXISTING_NETWORK" ]]; then
+    export INSTALLATION_MODE="IPI"
+  else
+    export INSTALLATION_MODE="UPI"
+  fi
+  log "Azure installation mode: ${INSTALLATION_MODE}"
 fi
-log "==== INSTALLATION MODE: ${INSTALLATION_MODE}"
-
 RESP_CODE=0
 
 # Export env variables which are not set by default during userdata execution
@@ -317,7 +324,7 @@ log " AZURE_SP_CLIENT_ID=$AZURE_SP_CLIENT_ID"
 log " SELLER_SUBSCRIPTION_ID=$SELLER_SUBSCRIPTION_ID"
 log " TENANT_ID=$TENANT_ID"
 log " GOOGLE_PROJECTID=$GOOGLE_PROJECTID"
-log " GOOGLE_APPLICATION_CREDENTIALS_DATA=$GOOGLE_APPLICATION_CREDENTIALS_DATA"
+log " GOOGLE_APPLICATION_CREDENTIALS_FILE=$GOOGLE_APPLICATION_CREDENTIALS_FILE"
 log " EMAIL_NOTIFICATION: $EMAIL_NOTIFICATION"
 log " EXISTING_NETWORK=$EXISTING_NETWORK"
 log " EXISTING_NETWORK_RG=$EXISTING_NETWORK_RG"
@@ -448,15 +455,15 @@ if [[ $PRE_VALIDATION == "pass" ]]; then
   chmod 600 $OPENSHIFT_PULL_SECRET_FILE_PATH
 
   ## Installing the collection depending on ENV_TYPE
-  if [[ $CLUSTER_TYPE == "aws" ]]; then
+  if [[ ($CLUSTER_TYPE == "aws") || ($CLUSTER_TYPE == "gcp") ]]; then
     if [[ $ENV_TYPE == "dev" ]]; then
-      echo "=== Building and Installing Ansible Collection Locally ==="
+      log "=== Building and Installing Ansible Collection Locally ==="
       cd $GIT_REPO_HOME/../ibm/mas_devops
       ansible-galaxy collection build
-      ansible-galaxy collection install ibm-mas_devops-*.tar.gz
-      echo "=== Ansible Collection built and installed locally Successfully ==="
+      ansible-galaxy collection install --force ibm-mas_devops-*.tar.gz
+      log "=== Ansible Collection built and installed locally Successfully ==="
     else
-      echo "MAS_DEVOPS_COLLECTION_VERSION=$MAS_DEVOPS_COLLECTION_VERSION"
+      log "MAS_DEVOPS_COLLECTION_VERSION=$MAS_DEVOPS_COLLECTION_VERSION"
       log "==== Installing Ansible Collection ===="
       ansible-galaxy collection install ibm.mas_devops:==${MAS_DEVOPS_COLLECTION_VERSION}
       log "==== Installed Ansible Collection Successfully ===="
@@ -531,7 +538,10 @@ if [[ $CLUSTER_TYPE == "aws" ]]; then
 elif [[ $CLUSTER_TYPE == "azure" ]]; then
   # Upload the log file to blob storage
   az storage blob upload --account-name ${STORAGE_ACNT_NAME} --container-name masocpcontainer --name ocp-cluster-provisioning-deployment-context/mas-provisioning.log --file $GIT_REPO_HOME/mas-provisioning.log
+elif [[ $CLUSTER_TYPE == "gcp" ]]; then
+  # Upload the log file to cloud storage
+  gsutil cp $GIT_REPO_HOME/mas-provisioning.log gs://masocp-${RANDOM_STR}-bucket/ocp-cluster-provisioning-deployment-context/
 fi
 log "Shutting down VM in a minute"
-shutdown -P "+1"
+#shutdown -P "+1"
 exit $RESP_CODE

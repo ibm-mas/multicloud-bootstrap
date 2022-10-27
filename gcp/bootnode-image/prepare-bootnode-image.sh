@@ -8,8 +8,9 @@ set -e
 apt-get update
 
 ## Install pre-reqs
-apt -y install python3-pip
+apt -y install openjdk-8-jre-headless python3-pip skopeo
 ln -s --force /usr/bin/python3 /usr/bin/python
+pip3 install dotmap jaydebeapi jmespath pyyaml yq
 
 ## Install jq
 wget "https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64"
