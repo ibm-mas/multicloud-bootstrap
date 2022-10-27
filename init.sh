@@ -153,11 +153,7 @@ export AZ_MODE="multi_zone"
 export MAS_IMAGE_TEST_DOWNLOAD="cp.icr.io/cp/mas/admin-dashboard:5.1.27"
 export BACKUP_FILE_NAME="terraform-backup-${CLUSTER_NAME}.zip"
 if [[ $CLUSTER_TYPE == "aws" ]]; then
-    if [[ $ENV_TYPE == "dev" ]]; then
-      export DEPLOYMENT_CONTEXT_UPLOAD_PATH="s3://mas-files-dev-buyer/masocp-${RANDOM_STR}-bucket-${DEPLOY_REGION}/ocp-cluster-provisioning-deployment-context/"
-    else
       export DEPLOYMENT_CONTEXT_UPLOAD_PATH="s3://masocp-${RANDOM_STR}-bucket-${DEPLOY_REGION}/ocp-cluster-provisioning-deployment-context/"
-    fi  
 elif [[ $CLUSTER_TYPE == "azure" ]]; then
   export DEPLOYMENT_CONTEXT_UPLOAD_PATH="ocp-cluster-provisioning-deployment-context/${BACKUP_FILE_NAME}"
   export STORAGE_ACNT_NAME="masocp${RANDOM_STR}stgaccount"
