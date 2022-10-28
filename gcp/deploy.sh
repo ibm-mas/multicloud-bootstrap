@@ -79,4 +79,42 @@ fi
 log "==== OCP cluster creation started ===="
 cd $GIT_REPO_HOME/../ibm/mas_devops/playbooks
 set +e
+# Provision OCP cluster
 export ROLE_NAME=ocp_provision && ansible-playbook ibm.mas_devops.run_role
+
+# Configure htpasswd
+kubeconfigfile="/root/openshift-install/config/${CLUSTER_NAME}/auth/kubeconfig"
+htpasswd -c -B -b /tmp/.htpasswd $OCP_USERNAME $OCP_PASSWORD
+sleep 10
+oc create secret generic htpass-secret --from-file=htpasswd=/tmp/.htpasswd -n openshift-config --kubeconfig $kubeconfigfile
+log "Created OpenShift secret for htpasswd"
+oc apply -f $GIT_REPO_HOME/templates/htpasswd.yml --kubeconfig $kubeconfigfile
+echo "Created OAuth configuration in OpenShift cluster"
+oc adm policy add-cluster-role-to-user cluster-admin $OCP_USERNAME --kubeconfig $kubeconfigfile
+echo "Updated cluster-admin role in OpenShift cluster"
+sleep 60
+login=failed
+for VARIABLE in {0..9}
+do
+    oc login --insecure-skip-tls-verify=true -u $OCP_USERNAME -p $OCP_PASSWORD --server=https://api.${CLUSTER_NAME}.${BASE_DOMAIN}:6443
+    if [[ $? -ne 0 ]]; then
+      log "OCP login failed, waiting ..."
+      sleep 60
+    else
+      log "OCP login successful"
+      login=success
+      break
+    fi
+done
+if [[ $login == "failed" ]]; then
+  log "Could not login to OpenShift cluster, exiting"
+  exit 1
+fi
+
+log "==== Adding PID limits to worker nodes ===="
+oc create -f $GIT_REPO_HOME/templates/container-runtime-config.yml
+
+# Configure IBM catalogs, deploy common services and cert manager
+export ROLE_NAME=ibm_catalogs && ansible-playbook ibm.mas_devops.run_role
+export ROLE_NAME=common_services && ansible-playbook ibm.mas_devops.run_role
+export ROLE_NAME=cert_manager && ansible-playbook ibm.mas_devops.run_role

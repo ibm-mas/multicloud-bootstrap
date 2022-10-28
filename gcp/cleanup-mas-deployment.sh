@@ -68,10 +68,10 @@ if [[ -n $INSTANCES ]]; then
   done
   # Wait until all the VMs are deleted
   while [ "$INSTANCES" != "" ]; do
+    sleep 60
     INSTANCES=$(gcloud compute instances list --format=json --filter="name~$UNIQUE_STR" | jq ".[].name" | tr -d '"')
     if [[ -n "$INSTANCES" ]]; then
       echo "Virtual instances still exist: $INSTANCES"
-      sleep 60
       continue
     else
       echo "All virtual instances deleted"
@@ -149,7 +149,7 @@ if [[ -n $CSBTS ]]; then
   echo "Cloud storage buckets found for this MAS instance"
   for inst in $CSBTS; do
     echo "Cloud storage bucket: $inst"
-    gcloud storage buckets delete gs://$inst --quiet
+    gcloud storage rm --recursive gs://$inst --quiet
   done
 fi
 
