@@ -149,6 +149,12 @@ if [[ (! -z $EXS_OCP_URL) && (! -z $EXS_OCP_USER) && (! -z $EXS_OCP_PWD) ]]; the
     export OCP_USERNAME=${EXS_OCP_USER}
     export OCP_PASSWORD=${EXS_OCP_PWD}
 fi
+############## TODO REMOVE THIS LATER ###############################################
+#export OCP_USERNAME=masocpuser4
+#export OCP_PASSWORD=mas121130429new
+#echo "$OCP_USERNAME $OCP_PASSWORD"
+#########################################
+
 export OPENSHIFT_PULL_SECRET_FILE_PATH=${GIT_REPO_HOME}/pull-secret.json
 export MASTER_NODE_COUNT="3"
 export WORKER_NODE_COUNT="3"

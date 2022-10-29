@@ -20,21 +20,22 @@ rm -rf $SECRETFILE
 if [[ $SECRET_TYPE == "masocp" ]]; then
   get_mas_creds $RANDOM_STR
   cat <<EOT >> $SECRETFILE
-  ocpusername=$OCP_USERNAME
-  ocppassword=$OCP_PASSWORD
-  masusername=$MAS_USER
-  maspassword=$MAS_PASSWORD
+ocpusername=$OCP_USERNAME
+ocppassword=$OCP_PASSWORD
+masusername=$MAS_USER
+maspassword=$MAS_PASSWORD
 EOT
 elif [[ $SECRET_TYPE == "ocp" ]]; then
   cat <<EOT >> $SECRETFILE
-  ocpusername=$OCP_USERNAME
-  ocppassword=$OCP_PASSWORD
+ocpusername=$OCP_USERNAME
+ocppassword=$OCP_PASSWORD
 EOT
 elif [[ $SECRET_TYPE == "mas" ]]; then
-  get_mas_creds $RANDOM_STR
+  #################### TODO ########################
+  #get_mas_creds $RANDOM_STR
   cat <<EOT >> $SECRETFILE
-  masusername=$MAS_USER
-  maspassword=$MAS_PASSWORD
+masusername=$MAS_USER
+maspassword=$MAS_PASSWORD
 EOT
 else
   log "Unsupported parameter passed"
@@ -63,6 +64,9 @@ elif [[ $CLUSTER_TYPE == "azure" ]]; then
   fi
   # az keyvault secret show --name maximo-$SECRET_TYPE-secret --vault-name $vaultname
   log "Secret created in Azure Key Vault"
+elif [[ $CLUSTER_TYPE == "gcp" ]]; then
+  gcloud secrets create "maximo-$SECRET_TYPE-secret-$RANDOM_STR" --data-file=$SECRETFILE
+  log "Secret created in GCP Secret Manager"
 fi
 # Delete the secrets file
 rm -rf $SECRETFILE

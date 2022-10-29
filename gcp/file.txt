@@ -1,0 +1,2 @@
+ocpusername=OCP_USERNAME
+ocppassword=OCP_PASSWORD

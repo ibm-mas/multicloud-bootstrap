@@ -35,6 +35,6 @@ log " MAS version is $mas_version"
 
 # Manage (if installed)
 if [[ $DEPLOY_MANAGE == "true" ]]; then
-manage_version=$(oc get subscription ibm-mas-manage -n mas-$MAS_INSTANCE_ID-$MAS_APP_ID  -o json | jq .status.installedCSV -r |  grep --perl-regexp '(?:(\d+)\.)?(?:(\d+)\.)?(?:(\d+)\.\d+)' --only-matching )
-log " Manage version is $manage_version"
+  manage_version=$(oc get subscription ibm-mas-manage -n mas-$MAS_INSTANCE_ID-$MAS_APP_ID  -o json | jq .status.installedCSV -r |  grep --perl-regexp '(?:(\d+)\.)?(?:(\d+)\.)?(?:(\d+)\.\d+)' --only-matching )
+  log " Manage version is $manage_version"
 fi
