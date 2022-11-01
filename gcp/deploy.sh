@@ -13,6 +13,7 @@ export SLS_STORAGE_CLASS="gce-pd-ssd"
 # BAS variables
 export UDS_STORAGE_CLASS="gce-pd-ssd"
 # CP4D variables
+export CPD_PRIMARY_STORAGE_CLASS="ocs-storagecluster-cephfs"
 export CPD_METADATA_STORAGE_CLASS="gce-pd-ssd"
 export CPD_SERVICE_STORAGE_CLASS="ocs-storagecluster-cephfs"
 # Variables required by ocp_provision Ansible role
@@ -123,19 +124,39 @@ cd $GIT_REPO_HOME
 log "==== Adding PID limits to worker nodes ===="
 oc create -f $GIT_REPO_HOME/templates/container-runtime-config.yml
 
+## Configure gce-pd-ssd storage class
+log "==== Configure gce-pd-ssd storage class - started ===="
+cd $GIT_REPO_HOME/gcp/ansible-playbooks
+set +e
+ansible-playbook configure-gce-pd-ssd.yaml
+set -e
+log "==== Configure gce-pd-ssd storage class - completed ===="
+
+## Configure ODF on gcp cluster
+log "==== Configure ODF on gcp cluster - started ===="
+cd $GIT_REPO_HOME/gcp/ansible-playbooks
+set +e
+export CLUSTER_ID=$(oc get machineset -n openshift-machine-api -o jsonpath='{.items[0].metadata.labels.machine\.openshift\.io/cluster-api-cluster}')
+export REGION=$(oc get machineset -n openshift-machine-api -o jsonpath='{.items[0].spec.template.spec.providerSpec.value.region}')
+export GCP_PROJECT_ID=$(oc get machineset -n openshift-machine-api -o jsonpath='{.items[0].spec.template.spec.providerSpec.value.projectID}')
+export GCP_SERVICEACC_EMAIL=$(oc get machineset -n openshift-machine-api -o jsonpath='{.items[0].spec.template.spec.providerSpec.value.serviceAccounts[0].email}')
+ansible-playbook configure-odf.yaml -vvv
+set -e
+log "==== Configure ODF on gcp cluster - completed ===="
+
 ## Configure IBM catalogs, deploy common services and cert manager
 log "==== OCP cluster configuration (Cert Manager) started ===="
 cd $GIT_REPO_HOME/../ibm/mas_devops/playbooks
 set +e
-#export ROLE_NAME=ibm_catalogs && ansible-playbook ibm.mas_devops.run_role
-#export ROLE_NAME=common_services && ansible-playbook ibm.mas_devops.run_role
-#export ROLE_NAME=cert_manager && ansible-playbook ibm.mas_devops.run_role
+export ROLE_NAME=ibm_catalogs && ansible-playbook ibm.mas_devops.run_role
+export ROLE_NAME=common_services && ansible-playbook ibm.mas_devops.run_role
+export ROLE_NAME=cert_manager && ansible-playbook ibm.mas_devops.run_role
 set -e
 log "==== OCP cluster configuration (Cert Manager) completed ===="
 
 ## Deploy MongoDB
 log "==== MongoDB deployment started ===="
-#export ROLE_NAME=mongodb && ansible-playbook ibm.mas_devops.run_role
+export ROLE_NAME=mongodb && ansible-playbook ibm.mas_devops.run_role
 log "==== MongoDB deployment completed ===="
 
 ## Copying the entitlement.lic to MAS_CONFIG_DIR
@@ -146,20 +167,20 @@ fi
 if [[ $DEPLOY_MANAGE == "true" && $DEPLOY_CP4D == "true" ]]; then
   ## Deploy Amqstreams
   log "==== Amq streams deployment started ===="
-  #export ROLE_NAME=kafka && ansible-playbook ibm.mas_devops.run_role
+  export ROLE_NAME=kafka && ansible-playbook ibm.mas_devops.run_role
   log "==== Amq streams deployment completed ===="
 fi
 
 ## Deploy SLS
 # sls and gencfg_sls are combined in common sls role, works when SLS_URL is set, handled in same sls role
 log "==== SLS deployment started ===="
-#export ROLE_NAME=sls && ansible-playbook ibm.mas_devops.run_role
+export ROLE_NAME=sls && ansible-playbook ibm.mas_devops.run_role
 log "==== SLS deployment completed ===="
 
 # Deploy UDS
 log "==== UDS deployment started ===="
 # uds and gencfg_uds are combined in common uds role, works when UDS_ENDPOINT_URL is set, handled in same uds role
-#export ROLE_NAME=uds && ansible-playbook ibm.mas_devops.run_role
+export ROLE_NAME=uds && ansible-playbook ibm.mas_devops.run_role
 log "==== UDS deployment completed ===="
 
 ## Deploy CP4D
@@ -172,31 +193,31 @@ fi
 
 ## Create MAS Workspace
 log "==== MAS Workspace generation started ===="
-#export ROLE_NAME=gencfg_workspace && ansible-playbook ibm.mas_devops.run_role
+export ROLE_NAME=gencfg_workspace && ansible-playbook ibm.mas_devops.run_role
 log "==== MAS Workspace generation completed ===="
 
 if [[ $DEPLOY_MANAGE == "true" ]]; then
   log "==== Configure JDBC  started ===="
-  #export ROLE_NAME=gencfg_jdbc && ansible-playbook ibm.mas_devops.run_role
+  export ROLE_NAME=gencfg_jdbc && ansible-playbook ibm.mas_devops.run_role
   log "==== Configure JDBC completed ===="
 fi
 
 ## Deploy MAS
 log "==== MAS deployment started ===="
-#export ROLE_NAME=suite_install && ansible-playbook ibm.mas_devops.run_role
-#export ROLE_NAME=suite_config && ansible-playbook ibm.mas_devops.run_role
-#export ROLE_NAME=suite_verify && ansible-playbook ibm.mas_devops.run_role
+export ROLE_NAME=suite_install && ansible-playbook ibm.mas_devops.run_role
+export ROLE_NAME=suite_config && ansible-playbook ibm.mas_devops.run_role
+export ROLE_NAME=suite_verify && ansible-playbook ibm.mas_devops.run_role
 log "==== MAS deployment completed ===="
 
 ## Deploy Manage
 if [[ $DEPLOY_MANAGE == "true" ]]; then
   # Deploy Manage
   log "==== MAS Manage deployment started ===="
-  #export ROLE_NAME=suite_app_install && ansible-playbook ibm.mas_devops.run_role
+  export ROLE_NAME=suite_app_install && ansible-playbook ibm.mas_devops.run_role
   log "==== MAS Manage deployment completed ===="
 
   # Configure app to use the DB
   log "==== MAS Manage configure app started ===="
-  #export ROLE_NAME=suite_app_config && ansible-playbook ibm.mas_devops.run_role
+  export ROLE_NAME=suite_app_config && ansible-playbook ibm.mas_devops.run_role
   log "==== MAS Manage configure app completed ===="
 fi

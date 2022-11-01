@@ -1,0 +1,6 @@
+---
+- name: Configure ODF on gcp cluster
+  hosts: localhost
+  gather_facts: no 
+  roles:
+    - odf
