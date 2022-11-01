@@ -52,6 +52,8 @@ fi
 
 echo "==== Execution started at `date` ===="
 echo "---------------------------------------------"
+gcloud config set component_manager/disable_update_check true 
+gcloud config set survey/disable_prompts true
 
 ## Delete virtual machines instances
 echo "Checking for virtual machines"

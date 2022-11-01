@@ -12,7 +12,6 @@ apt -y install apache2-utils openjdk-8-jre-headless python3-pip skopeo
 ln -s --force /usr/bin/python3 /usr/bin/python
 pip3 install dotmap jaydebeapi jmespath pyyaml yq
 
-
 ## Install jq
 wget "https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64"
 mv jq-linux64 jq
@@ -43,7 +42,7 @@ logging:
   receivers:
     masocp_deployment_receiver_[UNIQID]:
       type: files
-      include_paths: [/root/ansible-devops/multicloud-bootstrap/mas-provisioning.log]
+      include_paths: [/root/ansible-devops/multicloud-bootstrap/mas-provisioning.log,/root/openshift-install/config/masocp-[UNIQID]/.openshift_install.log]
       record_log_file_path: true
   service:
     pipelines:

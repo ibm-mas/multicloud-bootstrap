@@ -94,10 +94,10 @@ gcloud auth activate-service-account --key-file=$GIT_REPO_HOME/service-account.j
 # Configure htpasswd
 kubeconfigfile="/root/openshift-install/config/${CLUSTER_NAME}/auth/kubeconfig"
 htpasswd -c -B -b /tmp/.htpasswd $OCP_USERNAME $OCP_PASSWORD
-oc delete secret htpass-secret -n openshift-config --kubeconfig $kubeconfigfile
+oc delete secret htpass-secret -n openshift-config --kubeconfig $kubeconfigfile > /dev/null 2>&1
 oc create secret generic htpass-secret --from-file=htpasswd=/tmp/.htpasswd -n openshift-config --kubeconfig $kubeconfigfile
 log "Created OpenShift secret for htpasswd"
-oc apply -f $GIT_REPO_HOME/templates/htpasswd.yml --kubeconfig $kubeconfigfile
+oc apply -f $GIT_REPO_HOME/templates/oauth-htpasswd.yml --kubeconfig $kubeconfigfile
 echo "Created OAuth configuration in OpenShift cluster"
 oc adm policy add-cluster-role-to-user cluster-admin $OCP_USERNAME --kubeconfig $kubeconfigfile
 echo "Updated cluster-admin role in OpenShift cluster"
