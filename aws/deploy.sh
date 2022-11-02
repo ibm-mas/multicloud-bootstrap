@@ -19,6 +19,8 @@ IAM_POLICY_NAME="masocp-policy-${RANDOM_STR}"
 IAM_USER_NAME="masocp-user-${RANDOM_STR}"
 # SLS variables
 export SLS_STORAGE_CLASS=gp2
+# UDS variables
+export UDS_STORAGE_CLASS=gp2
 # CP4D variables
 export CPD_METADATA_STORAGE_CLASS=gp2
 export CPD_SERVICE_STORAGE_CLASS="ocs-storagecluster-cephfs"

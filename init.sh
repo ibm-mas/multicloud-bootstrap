@@ -196,12 +196,6 @@ else
 fi
 export SLS_TLS_CERT_LOCAL_FILE_PATH="${GIT_REPO_HOME}/sls.crt"
 export SLS_INSTANCE_NAME="masocp-${RANDOM_STR}"
-# UDS variables
-if [[ $CLUSTER_TYPE == "aws" ]]; then
-  export UDS_STORAGE_CLASS="gp2"
-elif [[ $CLUSTER_TYPE == "azure" ]]; then
-  export UDS_STORAGE_CLASS="managed-premium"
-fi
 export UDS_CONTACT_EMAIL="uds.support@ibm.com"
 export UDS_CONTACT_FIRSTNAME=Uds
 export UDS_CONTACT_LASTNAME=Support
@@ -424,7 +418,6 @@ if [[ $PRE_VALIDATION == "pass" ]]; then
     log "Debug: before: CLUSTER_NAME: $CLUSTER_NAME  BASE_DOMAIN: $BASE_DOMAIN"
     split_ocp_api_url $EXS_OCP_URL
     log "Debug: after: CLUSTER_NAME: $CLUSTER_NAME  BASE_DOMAIN: $BASE_DOMAIN"
-    # echo $BASE_DOMAIN
     export OCP_USERNAME=$EXS_OCP_USER
     export OCP_PASSWORD=$EXS_OCP_PWD
     export OPENSHIFT_USER_PROVIDE="true"
@@ -549,5 +542,5 @@ elif [[ $CLUSTER_TYPE == "gcp" ]]; then
   gsutil cp $GIT_REPO_HOME/mas-provisioning.log gs://masocp-${RANDOM_STR}-bucket/ocp-cluster-provisioning-deployment-context/
 fi
 log "Shutting down VM in a minute"
-#shutdown -P "+1"
+shutdown -P "+1"
 exit $RESP_CODE

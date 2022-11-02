@@ -9,19 +9,19 @@ if [[ $STATUS == "SUCCESS" ]]; then
   oc login -u $OCP_USERNAME -p $OCP_PASSWORD --server=https://api.${CLUSTER_NAME}.${BASE_DOMAIN}:6443
   # Collect email details
   certfile="${CLUSTER_NAME}-ca.crt"
-  #retrieve_mas_ca_cert $RANDOM_STR $certfile
+  retrieve_mas_ca_cert $RANDOM_STR $certfile
   certcontents=$(cat $certfile | tr '\n' "," | sed "s/,/\\\\\\\n/g")
   certcontents=$(echo $certcontents | sed 's/\//\\\//g')
   log "$certcontents"
   if [[ -z $SLS_URL ]]; then
-    #get_sls_endpoint_url $RANDOM_STR
+    get_sls_endpoint_url $RANDOM_STR
     log " CALL_SLS_URL=$CALL_SLS_URL"
   fi
   if [[ -z $UDS_ENDPOINT_URL ]]; then
-    #get_uds_endpoint_url $RANDOM_STR
+    get_uds_endpoint_url $RANDOM_STR
     log " CALL_UDS_URL=$CALL_UDS_URL"
   fi
-  #get_mas_creds $RANDOM_STR
+  get_mas_creds $RANDOM_STR
   log " MAS_USER=$MAS_USER"
   #log " MAS_PASSWORD=$MAS_PASSWORD"
 else

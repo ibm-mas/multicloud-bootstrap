@@ -199,7 +199,7 @@ fi
 ## MAS_ANNOTATIONS environment variable is used in suit-install role of MAS Installtion
 
 if [[ $CLUSTER_TYPE == "aws" ]]; then
-    #validating product type for helper.sh
+    # Validating product type for helper.sh
     validate_prouduct_type
 fi
 # Check if MAS license is provided

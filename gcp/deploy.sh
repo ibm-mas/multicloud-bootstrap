@@ -10,7 +10,7 @@ export MONGODB_STORAGE_CLASS="gce-pd-ssd"
 export KAFKA_STORAGE_CLASS="gce-pd-ssd"
 # SLS variables
 export SLS_STORAGE_CLASS="gce-pd-ssd"
-# BAS variables
+# UDS variables
 export UDS_STORAGE_CLASS="gce-pd-ssd"
 # CP4D variables
 export CPD_PRIMARY_STORAGE_CLASS="ocs-storagecluster-cephfs"

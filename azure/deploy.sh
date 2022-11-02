@@ -12,7 +12,7 @@ export KAFKA_STORAGE_CLASS=managed-premium
 SP_NAME="http://${CLUSTER_NAME}-sp"
 # SLS variables
 export SLS_STORAGE_CLASS=managed-premium
-# BAS variables
+# UDS variables
 export UDS_STORAGE_CLASS=managed-premium
 # CP4D variables
 export CPD_METADATA_STORAGE_CLASS=managed-premium
