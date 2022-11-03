@@ -162,7 +162,7 @@ export AZ_MODE="multi_zone"
 export OCP_VERSION="4.10.35"
 
 export MAS_IMAGE_TEST_DOWNLOAD="cp.icr.io/cp/mas/admin-dashboard:5.1.27"
-export BACKUP_FILE_NAME="terraform-backup-${CLUSTER_NAME}.zip"
+export BACKUP_FILE_NAME="deployment-backup-${CLUSTER_NAME}.zip"
 if [[ $CLUSTER_TYPE == "aws" ]]; then
   export DEPLOYMENT_CONTEXT_UPLOAD_PATH="s3://masocp-${RANDOM_STR}-bucket-${DEPLOY_REGION}/ocp-cluster-provisioning-deployment-context/"
 elif [[ $CLUSTER_TYPE == "azure" ]]; then
@@ -538,8 +538,9 @@ elif [[ $CLUSTER_TYPE == "azure" ]]; then
   # Upload the log file to blob storage
   az storage blob upload --account-name ${STORAGE_ACNT_NAME} --container-name masocpcontainer --name ocp-cluster-provisioning-deployment-context/mas-provisioning.log --file $GIT_REPO_HOME/mas-provisioning.log
 elif [[ $CLUSTER_TYPE == "gcp" ]]; then
-  # Upload the log file to cloud storage
+  # Upload the log files to cloud storage
   gsutil cp $GIT_REPO_HOME/mas-provisioning.log gs://masocp-${RANDOM_STR}-bucket/ocp-cluster-provisioning-deployment-context/
+  gsutil cp /root/openshift-install/config/${CLUSTER_NAME}/.openshift_install.log gs://${CLUSTER_NAME}-bucket/ocp-cluster-provisioning-deployment-context/
 fi
 log "Shutting down VM in a minute"
 shutdown -P "+1"

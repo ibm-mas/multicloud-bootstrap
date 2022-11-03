@@ -170,6 +170,32 @@ if [[ -n $IPS ]]; then
   done
 fi
 
+# Delete managed DNS zones
+echo "Checking for managed DNS zones"
+# Get managed DNS zone list
+MDNSZNS=$(gcloud dns managed-zones list --format=json --filter="name~$UNIQUE_STR" | jq ".[].name" | tr -d '"')
+echo "MDNSZNS = $MDNSZNS"
+if [[ -n $MDNSZNS ]]; then
+  echo "Managed DNS zones found for this MAS instance"
+  for inst in $MDNSZNS; do
+    # Get the managed DNS zone recordsets
+    echo " Deleting DNS zone $inst"
+    for type in A
+    do
+      echo " Retrieving record sets of type $type"
+      MDNSZNRSS=$(gcloud dns record-sets list --zone=$inst --format=json --filter="type=$type" | jq ".[].name" | tr -d '"')
+      echo " MDNSZNRSS = $MDNSZNRSS"
+      if [[ -n $MDNSZNRSS ]]; then
+        for inst1 in $MDNSZNRSS; do
+          gcloud dns record-sets delete $inst1 --zone=$inst --type=$type
+        done
+      fi
+    done
+    # Delete the managed zone
+    gcloud dns managed-zones delete $inst
+  done
+fi
+
 # Delete virtual network
 echo "Checking for virtual network"
 NWS=$(gcloud compute networks list --format=json | jq ".[] | select(.name | contains(\"$UNIQUE_STR\")).name" | tr -d '"')

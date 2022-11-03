@@ -91,6 +91,23 @@ CLUSTER_TYPE=$CLUSTER_TYPE_ORIG
 # Login to GCP
 gcloud auth activate-service-account --key-file=$GIT_REPO_HOME/service-account.json
 
+# Backup deployment context
+cd $GIT_REPO_HOME
+rm -rf /tmp/mas-multicloud
+mkdir /tmp/mas-multicloud
+cp -r * /tmp/mas-multicloud
+cd /tmp
+zip -r $BACKUP_FILE_NAME mas-multicloud/*
+set +e
+gsutil cp $BACKUP_FILE_NAME gs://masocp-${RANDOM_STR}-bucket/ocp-cluster-provisioning-deployment-context/
+retcode=$?
+if [[ $retcode -ne 0 ]]; then
+  log "Failed while uploading deployment context to Cloud Storage bucket"
+  exit 23
+fi
+set -e
+log "OCP cluster deployment context backed up at $DEPLOYMENT_CONTEXT_UPLOAD_PATH in file $CLUSTER_NAME.zip"
+
 # Configure htpasswd
 kubeconfigfile="/root/openshift-install/config/${CLUSTER_NAME}/auth/kubeconfig"
 htpasswd -c -B -b /tmp/.htpasswd $OCP_USERNAME $OCP_PASSWORD

@@ -88,7 +88,7 @@ if [[ $OPENSHIFT_USER_PROVIDE == "false" ]]; then
   log "==== Adding PID limits to worker nodes ===="
   oc create -f $GIT_REPO_HOME/templates/container-runtime-config.yml
 
-  # Backup Terraform configuration
+  # Backup deployment context
   rm -rf /tmp/ansible-devops
   mkdir /tmp/ansible-devops
   cp -r * /tmp/ansible-devops
@@ -99,11 +99,11 @@ if [[ $OPENSHIFT_USER_PROVIDE == "false" ]]; then
   az storage blob upload --account-name ${STORAGE_ACNT_NAME} --container-name masocpcontainer --name ${DEPLOYMENT_CONTEXT_UPLOAD_PATH} --file ${BACKUP_FILE_NAME}
   retcode=$?
   if [[ $retcode -ne 0 ]]; then
-    log "Failed while uploading deployment context to blob storage3"
+    log "Failed while uploading deployment context to blob storage"
     exit 23
   fi
   set -e
-  log "OCP cluster Terraform configuration backed up at $DEPLOYMENT_CONTEXT_UPLOAD_PATH in file $CLUSTER_NAME.zip"
+  log "OCP cluster deployment context backed up at $DEPLOYMENT_CONTEXT_UPLOAD_PATH in file $CLUSTER_NAME.zip"
 
 else
   log "==== Existing OCP cluster provided, skipping the cluster creation, Bastion host creation and S3 upload of deployment context ===="

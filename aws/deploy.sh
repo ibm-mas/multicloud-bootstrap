@@ -201,7 +201,7 @@ EOT
 
   set -e
 
-  # Backup Terraform configuration
+  # Backup deployment context
   cd $GIT_REPO_HOME
   rm -rf /tmp/mas-multicloud
   mkdir /tmp/mas-multicloud
@@ -212,11 +212,11 @@ EOT
   aws s3 cp $BACKUP_FILE_NAME $DEPLOYMENT_CONTEXT_UPLOAD_PATH --region $DEPLOY_REGION
   retcode=$?
   if [[ $retcode -ne 0 ]]; then
-    log "Failed while uploading deployment context to S3"
+    log "Failed while uploading deployment context to S3 bucket"
     exit 23
   fi
   set -e
-  log "OCP cluster Terraform configuration backed up at $DEPLOYMENT_CONTEXT_UPLOAD_PATH in file $CLUSTER_NAME.zip"
+  log "OCP cluster deployment context backed up at $DEPLOYMENT_CONTEXT_UPLOAD_PATH in file $CLUSTER_NAME.zip"
 
   # Create a secret in the Cloud to keep OCP access credentials
   cd $GIT_REPO_HOME
