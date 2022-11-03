@@ -154,6 +154,16 @@ if [[ -n $CSBTS ]]; then
     gcloud storage rm --recursive gs://$inst --quiet
   done
 fi
+echo "Checking for cloud storage bucket used by ODF storage"
+CSBTS=$(gcloud storage buckets list --format=json | jq ".[] | select(.labels.createdby==\"masocp-$UNIQUE_STR\").name" | tr -d '"')
+echo "CSBTS = $CSBTS"
+if [[ -n $CSBTS ]]; then
+  echo "Cloud storage buckets found for this MAS instance"
+  for inst in $CSBTS; do
+    echo "Cloud storage bucket: $inst"
+    gcloud storage rm --recursive gs://$inst --quiet
+  done
+fi
 
 # Delete IP addresses
 echo "Checking for IP addresses"

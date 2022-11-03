@@ -122,15 +122,15 @@ sleep 60
 login=failed
 for counter in {0..9}
 do
-    oc login --insecure-skip-tls-verify=true -u $OCP_USERNAME -p $OCP_PASSWORD --server=https://api.${CLUSTER_NAME}.${BASE_DOMAIN}:6443
-    if [[ $? -ne 0 ]]; then
-      log "OCP login failed, waiting ..."
-      sleep 60
-    else
-      log "OCP login successful"
-      login=success
-      break
-    fi
+  oc login --insecure-skip-tls-verify=true -u $OCP_USERNAME -p $OCP_PASSWORD --server=https://api.${CLUSTER_NAME}.${BASE_DOMAIN}:6443
+  if [[ $? -ne 0 ]]; then
+    log "OCP login failed, waiting ..."
+    sleep 60
+  else
+    log "OCP login successful"
+    login=success
+    break
+  fi
 done
 if [[ $login == "failed" ]]; then
   log "Could not login to OpenShift cluster, exiting"
@@ -175,6 +175,14 @@ export GCP_SERVICEACC_EMAIL=$(oc get machineset -n openshift-machine-api -o json
 ansible-playbook configure-odf.yaml -vvv
 set -e
 log "==== Configure ODF on gcp cluster - completed ===="
+
+# Add label to the Cloud storage bucket created by ODF storage
+CLDSTGBKT=$(oc get backingstores -n openshift-storage -o json | jq ".items[].spec.googleCloudStorage.targetBucket" | tr -d '"')
+log " CLDSTGBKT: $CLDSTGBKT"
+if [[ -n $CLDSTGBKT ]]; then
+  log " Adding label to Cloud Storage bucket"
+  gsutil label ch -l createdby:$CLUSTER_NAME gs://${CLUSTER_NAME}-bucket
+fi
 
 ## Configure IBM catalogs, deploy common services and cert manager
 log "==== OCP cluster configuration (Cert Manager) started ===="
