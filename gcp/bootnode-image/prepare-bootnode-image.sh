@@ -8,7 +8,7 @@ set -e
 apt-get update
 
 ## Install pre-reqs
-apt -y install apache2-utils nfs-common openjdk-8-jre-headless python3-pip skopeo
+apt -y install apache2-utils nfs-common openjdk-8-jre-headless python3-pip skopeo unzip zip
 ln -s --force /usr/bin/python3 /usr/bin/python
 pip3 install dotmap jaydebeapi jmespath pyyaml yq
 
