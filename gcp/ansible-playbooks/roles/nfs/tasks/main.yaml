@@ -1,0 +1,57 @@
+# Check if NFS server is defined 
+- name: Assert that NFS server is defined
+  assert:
+    that: nfs_server is defined and nfs_server != ""
+    fail_msg: "nfs_server must be defined"
+
+# Create namespace
+- name: Create namespace
+  kubernetes.core.k8s:
+    apply: yes
+    definition: "{{ lookup('template', 'templates/gcp/namespace.yaml') }}"
+    wait: yes
+
+# Create role
+- name: Create role
+  kubernetes.core.k8s:
+    apply: yes
+    definition: "{{ lookup('template', 'templates/gcp/role.yaml') }}"
+    wait: yes
+
+- name: Create admin policy
+  shell: |
+    oc adm policy add-role-to-user use-scc-hostmount-anyuid -z nfs-client-provisioner --role-namespace {{ nfs_storage_provisioner_namespace }} -n {{ nfs_storage_provisioner_namespace }}
+
+# Create deployment
+- name: Create deployment
+  kubernetes.core.k8s:
+    apply: yes
+    definition: "{{ lookup('template', 'templates/gcp/deployment.yaml') }}"
+    wait: yes
+
+# Create storage class
+- name: Create storage class
+  kubernetes.core.k8s:
+    apply: yes
+    definition: "{{ lookup('template', 'templates/gcp/storageclass.yaml') }}"
+    wait: yes
+
+# Create RBAC
+- name: Create deployment
+  kubernetes.core.k8s:
+    apply: yes
+    definition: "{{ lookup('template', 'templates/gcp/rbac.yaml') }}"
+    wait: yes
+
+# Wait for NFS client pods to be ready
+- name: "Wait for NFS client pods to be ready (30s delay)"
+  kubernetes.core.k8s_info:
+    api_version: apps/v1
+    name: nfs-client-provisioner
+    namespace: "{{ nfs_provisioner_namespace }}"
+    kind: Deployment
+  register: deployment_result
+  until:
+    - deployment_result.status.availableReplicas is defined and deployment_result.status.availableReplicas == (nfs_client_provisioner_replicas|int)
+  retries: 10 #  approx 5 minutes before we give up
+  delay: 30 #  1 minute

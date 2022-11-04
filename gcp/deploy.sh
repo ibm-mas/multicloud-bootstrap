@@ -4,18 +4,17 @@ set -e
 # This script deploys OpenShift cluster and MAS application
 
 ## Variables
+# Storage class, you can use 'odf' or 'nfs'
+export STORAGE_TYPE="nfs"
 # Mongo variables
-export MONGODB_STORAGE_CLASS="gce-pd-ssd"
-# Amqstreams variables
-export KAFKA_STORAGE_CLASS="gce-pd-ssd"
-# SLS variables
-export SLS_STORAGE_CLASS="gce-pd-ssd"
-# UDS variables
-export UDS_STORAGE_CLASS="gce-pd-ssd"
-# CP4D variables
-export CPD_PRIMARY_STORAGE_CLASS="ocs-storagecluster-cephfs"
-export CPD_METADATA_STORAGE_CLASS="gce-pd-ssd"
-export CPD_SERVICE_STORAGE_CLASS="ocs-storagecluster-cephfs"
+[ $STORAGE_TYPE == "nfs" ] && export MONGODB_STORAGE_CLASS="nfs-client" || export MONGODB_STORAGE_CLASS="gce-pd-ssd"
+[ $STORAGE_TYPE == "nfs" ] && export KAFKA_STORAGE_CLASS="nfs-client" || export KAFKA_STORAGE_CLASS="gce-pd-ssd"
+[ $STORAGE_TYPE == "nfs" ] && export SLS_STORAGE_CLASS="nfs-client" || export SLS_STORAGE_CLASS="gce-pd-ssd"
+[ $STORAGE_TYPE == "nfs" ] && export UDS_STORAGE_CLASS="nfs-client" || export UDS_STORAGE_CLASS="gce-pd-ssd"
+[ $STORAGE_TYPE == "nfs" ] && export CPD_PRIMARY_STORAGE_CLASS="nfs-client" || export CPD_PRIMARY_STORAGE_CLASS="ocs-storagecluster-cephfs"
+[ $STORAGE_TYPE == "nfs" ] && export CPD_METADATA_STORAGE_CLASS="nfs-client" || export CPD_METADATA_STORAGE_CLASS="gce-pd-ssd"
+[ $STORAGE_TYPE == "nfs" ] && export CPD_SERVICE_STORAGE_CLASS="nfs-client" || export CPD_SERVICE_STORAGE_CLASS="ocs-storagecluster-cephfs"
+
 # Variables required by ocp_provision Ansible role
 CLUSTER_TYPE_ORIG=$CLUSTER_TYPE
 export CLUSTER_TYPE="ipi"
@@ -31,9 +30,11 @@ export GOOGLE_PROJECTID=$GOOGLE_PROJECTID
 log "Below are Cloud specific deployment parameters,"
 log " MONGODB_STORAGE_CLASS: $MONGODB_STORAGE_CLASS"
 log " KAFKA_STORAGE_CLASS: $KAFKA_STORAGE_CLASS"
-log " SP_NAME: $SP_NAME"
 log " SLS_STORAGE_CLASS: $SLS_STORAGE_CLASS"
 log " UDS_STORAGE_CLASS: $UDS_STORAGE_CLASS"
+log " CPD_PRIMARY_STORAGE_CLASS: $CPD_PRIMARY_STORAGE_CLASS"
+log " CPD_METADATA_STORAGE_CLASS: $CPD_METADATA_STORAGE_CLASS"
+log " CPD_SERVICE_STORAGE_CLASS: $CPD_SERVICE_STORAGE_CLASS"
 log " SSH_PUB_KEY: $SSH_PUB_KEY"
 
 ## Download files from cloud storage bucket

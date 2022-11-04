@@ -1,0 +1,4 @@
+nfs_storage_provisioner_name: "{{ lookup('env', 'GCP_NFS_STORAGE_PROVISIONIER_NAME') | default('nfs-storage-provisioner', true) }}"
+nfs_storage_provisioner_namespace: "{{ lookup('env', 'GCP_NFS_STORAGE_PROVISIONIER_NAMESPACE') | default('masocp-nfs', true) }}"
+file_share_name: "{{ lookup('env', 'GCP_FILE_SHARE_NAME') | default('masocp_gcp_nfs', true) }}"
+nfs_client_provisioner_replicas: "{{ lookup('env', 'GCP_NFS_CLIENT_PROVISIONER') | default('masocp_gcp_nfs', true) }}"
