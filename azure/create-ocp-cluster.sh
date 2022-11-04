@@ -25,6 +25,9 @@ openshift-username      = "$OCP_USERNAME"
 openshift-password      = "$OCP_PASSWORD"
 master-node-count       = "$MASTER_NODE_COUNT"
 worker-node-count       = "$WORKER_NODE_COUNT"
+virtual-network-name    = "$RG_NAME-vnet"
+master-subnet-name      = "$RG_NAME-master-subnet"
+worker-subnet-name      = "$RG_NAME-worker-subnet-name"
 EOT
 if [[ -f terraform.tfvars ]]; then
     chmod 600 terraform.tfvars
