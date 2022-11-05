@@ -23,7 +23,7 @@
 #    when: worker.stdout_lines is defined
 
 
-# Crate OCS Machine set for Azure cluster 
+# Create OCS Machine set for Azure cluster 
 - name: Create OCS machineset (Azure)
   kubernetes.core.k8s:
     apply: yes

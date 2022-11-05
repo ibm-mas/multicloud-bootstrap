@@ -1,3 +1,13 @@
+# Debug Info
+- name: "Debug information"
+  debug:
+    msg:
+      - "NFS server ............................. {{ nfs_server }}"
+      - "NFS storage provisioner name ........... {{ nfs_storage_provisioner_name }}"
+      - "NFS storage provisioner namespace ...... {{ nfs_storage_provisioner_namespace }}"
+      - "File share name ........................ {{ file_share_name }}"
+      - "NFS client provisioner replicas ........ {{ nfs_client_provisioner_replicas }}"
+
 # Check if NFS server is defined 
 - name: Assert that NFS server is defined
   assert:
@@ -8,16 +18,24 @@
 - name: Create namespace
   kubernetes.core.k8s:
     apply: yes
-    definition: "{{ lookup('template', 'templates/gcp/namespace.yaml') }}"
+    definition: "{{ lookup('template', 'templates/gcp/namespace.yaml.j2') }}"
     wait: yes
 
 # Create role
 - name: Create role
   kubernetes.core.k8s:
     apply: yes
-    definition: "{{ lookup('template', 'templates/gcp/role.yaml') }}"
+    definition: "{{ lookup('template', 'templates/gcp/role.yaml.j2') }}"
     wait: yes
 
+# Create RBAC
+- name: Create deployment
+  kubernetes.core.k8s:
+    apply: yes
+    definition: "{{ lookup('template', 'templates/gcp/rbac.yaml.j2') }}"
+    wait: yes
+
+# Create admin policy
 - name: Create admin policy
   shell: |
     oc adm policy add-role-to-user use-scc-hostmount-anyuid -z nfs-client-provisioner --role-namespace {{ nfs_storage_provisioner_namespace }} -n {{ nfs_storage_provisioner_namespace }}
@@ -26,21 +44,14 @@
 - name: Create deployment
   kubernetes.core.k8s:
     apply: yes
-    definition: "{{ lookup('template', 'templates/gcp/deployment.yaml') }}"
+    definition: "{{ lookup('template', 'templates/gcp/deployment.yaml.j2') }}"
     wait: yes
 
 # Create storage class
 - name: Create storage class
   kubernetes.core.k8s:
     apply: yes
-    definition: "{{ lookup('template', 'templates/gcp/storageclass.yaml') }}"
-    wait: yes
-
-# Create RBAC
-- name: Create deployment
-  kubernetes.core.k8s:
-    apply: yes
-    definition: "{{ lookup('template', 'templates/gcp/rbac.yaml') }}"
+    definition: "{{ lookup('template', 'templates/gcp/storageclass.yaml.j2') }}"
     wait: yes
 
 # Wait for NFS client pods to be ready
@@ -48,10 +59,10 @@
   kubernetes.core.k8s_info:
     api_version: apps/v1
     name: nfs-client-provisioner
-    namespace: "{{ nfs_provisioner_namespace }}"
+    namespace: "{{ nfs_storage_provisioner_namespace }}"
     kind: Deployment
   register: deployment_result
   until:
-    - deployment_result.status.availableReplicas is defined and deployment_result.status.availableReplicas == (nfs_client_provisioner_replicas|int)
+    - deployment_result.resources[0].status.availableReplicas is defined and deployment_result.resources[0].status.availableReplicas == (nfs_client_provisioner_replicas|int)
   retries: 10 #  approx 5 minutes before we give up
   delay: 30 #  1 minute

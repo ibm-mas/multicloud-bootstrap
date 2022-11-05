@@ -143,17 +143,14 @@ fi
 ## Variables
 # OCP variables
 export CLUSTER_NAME="masocp-${RANDOM_STR}"
-export OCP_USERNAME="masocpuser"
-export OCP_PASSWORD="mas${RANDOM_STR:3:3}`date +%H%M%S`${RANDOM_STR:0:3}"
+export OCP_USERNAME="masocpuser1"
+################ TODO remove this #################
+export OCP_PASSWORD="masocpuser1pwd"
+#export OCP_PASSWORD="mas${RANDOM_STR:3:3}`date +%H%M%S`${RANDOM_STR:0:3}"
 if [[ (! -z $EXS_OCP_URL) && (! -z $EXS_OCP_USER) && (! -z $EXS_OCP_PWD) ]]; then
     export OCP_USERNAME=${EXS_OCP_USER}
     export OCP_PASSWORD=${EXS_OCP_PWD}
 fi
-############## TODO REMOVE THIS LATER ###############################################
-#export OCP_USERNAME=masocpuser4
-#export OCP_PASSWORD=mas121130429new
-#echo "$OCP_USERNAME $OCP_PASSWORD"
-#########################################
 
 export OPENSHIFT_PULL_SECRET_FILE_PATH=${GIT_REPO_HOME}/pull-secret.json
 export MASTER_NODE_COUNT="3"
@@ -543,5 +540,5 @@ elif [[ $CLUSTER_TYPE == "gcp" ]]; then
   gsutil cp /root/openshift-install/config/${CLUSTER_NAME}/.openshift_install.log gs://${CLUSTER_NAME}-bucket/ocp-cluster-provisioning-deployment-context/
 fi
 log "Shutting down VM in a minute"
-shutdown -P "+1"
+#shutdown -P "+1"
 exit $RESP_CODE

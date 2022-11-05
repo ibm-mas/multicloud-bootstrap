@@ -3,7 +3,7 @@
   hosts: localhost
   gather_facts: no
   tasks:
-  #Create storage class
+  # Create storage class
   - name: create gce-pd-ssd storage class
     kubernetes.core.k8s:
       definition:

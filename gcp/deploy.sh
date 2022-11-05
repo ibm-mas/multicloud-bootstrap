@@ -28,6 +28,7 @@ export GOOGLE_APPLICATION_CREDENTIALS=${GIT_REPO_HOME}/service-account.json
 export GOOGLE_PROJECTID=$GOOGLE_PROJECTID
 
 log "Below are Cloud specific deployment parameters,"
+log " STORAGE_TYPE=$STORAGE_TYPE"
 log " MONGODB_STORAGE_CLASS: $MONGODB_STORAGE_CLASS"
 log " KAFKA_STORAGE_CLASS: $KAFKA_STORAGE_CLASS"
 log " SLS_STORAGE_CLASS: $SLS_STORAGE_CLASS"
@@ -83,14 +84,31 @@ fi
 ## Create OCP cluster
 log "==== OCP cluster creation started ===="
 cd $GIT_REPO_HOME/../ibm/mas_devops/playbooks
-set +e
 # Provision OCP cluster
-export ROLE_NAME=ocp_provision && ansible-playbook ibm.mas_devops.run_role
+#export ROLE_NAME=ocp_provision && ansible-playbook ibm.mas_devops.run_role
 log "==== OCP cluster creation completed ===="
 CLUSTER_TYPE=$CLUSTER_TYPE_ORIG
 
 # Login to GCP
 gcloud auth activate-service-account --key-file=$GIT_REPO_HOME/service-account.json
+sleep 5
+log "Logged into using service account"
+
+# Create filestore instance
+NFS_FILESTORE_NAME=${CLUSTER_NAME}-nfs
+VPCNAME=$(cat /root/openshift-install/config/masocp-sjp116/.openshift_install.log | grep "msg=\"network =" | cut -d '/' -f 10 | tr -d '\\"')
+if [[ -z $VPCNAME ]]; then
+  log " ERROR: Could not retrieve VPC name"
+  exit 1
+fi
+log " VPCNAME=$VPCNAME"
+gcloud filestore instances create $NFS_FILESTORE_NAME --file-share=name=masocp_gcp_nfs,capacity=3TB --tier=basic-ssd --network=name=$VPCNAME --region=$DEPLOY_REGION --zone=${DEPLOY_REGION}-a
+export GCP_NFS_SERVER==$(gcloud filestore instances describe $NFS_FILESTORE_NAME --zone=${DEPLOY_REGION}-a --location=$DEPLOY_REGION --format=json | jq ".networks[0].ipAddresses[0]" | tr -d '"')
+log "NFS filestore $NFS_FILESTORE_NAME created in GCP with IP address $GCP_NFS_SERVER"
+if [[ -z $GCP_NFS_SERVER ]]; then
+  log " ERROR: Could not retrieve filestore instance IP address"
+  exit 1
+fi
 
 # Backup deployment context
 cd $GIT_REPO_HOME
@@ -102,6 +120,7 @@ zip -r $BACKUP_FILE_NAME mas-multicloud/*
 set +e
 gsutil cp $BACKUP_FILE_NAME gs://masocp-${RANDOM_STR}-bucket/ocp-cluster-provisioning-deployment-context/
 retcode=$?
+echo "retcode=$retcode"
 if [[ $retcode -ne 0 ]]; then
   log "Failed while uploading deployment context to Cloud Storage bucket"
   exit 23
@@ -112,14 +131,17 @@ log "OCP cluster deployment context backed up at $DEPLOYMENT_CONTEXT_UPLOAD_PATH
 # Configure htpasswd
 kubeconfigfile="/root/openshift-install/config/${CLUSTER_NAME}/auth/kubeconfig"
 htpasswd -c -B -b /tmp/.htpasswd $OCP_USERNAME $OCP_PASSWORD
-oc delete secret htpass-secret -n openshift-config --kubeconfig $kubeconfigfile > /dev/null 2>&1
+oc delete secret htpass-secret -n openshift-config --kubeconfig $kubeconfigfile | true > /dev/null 2>&1
 oc create secret generic htpass-secret --from-file=htpasswd=/tmp/.htpasswd -n openshift-config --kubeconfig $kubeconfigfile
 log "Created OpenShift secret for htpasswd"
 oc apply -f $GIT_REPO_HOME/templates/oauth-htpasswd.yml --kubeconfig $kubeconfigfile
 echo "Created OAuth configuration in OpenShift cluster"
 oc adm policy add-cluster-role-to-user cluster-admin $OCP_USERNAME --kubeconfig $kubeconfigfile
 echo "Updated cluster-admin role in OpenShift cluster"
-sleep 60
+
+# Login to OCP cluster using newly htpasswd credentials
+set +e
+sleep 10
 login=failed
 for counter in {0..9}
 do
@@ -137,12 +159,14 @@ if [[ $login == "failed" ]]; then
   log "Could not login to OpenShift cluster, exiting"
   exit 1
 fi
+set -e
+
 # Create a secret in the Cloud to keep OCP access credentials
 cd $GIT_REPO_HOME
 ./create-secret.sh ocp
 
 log "==== Adding PID limits to worker nodes ===="
-oc create -f $GIT_REPO_HOME/templates/container-runtime-config.yml
+#oc create -f $GIT_REPO_HOME/templates/container-runtime-config.yml
 
 log "==== Adding ER key details to OCP default pull-secret ===="
 cd /tmp
@@ -158,24 +182,30 @@ envsubst </tmp/dockerconfig.json >/tmp/.dockerconfigjson
 oc set data secret/pull-secret -n openshift-config --from-file=/tmp/.dockerconfigjson
 
 ## Configure gce-pd-ssd storage class
-log "==== Configure gce-pd-ssd storage class - started ===="
+log "==== Storageclass gce-pd-ssd configuration started ===="
 cd $GIT_REPO_HOME/gcp/ansible-playbooks
-set +e
 ansible-playbook configure-gce-pd-ssd.yaml
-set -e
-log "==== Configure gce-pd-ssd storage class - completed ===="
+log "==== Storageclass gce-pd-ssd configuration completed ===="
 
-## Configure ODF on gcp cluster
-log "==== Configure ODF on gcp cluster - started ===="
+## Configure storage
+if [[ $$STORAGE_TYPE == "odf" ]]; then
+  export CLUSTER_ID=$(oc get machineset -n openshift-machine-api -o jsonpath='{.items[0].metadata.labels.machine\.openshift\.io/cluster-api-cluster}')
+  export REGION=$(oc get machineset -n openshift-machine-api -o jsonpath='{.items[0].spec.template.spec.providerSpec.value.region}')
+  export GCP_PROJECT_ID=$(oc get machineset -n openshift-machine-api -o jsonpath='{.items[0].spec.template.spec.providerSpec.value.projectID}')
+  export GCP_SERVICEACC_EMAIL=$(oc get machineset -n openshift-machine-api -o jsonpath='{.items[0].spec.template.spec.providerSpec.value.serviceAccounts[0].email}')
+  log " CLUSTER_ID=$CLUSTER_ID"
+  log " REGION=$REGION"
+  log " GCP_PROJECT_ID=$GCP_PROJECT_ID"
+  log " GCP_SERVICEACC_EMAIL=$GCP_SERVICEACC_EMAIL"
+fi
+if [[ $$STORAGE_TYPE == "nfs" ]]; then
+  export GCP_FILE_SHARE_NAME="/masocp_gcp_nfs"
+  log " GCP_FILE_SHARE_NAME=$GCP_FILE_SHARE_NAME"
+fi
+log "==== Storageclass configuration started ===="
 cd $GIT_REPO_HOME/gcp/ansible-playbooks
-set +e
-export CLUSTER_ID=$(oc get machineset -n openshift-machine-api -o jsonpath='{.items[0].metadata.labels.machine\.openshift\.io/cluster-api-cluster}')
-export REGION=$(oc get machineset -n openshift-machine-api -o jsonpath='{.items[0].spec.template.spec.providerSpec.value.region}')
-export GCP_PROJECT_ID=$(oc get machineset -n openshift-machine-api -o jsonpath='{.items[0].spec.template.spec.providerSpec.value.projectID}')
-export GCP_SERVICEACC_EMAIL=$(oc get machineset -n openshift-machine-api -o jsonpath='{.items[0].spec.template.spec.providerSpec.value.serviceAccounts[0].email}')
-ansible-playbook configure-odf.yaml -vvv
-set -e
-log "==== Configure ODF on gcp cluster - completed ===="
+ansible-playbook configure-storage.yaml --extra-vars "storage_type=$STORAGE_TYPE"
+log "==== Storageclass configuration completed ===="
 
 # Add label to the Cloud storage bucket created by ODF storage
 CLDSTGBKT=$(oc get backingstores -n openshift-storage -o json | jq ".items[].spec.googleCloudStorage.targetBucket" | tr -d '"')
@@ -188,11 +218,9 @@ fi
 ## Configure IBM catalogs, deploy common services and cert manager
 log "==== OCP cluster configuration (Cert Manager) started ===="
 cd $GIT_REPO_HOME/../ibm/mas_devops/playbooks
-set +e
 export ROLE_NAME=ibm_catalogs && ansible-playbook ibm.mas_devops.run_role
 export ROLE_NAME=common_services && ansible-playbook ibm.mas_devops.run_role
 export ROLE_NAME=cert_manager && ansible-playbook ibm.mas_devops.run_role
-set -e
 log "==== OCP cluster configuration (Cert Manager) completed ===="
 
 ## Deploy MongoDB

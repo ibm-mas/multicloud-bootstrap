@@ -55,3 +55,6 @@ EOT
 rm -rf /home/*/.ssh/authorized_keys /root/.ssh/authorized_keys
 
 echo "Bootnode preparation completed"
+
+# Clear bash history
+history -c
