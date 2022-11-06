@@ -29,7 +29,7 @@
     wait: yes
 
 # Create RBAC
-- name: Create deployment
+- name: Create RBAC
   kubernetes.core.k8s:
     apply: yes
     definition: "{{ lookup('template', 'templates/gcp/rbac.yaml.j2') }}"

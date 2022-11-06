@@ -73,7 +73,7 @@ if [[ -n "$MAS_LICENSE_URL" ]]; then
   set -- $line
   hostid=$3
   log " SLS_HOST_ID: $hostid"
-  #SLS Instance name
+  # SLS Instance name
   export SLS_LICENSE_ID="$hostid"
   log " SLS_INSTANCE_NAME=$SLS_INSTANCE_NAME"
   log " SLS_LICENSE_ID=$SLS_LICENSE_ID"
@@ -85,6 +85,7 @@ fi
 log "==== OCP cluster creation started ===="
 cd $GIT_REPO_HOME/../ibm/mas_devops/playbooks
 # Provision OCP cluster
+############### TODO
 export ROLE_NAME=ocp_provision && ansible-playbook ibm.mas_devops.run_role
 log "==== OCP cluster creation completed ===="
 CLUSTER_TYPE=$CLUSTER_TYPE_ORIG
@@ -112,6 +113,7 @@ fi
 set -e
 log "OCP cluster deployment context backed up at $DEPLOYMENT_CONTEXT_UPLOAD_PATH in file $CLUSTER_NAME.zip"
 
+############### TODO
 # Configure htpasswd
 kubeconfigfile="/root/openshift-install/config/${CLUSTER_NAME}/auth/kubeconfig"
 htpasswd -c -B -b /tmp/.htpasswd $OCP_USERNAME $OCP_PASSWORD
@@ -119,9 +121,9 @@ oc delete secret htpass-secret -n openshift-config --kubeconfig $kubeconfigfile 
 oc create secret generic htpass-secret --from-file=htpasswd=/tmp/.htpasswd -n openshift-config --kubeconfig $kubeconfigfile
 log "Created OpenShift secret for htpasswd"
 oc apply -f $GIT_REPO_HOME/templates/oauth-htpasswd.yml --kubeconfig $kubeconfigfile
-echo "Created OAuth configuration in OpenShift cluster"
+log "Created OAuth configuration in OpenShift cluster"
 oc adm policy add-cluster-role-to-user cluster-admin $OCP_USERNAME --kubeconfig $kubeconfigfile
-echo "Updated cluster-admin role in OpenShift cluster"
+log "Updated cluster-admin role in OpenShift cluster"
 
 # Login to OCP cluster using newly htpasswd credentials
 set +e
@@ -147,10 +149,12 @@ set -e
 
 # Create a secret in the Cloud to keep OCP access credentials
 cd $GIT_REPO_HOME
+############### TODO
 ./create-secret.sh ocp
 
 log "==== Adding PID limits to worker nodes ===="
-#oc create -f $GIT_REPO_HOME/templates/container-runtime-config.yml
+############### TODO
+oc create -f $GIT_REPO_HOME/templates/container-runtime-config.yml
 
 log "==== Adding ER key details to OCP default pull-secret ===="
 cd /tmp
@@ -181,17 +185,18 @@ if [[ $$STORAGE_TYPE == "odf" ]]; then
   log " REGION=$REGION"
   log " GCP_PROJECT_ID=$GCP_PROJECT_ID"
   log " GCP_SERVICEACC_EMAIL=$GCP_SERVICEACC_EMAIL"
-elif [[ $$STORAGE_TYPE == "nfs" ]]; then
+elif [[ $STORAGE_TYPE == "nfs" ]]; then
   # Create filestore instance
   NFS_FILESTORE_NAME=${CLUSTER_NAME}-nfs
-  VPCNAME=$(cat /root/openshift-install/config/masocp-sjp116/.openshift_install.log | grep "msg=\"network =" | cut -d '/' -f 10 | tr -d '\\"')
+  VPCNAME=$(cat /root/openshift-install/config/$CLUSTER_NAME/.openshift_install.log | grep "msg=\"network =" | cut -d '/' -f 10 | tr -d '\\"')
   if [[ -z $VPCNAME ]]; then
     log " ERROR: Could not retrieve VPC name"
     exit 1
   fi
   log " VPCNAME=$VPCNAME"
+  ##### TODO
   gcloud filestore instances create $NFS_FILESTORE_NAME --file-share=name=masocp_gcp_nfs,capacity=3TB --tier=basic-ssd --network=name=$VPCNAME --region=$DEPLOY_REGION --zone=${DEPLOY_REGION}-a
-  export GCP_NFS_SERVER==$(gcloud filestore instances describe $NFS_FILESTORE_NAME --zone=${DEPLOY_REGION}-a --location=$DEPLOY_REGION --format=json | jq ".networks[0].ipAddresses[0]" | tr -d '"')
+  export GCP_NFS_SERVER=$(gcloud filestore instances describe $NFS_FILESTORE_NAME --zone=${DEPLOY_REGION}-a --location=$DEPLOY_REGION --format=json | jq ".networks[0].ipAddresses[0]" | tr -d '"')
   log "NFS filestore $NFS_FILESTORE_NAME created in GCP with IP address $GCP_NFS_SERVER"
   if [[ -z $GCP_NFS_SERVER ]]; then
     log " ERROR: Could not retrieve filestore instance IP address"

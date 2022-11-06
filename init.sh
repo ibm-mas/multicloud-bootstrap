@@ -147,7 +147,6 @@ if [[ (! -z $EXS_OCP_URL) && (! -z $EXS_OCP_USER) && (! -z $EXS_OCP_PWD) ]]; the
     export OCP_USERNAME=${EXS_OCP_USER}
     export OCP_PASSWORD=${EXS_OCP_PWD}
 fi
-
 export OPENSHIFT_PULL_SECRET_FILE_PATH=${GIT_REPO_HOME}/pull-secret.json
 export MASTER_NODE_COUNT="3"
 export WORKER_NODE_COUNT="3"
@@ -536,5 +535,6 @@ elif [[ $CLUSTER_TYPE == "gcp" ]]; then
   gsutil cp /root/openshift-install/config/${CLUSTER_NAME}/.openshift_install.log gs://${CLUSTER_NAME}-bucket/ocp-cluster-provisioning-deployment-context/
 fi
 log "Shutting down VM in a minute"
+############### TODO
 #shutdown -P "+1"
 exit $RESP_CODE
