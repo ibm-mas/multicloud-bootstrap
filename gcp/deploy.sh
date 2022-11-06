@@ -221,7 +221,7 @@ if [[ -n $CLDSTGBKT ]]; then
 fi
 
 ## Configure IBM catalogs, deploy common services and cert manager
-if [[ $$STORAGE_TYPE == "odf" ]]; then
+if [[ $STORAGE_TYPE == "odf" ]]; then
 log "==== OCP cluster configuration (Cert Manager) started ===="
   cd $GIT_REPO_HOME/../ibm/mas_devops/playbooks
   export ROLE_NAME=ibm_catalogs && ansible-playbook ibm.mas_devops.run_role
