@@ -205,6 +205,7 @@ elif [[ $STORAGE_TYPE == "nfs" ]]; then
   
   export GCP_FILE_SHARE_NAME="/masocp_gcp_nfs"
   log " GCP_FILE_SHARE_NAME=$GCP_FILE_SHARE_NAME"
+  sleep 60
 fi
 log "==== Storageclass configuration started ===="
 cd $GIT_REPO_HOME/gcp/ansible-playbooks
