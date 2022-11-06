@@ -6,13 +6,13 @@ set -e
 ## Variables
 # Storage class, you can use 'odf' or 'nfs'
 export STORAGE_TYPE="nfs"
-# Mongo variables
-[ $STORAGE_TYPE == "nfs" ] && export MONGODB_STORAGE_CLASS="nfs-client" || export MONGODB_STORAGE_CLASS="gce-pd-ssd"
-[ $STORAGE_TYPE == "nfs" ] && export KAFKA_STORAGE_CLASS="nfs-client" || export KAFKA_STORAGE_CLASS="gce-pd-ssd"
-[ $STORAGE_TYPE == "nfs" ] && export SLS_STORAGE_CLASS="nfs-client" || export SLS_STORAGE_CLASS="gce-pd-ssd"
-[ $STORAGE_TYPE == "nfs" ] && export UDS_STORAGE_CLASS="nfs-client" || export UDS_STORAGE_CLASS="gce-pd-ssd"
+# Storage class variables
+export MONGODB_STORAGE_CLASS="gce-pd-ssd"
+export KAFKA_STORAGE_CLASS="gce-pd-ssd"
+export SLS_STORAGE_CLASS="gce-pd-ssd"
+export UDS_STORAGE_CLASS="gce-pd-ssd"
+export CPD_METADATA_STORAGE_CLASS="gce-pd-ssd"
 [ $STORAGE_TYPE == "nfs" ] && export CPD_PRIMARY_STORAGE_CLASS="nfs-client" || export CPD_PRIMARY_STORAGE_CLASS="ocs-storagecluster-cephfs"
-[ $STORAGE_TYPE == "nfs" ] && export CPD_METADATA_STORAGE_CLASS="nfs-client" || export CPD_METADATA_STORAGE_CLASS="gce-pd-ssd"
 [ $STORAGE_TYPE == "nfs" ] && export CPD_SERVICE_STORAGE_CLASS="nfs-client" || export CPD_SERVICE_STORAGE_CLASS="ocs-storagecluster-cephfs"
 
 # Variables required by ocp_provision Ansible role
@@ -67,7 +67,7 @@ if [[ -f service-account.json ]]; then
   chmod 600 service-account.json
 fi
 
-### Read License File & Retrive SLS hostname and host id
+# Read License File & Retrive SLS hostname and host id
 if [[ -n "$MAS_LICENSE_URL" ]]; then
   line=$(head -n 1 entitlement.lic)
   set -- $line
@@ -85,7 +85,7 @@ fi
 log "==== OCP cluster creation started ===="
 cd $GIT_REPO_HOME/../ibm/mas_devops/playbooks
 # Provision OCP cluster
-#export ROLE_NAME=ocp_provision && ansible-playbook ibm.mas_devops.run_role
+export ROLE_NAME=ocp_provision && ansible-playbook ibm.mas_devops.run_role
 log "==== OCP cluster creation completed ===="
 CLUSTER_TYPE=$CLUSTER_TYPE_ORIG
 
@@ -93,22 +93,6 @@ CLUSTER_TYPE=$CLUSTER_TYPE_ORIG
 gcloud auth activate-service-account --key-file=$GIT_REPO_HOME/service-account.json
 sleep 5
 log "Logged into using service account"
-
-# Create filestore instance
-NFS_FILESTORE_NAME=${CLUSTER_NAME}-nfs
-VPCNAME=$(cat /root/openshift-install/config/masocp-sjp116/.openshift_install.log | grep "msg=\"network =" | cut -d '/' -f 10 | tr -d '\\"')
-if [[ -z $VPCNAME ]]; then
-  log " ERROR: Could not retrieve VPC name"
-  exit 1
-fi
-log " VPCNAME=$VPCNAME"
-gcloud filestore instances create $NFS_FILESTORE_NAME --file-share=name=masocp_gcp_nfs,capacity=3TB --tier=basic-ssd --network=name=$VPCNAME --region=$DEPLOY_REGION --zone=${DEPLOY_REGION}-a
-export GCP_NFS_SERVER==$(gcloud filestore instances describe $NFS_FILESTORE_NAME --zone=${DEPLOY_REGION}-a --location=$DEPLOY_REGION --format=json | jq ".networks[0].ipAddresses[0]" | tr -d '"')
-log "NFS filestore $NFS_FILESTORE_NAME created in GCP with IP address $GCP_NFS_SERVER"
-if [[ -z $GCP_NFS_SERVER ]]; then
-  log " ERROR: Could not retrieve filestore instance IP address"
-  exit 1
-fi
 
 # Backup deployment context
 cd $GIT_REPO_HOME
@@ -197,8 +181,23 @@ if [[ $$STORAGE_TYPE == "odf" ]]; then
   log " REGION=$REGION"
   log " GCP_PROJECT_ID=$GCP_PROJECT_ID"
   log " GCP_SERVICEACC_EMAIL=$GCP_SERVICEACC_EMAIL"
-fi
-if [[ $$STORAGE_TYPE == "nfs" ]]; then
+elif [[ $$STORAGE_TYPE == "nfs" ]]; then
+  # Create filestore instance
+  NFS_FILESTORE_NAME=${CLUSTER_NAME}-nfs
+  VPCNAME=$(cat /root/openshift-install/config/masocp-sjp116/.openshift_install.log | grep "msg=\"network =" | cut -d '/' -f 10 | tr -d '\\"')
+  if [[ -z $VPCNAME ]]; then
+    log " ERROR: Could not retrieve VPC name"
+    exit 1
+  fi
+  log " VPCNAME=$VPCNAME"
+  gcloud filestore instances create $NFS_FILESTORE_NAME --file-share=name=masocp_gcp_nfs,capacity=3TB --tier=basic-ssd --network=name=$VPCNAME --region=$DEPLOY_REGION --zone=${DEPLOY_REGION}-a
+  export GCP_NFS_SERVER==$(gcloud filestore instances describe $NFS_FILESTORE_NAME --zone=${DEPLOY_REGION}-a --location=$DEPLOY_REGION --format=json | jq ".networks[0].ipAddresses[0]" | tr -d '"')
+  log "NFS filestore $NFS_FILESTORE_NAME created in GCP with IP address $GCP_NFS_SERVER"
+  if [[ -z $GCP_NFS_SERVER ]]; then
+    log " ERROR: Could not retrieve filestore instance IP address"
+    exit 1
+  fi
+  
   export GCP_FILE_SHARE_NAME="/masocp_gcp_nfs"
   log " GCP_FILE_SHARE_NAME=$GCP_FILE_SHARE_NAME"
 fi
@@ -216,12 +215,14 @@ if [[ -n $CLDSTGBKT ]]; then
 fi
 
 ## Configure IBM catalogs, deploy common services and cert manager
+if [[ $$STORAGE_TYPE == "odf" ]]; then
 log "==== OCP cluster configuration (Cert Manager) started ===="
-cd $GIT_REPO_HOME/../ibm/mas_devops/playbooks
-export ROLE_NAME=ibm_catalogs && ansible-playbook ibm.mas_devops.run_role
-export ROLE_NAME=common_services && ansible-playbook ibm.mas_devops.run_role
-export ROLE_NAME=cert_manager && ansible-playbook ibm.mas_devops.run_role
-log "==== OCP cluster configuration (Cert Manager) completed ===="
+  cd $GIT_REPO_HOME/../ibm/mas_devops/playbooks
+  export ROLE_NAME=ibm_catalogs && ansible-playbook ibm.mas_devops.run_role
+  export ROLE_NAME=common_services && ansible-playbook ibm.mas_devops.run_role
+  export ROLE_NAME=cert_manager && ansible-playbook ibm.mas_devops.run_role
+  log "==== OCP cluster configuration (Cert Manager) completed ===="
+fi
 
 ## Deploy MongoDB
 log "==== MongoDB deployment started ===="

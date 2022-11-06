@@ -109,10 +109,8 @@ fi
 ## Configure Ops agent
 if [[ $CLUSTER_TYPE == "gcp" ]]; then
   log "Configuring Ops agent"
-  
   # Update config file
   sed -i "s/\[UNIQID\]/$RANDOM_STR/g" /etc/google-cloud-ops-agent/config.yaml
-  
   # Start Ops agent service
   service google-cloud-ops-agent restart
   sleep 5
@@ -143,10 +141,8 @@ fi
 ## Variables
 # OCP variables
 export CLUSTER_NAME="masocp-${RANDOM_STR}"
-export OCP_USERNAME="masocpuser1"
-################ TODO remove this #################
-export OCP_PASSWORD="masocpuser1pwd"
-#export OCP_PASSWORD="mas${RANDOM_STR:3:3}`date +%H%M%S`${RANDOM_STR:0:3}"
+export OCP_USERNAME="masocpuser"
+export OCP_PASSWORD="mas${RANDOM_STR:3:3}`date +%H%M%S`${RANDOM_STR:0:3}"
 if [[ (! -z $EXS_OCP_URL) && (! -z $EXS_OCP_USER) && (! -z $EXS_OCP_PWD) ]]; then
     export OCP_USERNAME=${EXS_OCP_USER}
     export OCP_PASSWORD=${EXS_OCP_PWD}
@@ -156,7 +152,7 @@ export OPENSHIFT_PULL_SECRET_FILE_PATH=${GIT_REPO_HOME}/pull-secret.json
 export MASTER_NODE_COUNT="3"
 export WORKER_NODE_COUNT="3"
 export AZ_MODE="multi_zone"
-export OCP_VERSION="4.10.35"
+export OCP_VERSION="4.10.40"
 
 export MAS_IMAGE_TEST_DOWNLOAD="cp.icr.io/cp/mas/admin-dashboard:5.1.27"
 export BACKUP_FILE_NAME="deployment-backup-${CLUSTER_NAME}.zip"
