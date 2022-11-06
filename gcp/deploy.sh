@@ -212,16 +212,17 @@ cd $GIT_REPO_HOME/gcp/ansible-playbooks
 ansible-playbook configure-storage.yaml --extra-vars "storage_type=$STORAGE_TYPE"
 log "==== Storageclass configuration completed ===="
 
-# Add label to the Cloud storage bucket created by ODF storage
-CLDSTGBKT=$(oc get backingstores -n openshift-storage -o json | jq ".items[].spec.googleCloudStorage.targetBucket" | tr -d '"')
-log " CLDSTGBKT: $CLDSTGBKT"
-if [[ -n $CLDSTGBKT ]]; then
-  log " Adding label to Cloud Storage bucket"
-  gsutil label ch -l createdby:$CLUSTER_NAME gs://${CLUSTER_NAME}-bucket
+if [[ $STORAGE_TYPE == "odf" ]]; then
+  # Add label to the Cloud storage bucket created by ODF storage
+  CLDSTGBKT=$(oc get backingstores -n openshift-storage -o json | jq ".items[].spec.googleCloudStorage.targetBucket" | tr -d '"')
+  log " CLDSTGBKT: $CLDSTGBKT"
+  if [[ -n $CLDSTGBKT ]]; then
+    log " Adding label to Cloud Storage bucket"
+    gsutil label ch -l createdby:$CLUSTER_NAME gs://${CLUSTER_NAME}-bucket
+  fi
 fi
 
 ## Configure IBM catalogs, deploy common services and cert manager
-if [[ $STORAGE_TYPE == "odf" ]]; then
 log "==== OCP cluster configuration (Cert Manager) started ===="
   cd $GIT_REPO_HOME/../ibm/mas_devops/playbooks
   export ROLE_NAME=ibm_catalogs && ansible-playbook ibm.mas_devops.run_role
