@@ -206,6 +206,19 @@ if [[ -n $MDNSZNS ]]; then
   done
 fi
 
+# Delete filestore instance
+echo "Checking for filestore instances"
+# Get filestore instance list
+FSTORES=$(gcloud filestore instances list --format=json --filter="name~$UNIQUE_STR" | jq ".[].name" | tr -d '"')
+echo "FSTORES = $FSTORES"
+if [[ -n $FSTORES ]]; then
+  echo "Filestore instances found for this MAS instance"
+  for inst in $FSTORES; do
+    echo "Filestore instance name: $inst"
+    gcloud filestore instances delete $inst --quiet
+  done
+fi
+
 # Delete virtual network
 echo "Checking for virtual network"
 NWS=$(gcloud compute networks list --format=json | jq ".[] | select(.name | contains(\"$UNIQUE_STR\")).name" | tr -d '"')
