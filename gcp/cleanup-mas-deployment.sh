@@ -219,6 +219,19 @@ if [[ -n $FSTORES ]]; then
   done
 fi
 
+# Delete secrets
+echo "Checking for secrets"
+# Get secrets list
+SECRETS=$(gcloud secrets list --format=json --filter="name~$UNIQUE_STR" | jq ".[].name" | tr -d '"')
+echo "SECRETS = $SECRETS"
+if [[ -n $SECRETS ]]; then
+  echo "Secrets found for this MAS instance"
+  for inst in $SECRETS; do
+    echo "Secrets name: $inst"
+    gcloud secrets delete $inst --quiet
+  done
+fi
+
 # Delete virtual network
 echo "Checking for virtual network"
 NWS=$(gcloud compute networks list --format=json | jq ".[] | select(.name | contains(\"$UNIQUE_STR\")).name" | tr -d '"')

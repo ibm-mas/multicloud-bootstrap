@@ -31,8 +31,7 @@ ocpusername=$OCP_USERNAME
 ocppassword=$OCP_PASSWORD
 EOT
 elif [[ $SECRET_TYPE == "mas" ]]; then
-  #################### TODO ########################
-  #get_mas_creds $RANDOM_STR
+  get_mas_creds $RANDOM_STR
   cat <<EOT >> $SECRETFILE
 masusername=$MAS_USER
 maspassword=$MAS_PASSWORD

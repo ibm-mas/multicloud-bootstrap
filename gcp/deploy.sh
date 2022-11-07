@@ -92,7 +92,6 @@ fi
 log "==== OCP cluster creation started ===="
 cd $GIT_REPO_HOME/../ibm/mas_devops/playbooks
 # Provision OCP cluster
-############### TODO
 export ROLE_NAME=ocp_provision && ansible-playbook ibm.mas_devops.run_role
 log "==== OCP cluster creation completed ===="
 CLUSTER_TYPE=$CLUSTER_TYPE_ORIG
@@ -120,7 +119,6 @@ fi
 set -e
 log "OCP cluster deployment context backed up at $DEPLOYMENT_CONTEXT_UPLOAD_PATH in file $CLUSTER_NAME.zip"
 
-############### TODO
 # Configure htpasswd
 kubeconfigfile="/root/openshift-install/config/${CLUSTER_NAME}/auth/kubeconfig"
 htpasswd -c -B -b /tmp/.htpasswd $OCP_USERNAME $OCP_PASSWORD
@@ -156,11 +154,9 @@ set -e
 
 # Create a secret in the Cloud to keep OCP access credentials
 cd $GIT_REPO_HOME
-############### TODO
 ./create-secret.sh ocp
 
 log "==== Adding PID limits to worker nodes ===="
-############### TODO
 oc create -f $GIT_REPO_HOME/templates/container-runtime-config.yml
 
 log "==== Adding ER key details to OCP default pull-secret ===="
@@ -195,13 +191,12 @@ if [[ $STORAGE_TYPE == "odf" ]]; then
 elif [[ $STORAGE_TYPE == "nfs" ]]; then
   # Create filestore instance
   NFS_FILESTORE_NAME=${CLUSTER_NAME}-nfs
-  VPCNAME=$(cat /root/openshift-install/config/$CLUSTER_NAME/.openshift_install.log | grep "msg=\"network =" | cut -d '/' -f 10 | tr -d '\\"')
+  VPCNAME=$(cat /root/openshift-install/config/$CLUSTER_NAME/cluster.tfvars.json | | jq ".network" | cut -d '/' -f 10 | tr -d '\\"')
   if [[ -z $VPCNAME ]]; then
     log " ERROR: Could not retrieve VPC name"
     exit 1
   fi
   log " VPCNAME=$VPCNAME"
-  ##### TODO
   gcloud filestore instances create $NFS_FILESTORE_NAME --file-share=name=masocp_gcp_nfs,capacity=3TB --tier=basic-ssd --network=name=$VPCNAME --region=$DEPLOY_REGION --zone=${DEPLOY_REGION}-a
   export GCP_NFS_SERVER=$(gcloud filestore instances describe $NFS_FILESTORE_NAME --zone=${DEPLOY_REGION}-a --location=$DEPLOY_REGION --format=json | jq ".networks[0].ipAddresses[0]" | tr -d '"')
   log "NFS filestore $NFS_FILESTORE_NAME created in GCP with IP address $GCP_NFS_SERVER"

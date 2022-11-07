@@ -535,6 +535,5 @@ elif [[ $CLUSTER_TYPE == "gcp" ]]; then
   gsutil cp /root/openshift-install/config/${CLUSTER_NAME}/.openshift_install.log gs://${CLUSTER_NAME}-bucket/ocp-cluster-provisioning-deployment-context/
 fi
 log "Shutting down VM in a minute"
-############### TODO
-#shutdown -P "+1"
+shutdown -P "+1"
 exit $RESP_CODE
