@@ -47,7 +47,15 @@ if [[ ${SLS_PUB_CERT_URL,,} =~ ^https? ]]; then
   wget "$SLS_PUB_CERT_URL" -O sls.crt
 elif [[ ${SLS_PUB_CERT_URL,,} =~ ^s3 ]]; then
   log "Downloading SLS certificate from S3 URL"
-  aws s3 cp "$SLS_PUB_CERT_URL" sls.crt
+  aws s3 cp "$SLS_PUB_CERT_URL" sls.crt --region $DEPLOY_REGION
+  ret=$?
+        if [ $ret -ne 0 ]; then
+        aws s3 cp "$SLS_PUB_CERT_URL" sls.crt --region us-east-1
+        ret=$?
+        if [ $ret -ne 0 ]; then
+            log "Invalid SLS License URL"
+        fi
+        fi
 fi
 if [[ -f sls.crt ]]; then
   chmod 600 sls.crt
@@ -59,7 +67,15 @@ if [[ ${UDS_PUB_CERT_URL,,} =~ ^https? ]]; then
   wget "$UDS_PUB_CERT_URL" -O uds.crt
 elif [[ ${UDS_PUB_CERT_URL,,} =~ ^s3 ]]; then
   log "Downloading UDS certificate from S3 URL"
-  aws s3 cp "$UDS_PUB_CERT_URL" uds.crt
+  aws s3 cp "$UDS_PUB_CERT_URL" uds.crt --region $DEPLOY_REGION
+  ret=$?
+        if [ $ret -ne 0 ]; then
+        aws s3 cp "$UDS_PUB_CERT_URL" uds.crt --region us-east-1
+        ret=$?
+        if [ $ret -ne 0 ]; then
+            log "Invalid UDS License URL"
+        fi
+        fi
 fi
 if [[ -f uds.crt ]]; then
   chmod 600 uds.crt
@@ -191,7 +207,7 @@ EOT
   cd /tmp
   zip -r $BACKUP_FILE_NAME mas-multicloud/*
   set +e
-  aws s3 cp $BACKUP_FILE_NAME $DEPLOYMENT_CONTEXT_UPLOAD_PATH
+  aws s3 cp $BACKUP_FILE_NAME $DEPLOYMENT_CONTEXT_UPLOAD_PATH --region $DEPLOY_REGION
   retcode=$?
   if [[ $retcode -ne 0 ]]; then
     log "Failed while uploading deployment context to S3"

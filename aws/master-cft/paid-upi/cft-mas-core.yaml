@@ -175,9 +175,7 @@ Metadata:
         Parameters:
           - OfferingType
       - Label:
-          default: >-
-            New OpenShift cluster configuration details (complete this section
-            only if you want to create a new cluster)
+          default: New OpenShift cluster configuration details
         Parameters:
           - HostedZone
           - ClusterSize
@@ -222,7 +220,7 @@ Metadata:
         Parameters:
           - EmailNotification
       - Label:
-          default: 'Choose the OCP cluster type  & existing VPC Details '
+          default: Choose the OCP cluster type and existing VPC Details
         Parameters:
           - PrivateCluster
           - ExistingVPCId
@@ -722,3 +720,4 @@ Outputs:
     Value: !GetAtt
       - DeployWaitCondition
       - Data
+      

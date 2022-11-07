@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Template to create Bootnode used for deploying MAS(BYoL) on existing OpenShift
+Description: Template to create Bootnode used for deploying MAS on OpenShift
 Parameters:
   OfferingType:
     Description: Select your preferred Suite offering type.
@@ -9,14 +9,45 @@ Parameters:
     AllowedValues:
       - MAS Core + Cloud Pak for Data
       - MAS Core + Manage (no Cloud Pak for Data)
-  BootNodeVPCId:
+  HostedZone:
     Description: >-
-      Enter the VPC Id to create the bootnode into. Default VPC created by AWS
-      will be used if not specified. If existing OpenShift cluster is specified,
-      make sure it is reachable from this VPC
+      Select the public/private hosted zone that you created in the AWS Route 53
+      service, for example: mas4aws.myorg.com
+    Type: 'AWS::Route53::HostedZone::Id'
+  ExistingVPCId:
+    Description: >-
+      Enter the existing VPC ID to create the OpenShift cluster resources into
+      (required for UPI mode deployment).
     Type: 'AWS::EC2::VPC::Id'
-  BootNodeSubnetId:
-    Description: Enter the subnet ID from the bootnode VPC to be used for the bootnode.
+  ExistingPrivateSubnet1Id:
+    Description: >-
+      Enter the private subnet1 ID from the existing VPC (required for UPI mode
+      deployment).
+    Type: 'AWS::EC2::Subnet::Id'
+  ExistingPrivateSubnet2Id:
+    Description: >-
+      Enter the private subnet2 ID from the existing VPC (required for UPI mode
+      deployment).
+    Type: 'AWS::EC2::Subnet::Id'
+  ExistingPrivateSubnet3Id:
+    Description: >-
+      Enter the private subnet3 ID from the existing VPC (required for UPI mode
+      deployment).
+    Type: 'AWS::EC2::Subnet::Id'
+  ExistingPublicSubnet1Id:
+    Description: >-
+      Enter the public subnet1 ID from the existing VPC (required for UPI mode
+      deployment).
+    Type: 'AWS::EC2::Subnet::Id'
+  ExistingPublicSubnet2Id:
+    Description: >-
+      Enter the public subnet2 ID from the existing VPC (required for UPI mode
+      deployment).
+    Type: 'AWS::EC2::Subnet::Id'
+  ExistingPublicSubnet3Id:
+    Description: >-
+      Enter the public subnet3 ID from the existing VPC (required for UPI mode
+      deployment).)
     Type: 'AWS::EC2::Subnet::Id'
   BootnodeSGIngressCidrIp:
     Description: >-
@@ -28,29 +59,39 @@ Parameters:
     MaxLength: '18'
     AllowedPattern: '(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})/(\d{1,2})'
     ConstraintDescription: must be a valid IP CIDR range of the form w.x.y.z/a.
-  OpenShiftClusterApiUrl:
+  ClusterSize:
     Description: >-
-      Enter the cluster's URL in the format
-      https://api.<cluster_name>.<domain_name>. Do not specify the port number.
-      For example,https://api.masocp.joalae.mas4aws.com
+      Select your preferred cluster size. All master nodes (M) are m5.2xlarge
+      Amazon EC2 instances. All worker nodes (W) are m5.4xlarge instances.
+      Choose from: small (3M, 3W, total memory: 288GB), medium (3M, 5W, total
+      memory: 416GB), or large (5M, 7W, total memory: 608GB).
     Type: String
-  OpenShiftUser:
-    Description: Enter the username of the existing cluster account.
+    Default: small
+    MinLength: '1'
+    AllowedValues:
+      - small
+      - medium
+      - large
+  RedHatSubscription:
+    Description: >-
+      Do you have a valid and active Red Hat subscription for the OpenShift cluster deployment?
     Type: String
-  OpenShiftPassword:
-    Description: Enter the password of the existing cluster account.
-    Type: String
-    NoEcho: true
+    AllowedValues:
+      - Yes, I have a valid and active Red Hat subscription
+      - No, I don't have a valid and active Red Hat subscription
+    AllowedPattern: 'Yes.*'
+    ConstraintDescription: must have a valid and active Red Hat subscription.
   EntitledRegistryKey:
     Description: Enter the registry key that you downloaded from the IBM Container Library.
     Type: String
     NoEcho: true
     MinLength: '1'
-  MASLicenseUrl:
+  OpenShiftPullSecret:
     Description: >-
-      Enter the HTTP or S3 location of your Suite license key file, for example:
-      s3://masocp-license/entitlement.lic
+      Enter the JSON text from the pull secret file that you downloaded from the
+      Red Hat Hybrid Cloud Console.
     Type: String
+    NoEcho: true
     MinLength: '1'
   MASManageDBUser:
     Description: >-
@@ -128,6 +169,13 @@ Parameters:
     AllowedValues:
       - true
       - false
+  PrivateCluster:
+    Description: Select true to create a private OpenShift cluster
+    Default: false
+    Type: String
+    AllowedValues:
+      - true
+      - false
 Metadata:
   'AWS::CloudFormation::Interface':
     ParameterGroups:
@@ -136,25 +184,21 @@ Metadata:
         Parameters:
           - OfferingType
       - Label:
-          default: >-
-            Existing OpenShift cluster connection details (you must complete
-            this section)
+          default: New OpenShift cluster configuration details
         Parameters:
-          - OpenShiftClusterApiUrl
-          - OpenShiftUser
-          - OpenShiftPassword
+          - HostedZone
+          - ClusterSize
+          - RedHatSubscription
       - Label:
           default: Cluster and bootnode access (you must complete this section)
         Parameters:
           - SSHKey
           - BootnodeSGIngressCidrIp
-          - BootNodeVPCId
-          - BootNodeSubnetId
       - Label:
           default: Keys and licenses (you must complete this section)
         Parameters:
           - EntitledRegistryKey
-          - MASLicenseUrl
+          - OpenShiftPullSecret
       - Label:
           default: >-
             Maximo Manage database configuration (complete this section only if
@@ -185,10 +229,21 @@ Metadata:
           default: Email notification
         Parameters:
           - EmailNotification
+      - Label:
+          default: Choose the OCP cluster type and existing VPC Details
+        Parameters:
+          - PrivateCluster
+          - ExistingVPCId
+          - ExistingPrivateSubnet1Id
+          - ExistingPrivateSubnet2Id
+          - ExistingPrivateSubnet3Id
+          - ExistingPublicSubnet1Id
+          - ExistingPublicSubnet2Id
+          - ExistingPublicSubnet3Id
 Mappings:
   RegionMap:
     us-east-1:
-      HVM64: ami-0ef2a204a69167b2e
+      HVM64: ami-073adc95ec6baf82c
     us-east-2:
       HVM64: ami-xxxxxxxxxxxxxxxxx
     us-west-2:
@@ -218,18 +273,6 @@ Mappings:
     ap-southeast-2:
       HVM64: ami-xxxxxxxxxxxxxxxxx
     sa-east-1:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
-    af-south-1:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
-    ap-east-1:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
-    ap-southeast-3:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
-    eu-south-1:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
-    me-south-1:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
-    me-central-1:
       HVM64: ami-xxxxxxxxxxxxxxxxx
 Resources:
   DeployWaitConditionHandle:
@@ -377,7 +420,7 @@ Resources:
       Role: !GetAtt
         - LambdaRole
         - Arn
-      Runtime: python3.8
+      Runtime: python3.7
       Tags:
         - Key: Name
           Value: RandomizerLambda
@@ -416,7 +459,7 @@ Resources:
       Role: !GetAtt
         - LambdaRole
         - Arn
-      Runtime: python3.8
+      Runtime: python3.7
       Code:
         ZipFile: |
           import boto3
@@ -432,6 +475,14 @@ Resources:
               except Exception as e:
                   print("Exception Error : " + str(e))
                   cfnresponse.send(event, context, cfnresponse.FAILED, responseData, "CustomResourcePhysicalID")
+  CallLambdaGetHostedZoneName:
+    Type: 'Custom::CallLambdaGetHostedZoneName'
+    Properties:
+      ServiceToken: !GetAtt
+        - LambdaFunctionGetHostedZoneName
+        - Arn
+      ZoneId: !Ref HostedZone
+      Region: !Ref 'AWS::Region'
   DeploymentConfigBucket:
     Type: 'AWS::S3::Bucket'
     Properties:
@@ -448,50 +499,6 @@ Resources:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: AES256
-  LambdaFunctionGetSubnetForBootnode:
-    Type: 'AWS::Lambda::Function'
-    Properties:
-      Handler: index.lambda_handler
-      Role: !GetAtt
-        - LambdaRole
-        - Arn
-      Runtime: python3.8
-      Code:
-        ZipFile: |
-          import boto3
-          import string
-          import cfnresponse
-          def lambda_handler(event, context):
-              responseData = {}
-              try:
-                  ec2_client = boto3.client('ec2', region_name=event["ResourceProperties"]["Region"])
-                  response = ec2_client.describe_vpcs()
-                  for vpc_response in response['Vpcs']:
-                    vpc_id = vpc_response['VpcId']
-                    is_default = vpc_response['IsDefault']
-                    if is_default == True:
-                      default_vpc_id = vpc_id
-                      break
-                  response = ec2_client.describe_subnets()
-                  for subnet_response in response['Subnets']:
-                    subnet_id = subnet_response['SubnetId']
-                    subnet_vpc_id = subnet_response['VpcId']
-                    az_id = subnet_response['AvailabilityZoneId']
-                    if subnet_vpc_id == default_vpc_id:
-                      if "az1" in az_id:
-                        responseData['DefaultVPCId'] = subnet_vpc_id
-                        responseData['DefaultVPCAz1SubnetId'] = subnet_id
-                  cfnresponse.send(event, context, cfnresponse.SUCCESS, responseData, "CustomResourcePhysicalID")
-              except Exception as e:
-                  print("Exception Error : " + str(e))
-                  cfnresponse.send(event, context, cfnresponse.FAILED, responseData, "CustomResourcePhysicalID")
-  CallLambdaFunctionGetSubnetForBootnode:
-    Type: 'Custom::CallLambdaFunctionGetSubnetForBootnode'
-    Properties:
-      ServiceToken: !GetAtt
-        - LambdaFunctionGetSubnetForBootnode
-        - Arn
-      Region: !Ref 'AWS::Region'
   BootnodeSecurityGroup:
     Type: 'AWS::EC2::SecurityGroup'
     Properties:
@@ -508,7 +515,7 @@ Resources:
       SecurityGroupEgress:
         - IpProtocol: '-1'
           CidrIp: 0.0.0.0/0
-      VpcId: !Ref BootNodeVPCId
+      VpcId: !Ref ExistingVPCId
       Tags:
         - Key: Name
           Value: !Join
@@ -520,7 +527,7 @@ Resources:
   Bootnode:
     Type: 'AWS::EC2::Instance'
     Properties:
-      SubnetId: !Ref BootNodeSubnetId
+      SubnetId: !Ref ExistingPublicSubnet1Id
       ImageId: !FindInMap
         - RegionMap
         - !Ref 'AWS::Region'
@@ -542,7 +549,7 @@ Resources:
             - 'git clone https://github.com/ibm-mas/ansible-devops.git;'
             - cd ansible-devops;
             - rm -rf multicloud-bootstrap 1>/dev/null 2>&1;
-            - 'git clone -b byol-ocp-410 https://github.com/ibm-mas/multicloud-bootstrap.git;'
+            - 'git clone https://github.com/ibm-mas/multicloud-bootstrap.git;'
             - cd multicloud-bootstrap;
             - 'find . -type f -name "*.sh" -exec chmod +x {} \;;'
             - ./init.sh "aws" "
@@ -552,13 +559,16 @@ Resources:
             - '" "'
             - !Ref 'AWS::AccountId'
             - '" "'
+            - !Ref ClusterSize
             - '" "'
             - !GetAtt
               - CallLambdaRandomizer
               - Lower_RandomString
             - '" "'
-            - '" "'
-            - '" "'
+            - !GetAtt
+              - CallLambdaGetHostedZoneName
+              - ZoneName
+            - '" "" "'
             - !Ref SSHKey
             - '" "'
             - !Ref DeployWaitConditionHandle
@@ -566,9 +576,8 @@ Resources:
             - !Ref EntitledRegistryKey
             - '" '
             - ''''
-            - ''' '''
-            - !Ref MASLicenseUrl
-            - ''' '''
+            - !Ref OpenShiftPullSecret
+            - ''' '''' '''
             - !Ref SLSEndpointUrl
             - ''' '''
             - !Ref SLSRegistrationKey
@@ -590,15 +599,24 @@ Resources:
             - !Ref MASManageDBCertificateUrl
             - ''' '''
             - !Ref ImportDemoData
-            - ''' '''
-            - !Ref OpenShiftClusterApiUrl
-            - ''' '''
-            - !Ref OpenShiftUser
-            - ''' '''
-            - !Ref OpenShiftPassword
-            - ''' '''' '''
+            - ''' '''' '''' '''' '''' '''
             - !Ref EmailNotification
-            - ''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''
+            - ''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''
+            - !Ref ExistingVPCId
+            - ''' '''' '''
+            - !Ref ExistingPrivateSubnet1Id
+            - ''' '''
+            - !Ref ExistingPrivateSubnet2Id
+            - ''' '''
+            - !Ref ExistingPrivateSubnet3Id
+            - ''' '''
+            - !Ref ExistingPublicSubnet1Id
+            - ''' '''
+            - !Ref ExistingPublicSubnet2Id
+            - ''' '''
+            - !Ref ExistingPublicSubnet3Id
+            - ''' '''
+            - !Ref PrivateCluster
             - ''' "prod" '
             - '2>&1 | tee mas-provisioning.log; '
       Tags:
@@ -620,7 +638,37 @@ Outputs:
   MASCloudAutomationVersion:
     Description: Version of the MAS automated deployment on Cloud
     Value: '2.0'
-  MASInitialSetupUrlLogin:
+  ClusterUniqueString:
+    Description: Unique string that is part of cluster resoutce names
+    Value: !GetAtt
+      - CallLambdaRandomizer
+      - Lower_RandomString
+  OpenShiftConsoleUrl:
+    Description: Url to login to OpenShift console
+    Value: !Join
+      - ''
+      - - 'https://console-openshift-console.apps.masocp-'
+        - !GetAtt
+          - CallLambdaRandomizer
+          - Lower_RandomString
+        - .
+        - !GetAtt
+          - CallLambdaGetHostedZoneName
+          - ZoneName
+  OpenShiftApiUrl:
+    Description: Url to login to OpenShift Api
+    Value: !Join
+      - ''
+      - - 'https://api.masocp-'
+        - !GetAtt
+          - CallLambdaRandomizer
+          - Lower_RandomString
+        - .
+        - !GetAtt
+          - CallLambdaGetHostedZoneName
+          - ZoneName
+        - ':6443'
+  MASInitialSetupUrl:
     Description: >-
       Url to perform MAS initial setup, make sure you have imported the MAS
       public certificate into the browser
@@ -630,14 +678,16 @@ Outputs:
         - !GetAtt
           - CallLambdaRandomizer
           - Lower_RandomString
-        - .apps.
-        - !Select
-          - '1'
-          - !Split
-            - api.
-            - !Ref OpenShiftClusterApiUrl
+        - .apps.masocp-
+        - !GetAtt
+          - CallLambdaRandomizer
+          - Lower_RandomString
+        - .
+        - !GetAtt
+          - CallLambdaGetHostedZoneName
+          - ZoneName
         - /initialsetup
-  MASAdminUrlLogin:
+  MASAdminUrl:
     Description: >-
       Url to login to MAS Admin UI, make sure you have imported the MAS public
       certificate into the browser
@@ -647,13 +697,15 @@ Outputs:
         - !GetAtt
           - CallLambdaRandomizer
           - Lower_RandomString
-        - .apps.
-        - !Select
-          - '1'
-          - !Split
-            - api.
-            - !Ref OpenShiftClusterApiUrl
-  MASWorkspaceUrlLogin:
+        - .apps.masocp-
+        - !GetAtt
+          - CallLambdaRandomizer
+          - Lower_RandomString
+        - .
+        - !GetAtt
+          - CallLambdaGetHostedZoneName
+          - ZoneName
+  MASWorkspaceUrl:
     Description: >-
       Url to login to MAS Workspace, make sure you have imported the MAS public
       certificate into the browser
@@ -663,12 +715,14 @@ Outputs:
         - !GetAtt
           - CallLambdaRandomizer
           - Lower_RandomString
-        - .apps.
-        - !Select
-          - '1'
-          - !Split
-            - api.
-            - !Ref OpenShiftClusterApiUrl
+        - .apps.masocp-
+        - !GetAtt
+          - CallLambdaRandomizer
+          - Lower_RandomString
+        - .
+        - !GetAtt
+          - CallLambdaGetHostedZoneName
+          - ZoneName
   DeploymentStatus:
     Description: >-
       Status of the deployment. Value will be a JSON string in the format
@@ -676,3 +730,4 @@ Outputs:
     Value: !GetAtt
       - DeployWaitCondition
       - Data
+      
