@@ -224,12 +224,11 @@ fi
 
 ## Configure IBM catalogs, deploy common services and cert manager
 log "==== OCP cluster configuration (Cert Manager) started ===="
-  cd $GIT_REPO_HOME/../ibm/mas_devops/playbooks
-  export ROLE_NAME=ibm_catalogs && ansible-playbook ibm.mas_devops.run_role
-  export ROLE_NAME=common_services && ansible-playbook ibm.mas_devops.run_role
-  export ROLE_NAME=cert_manager && ansible-playbook ibm.mas_devops.run_role
-  log "==== OCP cluster configuration (Cert Manager) completed ===="
-fi
+cd $GIT_REPO_HOME/../ibm/mas_devops/playbooks
+export ROLE_NAME=ibm_catalogs && ansible-playbook ibm.mas_devops.run_role
+export ROLE_NAME=common_services && ansible-playbook ibm.mas_devops.run_role
+export ROLE_NAME=cert_manager && ansible-playbook ibm.mas_devops.run_role
+log "==== OCP cluster configuration (Cert Manager) completed ===="
 
 ## Deploy MongoDB
 log "==== MongoDB deployment started ===="
