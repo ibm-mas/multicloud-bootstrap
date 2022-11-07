@@ -176,7 +176,7 @@ ansible-playbook configure-gce-pd-ssd.yaml
 log "==== Storageclass gce-pd-ssd configuration completed ===="
 
 ## Configure storage
-if [[ $$STORAGE_TYPE == "odf" ]]; then
+if [[ $STORAGE_TYPE == "odf" ]]; then
   export CLUSTER_ID=$(oc get machineset -n openshift-machine-api -o jsonpath='{.items[0].metadata.labels.machine\.openshift\.io/cluster-api-cluster}')
   export REGION=$(oc get machineset -n openshift-machine-api -o jsonpath='{.items[0].spec.template.spec.providerSpec.value.region}')
   export GCP_PROJECT_ID=$(oc get machineset -n openshift-machine-api -o jsonpath='{.items[0].spec.template.spec.providerSpec.value.projectID}')
