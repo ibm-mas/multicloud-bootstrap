@@ -183,7 +183,7 @@
   # Create bastion subnet in the vnet
 
     resource "azurerm_subnet" "bastion_subnet" {
-  count                     = var.new-or-existing == "new" ? 1 : 0
+     count               = var.new-or-existing == "new" ? 1 : 0
     name                 = "AzureBastionSubnet"
     resource_group_name  = var.resource-group
     virtual_network_name = var.virtual-network-name
@@ -196,7 +196,7 @@
 
   #Create public IP
     resource "azurerm_public_ip" "bastion_ip" {
-  count                     = var.new-or-existing == "new" ? 1 : 0
+     count              = var.new-or-existing == "new" ? 1 : 0
     name                = "bastion-ip"
     location            = var.region
     resource_group_name = var.resource-group
