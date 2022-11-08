@@ -232,6 +232,20 @@ if [[ -n $SECRETS ]]; then
   done
 fi
 
+# Delete service accounts
+echo "Checking for service accounts"
+# Get service accounts list
+SAS=$(gcloud iam service-accounts list --format=json --filter="name~$UNIQUE_STR" | jq ".[].name" | tr -d '"')
+echo "SAS = $SAS"
+if [[ -n $SAS ]]; then
+  echo "Service accounts found for this MAS instance"
+  for inst in $SAS; do
+    echo "Service account name: $inst"
+    inst=$(echo $inst | cut -d '/' -f 4)
+    gcloud iam service-accounts delete $inst --quiet
+  done
+fi
+
 # Delete virtual network
 echo "Checking for virtual network"
 NWS=$(gcloud compute networks list --format=json | jq ".[] | select(.name | contains(\"$UNIQUE_STR\")).name" | tr -d '"')
