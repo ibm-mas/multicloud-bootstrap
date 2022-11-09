@@ -216,8 +216,8 @@
     resource_group_name = var.resource-group
     ip_configuration {
     name                 = "bastion-configuration"
-    subnet_id            = azurerm_subnet.bastion_subnet.id
-    public_ip_address_id = azurerm_public_ip.bastion_ip.id
+    subnet_id            = azurerm_subnet.bastion_subnet.id[count.index]
+    public_ip_address_id = azurerm_public_ip.bastion_ip.id[count.index]
   }
     depends_on = [
     azurerm_resource_group.cpdrg,
