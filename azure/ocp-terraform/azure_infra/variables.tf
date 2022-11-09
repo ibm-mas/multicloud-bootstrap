@@ -81,12 +81,7 @@ variable "worker-subnet-cidr" {
 variable "bastion_cidr" {
   default = "10.0.3.224/27"
 }
-  variable "bastion_ip.id" {
-  default = "20.85.70.120"
-}
-  variable "bastion_subnet.id" {
-  default = "/subscriptions/b2ca5467-2502-4b05-b78e-744604c6531d/resourceGroups/IPI-vnetnewname/providers/Microsoft.Network/virtualNetworks/ifxrgl-ocp-vnet/subnets/AzureBastionSubnet"
-}
+
 # Deploy OCP into single or multi-zone
 variable "single-or-multi-zone" {
   default = "single"

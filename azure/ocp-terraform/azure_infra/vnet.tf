@@ -75,7 +75,7 @@
   }
 
     resource "azurerm_network_security_group" "master" {
-  count               = var.new-or-existing == "new" ? 1 : 0
+    count               = var.new-or-existing == "new" ? 1 : 0
     name                = "master-nsg"
     location            = var.region
     resource_group_name = var.resource-group
@@ -196,7 +196,7 @@
 
   #Create public IP
     resource "azurerm_public_ip" "bastion_ip" {
-     count              = var.new-or-existing == "new" ? 1 : 0
+    count              = var.new-or-existing == "new" ? 1 : 0
     name                = "bastion-ip"
     location            = var.region
     resource_group_name = var.resource-group
@@ -210,11 +210,10 @@
 
   #Create bastion host
     resource "azurerm_bastion_host" "bastion_host" {
-  count                     = var.new-or-existing == "new" ? 1 : 0
+   count                     = var.new-or-existing == "new" ? 1 : 0
     name                = "azure-bastion-host"
     location            = var.region
     resource_group_name = var.resource-group
-    
     ip_configuration {
     name                 = "bastion-configuration"
     subnet_id            = azurerm_subnet.bastion_subnet.id
