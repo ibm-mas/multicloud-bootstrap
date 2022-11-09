@@ -75,7 +75,7 @@
   }
 
     resource "azurerm_network_security_group" "master" {
-    count               = var.new-or-existing == "new" ? 1 : 0
+   count               = var.new-or-existing == "new" ? 1 : 0
     name                = "master-nsg"
     location            = var.region
     resource_group_name = var.resource-group
@@ -216,9 +216,9 @@
     resource_group_name = var.resource-group
     ip_configuration {
     name                 = "bastion-configuration"
-    subnet_id            = azurerm_subnet.bastion[0].id
-    public_ip_address_id = azurerm_public_ip.bastion[0].id
-     }
+    subnet_id            = azurerm_subnet.bastion_subnet[0].id
+    public_ip_address_id = azurerm_public_ip.bastion_ip[0].id
+  }
     depends_on = [
     azurerm_resource_group.cpdrg,
     azurerm_virtual_network.cpdvirtualnetwork,
