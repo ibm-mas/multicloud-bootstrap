@@ -483,7 +483,6 @@ if [[ $PRE_VALIDATION == "pass" ]]; then
     export MESSAGE_TEXT="Please import the attached certificate into the browser to access MAS UI."
     export OPENSHIFT_CLUSTER_CONSOLE_URL="https:\/\/console-openshift-console.apps.${CLUSTER_NAME}.${BASE_DOMAIN}"
     export OPENSHIFT_CLUSTER_API_URL="https:\/\/api.${CLUSTER_NAME}.${BASE_DOMAIN}:6443"
-    export OPENSHIFT_CLUSTER_API_URL="https:\/\/api.${CLUSTER_NAME}.${BASE_DOMAIN}:6443"
     export MAS_URL_INIT_SETUP="https:\/\/admin.${RANDOM_STR}.apps.${CLUSTER_NAME}.${BASE_DOMAIN}\/initialsetup"
     export MAS_URL_ADMIN="https:\/\/admin.${RANDOM_STR}.apps.${CLUSTER_NAME}.${BASE_DOMAIN}"
     export MAS_URL_WORKSPACE="https:\/\/$MAS_WORKSPACE_ID.home.${RANDOM_STR}.apps.${CLUSTER_NAME}.${BASE_DOMAIN}"

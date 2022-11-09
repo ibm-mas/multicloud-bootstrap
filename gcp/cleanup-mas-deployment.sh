@@ -235,7 +235,7 @@ fi
 # Delete service accounts
 echo "Checking for service accounts"
 # Get service accounts list
-SAS=$(gcloud iam service-accounts list --format=json --filter="name~$UNIQUE_STR" | jq ".[].name" | tr -d '"')
+SAS=$(gcloud iam service-accounts list --format=json --filter="displayName~$UNIQUE_STR" | jq ".[].name" | tr -d '"')
 echo "SAS = $SAS"
 if [[ -n $SAS ]]; then
   echo "Service accounts found for this MAS instance"

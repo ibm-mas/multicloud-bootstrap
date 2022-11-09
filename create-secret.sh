@@ -20,19 +20,32 @@ rm -rf $SECRETFILE
 if [[ $SECRET_TYPE == "masocp" ]]; then
   get_mas_creds $RANDOM_STR
   cat <<EOT >> $SECRETFILE
+uniquestring=$RANDOM_STR
+ocpclusterurl=$OPENSHIFT_CLUSTER_CONSOLE_URL
+ocpapiurl=$OPENSHIFT_CLUSTER_API_URL
 ocpusername=$OCP_USERNAME
 ocppassword=$OCP_PASSWORD
+masinitialsetupurl=$MAS_URL_INIT_SETUP
+masadminurl=$MAS_URL_ADMIN
+masworkspaceurl=$MAS_URL_WORKSPACE
 masusername=$MAS_USER
 maspassword=$MAS_PASSWORD
 EOT
 elif [[ $SECRET_TYPE == "ocp" ]]; then
   cat <<EOT >> $SECRETFILE
+uniquestring=$RANDOM_STR
+ocpclusterurl=$OPENSHIFT_CLUSTER_CONSOLE_URL
+ocpapiurl=$OPENSHIFT_CLUSTER_API_URL
 ocpusername=$OCP_USERNAME
 ocppassword=$OCP_PASSWORD
 EOT
 elif [[ $SECRET_TYPE == "mas" ]]; then
   get_mas_creds $RANDOM_STR
   cat <<EOT >> $SECRETFILE
+uniquestring=$RANDOM_STR
+masinitialsetupurl=$MAS_URL_INIT_SETUP
+masadminurl=$MAS_URL_ADMIN
+masworkspaceurl=$MAS_URL_WORKSPACE
 masusername=$MAS_USER
 maspassword=$MAS_PASSWORD
 EOT
