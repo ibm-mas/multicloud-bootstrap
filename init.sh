@@ -290,6 +290,7 @@ export MAS_ICR_CP=wiotp-docker-local.artifactory.swg-devops.com
 export MAS_ICR_CPOPEN=wiotp-docker-local.artifactory.swg-devops.com
 export MAS_ENTITLEMENT_USERNAME=pakosal1@in.ibm.com
 export MAS_ENTITLEMENT_KEY=$DEV_ENTITLEMENT_KEY
+export CP4D_PRODUCT_VERSION=4.5.0
 echo 'CHECK 2'
 echo $SLS_ENTITLEMENT_KEY
 echo $MAS_ENTITLEMENT_KEY
