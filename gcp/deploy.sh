@@ -191,7 +191,7 @@ if [[ $STORAGE_TYPE == "odf" ]]; then
 elif [[ $STORAGE_TYPE == "nfs" ]]; then
   # Create filestore instance
   NFS_FILESTORE_NAME=${CLUSTER_NAME}-nfs
-  VPCNAME=$(cat /root/openshift-install/config/$CLUSTER_NAME/cluster.tfvars.json | | jq ".network" | cut -d '/' -f 10 | tr -d '\\"')
+  VPCNAME=$(cat /root/openshift-install/config/$CLUSTER_NAME/cluster.tfvars.json | jq ".network" | cut -d '/' -f 10 | tr -d '\\"')
   if [[ -z $VPCNAME ]]; then
     log " ERROR: Could not retrieve VPC name"
     exit 1
