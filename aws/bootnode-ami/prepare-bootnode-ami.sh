@@ -12,9 +12,6 @@ dnf update -y
 ## Install pre-reqs
 dnf install git httpd-tools java python38 unzip wget zip -y
 
-pip install awscli --upgrade --user
-pip install pyyaml
-pip install jaydebeapi
 
 # Install AWS cli
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
@@ -49,12 +46,20 @@ mv terraform /usr/local/bin/
 terraform version
 rm -rf terraform_${TERRAFORM_VER}_linux_amd64.zip
 
-## Install Ansible
-pip3 install ansible==4.9.0
-pip3 install openshift
-ansible-galaxy collection install community.kubernetes
+#Python3.8
 ln -s --force /usr/bin/python3.8 /usr/bin/python
 ln -s --force /usr/bin/pip3.8 /usr/bin/pip
+pip install --upgrade pip
+
+pip install awscli --upgrade --user
+pip install pyyaml
+pip install jaydebeapi
+
+## Install Ansible
+pip install ansible==4.9.0
+pip install openshift
+ansible-galaxy collection install community.kubernetes
+
 # Install CloudWatch agent
 cd /tmp
 wget https://s3.amazonaws.com/amazoncloudwatch-agent/redhat/amd64/latest/amazon-cloudwatch-agent.rpm
