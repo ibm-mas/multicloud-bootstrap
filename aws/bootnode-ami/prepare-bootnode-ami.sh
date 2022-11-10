@@ -11,8 +11,7 @@ dnf update -y
 
 ## Install pre-reqs
 dnf install git httpd-tools java python38 unzip wget zip -y
-ln -s --force /usr/bin/python3.8 /usr/bin/python
-ln -s --force /usr/bin/pip3.8 /usr/bin/pip
+
 pip install awscli --upgrade --user
 pip install pyyaml
 pip install jaydebeapi
@@ -54,7 +53,8 @@ rm -rf terraform_${TERRAFORM_VER}_linux_amd64.zip
 pip3 install ansible==4.9.0
 pip3 install openshift
 ansible-galaxy collection install community.kubernetes
-
+ln -s --force /usr/bin/python3.8 /usr/bin/python
+ln -s --force /usr/bin/pip3.8 /usr/bin/pip
 # Install CloudWatch agent
 cd /tmp
 wget https://s3.amazonaws.com/amazoncloudwatch-agent/redhat/amd64/latest/amazon-cloudwatch-agent.rpm
