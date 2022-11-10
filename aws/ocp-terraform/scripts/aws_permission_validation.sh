@@ -8,8 +8,10 @@ if [[ $# -ge 1 && "-h" == $1 ]] ; then
 fi
 
 DEPLOY_HOME="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd)"
-VENV="$HOME/.aws_python_venv"
 
+rm -rf $HOME/.aws_python_venv
+
+VENV="$HOME/.aws_python_venv"
 # create the virtual environment if needed.
 if [[ ! -d "$VENV" ]]; then
     echo "Create virtual python environment"
