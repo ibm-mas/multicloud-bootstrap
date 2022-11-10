@@ -153,6 +153,8 @@ fi
 set -e
 
 # Create a secret in the Cloud to keep OCP access credentials
+export OPENSHIFT_CLUSTER_CONSOLE_URL="https:\/\/console-openshift-console.apps.${CLUSTER_NAME}.${BASE_DOMAIN}"
+export OPENSHIFT_CLUSTER_API_URL="https:\/\/api.${CLUSTER_NAME}.${BASE_DOMAIN}:6443"
 cd $GIT_REPO_HOME
 ./create-secret.sh ocp
 
