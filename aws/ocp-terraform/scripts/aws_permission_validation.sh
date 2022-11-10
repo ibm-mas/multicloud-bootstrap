@@ -10,7 +10,9 @@ fi
 DEPLOY_HOME="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd)"
 
 rm -rf $HOME/.aws_python_venv
-
+echo "********************************************"
+python3 --version
+python --version
 VENV="$HOME/.aws_python_venv"
 # create the virtual environment if needed.
 if [[ ! -d "$VENV" ]]; then
