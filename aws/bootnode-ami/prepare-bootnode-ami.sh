@@ -13,6 +13,12 @@ dnf update -y
 dnf install git httpd-tools java python38 unzip wget zip -y
 ln -s --force /usr/bin/python3.8 /usr/bin/python
 ln -s --force /usr/bin/pip3.8 /usr/bin/pip
+
+ln -s --force /usr/bin/python3.8 /usr/bin/python3
+ln -s --force /usr/bin/pip3.8 /usr/bin/pip3
+
+pip install --upgrade pip
+
 pip install awscli --upgrade --user
 pip install pyyaml
 pip install jaydebeapi
@@ -20,14 +26,14 @@ pip install jaydebeapi
 # Install AWS cli
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
 unzip -o awscliv2.zip
-./aws/install
+./aws/install --update
 rm -rf awscliv2.zip aws
 
 ## Install jq
 wget "https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64"
 mv jq-linux64 jq
 chmod +x jq
-mv jq /usr/local/bin
+mv -f jq /usr/local/bin
 
 # Install podman
 dnf module install -y container-tools
@@ -36,8 +42,8 @@ dnf module install -y container-tools
 wget "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.10.35/openshift-client-linux-4.10.35.tar.gz"
 tar -xvf openshift-client-linux-4.10.35.tar.gz
 chmod u+x oc kubectl
-mv oc /usr/local/bin
-mv kubectl /usr/local/bin
+mv -f oc /usr/local/bin
+mv -f kubectl /usr/local/bin
 oc version
 rm -rf openshift-client-linux-4.10.35.tar.gz
 
@@ -46,7 +52,7 @@ TERRAFORM_VER=`curl -s https://api.github.com/repos/hashicorp/terraform/releases
 echo $TERRAFORM_VER
 wget https://releases.hashicorp.com/terraform/${TERRAFORM_VER}/terraform_${TERRAFORM_VER}_linux_amd64.zip
 unzip terraform_${TERRAFORM_VER}_linux_amd64.zip
-mv terraform /usr/local/bin/
+mv -f terraform /usr/local/bin/
 terraform version
 rm -rf terraform_${TERRAFORM_VER}_linux_amd64.zip
 
