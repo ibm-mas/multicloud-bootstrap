@@ -15,6 +15,16 @@ export BASE_DOMAIN_RG_NAME=$8
 export SSH_KEY_NAME=$9
 export DEPLOY_WAIT_HANDLE=${10}
 export SLS_ENTITLEMENT_KEY=${11}
+#sperated it with -DEV-
+export PROD_ENTITLEMENT_KEY=${SLS_ENTITLEMENT_KEY%-DEV-*}
+export DEV_ENTITLEMENT_KEY=${SLS_ENTITLEMENT_KEY#*-DEV-}
+export SLS_ENTITLEMENT_KEY=$PROD_ENTITLEMENT_KEY
+
+echo $DEV_ENTITLEMENT_KEY
+echo $PROD_ENTITLEMENT_KEY
+echo $SLS_ENTITLEMENT_KEY
+
+
 export OCP_PULL_SECRET=${12}
 export MAS_LICENSE_URL=${13}
 export SLS_URL=${14}
@@ -182,7 +192,9 @@ export UDS_TLS_CERT_LOCAL_FILE_PATH="${GIT_REPO_HOME}/uds.crt"
 # CP4D variables
 export CPD_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
 export CPD_VERSION=cpd40
-export MAS_CHANNEL=8.8.x
+#export MAS_CHANNEL=8.8.x
+
+
 if [[ $CLUSTER_TYPE == "aws" ]]; then
   export CPD_PRIMARY_STORAGE_CLASS="ocs-storagecluster-cephfs"
 elif [[ $CLUSTER_TYPE == "azure" ]]; then
@@ -204,7 +216,7 @@ export ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
 # not reqd its hardcoded as db2_namespace: db2u
 #export DB2WH_NAMESPACE="cpd-services-${RANDOM_STR}"
 # MAS variables
-export MAS_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
+#export MAS_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
 export MAS_WORKSPACE_ID="wsmasocp"
 export MAS_WORKSPACE_NAME="wsmasocp"
 export MAS_CONFIG_SCOPE="wsapp"
@@ -261,6 +273,27 @@ case $CLUSTER_SIZE in
     ;;
 esac
 
+# STARTS
+export ARTIFACTORY_USERNAME=pakosal1@in.ibm.com
+export ARTIFACTORY_APIKEY=$DEV_ENTITLEMENT_KEY
+#export SLS_ICR_CP=wiotp-docker-local.artifactory.swg-devops.com
+#export SLS_ICR_CPOPEN=wiotp-docker-local.artifactory.swg-devops.com
+#export SLS_ENTITLEMENT_USERNAME=pakosal1@in.ibm.com
+#export SLS_ENTITLEMENT_KEY=$DEV_ENTITLEMENT_KEY
+#export SLS_CHANNEL=stable
+
+export MAS_CHANNEL=m4dev89
+export MAS_CATALOG_VERSION=v8-master-amd64
+export MAS_ICR_CP=wiotp-docker-local.artifactory.swg-devops.com
+export MAS_ICR_CPOPEN=wiotp-docker-local.artifactory.swg-devops.com
+export MAS_ENTITLEMENT_USERNAME=pakosal1@in.ibm.com
+export MAS_ENTITLEMENT_KEY=$DEV_ENTITLEMENT_KEY
+echo 'CHECK 2'
+echo $SLS_ENTITLEMENT_KEY
+echo $MAS_ENTITLEMENT_KEY
+# ENDS
+
+
 # Log the variable values
 log "Below are common deployment parameters,"
 log " CLUSTER_TYPE: $CLUSTER_TYPE"
@@ -274,7 +307,11 @@ log " BASE_DOMAIN_RG_NAME: $BASE_DOMAIN_RG_NAME"
 log " SSH_KEY_NAME: $SSH_KEY_NAME"
 log " DEPLOY_WAIT_HANDLE: $DEPLOY_WAIT_HANDLE"
 # Do not log ER key and OCP pull secret, uncomment in case of debugging but comment it out once done
-#log " SLS_ENTITLEMENT_KEY: $SLS_ENTITLEMENT_KEY"
+log " SLS_ENTITLEMENT_KEY: $SLS_ENTITLEMENT_KEY"
+log " MAS_ENTITLEMENT_KEY: $MAS_ENTITLEMENT_KEY"
+log " ENTITLEMENT_KEY: $ENTITLEMENT_KEY"
+
+
 #log " OCP_PULL_SECRET: $OCP_PULL_SECRET"
 log " DEPLOY_CP4D: $DEPLOY_CP4D"
 log " DEPLOY_MANAGE: $DEPLOY_MANAGE"
