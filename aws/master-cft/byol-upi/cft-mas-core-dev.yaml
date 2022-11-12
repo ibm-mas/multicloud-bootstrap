@@ -276,7 +276,7 @@ Mappings:
         af-south-1:
             HVM64: ami-0e296bc6ff57c6224
         ap-east-1:
-            HVM64: ami-09db5ff6b57821167
+            HVM64: ami-0f946ca985a50c478
         ap-southeast-3:
             HVM64: ami-0ced3df877f5a3530
         eu-south-1:

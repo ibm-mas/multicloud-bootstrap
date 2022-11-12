@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Template to create Bootnode used for deploying MAS on OpenShift
+Description: Template to create Bootnode used for deploying MAS(BYoL) and OpenShift using IPI
 Parameters:
   OfferingType:
     Description: Select your preferred Suite offering type.
@@ -189,49 +189,17 @@ Metadata:
 Mappings:
   RegionMap:
     us-east-1:
-      HVM64: ami-0ef2a204a69167b2e
-    us-east-2:
-      HVM64: ami-062b6a674eb0c2e9c
-    us-west-2:
-      HVM64: ami-049f9274268d2ff88
-    ca-central-1:
-      HVM64: ami-0d4af3a718018c899
-    eu-north-1:
-      HVM64: ami-0b3a8c8ed376a9193
-    eu-west-1:
-      HVM64: ami-0fb132ff756953f9a
-    eu-west-2:
-      HVM64: ami-00c3f6ddb720e678c
-    eu-west-3:
-      HVM64: ami-027d2da40bb974cfb
-    eu-central-1:
-      HVM64: ami-03e573b07a13a8c31
-    ap-northeast-1:
-      HVM64: ami-09f275ddde52139a7
-    ap-northeast-2:
-      HVM64: ami-03a1fb3b705d0dd91
-    ap-northeast-3:
-      HVM64: ami-0b01445f04bda9219
+      HVM64: ami-07494308bf779622b
     ap-south-1:
-      HVM64: ami-0d6f41add7f1c62dd
-    ap-southeast-1:
-      HVM64: ami-0825fcd346fb3babe
-    ap-southeast-2:
-      HVM64: ami-09a4cfc5416a39c2c
-    sa-east-1:
-      HVM64: ami-037608508e4c078cd
-    af-south-1:
-      HVM64: ami-0e296bc6ff57c6224
-    ap-east-1:
-      HVM64: ami-09db5ff6b57821167
-    ap-southeast-3:
-      HVM64: ami-0ced3df877f5a3530
+      HVM64: ami-02190fd9502ff751c
+    ap-northeast-3:
+      HVM64: ami-0d96abb825f3fc970
+    ca-central-1:
+      HVM64: ami-0268cd112c39d8715
     eu-south-1:
-      HVM64: ami-0a5d12139b7860a6d
-    me-south-1:
-      HVM64: ami-0786491c0f1346ded
-    me-central-1:
-      HVM64: ami-0d970767e878b6caa
+      HVM64: ami-066b85f05b8522522
+    ap-northeast-2:
+      HVM64: ami-08bbc3968b08ebc42
 Resources:
   DeployWaitConditionHandle:
     Type: 'AWS::CloudFormation::WaitConditionHandle'
@@ -378,7 +346,7 @@ Resources:
       Role: !GetAtt
         - LambdaRole
         - Arn
-      Runtime: python3.7
+      Runtime: python3.8
       Tags:
         - Key: Name
           Value: RandomizerLambda
@@ -417,7 +385,7 @@ Resources:
       Role: !GetAtt
         - LambdaRole
         - Arn
-      Runtime: python3.7
+      Runtime: python3.8
       Code:
         ZipFile: |
           import boto3
@@ -464,7 +432,7 @@ Resources:
       Role: !GetAtt
         - LambdaRole
         - Arn
-      Runtime: python3.7
+      Runtime: python3.8
       Code:
         ZipFile: |
           import boto3

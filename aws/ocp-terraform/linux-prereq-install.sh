@@ -2,7 +2,7 @@
 
 ## Install wget, htpasswd, python3 and aws CLIs
 
-yum install wget httpd-tools python36 -y
+yum install wget httpd-tools python38 -y
 ln -s /usr/bin/python3 /usr/bin/python
 ln -s /usr/bin/pip3 /usr/bin/pip
 pip install awscli --upgrade --user
@@ -20,8 +20,8 @@ mv jq /usr/local/bin
 
 ## Download Openshift CLI and move to /usr/local/bin
 
-wget "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.8.46/openshift-client-linux-4.8.46.tar.gz"
-tar -xvf openshift-client-linux-4.8.46.tar.gz
+wget "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.10.35/openshift-client-linux-4.10.35.tar.gz"
+tar -xvf openshift-client-linux-4.10.35.tar.gz
 chmod u+x oc kubectl
 sudo mv oc /usr/local/bin
 sudo mv kubectl /usr/local/bin
