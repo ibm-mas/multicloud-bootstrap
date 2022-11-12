@@ -237,7 +237,7 @@ fi
 log " new_or_existing_vpc_subnet=$new_or_existing_vpc_subnet"
 log " enable_permission_quota_check=$enable_permission_quota_check"
 
-if [[ -z "$EXISTING_NETWORK" && $CLUSTER_TYPE == "azure" ]]; then
+if [[ -z "$EXISTING_NETWORK" || $CLUSTER_TYPE == "azure" ]]; then
   export INSTALLATION_MODE="IPI"
 else
   export INSTALLATION_MODE="UPI"
