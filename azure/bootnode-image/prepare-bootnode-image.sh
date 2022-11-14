@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -x
 
 # This script should be executed on the Red Hat 8 instance before creating AMI from it.
 # The created AMI will be used to create Bootnode instance for MAS provisioning.
@@ -54,8 +54,11 @@ echo "https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/4.10.35/o
 wget https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/4.10.35/openshift-client-linux-4.10.35.tar.gz
 echo "*********************************************2"
 tar -xvf openshift-client-linux-4.10.35.tar.gz
-mv openshift-install /usr/local/bin/
-rm -rf ./openshift-install-linux-4.10.35.tar.gz
+chmod u+x oc kubectl
+mv -f oc /usr/local/bin
+mv -f kubectl /usr/local/bin
+oc version
+rm -rf openshift-client-linux-4.10.35.tar.gz
 
 
 # Install Azure cli
