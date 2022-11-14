@@ -48,7 +48,11 @@ sudo yum install -y jq
 python3 -m pip install dotmap
 python3 -m pip install yq 
 #Install openshift-install 4.10.35
+
+echo "*********************************************1"
+echo "https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/4.10.35/openshift-client-linux-4.10.35.tar.gz"
 wget https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/4.10.35/openshift-client-linux-4.10.35.tar.gz
+echo "*********************************************2"
 tar -xvf openshift-client-linux-4.10.35.tar.gz
 mv openshift-install /usr/local/bin/
 rm -rf ./openshift-install-linux-4.10.35.tar.gz
