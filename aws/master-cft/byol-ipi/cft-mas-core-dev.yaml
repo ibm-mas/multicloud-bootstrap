@@ -192,10 +192,15 @@ Mappings:
       HVM64: ami-07494308bf779622b
     ap-south-1:
       HVM64: ami-02190fd9502ff751c
+    ap-northeast-2:
+      HVM64: ami-08bbc3968b08ebc42
     ap-northeast-3:
       HVM64: ami-0d96abb825f3fc970
     ca-central-1:
       HVM64: ami-0268cd112c39d8715
+    eu-south-1:
+      HVM64: ami-066b85f05b8522522
+    
 Resources:
   DeployWaitConditionHandle:
     Type: 'AWS::CloudFormation::WaitConditionHandle'
