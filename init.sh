@@ -15,14 +15,18 @@ export BASE_DOMAIN_RG_NAME=$8
 export SSH_KEY_NAME=$9
 export DEPLOY_WAIT_HANDLE=${10}
 export SLS_ENTITLEMENT_KEY=${11}
-#sperated it with -DEV-
+#sperated it with <<ER>>-DEV-<<EI>>-PASSWORD-<<EP>>
 export PROD_ENTITLEMENT_KEY=${SLS_ENTITLEMENT_KEY%-DEV-*}
 export DEV_ENTITLEMENT_KEY=${SLS_ENTITLEMENT_KEY#*-DEV-}
+export ENTERPRISE_ID=${DEV_ENTITLEMENT_KEY%-PASSWORD-*}
+export ENTERPRISE_PASSWORD=${DEV_ENTITLEMENT_KEY#*-PASSWORD-}
 export SLS_ENTITLEMENT_KEY=$PROD_ENTITLEMENT_KEY
 
-echo $DEV_ENTITLEMENT_KEY
-echo $PROD_ENTITLEMENT_KEY
-echo $SLS_ENTITLEMENT_KEY
+#echo $DEV_ENTITLEMENT_KEY
+#echo PROD_ENTITLEMENT_KEY
+#echo $SLS_ENTITLEMENT_KEY
+#echo $ENTERPRISE_ID
+#echo $ENTERPRISE_PASSWORD
 
 
 export OCP_PULL_SECRET=${12}
@@ -78,6 +82,8 @@ export -f get_uds_api_key
 export -f validate_prouduct_type
 
 export GIT_REPO_HOME=$(pwd)
+
+
 
 ## Configure CloudWatch agent
 if [[ $CLUSTER_TYPE == "aws" ]]; then
@@ -151,7 +157,7 @@ export AZ_MODE="multi_zone"
 export MAS_IMAGE_TEST_DOWNLOAD="cp.icr.io/cp/mas/admin-dashboard:5.1.27"
 export BACKUP_FILE_NAME="terraform-backup-${CLUSTER_NAME}.zip"
 if [[ $CLUSTER_TYPE == "aws" ]]; then
-  export DEPLOYMENT_CONTEXT_UPLOAD_PATH="s3://masocp-${RANDOM_STR}-bucket-${DEPLOY_REGION}/ocp-cluster-provisioning-deployment-context/"
+      export DEPLOYMENT_CONTEXT_UPLOAD_PATH="s3://masocp-${RANDOM_STR}-bucket-${DEPLOY_REGION}/ocp-cluster-provisioning-deployment-context/"
 elif [[ $CLUSTER_TYPE == "azure" ]]; then
   export DEPLOYMENT_CONTEXT_UPLOAD_PATH="ocp-cluster-provisioning-deployment-context/${BACKUP_FILE_NAME}"
   export STORAGE_ACNT_NAME="masocp${RANDOM_STR}stgaccount"
@@ -237,7 +243,7 @@ fi
 log " new_or_existing_vpc_subnet=$new_or_existing_vpc_subnet"
 log " enable_permission_quota_check=$enable_permission_quota_check"
 
-if [[ -z "$EXISTING_NETWORK" || $CLUSTER_TYPE == "azure" ]]; then
+if [[ -z "$EXISTING_NETWORK" && $CLUSTER_TYPE == "azure" ]]; then
   export INSTALLATION_MODE="IPI"
 else
   export INSTALLATION_MODE="UPI"
@@ -274,23 +280,24 @@ case $CLUSTER_SIZE in
 esac
 
 # STARTS
-export ARTIFACTORY_USERNAME=amitmangalvedkar@in.ibm.com
-export ARTIFACTORY_APIKEY=$DEV_ENTITLEMENT_KEY
+export ARTIFACTORY_USERNAME=$ENTERPRISE_ID
+export ARTIFACTORY_APIKEY=$ENTERPRISE_PASSWORD
 #export SLS_ICR_CP=wiotp-docker-local.artifactory.swg-devops.com
 #export SLS_ICR_CPOPEN=wiotp-docker-local.artifactory.swg-devops.com
-#export SLS_ENTITLEMENT_USERNAME=amitmangalvedkar@in.ibm.com
+#export SLS_ENTITLEMENT_USERNAME=pakosal1@in.ibm.com
 #export SLS_ENTITLEMENT_KEY=$DEV_ENTITLEMENT_KEY
 #export SLS_CHANNEL=stable
-
+#export CPD_VERSION=cpd40
+export CPD_PRODUCT_VERSION=4.5.0
 export MAS_CHANNEL=8.9.x
 export MAS_CATALOG_VERSION=v8-master-amd64
 export MAS_ICR_CP=wiotp-docker-local.artifactory.swg-devops.com
 export MAS_ICR_CPOPEN=wiotp-docker-local.artifactory.swg-devops.com
-export MAS_ENTITLEMENT_USERNAME=amitmangalvedkar@in.ibm.com
-export MAS_ENTITLEMENT_KEY=$DEV_ENTITLEMENT_KEY
+export MAS_ENTITLEMENT_USERNAME=$ENTERPRISE_ID
+export MAS_ENTITLEMENT_KEY=$ENTERPRISE_PASSWORD
 echo 'CHECK 2'
-echo $SLS_ENTITLEMENT_KEY
-echo $MAS_ENTITLEMENT_KEY
+#echo $SLS_ENTITLEMENT_KEY
+#echo $MAS_ENTITLEMENT_KEY
 # ENDS
 
 
@@ -307,9 +314,9 @@ log " BASE_DOMAIN_RG_NAME: $BASE_DOMAIN_RG_NAME"
 log " SSH_KEY_NAME: $SSH_KEY_NAME"
 log " DEPLOY_WAIT_HANDLE: $DEPLOY_WAIT_HANDLE"
 # Do not log ER key and OCP pull secret, uncomment in case of debugging but comment it out once done
-log " SLS_ENTITLEMENT_KEY: $SLS_ENTITLEMENT_KEY"
-log " MAS_ENTITLEMENT_KEY: $MAS_ENTITLEMENT_KEY"
-log " ENTITLEMENT_KEY: $ENTITLEMENT_KEY"
+#log " SLS_ENTITLEMENT_KEY: $SLS_ENTITLEMENT_KEY"
+#log " MAS_ENTITLEMENT_KEY: $MAS_ENTITLEMENT_KEY"
+#log " ENTITLEMENT_KEY: $ENTITLEMENT_KEY"
 
 
 #log " OCP_PULL_SECRET: $OCP_PULL_SECRET"
