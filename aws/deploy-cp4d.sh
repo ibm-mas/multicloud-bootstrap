@@ -173,6 +173,8 @@ export HOME=/root
 export CPD_METADATA_STORAGE_CLASS=gp2
 export CPD_SERVICE_STORAGE_CLASS=ocs-storagecluster-cephfs
 
+export CPD_PRODUCT_VERSION=4.6.0
+
 echo
 echoBlue "==== Installing Ansible Collection ===="
 export MAS_DEVOPS_COLLECTION_VERSION=10.0.0

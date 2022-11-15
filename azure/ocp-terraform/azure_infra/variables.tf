@@ -232,13 +232,13 @@ variable "rwo_cpd_storageclass" {
   }
 }
 ############################################
-# CPD 4.6 service variables
+# CPD 4.0 service variables
 ###########################################
 variable "cpd_platform" {
   type = map(string)
   default = {
     enable  = "yes"
-    version = "4.6.0"
+    version = "4.0.2"
     channel = "v2.0"
   }
 }
@@ -256,7 +256,7 @@ variable "analytics_engine" {
   type = map(string)
   default = {
     enable  = "no"
-    version = "4.6.0"
+    version = "4.0.2"
     channel = "stable-v1"
   }
 }
@@ -265,7 +265,7 @@ variable "watson_knowledge_catalog" {
   type = map(string)
   default = {
     enable  = "no"
-    version = "4.6.0"
+    version = "4.0.2"
     channel = "v1.0"
   }
 }
@@ -274,7 +274,7 @@ variable "watson_studio" {
   type = map(string)
   default = {
     enable  = "no"
-    version = "4.6.0"
+    version = "4.0.2"
     channel = "v2.0"
   }
 }
@@ -283,7 +283,7 @@ variable "watson_machine_learning" {
   type = map(string)
   default = {
     enable  = "no"
-    version = "4.6.0"
+    version = "4.0.2"
     channel = "v1.1"
   }
 }
@@ -292,7 +292,7 @@ variable "watson_ai_openscale" {
   type = map(string)
   default = {
     enable  = "no"
-    version = "4.6.0"
+    version = "4.0.2"
     channel = "v1"
   }
 }
@@ -301,7 +301,7 @@ variable "spss_modeler" {
   type = map(string)
   default = {
     enable  = "no"
-    version = "4.6.0"
+    version = "4.0.2"
     channel = "v1.0"
   }
 }
@@ -310,7 +310,7 @@ variable "cognos_dashboard_embedded" {
   type = map(string)
   default = {
     enable  = "no"
-    version = "4.6.0"
+    version = "4.0.2"
     channel = "v1.0"
   }
 }
@@ -319,7 +319,7 @@ variable "datastage" {
   type = map(string)
   default = {
     enable  = "no"
-    version = "4.6.0"
+    version = "4.0.2"
     channel = "v1.0"
   }
 }
@@ -328,7 +328,7 @@ variable "db2_warehouse" {
   type = map(string)
   default = {
     enable  = "no"
-    version = "4.6.0"
+    version = "4.0.2"
     channel = "v1.0"
   }
 }
@@ -337,7 +337,7 @@ variable "db2_oltp" {
   type = map(string)
   default = {
     enable  = "no"
-    version = "4.6.0"
+    version = "4.0.2"
     channel = "v1.0"
   }
 }
@@ -346,7 +346,7 @@ variable "cognos_analytics" {
   type = map(string)
   default = {
     enable  = "no"
-    version = "4.6.0"
+    version = "4.0.2"
     channel = "v4.0"
   }
 }
@@ -355,7 +355,7 @@ variable "data_management_console" {
   type = map(string)
   default = {
     enable  = "no"
-    version = "4.6.0"
+    version = "4.0.2"
     channel = "v1.0"
   }
 }
@@ -364,7 +364,7 @@ variable "master_data_management" {
   type = map(string)
   default = {
     enable  = "no"
-    version = "4.6.0"
+    version = "4.0.2"
     channel = "v1.1"
   }
 }
@@ -373,7 +373,7 @@ variable "db2_aaservice" {
   type = map(string)
   default = {
     enable  = "no"
-    version = "4.6.0"
+    version = "4.0.2"
     channel = "v1.0"
   }
 }
@@ -382,7 +382,7 @@ variable "decision_optimization" {
   type = map(string)
   default = {
     enable  = "no"
-    version = "4.6.0"
+    version = "4.0.2"
     channel = "v4.0"
   }
 }
