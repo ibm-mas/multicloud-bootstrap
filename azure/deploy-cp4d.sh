@@ -173,7 +173,7 @@ export ENTITLEMENT_KEY=${ER_KEY}
 export CPD_METADATA_STORAGE_CLASS=managed-premium
 export CPD_SERVICE_STORAGE_CLASS=azurefiles-premium
 
-export CPD_PRODUCT_VERSION=4.6.0
+export CPD_PRODUCT_VERSION=4.5.2
 
 echo
 echoBlue "==== Installing Ansible Collection ===="
