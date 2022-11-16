@@ -16,7 +16,6 @@ set -e
 #   BOOTSTRAP_AUTOMATION_TAG_OR_BRANCH: If you want to build the image with specific bootstrap automation code tag or branch, provide that value.
 #     Specific branch is normally used when testing the changes from your feature branch.
 #     Specific tag is normally used when the bootstrap code is locked for a specific release.
-#
 
 ANSIBLE_COLLECTION_VERSION=$1
 ANSIBLE_COLLECTION_BRANCH=$2

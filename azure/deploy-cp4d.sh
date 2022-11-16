@@ -143,7 +143,6 @@ if [[ $? -gt 0 ]]; then
 else
   echoGreen "\nOpenShift Login is successful."
 fi
-
 echoBlue "\n==== Execution started at $(date) ===="
 
 export MAS_INSTANCE_ID="${UNIQ_STR}"
