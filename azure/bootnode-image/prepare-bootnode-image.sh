@@ -34,8 +34,12 @@ dnf update -y
 
 ## Install pre-reqs
 dnf install git httpd-tools java python38 unzip wget zip -y
-ln -s --force /usr/bin/python3 /usr/bin/python
-ln -s --force /usr/bin/pip3 /usr/bin/pip
+ln -s --force /usr/bin/python3.8 /usr/bin/python
+ln -s --force /usr/bin/pip3.8 /usr/bin/pip
+
+ln -s --force /usr/bin/python3.8 /usr/bin/python3
+ln -s --force /usr/bin/pip3.8 /usr/bin/pip3
+pip install --upgrade pip
 pip3 install pyyaml
 pip3 install jaydebeapi
 pip3 install jmespath
@@ -46,8 +50,11 @@ python3 -m pip install yq
 #Install openshift-install 4.10.35
 wget https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/4.10.35/openshift-client-linux-4.10.35.tar.gz
 tar -xvf openshift-client-linux-4.10.35.tar.gz
-mv openshift-install /usr/local/bin/
-rm -rf ./openshift-install-linux-4.10.35.tar.gz
+chmod u+x oc kubectl
+mv -f oc /usr/local/bin
+mv -f kubectl /usr/local/bin
+oc version
+rm -rf openshift-client-linux-4.10.35.tar.gz
 
 
 # Install Azure cli
