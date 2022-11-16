@@ -159,6 +159,7 @@ export CPD_PRIMARY_STORAGE_CLASS="azurefiles-premium"
 export CPD_OPERATORS_NAMESPACE="ibm-cpd-operators-${UNIQ_STR}"
 export CPD_INSTANCE_NAMESPACE="ibm-cpd-${UNIQ_STR}"
 export CPD_SERVICES_NAMESPACE="cpd-services-${UNIQ_STR}"
+export CPD_PRODUCT_VERSION=4.5.0
 
 # DB2WH variables
 export DB2_META_STORAGE_CLASS=${CPD_PRIMARY_STORAGE_CLASS}
@@ -184,7 +185,6 @@ echo
 # Deploy CP4D
 echoBlue "====  CP4D deployment started    ===="
 echo
-export CPD_PRODUCT_VERSION=4.5.0
 export ROLE_NAME=cp4d && ansible-playbook ibm.mas_devops.run_role
 export ROLE_NAME=db2 && ansible-playbook ibm.mas_devops.run_role
 echo
