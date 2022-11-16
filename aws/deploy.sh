@@ -348,6 +348,7 @@ fi
 ## Deploy CP4D
 if [[ $DEPLOY_CP4D == "true" ]]; then
   log "==== CP4D deployment started ===="
+  export CPD_PRODUCT_VERSION=4.5.0  
   export ROLE_NAME=cp4d && ansible-playbook ibm.mas_devops.run_role
   export ROLE_NAME=db2 && ansible-playbook ibm.mas_devops.run_role
   log "==== CP4D deployment completed ===="
