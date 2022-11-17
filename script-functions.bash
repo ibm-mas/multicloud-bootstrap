@@ -10,6 +10,7 @@ op_versions['Db2uCluster']=11.4
 op_versions['kafkas.kafka.strimzi.io']=2.4.9
 op_versions['ocpVersion48']='^4\.([8])(\.[0-9]+.*)*$'
 op_versions['ocpVersion410']='^4\.([1][0])?(\.[0-9][0-9]+.*)*$'
+op_versions['ocpVersion411']='^4\.([1][1])?(\.[0-9][0-9]+.*)*$'
 op_versions['rosaVersion']='^4\.([1][0])?(\.[0-9]+.*)*$'
 op_versions['cpd-platform-operator']=2.0.7
 op_versions['user-data-services-operator']=2.0.6
@@ -58,16 +59,16 @@ checkROSA(){
 function getOCPVersion() {
 	currentOpenshiftVersion=$(oc get clusterversion | awk  'NR==2 {print $2 }')
 	log " OCP version is $currentOpenshiftVersion"
-	if [[ ${currentOpenshiftVersion} =~ ${op_versions[ocpVersion48]} ]]; then
+	if [[ ${currentOpenshiftVersion} =~ ${op_versions[ocpVersion410]} ]]; then
     	log " OCP Supported Version"
-	elif [[ ${currentOpenshiftVersion} =~ ${op_versions[ocpVersion410]} ]]; then
-		log " OCP Supported Version"
-		log " DEPLOY_CP4D: $DEPLOY_CP4D"
-		if [[ $DEPLOY_CP4D == "true" ]]; then
+	elif [[ ${currentOpenshiftVersion} =~ ${op_versions[ocpVersion411]} ]]; then
+		log " OCP Version Not Supported"
+		#log " DEPLOY_CP4D: $DEPLOY_CP4D"
+		#if [[ $DEPLOY_CP4D == "true" ]]; then
 			SCRIPT_STATUS=29
-			export SERVICE_NAME=" MAS+CP4D offering is not supported on OCP 4.10.x"
+			export SERVICE_NAME=" MAS+CP4D offering is not supported on OCP 4.11.x"
 			return $SCRIPT_STATUS
-		fi
+		#fi
 
   	else
     	log " Unsupported Openshift version $currentOpenshiftVersion. Supported OpenShift versions are 4.8.x and 4.10.x"
