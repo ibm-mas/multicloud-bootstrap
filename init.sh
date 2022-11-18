@@ -520,7 +520,21 @@ if [[ $PRE_VALIDATION == "pass" ]]; then
     RESP_CODE=0
   else
     mark_provisioning_failed $retcode
+     if [[ $retcode -eq 2 ]]; then
+          log "OCP Creation Successful ,Suite Deployment failed"
+          log "===== PROVISIONING COMPLETED ====="
+          export STATUS=FAILURE
+          export STATUS_MSG="OCP Creation Successful,Failed in the Ansible playbook execution"
+          export MESSAGE_TEXT="Please import the attached certificate into the browser to access MAS UI."
+          export OPENSHIFT_CLUSTER_CONSOLE_URL="https:\/\/console-openshift-console.apps.${CLUSTER_NAME}.${BASE_DOMAIN}"
+          export OPENSHIFT_CLUSTER_API_URL="https:\/\/api.${CLUSTER_NAME}.${BASE_DOMAIN}:6443"
+          export MAS_URL_INIT_SETUP="NA"
+          export MAS_URL_ADMIN="NA"
+          export MAS_URL_WORKSPACE="NA"
+          RESP_CODE=2
+        fi
   fi
+
 fi
 
 log " STATUS=$STATUS"
@@ -532,7 +546,7 @@ if [[ $CLUSTER_TYPE == "aws" ]]; then
   cd $GIT_REPO_HOME/$CLUSTER_TYPE
   # Complete the CFT stack creation successfully
   log "Sending completion signal to CloudFormation stack."
-  curl -k -X PUT -H 'Content-Type:' --data-binary "{\"Status\":\"SUCCESS\",\"Reason\":\"MAS deployment complete\",\"UniqueId\":\"ID-$CLUSTER_TYPE-$CLUSTER_SIZE-$CLUSTER_NAME\",\"Data\":\"${STATUS}#${STATUS_MSG}\"}" "$DEPLOY_WAIT_HANDLE"
+   curl -k -X PUT -H 'Content-Type:' --data-binary "{\"Status\":\"SUCCESS\",\"Reason\":\"MAS deployment complete\",\"UniqueId\":\"ID-$CLUSTER_TYPE-$CLUSTER_SIZE-$CLUSTER_NAME\",\"Data\":\"${STATUS}#${STATUS_MSG}#${OPENSHIFT_CLUSTER_CONSOLE_URL}#${OPENSHIFT_CLUSTER_API_URL}#${MAS_URL_INIT_SETUP}#${MAS_URL_ADMIN}#${MAS_URL_WORKSPACE}\"}" "$DEPLOY_WAIT_HANDLE"
 fi
 
 # Send email notification
