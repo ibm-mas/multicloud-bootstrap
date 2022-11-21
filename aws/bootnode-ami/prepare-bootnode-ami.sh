@@ -11,11 +11,11 @@ dnf update -y
 
 ## Install pre-reqs
 dnf install git httpd-tools java python38 unzip wget zip -y
-ln -s --force /usr/bin/python3.8 /usr/bin/python
-ln -s --force /usr/bin/pip3.8 /usr/bin/pip
+ln -s --force /usr/bin/python3 /usr/bin/python
+ln -s --force /usr/bin/pip3 /usr/bin/pip
 
-ln -s --force /usr/bin/python3.8 /usr/bin/python3
-ln -s --force /usr/bin/pip3.8 /usr/bin/pip3
+ln -s --force /usr/bin/python3 /usr/bin/python3
+ln -s --force /usr/bin/pip3 /usr/bin/pip3
 
 pip install --upgrade pip
 
