@@ -88,18 +88,6 @@ else
   log " MAS LICENSE URL file is not available."
 fi
 
-## Create deployment context bucket
-log "==== Deployment context bucket creation started ===="
-set +e
-gcloud storage buckets create gs://masocp-${RANDOM_STR}-bucket --location $REGION
-retcode=$?
-echo "retcode=$retcode"
-if [[ $retcode -ne 0 ]]; then
-  log "Failed to create deployment context bucket."
-  exit 23
-fi
-set -e
-log "==== Deployment context bucket creation completed  ===="
 
 ## Create OCP cluster
 log "==== OCP cluster creation started ===="
@@ -113,6 +101,19 @@ CLUSTER_TYPE=$CLUSTER_TYPE_ORIG
 gcloud auth activate-service-account --key-file=$GIT_REPO_HOME/service-account.json
 sleep 5
 log "Logged into using service account"
+
+## Create deployment context bucket
+log "==== Deployment context bucket creation started ===="
+set +e
+gcloud storage buckets create gs://masocp-${RANDOM_STR}-bucket --location $REGION
+retcode=$?
+echo "retcode=$retcode"
+if [[ $retcode -ne 0 ]]; then
+  log "Failed to create deployment context bucket."
+  exit 23
+fi
+set -e
+log "==== Deployment context bucket creation completed  ===="
 
 # Backup deployment context
 cd $GIT_REPO_HOME
