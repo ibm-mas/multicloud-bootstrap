@@ -88,6 +88,19 @@ else
   log " MAS LICENSE URL file is not available."
 fi
 
+## Create deployment context bucket
+log "==== Deployment context bucket creation started ===="
+set +e
+gcloud storage buckets create gs://masocp-${RANDOM_STR}-bucket --location $REGION
+retcode=$?
+echo "retcode=$retcode"
+if [[ $retcode -ne 0 ]]; then
+  log "Failed to create deployment context bucket."
+  exit 23
+fi
+set -e
+log "==== Deployment context bucket creation completed  ===="
+
 ## Create OCP cluster
 log "==== OCP cluster creation started ===="
 cd $GIT_REPO_HOME/../ibm/mas_devops/playbooks
