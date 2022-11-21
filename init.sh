@@ -242,6 +242,7 @@ log " enable_permission_quota_check=$enable_permission_quota_check"
 
 if [[ -z "$EXISTING_NETWORK" && $CLUSTER_TYPE == "azure" ]]; then
   export INSTALLATION_MODE="IPI"
+  export EXISTING_NETWORK=$RANDOM_STR-ocp
 else
   export INSTALLATION_MODE="UPI"
 fi
