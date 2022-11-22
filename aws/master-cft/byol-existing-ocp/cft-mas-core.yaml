@@ -620,59 +620,32 @@ Outputs:
   MASCloudAutomationVersion:
     Description: Version of the MAS automated deployment on Cloud
     Value: '2.0'
+  ClusterUniqueString:
+    Description: Unique string that is part of cluster resoutce names
+    Value: !GetAtt
+      - CallLambdaRandomizer
+      - Lower_RandomString
   MASInitialSetupUrlLogin:
     Description: >-
       Url to perform MAS initial setup, make sure you have imported the MAS
       public certificate into the browser
-    Value: !Join
-      - ''
-      - - 'https://admin.'
-        - !GetAtt
-          - CallLambdaRandomizer
-          - Lower_RandomString
-        - .apps.
-        - !Select
-          - '1'
-          - !Split
-            - api.
-            - !Ref OpenShiftClusterApiUrl
-        - /initialsetup
-  MASAdminUrlLogin:
+    Value: !Select [4, !Split ["#", !GetAtt DeployWaitCondition.Data]]
+  MASAdminUrl:
     Description: >-
       Url to login to MAS Admin UI, make sure you have imported the MAS public
       certificate into the browser
-    Value: !Join
-      - ''
-      - - 'https://admin.'
-        - !GetAtt
-          - CallLambdaRandomizer
-          - Lower_RandomString
-        - .apps.
-        - !Select
-          - '1'
-          - !Split
-            - api.
-            - !Ref OpenShiftClusterApiUrl
-  MASWorkspaceUrlLogin:
+    Value: !Select [5, !Split ["#", !GetAtt DeployWaitCondition.Data]]
+  MASWorkspaceUrl:
     Description: >-
       Url to login to MAS Workspace, make sure you have imported the MAS public
       certificate into the browser
-    Value: !Join
-      - ''
-      - - 'https://wsmasocp.home.'
-        - !GetAtt
-          - CallLambdaRandomizer
-          - Lower_RandomString
-        - .apps.
-        - !Select
-          - '1'
-          - !Split
-            - api.
-            - !Ref OpenShiftClusterApiUrl
+    Value: !Select [0, !Split ["\"",!Select [0, !Split ["}",!Select [6, !Split ["#", !GetAtt DeployWaitCondition.Data]]]]]]
   DeploymentStatus:
     Description: >-
-      Status of the deployment. Value will be a JSON string in the format
-      {"[signal-unique-id]":"SUCCESS/FAILURE#[message]"}.
-    Value: !GetAtt
-      - DeployWaitCondition
-      - Data
+      Status of the deployment.
+    Value:  !Select [1, !Split ["\"", !Select [1, !Split [":", !Select [0, !Split ["#", !GetAtt DeployWaitCondition.Data]]]]]]
+  DeploymentDescription:
+    Description: >-
+      Status description of the deployment.
+    Value: !Select [1, !Split ["#", !GetAtt DeployWaitCondition.Data]]
+

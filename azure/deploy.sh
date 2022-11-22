@@ -25,7 +25,6 @@ log " SP_NAME: $SP_NAME"
 log " SLS_STORAGE_CLASS: $SLS_STORAGE_CLASS"
 log " UDS_STORAGE_CLASS: $UDS_STORAGE_CLASS"
 log " SSH_PUB_KEY: $SSH_PUB_KEY"
-
 ## Download files from S3 bucket
 # Download MAS license
 log "==== Downloading MAS license ===="
@@ -207,7 +206,6 @@ fi
 # Deploy CP4D
 if [[ $DEPLOY_CP4D == "true" ]]; then
   log "==== CP4D deployment started ===="
-  export CPD_PRODUCT_VERSION=4.5.0  
   export ROLE_NAME=cp4d && ansible-playbook ibm.mas_devops.run_role
   export ROLE_NAME=db2 && ansible-playbook ibm.mas_devops.run_role
   log "==== CP4D deployment completed ===="

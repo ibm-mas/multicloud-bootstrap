@@ -648,98 +648,41 @@ Resources:
             Handle: !Ref DeployWaitConditionHandle
             Timeout: 36000
 Outputs:
-    MASCloudAutomationVersion:
-        Description: Version of the MAS automated deployment on Cloud
-        Value: '2.0'
-    ClusterUniqueString:
-        Description: Unique string that is part of cluster resoutce names
-        Value: !GetAtt
-            - CallLambdaRandomizer
-            - Lower_RandomString
-    OpenShiftConsoleUrl:
-        Description: Url to login to OpenShift console
-        Value: !Join
-            - ''
-            - - 'https://console-openshift-console.apps.masocp-'
-              - !GetAtt
-                  - CallLambdaRandomizer
-                  - Lower_RandomString
-              - .
-              - !GetAtt
-                  - CallLambdaGetHostedZoneName
-                  - ZoneName
-    OpenShiftApiUrl:
-        Description: Url to login to OpenShift Api
-        Value: !Join
-            - ''
-            - - 'https://api.masocp-'
-              - !GetAtt
-                  - CallLambdaRandomizer
-                  - Lower_RandomString
-              - .
-              - !GetAtt
-                  - CallLambdaGetHostedZoneName
-                  - ZoneName
-              - ':6443'
-    MASInitialSetupUrl:
-        Description: >-
-            Url to perform MAS initial setup, make sure you have imported the MAS
-            public certificate into the browser
-        Value: !Join
-            - ''
-            - - 'https://admin.'
-              - !GetAtt
-                  - CallLambdaRandomizer
-                  - Lower_RandomString
-              - .apps.masocp-
-              - !GetAtt
-                  - CallLambdaRandomizer
-                  - Lower_RandomString
-              - .
-              - !GetAtt
-                  - CallLambdaGetHostedZoneName
-                  - ZoneName
-              - /initialsetup
-    MASAdminUrl:
-        Description: >-
-            Url to login to MAS Admin UI, make sure you have imported the MAS public
-            certificate into the browser
-        Value: !Join
-            - ''
-            - - 'https://admin.'
-              - !GetAtt
-                  - CallLambdaRandomizer
-                  - Lower_RandomString
-              - .apps.masocp-
-              - !GetAtt
-                  - CallLambdaRandomizer
-                  - Lower_RandomString
-              - .
-              - !GetAtt
-                  - CallLambdaGetHostedZoneName
-                  - ZoneName
-    MASWorkspaceUrl:
-        Description: >-
-            Url to login to MAS Workspace, make sure you have imported the MAS public
-            certificate into the browser
-        Value: !Join
-            - ''
-            - - 'https://wsmasocp.home.'
-              - !GetAtt
-                  - CallLambdaRandomizer
-                  - Lower_RandomString
-              - .apps.masocp-
-              - !GetAtt
-                  - CallLambdaRandomizer
-                  - Lower_RandomString
-              - .
-              - !GetAtt
-                  - CallLambdaGetHostedZoneName
-                  - ZoneName
-    DeploymentStatus:
-        Description: >-
-            Status of the deployment. Value will be a JSON string in the format
-            {"[signal-unique-id]":"SUCCESS/FAILURE#[message]"}.
-        Value: !GetAtt
-            - DeployWaitCondition
-            - Data
+  MASCloudAutomationVersion:
+    Description: Version of the MAS automated deployment on Cloud
+    Value: '2.0'
+  ClusterUniqueString:
+    Description: Unique string that is part of cluster resoutce names
+    Value: !GetAtt
+      - CallLambdaRandomizer
+      - Lower_RandomString
+  OpenShiftConsoleUrl:
+    Description: Url to login to OpenShift console
+    Value: !Select [2, !Split ["#", !GetAtt DeployWaitCondition.Data]]
+  OpenShiftApiUrl:
+    Description: Url to login to OpenShift Api
+    Value: !Select [3, !Split ["#", !GetAtt DeployWaitCondition.Data]]
+  MASInitialSetupUrl:
+    Description: >-
+      Url to perform MAS initial setup, make sure you have imported the MAS
+      public certificate into the browser
+    Value: !Select [4, !Split ["#", !GetAtt DeployWaitCondition.Data]]
+  MASAdminUrl:
+    Description: >-
+      Url to login to MAS Admin UI, make sure you have imported the MAS public
+      certificate into the browser
+    Value: !Select [5, !Split ["#", !GetAtt DeployWaitCondition.Data]]
+  MASWorkspaceUrl:
+    Description: >-
+      Url to login to MAS Workspace, make sure you have imported the MAS public
+      certificate into the browser
+    Value: !Select [0, !Split ["\"",!Select [0, !Split ["}",!Select [6, !Split ["#", !GetAtt DeployWaitCondition.Data]]]]]]
+  DeploymentStatus:
+    Description: >-
+      Status of the deployment.
+    Value:  !Select [1, !Split ["\"", !Select [1, !Split [":", !Select [0, !Split ["#", !GetAtt DeployWaitCondition.Data]]]]]]
+  DeploymentDescription:
+    Description: >-
+      Status description of the deployment.
+    Value: !Select [1, !Split ["#", !GetAtt DeployWaitCondition.Data]]
+

@@ -196,9 +196,8 @@ export UDS_TLS_CERT_LOCAL_FILE_PATH="${GIT_REPO_HOME}/uds.crt"
 # CP4D variables
 export CPD_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
 export CPD_VERSION=cpd40
-#export MAS_CHANNEL=8.8.x
-
-
+export CPD_PRODUCT_VERSION=4.5.0
+export MAS_CHANNEL=8.9.x
 if [[ $CLUSTER_TYPE == "aws" ]]; then
   export CPD_PRIMARY_STORAGE_CLASS="ocs-storagecluster-cephfs"
 elif [[ $CLUSTER_TYPE == "azure" ]]; then
@@ -228,8 +227,8 @@ export MAS_APP_ID=manage
 export MAS_APPWS_JDBC_BINDING="workspace-application"
 export MAS_JDBC_CERT_LOCAL_FILE=$GIT_REPO_HOME/db.crt
 export MAS_CLOUD_AUTOMATION_VERSION=1.0
-export MAS_DEVOPS_COLLECTION_VERSION=11.0.0
-export MAS_APP_CHANNEL=8.4.x
+export MAS_DEVOPS_COLLECTION_VERSION=11.7.2
+export MAS_APP_CHANNEL=8.5.x
 if [ -z "$EXISTING_NETWORK" ]; then
   export new_or_existing_vpc_subnet="new"
   export enable_permission_quota_check=true
@@ -241,7 +240,7 @@ fi
 log " new_or_existing_vpc_subnet=$new_or_existing_vpc_subnet"
 log " enable_permission_quota_check=$enable_permission_quota_check"
 
-if [[ -z "$EXISTING_NETWORK" || $CLUSTER_TYPE == "azure" ]]; then
+if [[ -z "$EXISTING_NETWORK" && $CLUSTER_TYPE == "azure" ]]; then
   export INSTALLATION_MODE="IPI"
 else
   export INSTALLATION_MODE="UPI"
@@ -286,7 +285,6 @@ export ARTIFACTORY_APIKEY=$ENTERPRISE_PASSWORD
 #export SLS_ENTITLEMENT_KEY=$DEV_ENTITLEMENT_KEY
 #export SLS_CHANNEL=stable
 
-export MAS_CHANNEL=8.9.x
 export MAS_CATALOG_VERSION=v8-master-amd64
 export MAS_ICR_CP=wiotp-docker-local.artifactory.swg-devops.com
 export MAS_ICR_CPOPEN=wiotp-docker-local.artifactory.swg-devops.com
@@ -378,6 +376,7 @@ log " UDS_CONTACT_EMAIL: $UDS_CONTACT_EMAIL"
 log " UDS_CONTACT_FIRSTNAME: $UDS_CONTACT_FIRSTNAME"
 log " UDS_CONTACT_LASTNAME: $UDS_CONTACT_LASTNAME"
 log " CPD_PRIMARY_STORAGE_CLASS: $CPD_PRIMARY_STORAGE_CLASS"
+log " CPD_PRODUCT_VERSION: $CPD_PRODUCT_VERSION"
 log " MAS_APP_ID: $MAS_APP_ID"
 log " MAS_WORKSPACE_ID: $MAS_WORKSPACE_ID"
 log " MAS_JDBC_CERT_LOCAL_FILE: $MAS_JDBC_CERT_LOCAL_FILE"
@@ -521,7 +520,21 @@ if [[ $PRE_VALIDATION == "pass" ]]; then
     RESP_CODE=0
   else
     mark_provisioning_failed $retcode
+     if [[ $retcode -eq 2 ]]; then
+          log "OCP Creation Successful ,Suite Deployment failed"
+          log "===== PROVISIONING COMPLETED ====="
+          export STATUS=FAILURE
+          export STATUS_MSG="OCP Creation Successful,Failed in the Ansible playbook execution"
+          export MESSAGE_TEXT="Please import the attached certificate into the browser to access MAS UI."
+          export OPENSHIFT_CLUSTER_CONSOLE_URL="https:\/\/console-openshift-console.apps.${CLUSTER_NAME}.${BASE_DOMAIN}"
+          export OPENSHIFT_CLUSTER_API_URL="https:\/\/api.${CLUSTER_NAME}.${BASE_DOMAIN}:6443"
+          export MAS_URL_INIT_SETUP="NA"
+          export MAS_URL_ADMIN="NA"
+          export MAS_URL_WORKSPACE="NA"
+          RESP_CODE=2
+        fi
   fi
+
 fi
 
 log " STATUS=$STATUS"
@@ -533,7 +546,7 @@ if [[ $CLUSTER_TYPE == "aws" ]]; then
   cd $GIT_REPO_HOME/$CLUSTER_TYPE
   # Complete the CFT stack creation successfully
   log "Sending completion signal to CloudFormation stack."
-  curl -k -X PUT -H 'Content-Type:' --data-binary "{\"Status\":\"SUCCESS\",\"Reason\":\"MAS deployment complete\",\"UniqueId\":\"ID-$CLUSTER_TYPE-$CLUSTER_SIZE-$CLUSTER_NAME\",\"Data\":\"${STATUS}#${STATUS_MSG}\"}" "$DEPLOY_WAIT_HANDLE"
+   curl -k -X PUT -H 'Content-Type:' --data-binary "{\"Status\":\"SUCCESS\",\"Reason\":\"MAS deployment complete\",\"UniqueId\":\"ID-$CLUSTER_TYPE-$CLUSTER_SIZE-$CLUSTER_NAME\",\"Data\":\"${STATUS}#${STATUS_MSG}#${OPENSHIFT_CLUSTER_CONSOLE_URL}#${OPENSHIFT_CLUSTER_API_URL}#${MAS_URL_INIT_SETUP}#${MAS_URL_ADMIN}#${MAS_URL_WORKSPACE}\"}" "$DEPLOY_WAIT_HANDLE"
 fi
 
 # Send email notification
