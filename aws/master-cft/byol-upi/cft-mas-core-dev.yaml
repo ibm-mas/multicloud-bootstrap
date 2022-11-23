@@ -173,6 +173,15 @@ Parameters:
         AllowedValues:
             - true
             - false
+    OperationalMode:
+        Description: >-
+            Non-production installations can be used for internal development and testing activities only.
+        Type: String
+        Default: Production
+        MinLength: '1'
+        AllowedValues:
+            - Production
+            - Non-production
 Metadata:
     'AWS::CloudFormation::Interface':
         ParameterGroups:
@@ -239,6 +248,10 @@ Metadata:
                   - ExistingPublicSubnet1Id
                   - ExistingPublicSubnet2Id
                   - ExistingPublicSubnet3Id
+            - Label:
+                default: Operational Mode
+              Parameters:
+                - OperationalMode
 Mappings:
   RegionMap:
     us-east-1:
@@ -627,6 +640,8 @@ Resources:
                       - !Ref ExistingPublicSubnet3Id
                       - ''' '''
                       - !Ref PrivateCluster
+                      - ''' '''
+                      - !Ref OperationalMode
                       - ''' "dev" '
                       - '2>&1 | tee mas-provisioning.log; '
             Tags:
