@@ -32,7 +32,7 @@ usage() {
   echo "  Provide either 'stack-name' or 'unique-string' parameter."
   echo " "
   echo "  - If CloudFormation stack is present and it has the resource with 'Logical ID' named 'DeploymentRoleProfile',"
-  echo "    you can delete the MAS instance by stack name. (Check the 'Resources' tab on CloudFormation stack)"
+  echo "    you can delete the AWS stack by stack name. (Check the 'Resources' tab on CloudFormation stack)"
   echo "  - If you want to cleanup the resources based on the unique string, then provide the 'unique-string' parameter."
   echo "    In this case, the associated CloudFormation stack won't be deleted even if it exists. It should be deleted explicitly."
   echo " "
@@ -96,7 +96,7 @@ if [[ (-n $STACK_NAME) && (-n $UNIQUE_STR) ]]; then
 fi
 
 if [[ -n $STACK_NAME ]]; then
-  # Get MAS instance unique string
+  # Get AWS stack unique string
   UNIQ_STR=$(aws cloudformation describe-stack-resources --stack-name $STACK_NAME --region $REGION 2>/dev/null | jq ".StackResources[] | select(.LogicalResourceId == \"DeploymentRoleProfile\").PhysicalResourceId" | tr -d '"' | cut -d '-' -f 5)
   if [[ -z $UNIQ_STR ]]; then
     echo "ERROR: Could not retrieve the unique string from the stack. Make sure stack name and region parameters are correct."
@@ -109,7 +109,7 @@ elif [[ -n UNIQUE_STR ]]; then
 fi
 
 echo "==== Execution started at `date` ===="
-echo "MAS instance unique string: $UNIQ_STR"
+echo "AWS stack unique string: $UNIQ_STR"
 echo "---------------------------------------------"
 
 ## Delete EC2 instances
@@ -118,7 +118,7 @@ echo "Checking for EC2 instances"
 INSTANCES=$(aws ec2 describe-instances --filters Name=tag:Name,Values=masocp-${UNIQ_STR}* --region $REGION | jq ".Reservations[].Instances[] | select(.State.Name != \"terminated\").InstanceId" | tr -d '"')
 echo "INSTANCES = $INSTANCES"
 if [[ -n $INSTANCES ]]; then
-  echo "EC2 instances found for this MAS instance"
+  echo "EC2 instances found for this AWS stack"
   EC2_LIST=""
   for inst in $INSTANCES; do
     EC2_LIST="$EC2_LIST $inst"
@@ -133,7 +133,7 @@ if [[ -n $INSTANCES ]]; then
   aws ec2 wait instance-terminated --region $REGION --instance-ids $EC2_LIST
   echo "Deleted EC2 instances"
 else
-  echo "No EC2 instances found for this MAS instance"
+  echo "No EC2 instances found for this AWS stack"
 fi
 echo "---------------------------------------------"
 
@@ -142,13 +142,13 @@ echo "Checking for volumes"
 VOLS=$(aws ec2 describe-volumes --filters Name=tag:Name,Values=masocp-${UNIQ_STR}* --region $REGION | jq ".Volumes[].VolumeId" | tr -d '"')
 echo "VOLS=$VOLS"
 if [[ -n $VOLS ]]; then
-  echo "Found volumes for this MAS instance"
+  echo "Found volumes for this AWS stack"
   for inst in $VOLS; do
     aws ec2 delete-volume --volume-id $inst --region $REGION
     echo "Deleted volume $inst"
   done
 else
-  echo "No volumess found for this MAS instance"
+  echo "No volumess found for this AWS stack"
 fi
 
 ## Delete NAT gateways and release EIPs
@@ -157,14 +157,14 @@ echo "Checking for VPC"
 VPC_ID=$(aws ec2 describe-vpcs --filters Name=tag:Name,Values=masocp-${UNIQ_STR}-vpc --region $REGION | jq ".Vpcs[0].VpcId" | tr -d '"')
 echo "VPC_ID = $VPC_ID"
 if [[ $VPC_ID != "null" ]]; then
-  echo "Found VPC with Id $VPC_ID for this MAS instance, it will be deleted at the end"
+  echo "Found VPC with Id $VPC_ID for this AWS stack, it will be deleted at the end"
   echo "---------------------------------------------"
   echo "Checking for NAT gateways"
   # Get NAT gateways
   NAT_GATEWAYS=$(aws ec2 describe-nat-gateways --filter Name=vpc-id,Values=$VPC_ID --region $REGION | jq ".NatGateways[] | select(.State != \"deleted\").NatGatewayId" | tr -d '"')
   echo "NAT_GATEWAYS = $NAT_GATEWAYS"
   if [[ -n $NAT_GATEWAYS ]]; then
-    echo "Found NAT gateways for this MAS instance"
+    echo "Found NAT gateways for this AWS stack"
     # Get EIPs associated with NAT gateways
     NAT_GATEWAY_EIPS=$(aws ec2 describe-nat-gateways --filter Name=vpc-id,Values=$VPC_ID --region $REGION | jq ".NatGateways[].NatGatewayAddresses[0].PublicIp" | tr -d '"')
     echo "NAT_GATEWAY_EIPS = $NAT_GATEWAY_EIPS"
@@ -189,7 +189,7 @@ if [[ $VPC_ID != "null" ]]; then
     echo "---------------------------------------------"
     echo "Checking for EIPs"
     if [[ -n $NAT_GATEWAY_EIPS ]]; then
-      echo "Found EIPs for this MAS instance"
+      echo "Found EIPs for this AWS stack"
       # Release EIPs
       for inst in $NAT_GATEWAY_EIPS; do
         allocaid=$(aws ec2 describe-addresses --region $REGION --public-ips $inst | jq ".Addresses[].AllocationId" | tr -d '"')
@@ -201,10 +201,10 @@ if [[ $VPC_ID != "null" ]]; then
         echo "Released EIP $inst"
       done
     else
-      echo "No EIPs found for this MAS instance"
+      echo "No EIPs found for this AWS stack"
     fi
   else
-    echo "No NAT gateways found for this MAS instance"
+    echo "No NAT gateways found for this AWS stack"
   fi
   echo "---------------------------------------------"
 
@@ -215,13 +215,13 @@ if [[ $VPC_ID != "null" ]]; then
   echo "LOAD_BALANCERS = $LOAD_BALANCERS"
   if [[ -n $LOAD_BALANCERS ]]; then
     SLEEPTIME=60
-    echo "Found load balancers for this MAS instance"
+    echo "Found load balancers for this AWS stack"
     for inst in $LOAD_BALANCERS; do
       aws elb delete-load-balancer --region $REGION --load-balancer-name $inst
       echo "Deleted load balancer $inst"
     done
   else
-    echo "No load balancers found for this MAS instance"
+    echo "No load balancers found for this AWS stack"
   fi
   echo "---------------------------------------------"
 
@@ -231,13 +231,13 @@ if [[ $VPC_ID != "null" ]]; then
   echo "LOAD_BALANCERS_V2 = $LOAD_BALANCERS_V2"
   if [[ -n $LOAD_BALANCERS_V2 ]]; then
     SLEEPTIME=120
-    echo "Found v2 load balancers for this MAS instance"
+    echo "Found v2 load balancers for this AWS stack"
     for inst in $LOAD_BALANCERS_V2; do
       aws elbv2 delete-load-balancer --region $REGION --load-balancer-arn "$inst"
       echo "Deleted v2 load balancer $inst"
     done
   else
-    echo "No v2 load balancers found for this MAS instance"
+    echo "No v2 load balancers found for this AWS stack"
   fi
   echo "Waiting for $SLEEPTIME seconds for network interfaces to be released"
   sleep $SLEEPTIME
@@ -248,14 +248,14 @@ if [[ $VPC_ID != "null" ]]; then
   NW_IFS=$(aws ec2 describe-network-interfaces --region $REGION --filter Name=vpc-id,Values=$VPC_ID | jq ".NetworkInterfaces[] | select(.VpcId == \"$VPC_ID\").NetworkInterfaceId" | tr -d '"')
   echo "NW_IFS = $NW_IFS"
   if [[ -n $NW_IFS ]]; then
-    echo "Found network interfaces for this MAS instance"
+    echo "Found network interfaces for this AWS stack"
     for inst in $NW_IFS; do
       aws ec2 delete-network-interface --network-interface-id $inst --region $REGION
       echo "Deleted network interface $inst"
       sleep 5
     done
   else
-    echo "No network interfaces found for this MAS instance"
+    echo "No network interfaces found for this AWS stack"
   fi
   echo "---------------------------------------------"
 
@@ -264,7 +264,7 @@ if [[ $VPC_ID != "null" ]]; then
   IGWID=$(aws ec2 describe-internet-gateways --region $REGION --filter Name=attachment.vpc-id,Values=$VPC_ID | jq ".InternetGateways[].InternetGatewayId" | tr -d '"')
   echo "IGWID = $IGWID"
   if [[ -n $IGWID ]]; then
-    echo "Found internet gateway $IGWID for this MAS instance"
+    echo "Found internet gateway $IGWID for this AWS stack"
     # Detach internet gateway
     aws ec2 detach-internet-gateway --region $REGION --internet-gateway-id $IGWID --vpc-id $VPC_ID
     echo "Detached internet gateway $IGWID from VPC $VPC_ID"
@@ -272,7 +272,7 @@ if [[ $VPC_ID != "null" ]]; then
     aws ec2 delete-internet-gateway --region $REGION --internet-gateway-id $IGWID
     echo "Deleted internet gateway $IGWID"
   else
-    echo "No internet gateways found for this MAS instance"
+    echo "No internet gateways found for this AWS stack"
   fi
   echo "---------------------------------------------"
 
@@ -281,13 +281,13 @@ if [[ $VPC_ID != "null" ]]; then
   SUBNETS=$(aws ec2 describe-subnets --region $REGION --filter Name=vpc-id,Values=$VPC_ID | jq ".Subnets[].SubnetId" | tr -d '"')
   echo "SUBNETS = $SUBNETS"
   if [[ -n $SUBNETS ]]; then
-    echo "Found subnets for this MAS instance"
+    echo "Found subnets for this AWS stack"
     for inst in $SUBNETS; do
       aws ec2 delete-subnet --subnet-id $inst --region $REGION
       echo "Deleted subnet $inst"
     done
   else
-    echo "No subnets found for this MAS instance"
+    echo "No subnets found for this AWS stack"
   fi
   echo "---------------------------------------------"
 
@@ -296,7 +296,7 @@ if [[ $VPC_ID != "null" ]]; then
   RTS=$(aws ec2 describe-route-tables --filter Name=vpc-id,Values=$VPC_ID --region $REGION | jq ".RouteTables[].RouteTableId" | tr -d '"')
   echo "RTS = $RTS"
   if [[ -n $RTS ]]; then
-    echo "Found routing tables for this MAS instance"
+    echo "Found routing tables for this AWS stack"
     for inst in $RTS; do
       # Check if RT is 'Main' RT
       mainrt=$(aws ec2 describe-route-tables --filter Name=route-table-id,Values=$inst --region $REGION | jq ".RouteTables[].Associations[].Main")
@@ -308,7 +308,7 @@ if [[ $VPC_ID != "null" ]]; then
       fi
     done
   else
-    echo "No routing tables found for this MAS instance"
+    echo "No routing tables found for this AWS stack"
   fi
   echo "---------------------------------------------"
 
@@ -317,7 +317,7 @@ if [[ $VPC_ID != "null" ]]; then
   NACLS=$(aws ec2 describe-network-acls --filter Name=vpc-id,Values=$VPC_ID --region $REGION | jq ".NetworkAcls[].NetworkAclId" | tr -d '"')
   echo "NACLS = $NACLS"
   if [[ -n $NACLS ]]; then
-    echo "Found network ACLs for this MAS instance"
+    echo "Found network ACLs for this AWS stack"
     for inst in $NACLS; do
       # Check if network ACL is 'default' RT
       defacl=$(aws ec2 describe-network-acls --filter Name=vpc-id,Values=$VPC_ID --region $REGION | jq ".NetworkAcls[].IsDefault")
@@ -329,7 +329,7 @@ if [[ $VPC_ID != "null" ]]; then
       fi
     done
   else
-    echo "No network ACLs found for this MAS instance"
+    echo "No network ACLs found for this AWS stack"
   fi
   echo "---------------------------------------------"
 
@@ -338,7 +338,7 @@ if [[ $VPC_ID != "null" ]]; then
   SGS=$(aws ec2 describe-security-groups --region $REGION | jq ".SecurityGroups[] | select(.VpcId == \"$VPC_ID\").GroupId" | tr -d '"')
   echo "SGS = $SGS"
   if [[ -n $SGS ]]; then
-    echo "Found security groups for this MAS instance"
+    echo "Found security groups for this AWS stack"
     # Delete the inbound and outbound rules
     for inst in $SGS; do
       # Check if security group is 'default'
@@ -371,14 +371,14 @@ if [[ $VPC_ID != "null" ]]; then
       fi
     done
   else
-    echo "No security groups found for this MAS instance"
+    echo "No security groups found for this AWS stack"
   fi
   echo "---------------------------------------------"
 
   # Delete VPC
   aws ec2 delete-vpc --region $REGION --vpc-id $VPC_ID
 else
-  echo "No VPC found for this MAS instance"
+  echo "No VPC found for this AWS stack"
 fi
 echo "---------------------------------------------"
 
@@ -387,14 +387,14 @@ echo "Checking for S3 buckets"
 S3BUCKETS=$(aws s3api list-buckets --query 'Buckets[?contains(Name, `masocp-'"${UNIQ_STR}"'`) == `true`].[Name]' --output text)
 echo "S3BUCKETS = $S3BUCKETS"
 if [[ -n $S3BUCKETS ]]; then
-  echo "Found S3 buckets for this MAS instance"
+  echo "Found S3 buckets for this AWS stack"
   for inst in $S3BUCKETS; do
     inst=$(echo $inst | tr -d '\r\n')
     aws s3 rb s3://$inst --force --region $REGION
     echo "Deleted bucket $inst"
   done
 else
-  echo "No S3 buckets for this MAS instance"
+  echo "No S3 buckets for this AWS stack"
 fi
 echo "---------------------------------------------"
 
@@ -404,7 +404,7 @@ echo "Checking for IAM users"
 USERS=$(aws iam list-users | jq ".Users[] | select(.UserName | contains(\"$UNIQ_STR\")).UserName" | tr -d '"')
 echo "USERS = $USERS"
 if [[ -n $USERS ]]; then
-  echo "Found IAM users for this MAS instance"
+  echo "Found IAM users for this AWS stack"
   for inst in $USERS; do
     # Get and detach policies attached to user
     policies=$(aws iam list-attached-user-policies --user-name ${inst} | jq ".AttachedPolicies[].PolicyArn" | tr -d '"')
@@ -432,7 +432,7 @@ if [[ -n $USERS ]]; then
     echo "Deleted user ${inst}"
   done
 else
-  echo "No IAM users for this MAS instance"
+  echo "No IAM users for this AWS stack"
 fi
 echo "---------------------------------------------"
 
@@ -441,7 +441,7 @@ echo "Checking for IAM instance profiles"
 INSTPROFS=$(aws iam list-instance-profiles | jq ".InstanceProfiles[] | select(.InstanceProfileName | contains(\"$UNIQ_STR\")).InstanceProfileName" | tr -d '"')
 echo "INSTPROFS = $INSTPROFS"
 if [[ -n $INSTPROFS ]]; then
-  echo "Found IAM instance profiles for this MAS instance"
+  echo "Found IAM instance profiles for this AWS stack"
   for inst in $INSTPROFS; do
     # Get roles associated with instance profile
     ifroles=$(aws iam get-instance-profile --instance-profile-name $inst | jq ".InstanceProfile.Roles[].RoleName" | tr -d '"')
@@ -457,7 +457,7 @@ if [[ -n $INSTPROFS ]]; then
     echo "Deleted IAM instance profile ${inst}"
   done
 else
-  echo "No IAM instance profiles for this MAS instance"
+  echo "No IAM instance profiles for this AWS stack"
 fi
 echo "---------------------------------------------"
 
@@ -466,14 +466,14 @@ echo "Checking for IAM policies"
 POLICIES=$(aws iam list-policies | jq ".Policies[] | select(.PolicyName | contains(\"$UNIQ_STR\")).Arn" | tr -d '"')
 echo "POLICIES = $POLICIES"
 if [[ -n $POLICIES ]]; then
-  echo "Found IAM policies for this MAS instance"
+  echo "Found IAM policies for this AWS stack"
   for inst in $POLICIES; do
     # Delete policy
     aws iam delete-policy --policy-arn $inst
     echo "Deleted IAM policy ${inst}"
   done
 else
-  echo "No IAM policies for this MAS instance"
+  echo "No IAM policies for this AWS stack"
 fi
 echo "---------------------------------------------"
 
@@ -482,7 +482,7 @@ echo "Checking for IAM roles"
 ROLES=$(aws iam list-roles | jq ".Roles[] | select(.RoleName | contains(\"$UNIQ_STR\")).RoleName" | tr -d '"')
 echo "ROLES = $ROLES"
 if [[ -n $ROLES ]]; then
-  echo "Found IAM roles for this MAS instance"
+  echo "Found IAM roles for this AWS stack"
   for inst in $ROLES; do
     # Delete role policies
     rolepols=$(aws iam list-role-policies --role-name $inst | jq ".PolicyNames[]" | tr -d '"')
@@ -495,7 +495,7 @@ if [[ -n $ROLES ]]; then
     echo "Deleted IAM role ${inst}"
   done
 else
-  echo "No IAM roles for this MAS instance"
+  echo "No IAM roles for this AWS stack"
 fi
 echo "---------------------------------------------"
 
@@ -504,7 +504,7 @@ echo "Checking for private hosted zones"
 PHZID=$(aws route53 list-hosted-zones --region $REGION --output text --query 'HostedZones[*].[Name,Id]' --output text | grep $UNIQ_STR | cut -f2 | cut -f3 -d '/' | tr -d '\r\n')
 echo "PHZID = $PHZID"
 if [[ -n $PHZID ]]; then
-  echo "Found private hosted zone for this MAS instance"
+  echo "Found private hosted zone for this AWS stack"
   aws route53 list-resource-record-sets --hosted-zone-id $PHZID --region $REGION | jq -c '.ResourceRecordSets[]' |
   while read -r resourcerecordset; do
     read -r name type <<<$(echo $(jq -r '.Name,.Type' <<<"$resourcerecordset"))
@@ -515,7 +515,7 @@ if [[ -n $PHZID ]]; then
   aws route53 delete-hosted-zone --id "$PHZID" --region $REGION
 	echo "Deleted private hosted zone ${PHZID}"
 else
-  echo "No private hosted zone for this MAS instance"
+  echo "No private hosted zone for this AWS stack"
 fi
 echo "---------------------------------------------"
 
@@ -524,26 +524,26 @@ echo "Checking for CloudWatch Log groups"
 CWLG=$(aws logs describe-log-groups --region $REGION | jq ".logGroups[] | select(.logGroupName | contains(\"${STACK_NAME}-LambdaFunction\")).logGroupName" | tr -d '"')
 echo "CWLG = $CWLG"
 if [[ -n $CWLG ]]; then
-  echo "Found OCP installer created CloudWatch Log groups for this MAS instance"
+  echo "Found OCP installer created CloudWatch Log groups for this AWS stack"
   for inst in $CWLG; do
     # Delete log group
     aws logs delete-log-group --log-group-name $inst --region $REGION
     echo "Deleted OCP installer created CloudWatch Log group $inst"
   done
 else
-  echo "No OCP installer created CloudWatch Log groups for this MAS instance"
+  echo "No OCP installer created CloudWatch Log groups for this AWS stack"
 fi
 CWLG=$(aws logs describe-log-groups --region $REGION | jq ".logGroups[] | select(.logGroupName | contains(\"masocp-${UNIQ_STR}\")).logGroupName" | tr -d '"')
 echo "CWLG = $CWLG"
 if [[ -n $CWLG ]]; then
-  echo "Found automation created CloudWatch Log groups for this MAS instance"
+  echo "Found automation created CloudWatch Log groups for this AWS stack"
   for inst in $CWLG; do
     # Delete log group
     aws logs delete-log-group --log-group-name $inst --region $REGION
     echo "Deleted automation created CloudWatch Log group $inst"
   done
 else
-  echo "No automation created CloudWatch Log groups for this MAS instance"
+  echo "No automation created CloudWatch Log groups for this AWS stack"
 fi
 echo "---------------------------------------------"
 
@@ -557,7 +557,7 @@ for secret in maximo-ocp-secret-$UNIQ_STR maximo-mas-secret-$UNIQ_STR; do
     aws secretsmanager delete-secret --secret-id $secret --region $REGION
     echo "Deleted secret $secret"
   else
-    echo "No secret named $secret for this MAS instance"
+    echo "No secret named $secret for this AWS stack"
   fi
 done
 
@@ -574,7 +574,7 @@ if [[ -n $STACK_NAME ]]; then
     aws cloudformation wait stack-delete-complete --stack-name $STACKARN --region $REGION
     echo "Deleted stack $STACK_NAME"
   else
-    echo "No CloudFormation stack for this MAS instance"
+    echo "No CloudFormation stack for this AWS stack"
   fi
   echo "---------------------------------------------"
 else
