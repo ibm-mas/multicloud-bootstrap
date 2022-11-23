@@ -83,8 +83,7 @@ export -f get_uds_api_key
 export -f validate_prouduct_type
 
 export GIT_REPO_HOME=$(pwd)
-log " OPERATIONAL_MODE $OPERATIONAL_MODE"
-log " ENV_TYPE $ENV_TYPE"
+
 
 ## Configure CloudWatch agent
 if [[ $CLUSTER_TYPE == "aws" ]]; then
@@ -301,6 +300,7 @@ echo 'CHECK 2'
 
 # Log the variable values
 log "Below are common deployment parameters,"
+log " OPERATIONAL_MODE: $OPERATIONAL_MODE"
 log " CLUSTER_TYPE: $CLUSTER_TYPE"
 log " OFFERING_TYPE: $OFFERING_TYPE"
 log " DEPLOY_REGION: $DEPLOY_REGION"
