@@ -185,6 +185,27 @@
                             "validationMessage": "Contain letters, numbers and special characters only."
                         },
                         "visible": true
+                    },
+                    {
+                        "name": "operationalMode",
+                        "type": "Microsoft.Common.DropDown",
+                        "label": "Operational Mode",
+                        "defaultValue": "Production",
+                        "toolTip": "Non-production installations can be used for internal development and testing activities only.",
+                        "constraints": {
+                            "allowedValues": [
+                                {
+                                    "label": "Production",
+                                    "value": "Production"
+                                },
+                                {
+                                    "label": "Non-production",
+                                    "value": "Non-production"
+                                }
+                            ],
+                            "required": true
+                        },
+                        "visible": true
                     }
                 ]
             },
@@ -484,7 +505,7 @@
             "entitledRegistryKey": "[steps('ApplicationSettings').entitledRegistryKey]",
             "openShiftPullSecret": "[steps('ApplicationSettings').openShiftPullSecret]",
             "masLicenseUrl": "[steps('ApplicationSettings').masLicenseUrl]",
-
+            "operationalMode": "[steps('ApplicationSettings').operationalMode]",
             "openShiftClustervnetId": "[steps('ExistingNetworkInfrastructure').openShiftClustervnetId]",
 
             "slsEndpointUrl": "[steps('ExistingInfrastructure').slsEndpointUrl]",
