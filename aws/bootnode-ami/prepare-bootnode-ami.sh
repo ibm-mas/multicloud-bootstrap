@@ -47,13 +47,7 @@ mv -f kubectl /usr/local/bin
 oc version
 rm -rf openshift-client-linux-4.10.35.tar.gz
 
-## Download the server version Openshift CLI and move to /usr/local/bin
-wget "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.10.35/openshift-install-linux.tar.gz"
-tar -xvf openshift-install-linux.tar.gz
-chmod u+x openshift-install
-mv -f openshift-install /usr/local/bin
-openshift-install version
-rm -rf openshift-install-linux.tar.gz
+
 
 ## Install terraform
 TERRAFORM_VER=`curl -s https://api.github.com/repos/hashicorp/terraform/releases/latest |  grep tag_name | cut -d: -f2 | tr -d \"\,\v | awk '{$1=$1};1'`
