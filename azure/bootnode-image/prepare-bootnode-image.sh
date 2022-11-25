@@ -45,7 +45,7 @@ pip3 install jmespath
 pip3 install yq
 sudo yum install -y jq
 python3 -m pip install dotmap
-python3 -m pip install yq 
+python3 -m pip install yq
 #Install openshift-install 4.10.35
 wget https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/4.10.35/openshift-client-linux-4.10.35.tar.gz
 tar -xvf openshift-client-linux-4.10.35.tar.gz
@@ -55,6 +55,13 @@ mv -f kubectl /usr/local/bin
 oc version
 rm -rf openshift-client-linux-4.10.35.tar.gz
 
+## Download the  Openshift CLI and move to /usr/local/bin
+wget "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.10.35/openshift-install-linux.tar.gz"
+tar -xvf openshift-install-linux.tar.gz
+chmod u+x openshift-install
+mv -f openshift-install /usr/local/bin
+openshift-install version
+rm -rf openshift-install-linux.tar.gz
 
 # Install Azure cli
 rpm --import https://packages.microsoft.com/keys/microsoft.asc
@@ -80,14 +87,6 @@ mv jq /usr/local/bin
 
 # Install podman
 dnf module install -y container-tools
-
-## Download Openshift CLI and move to /usr/local/bin
-wget -q "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.10.35/openshift-client-linux-4.10.35.tar.gz"
-tar -xvf openshift-client-linux-4.10.35.tar.gz
-chmod u+x oc kubectl
-mv oc /usr/local/bin
-mv kubectl /usr/local/bin
-rm -rf openshift-client-linux-4.10.35.tar.gz
 
 ## Install terraform
 TERRAFORM_VER=`curl -s https://api.github.com/repos/hashicorp/terraform/releases/latest |  grep tag_name | cut -d: -f2 | tr -d \"\,\v | awk '{$1=$1};1'`

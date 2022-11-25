@@ -47,6 +47,8 @@ mv -f kubectl /usr/local/bin
 oc version
 rm -rf openshift-client-linux-4.10.35.tar.gz
 
+
+
 ## Install terraform
 TERRAFORM_VER=`curl -s https://api.github.com/repos/hashicorp/terraform/releases/latest |  grep tag_name | cut -d: -f2 | tr -d \"\,\v | awk '{$1=$1};1'`
 echo $TERRAFORM_VER
