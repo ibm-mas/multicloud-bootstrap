@@ -6,7 +6,7 @@ deploymentManagerRef:
   group: dev.marketplace.cloud.google.com
   kind: DeploymentManagerAutogenTemplate
   name: autogen
-zipFilePath: template.zip # {"$kpt-set":"zipPath"}
+zipFilePath: masocp-template-1.0.0.zip # {"$kpt-set":"zipPath"}
 ---
 apiVersion: dev.marketplace.cloud.google.com/v1alpha1
 kind: DeploymentManagerAutogenTemplate
@@ -15,10 +15,10 @@ metadata:
 spec:
   # See https://pkg.go.dev/github.com/GoogleCloudPlatform/marketplace-tools/mpdev/internal/apply?tab=doc#PackageInfo
   packageInfo:
-    version: '1.2.0'
+    version: '1.0.0'
     osInfo:
-      name: Debian
-      version: '9.12'
+      name: Red Hat Enterprise Linux CoreOS
+      version: '8.5'
     components:
     - name: IBM Maximo Application Suite
       version: '8.9.0'
@@ -294,25 +294,14 @@ spec:
         project: sp-edge-ocp-cluster-ipi # {"$ref":"#/definitions/io.k8s.cli.setters.projectId"}
       machineType:
         defaultMachineType:
-          gceMachineType: g1-small
+          gceMachineType: e2-medium
       networkInterfaces:
         minCount: 1
-        maxCount: 8
-      
-      postDeploy:
-        actionItems:
-        - heading: OpenShift Console URL
-          description: Visit <a href="https://console-openshift-console.apps.masocp-vktest1.{{ inputs().publicDomain}}">https://console-openshift-console.apps.masocp-vktest1.{{ inputs().publicDomain}}</a>
-        infoRows:
-        - label: OCP Console URL
-          value: Link1
-      
+        maxCount: 8      
       gceStartupScript:
         bashScriptContent: |
           #!/bin/bash
           # Initiate the provisioning process
-          
-          echo FIRSTLINE >> /var/log/startup-log1.txt
           getMetadata() {
             curl http://metadata.google.internal/computeMetadata/v1/instance/attributes/$1 -H "Metadata-Flavor: Google"
           }
