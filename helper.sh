@@ -136,13 +136,6 @@ mark_provisioning_failed() {
   export MAS_URL_INIT_SETUP=NA
   export MAS_URL_ADMIN=NA
   export MAS_URL_WORKSPACE=NA
-  export CLUSTER_NAME=NA
-  export BASE_DOMAIN=NA
-  export OCP_USERNAME=NA
-  export OCP_PASSWORD=NA
-  export MAS_USER=NA
-  export MAS_PASSWORD=NA
-  export SLS_URL=NA
 }
 
 # Split the CLUSTER_NAME and BASE_DOMAIN from provided Openshift API url
