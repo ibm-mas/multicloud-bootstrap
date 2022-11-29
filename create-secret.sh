@@ -16,25 +16,46 @@ log "Secret type to create is $SECRET_TYPE"
 cd /tmp
 SECRETFILE="masocp-secrets.json"
 rm -rf $SECRETFILE
+
+# Create script scoped variables
+OPENSHIFT_CLUSTER_CONSOLE_URL_NEW=$(echo $OPENSHIFT_CLUSTER_CONSOLE_URL | tr -d '/')
+OPENSHIFT_CLUSTER_API_URL_NEW=$(echo $OPENSHIFT_CLUSTER_API_URL | tr -d '/')
+MAS_URL_INIT_SETUP_NEW=$(echo $MAS_URL_INIT_SETUP | tr -d '/')
+MAS_URL_ADMIN_NEW=$(echo $MAS_URL_ADMIN | tr -d '/')
+MAS_URL_WORKSPACE_NEW=$(echo $MAS_URL_WORKSPACE | tr -d '/')
+
 # Create a secrets file
 if [[ $SECRET_TYPE == "masocp" ]]; then
   get_mas_creds $RANDOM_STR
   cat <<EOT >> $SECRETFILE
-  ocpusername=$OCP_USERNAME
-  ocppassword=$OCP_PASSWORD
-  masusername=$MAS_USER
-  maspassword=$MAS_PASSWORD
+uniquestring=$RANDOM_STR
+ocpclusterurl=$OPENSHIFT_CLUSTER_CONSOLE_URL_NEW
+ocpapiurl=$OPENSHIFT_CLUSTER_API_URL_NEW
+ocpusername=$OCP_USERNAME
+ocppassword=$OCP_PASSWORD
+masinitialsetupurl=$MAS_URL_INIT_SETUP_NEW
+masadminurl=$MAS_URL_ADMIN_NEW
+masworkspaceurl=$MAS_URL_WORKSPACE_NEW
+masusername=$MAS_USER
+maspassword=$MAS_PASSWORD
 EOT
 elif [[ $SECRET_TYPE == "ocp" ]]; then
   cat <<EOT >> $SECRETFILE
-  ocpusername=$OCP_USERNAME
-  ocppassword=$OCP_PASSWORD
+uniquestring=$RANDOM_STR
+ocpclusterurl=$OPENSHIFT_CLUSTER_CONSOLE_URL_NEW
+ocpapiurl=$OPENSHIFT_CLUSTER_API_URL_NEW
+ocpusername=$OCP_USERNAME
+ocppassword=$OCP_PASSWORD
 EOT
 elif [[ $SECRET_TYPE == "mas" ]]; then
   get_mas_creds $RANDOM_STR
   cat <<EOT >> $SECRETFILE
-  masusername=$MAS_USER
-  maspassword=$MAS_PASSWORD
+uniquestring=$RANDOM_STR
+masinitialsetupurl=$MAS_URL_INIT_SETUP_NEW
+masadminurl=$MAS_URL_ADMIN_NEW
+masworkspaceurl=$MAS_URL_WORKSPACE_NEW
+masusername=$MAS_USER
+maspassword=$MAS_PASSWORD
 EOT
 else
   log "Unsupported parameter passed"
@@ -63,6 +84,9 @@ elif [[ $CLUSTER_TYPE == "azure" ]]; then
   fi
   # az keyvault secret show --name maximo-$SECRET_TYPE-secret --vault-name $vaultname
   log "Secret created in Azure Key Vault"
+elif [[ $CLUSTER_TYPE == "gcp" ]]; then
+  gcloud secrets create "maximo-$SECRET_TYPE-secret-$RANDOM_STR" --data-file=$SECRETFILE
+  log "Secret created in GCP Secret Manager"
 fi
 # Delete the secrets file
 rm -rf $SECRETFILE
