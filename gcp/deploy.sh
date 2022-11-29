@@ -213,8 +213,11 @@ elif [[ $STORAGE_TYPE == "nfs" ]]; then
     exit 1
   fi
   log " VPCNAME=$VPCNAME"
-  gcloud filestore instances create $NFS_FILESTORE_NAME --file-share=name=masocp_gcp_nfs,capacity=3TB --tier=basic-ssd --network=name=$VPCNAME --region=$DEPLOY_REGION --zone=${DEPLOY_REGION}-a
-  export GCP_NFS_SERVER=$(gcloud filestore instances describe $NFS_FILESTORE_NAME --zone=${DEPLOY_REGION}-a --location=$DEPLOY_REGION --format=json | jq ".networks[0].ipAddresses[0]" | tr -d '"')
+  zonesuffix=$(gcloud compute regions describe $DEPLOY_REGION --format=json | jq ".zones[0]" | tr -d '"' | cut -d '/' -f 9 | cut -d '-' -f 3)
+  ZONENAME=${DEPLOY_REGION}-${zonesuffix}
+  log " ZONENAME=$ZONENAME"
+  gcloud filestore instances create $NFS_FILESTORE_NAME --file-share=name=masocp_gcp_nfs,capacity=3TB --tier=basic-ssd --network=name=$VPCNAME --region=$DEPLOY_REGION --zone=$ZONENAME
+  export GCP_NFS_SERVER=$(gcloud filestore instances describe $NFS_FILESTORE_NAME --zone=$ZONENAME --location=$DEPLOY_REGION --format=json | jq ".networks[0].ipAddresses[0]" | tr -d '"')
   log "NFS filestore $NFS_FILESTORE_NAME created in GCP with IP address $GCP_NFS_SERVER"
   if [[ -z $GCP_NFS_SERVER ]]; then
     log " ERROR: Could not retrieve filestore instance IP address"
