@@ -531,7 +531,7 @@ elif [[ $CLUSTER_TYPE == "azure" ]]; then
 elif [[ $CLUSTER_TYPE == "gcp" ]]; then
   # Upload the log files to cloud storage
   gsutil cp $GIT_REPO_HOME/mas-provisioning.log gs://masocp-${RANDOM_STR}-bucket/ocp-cluster-provisioning-deployment-context/
-  gsutil cp /root/openshift-install/config/${CLUSTER_NAME}/.openshift_install.log gs://${CLUSTER_NAME}-bucket/ocp-cluster-provisioning-deployment-context/
+  gsutil cp /root/openshift-install/config/${CLUSTER_NAME}/.openshift_install.log gs://${RANDOM_STR}-bucket/ocp-cluster-provisioning-deployment-context/
 fi
 log "Shutting down VM in a minute"
 shutdown -P "+1"
