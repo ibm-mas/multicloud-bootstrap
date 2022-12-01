@@ -276,7 +276,6 @@ Resources:
                   - 'iam:CreateUser'
                   - 'iam:AttachUserPolicy'
                   - 'iam:CreateAccessKey'
-                  - 's3:GetObject'
                   - 's3:PutObject'
                   - 's3:DeleteObject'
                   - 's3:DeleteBucket'
@@ -306,7 +305,10 @@ Resources:
                       - s3
                       - ''
                       - ''
-                      - '*/*'
+                      - !Join
+                        - /
+                        - - !Ref DeploymentConfigBucket
+                          - '*'
                   - !Join
                     - ':'
                     - - arn
@@ -332,6 +334,7 @@ Resources:
                   - 'ses:ListIdentities'
                   - 'route53:ListHostedZones'
                   - 'ses:GetIdentityVerificationAttributes'
+                  - 's3:GetObject'
                   - 'logs:CreateLogGroup'
                   - 'logs:CreateLogStream'
                   - 'logs:PutLogEvents'

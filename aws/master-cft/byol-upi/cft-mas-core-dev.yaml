@@ -294,7 +294,7 @@ Mappings:
       HVM64: ami-0872ea1a62d5925b8
     sa-east-1:
       HVM64: ami-02db20519b43317bb
-    
+
 Resources:
     DeployWaitConditionHandle:
         Type: 'AWS::CloudFormation::WaitConditionHandle'
@@ -327,7 +327,6 @@ Resources:
                                 - 'iam:CreateUser'
                                 - 'iam:AttachUserPolicy'
                                 - 'iam:CreateAccessKey'
-                                - 's3:GetObject'
                                 - 's3:PutObject'
                                 - 's3:DeleteObject'
                                 - 's3:DeleteBucket'
@@ -351,13 +350,16 @@ Resources:
                                       - !Ref 'AWS::AccountId'
                                       - policy/*
                                 - !Join
-                                    - ':'
-                                    - - arn
+                                      - ':'
+                                      - - arn
                                       - aws
                                       - s3
                                       - ''
                                       - ''
-                                      - '*/*'
+                                      - !Join
+                                      - /
+                                      - - !Ref DeploymentConfigBucket
+                                      - '*'
                                 - !Join
                                     - ':'
                                     - - arn
@@ -383,6 +385,7 @@ Resources:
                                 - 'ses:ListIdentities'
                                 - 'route53:ListHostedZones'
                                 - 'ses:GetIdentityVerificationAttributes'
+                                - 's3:GetObject'
                                 - 'logs:CreateLogGroup'
                                 - 'logs:CreateLogStream'
                                 - 'logs:PutLogEvents'
