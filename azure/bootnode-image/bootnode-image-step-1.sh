@@ -85,7 +85,8 @@ az sig image-version update --resource-group masocp-bootnode-image-rg-${UNIQSTR}
 echo " Replicating the images to supported regions in the background, it may take around 30 minutes to complete. Please check the replication status from Azure portal."
 
 # Delete the VM resource group
-az group delete -y --name masocp-bootnode-vm-rg-${UNIQSTR}
+az group delete -y --name masocp-bootnode-vm-rg-${UNIQSTR} --no-wait
+az group wait --name masocp-bootnode-vm-rg-${UNIQSTR} --deleted
 
 echo "========================================="
 echo "Bootnode image creation step-1 completed."
