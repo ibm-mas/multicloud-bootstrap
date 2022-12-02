@@ -67,7 +67,8 @@ export EXISTING_PUBLIC_SUBNET1_ID=${46}
 export EXISTING_PUBLIC_SUBNET2_ID=${47}
 export EXISTING_PUBLIC_SUBNET3_ID=${48}
 export PRIVATE_CLUSTER=${49}
-export ENV_TYPE=${50}
+export OPERATIONAL_MODE=${50}
+export ENV_TYPE=${51}
 export GIT_REPO_HOME=$(pwd)
 # Load helper functions
 . helper.sh
@@ -82,6 +83,7 @@ export -f get_uds_api_key
 export -f validate_prouduct_type
 
 export GIT_REPO_HOME=$(pwd)
+
 
 ## Configure CloudWatch agent
 if [[ $CLUSTER_TYPE == "aws" ]]; then
@@ -298,6 +300,7 @@ echo 'CHECK 2'
 
 # Log the variable values
 log "Below are common deployment parameters,"
+log " OPERATIONAL_MODE: $OPERATIONAL_MODE"
 log " CLUSTER_TYPE: $CLUSTER_TYPE"
 log " OFFERING_TYPE: $OFFERING_TYPE"
 log " DEPLOY_REGION: $DEPLOY_REGION"
@@ -422,6 +425,18 @@ else
 fi
 log "===== PRE-VALIDATION COMPLETED ($PRE_VALIDATION) ====="
 
+# Setting operationMode annotation if pre-validation checks are passed
+if [[ $PRE_VALIDATION == "pass" ]]; then
+  log "Before: OPERATIONAL_MODE=${OPERATIONAL_MODE}  MAS_ANNOTATIONS=${MAS_ANNOTATIONS} "
+  if [[ $OPERATIONAL_MODE == "Non-production"  ]]; then
+    if [[ -n "$MAS_ANNOTATIONS" ]]; then
+      export MAS_ANNOTATIONS="mas.ibm.com/operationalMode=nonproduction,${MAS_ANNOTATIONS}"
+    else
+      export MAS_ANNOTATIONS="mas.ibm.com/operationalMode=nonproduction"
+    fi
+  fi
+  log "After: MAS_ANNOTATIONS=${MAS_ANNOTATIONS} "
+fi
 # Perform the MAS deployment only if pre-validation checks are passed
 if [[ $PRE_VALIDATION == "pass" ]]; then
   ## If user provided input of Openshift API url along with creds, then use the provided details for deployment of other components like CP4D, MAS etc.

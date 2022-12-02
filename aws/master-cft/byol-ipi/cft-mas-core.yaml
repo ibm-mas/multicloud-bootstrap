@@ -1,5 +1,7 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Template to create Bootnode used for deploying MAS(BYoL) and OpenShift using IPI
+Description: >-
+  Template to create Bootnode used for deploying MAS(BYoL) and OpenShift using
+  IPI
 Parameters:
   OfferingType:
     Description: Select your preferred Suite offering type.
@@ -133,6 +135,16 @@ Parameters:
     AllowedValues:
       - true
       - false
+  OperationalMode:
+    Description: >-
+      Non-production installations can be used for internal development and
+      testing activities only.
+    Type: String
+    Default: Production
+    MinLength: '1'
+    AllowedValues:
+      - Production
+      - Non-production
 Metadata:
   'AWS::CloudFormation::Interface':
     ParameterGroups:
@@ -186,6 +198,10 @@ Metadata:
           default: Email notification
         Parameters:
           - EmailNotification
+      - Label:
+          default: Operational Mode
+        Parameters:
+          - OperationalMode
 Mappings:
   RegionMap:
     us-east-1:
@@ -264,7 +280,6 @@ Resources:
                   - 'iam:CreateUser'
                   - 'iam:AttachUserPolicy'
                   - 'iam:CreateAccessKey'
-                  - 's3:GetObject'
                   - 's3:PutObject'
                   - 's3:DeleteObject'
                   - 's3:DeleteBucket'
@@ -294,7 +309,10 @@ Resources:
                       - s3
                       - ''
                       - ''
-                      - '*/*'
+                      - !Join
+                        - /
+                        - - !Ref DeploymentConfigBucket
+                          - '*'
                   - !Join
                     - ':'
                     - - arn
@@ -320,6 +338,7 @@ Resources:
                   - 'ses:ListIdentities'
                   - 'route53:ListHostedZones'
                   - 'ses:GetIdentityVerificationAttributes'
+                  - 's3:GetObject'
                   - 'logs:CreateLogGroup'
                   - 'logs:CreateLogStream'
                   - 'logs:PutLogEvents'
@@ -555,7 +574,9 @@ Resources:
             - 'git clone https://github.com/ibm-mas/ansible-devops.git;'
             - cd ansible-devops;
             - rm -rf multicloud-bootstrap 1>/dev/null 2>&1;
-            - 'git clone -b byol-ocp-410.1 https://github.com/ibm-mas/multicloud-bootstrap.git;'
+            - >-
+              git clone -b byol-ocp-410.1
+              https://github.com/ibm-mas/multicloud-bootstrap.git;
             - cd multicloud-bootstrap;
             - 'find . -type f -name "*.sh" -exec chmod +x {} \;;'
             - ./init.sh "aws" "
@@ -610,6 +631,8 @@ Resources:
             - ''' '''' '''' '''' '''' '''
             - !Ref EmailNotification
             - ''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''
+            - ''' '''
+            - !Ref OperationalMode
             - ''' "prod" '
             - '2>&1 | tee mas-provisioning.log; '
       Tags:
@@ -638,30 +661,86 @@ Outputs:
       - Lower_RandomString
   OpenShiftConsoleUrl:
     Description: Url to login to OpenShift console
-    Value: !Select [2, !Split ["#", !GetAtt DeployWaitCondition.Data]]
+    Value: !Select
+      - 2
+      - !Split
+        - '#'
+        - !GetAtt
+          - DeployWaitCondition
+          - Data
   OpenShiftApiUrl:
     Description: Url to login to OpenShift Api
-    Value: !Select [3, !Split ["#", !GetAtt DeployWaitCondition.Data]]
+    Value: !Select
+      - 3
+      - !Split
+        - '#'
+        - !GetAtt
+          - DeployWaitCondition
+          - Data
   MASInitialSetupUrl:
     Description: >-
       Url to perform MAS initial setup, make sure you have imported the MAS
       public certificate into the browser
-    Value: !Select [4, !Split ["#", !GetAtt DeployWaitCondition.Data]]
+    Value: !Select
+      - 4
+      - !Split
+        - '#'
+        - !GetAtt
+          - DeployWaitCondition
+          - Data
   MASAdminUrl:
     Description: >-
       Url to login to MAS Admin UI, make sure you have imported the MAS public
       certificate into the browser
-    Value: !Select [5, !Split ["#", !GetAtt DeployWaitCondition.Data]]
+    Value: !Select
+      - 5
+      - !Split
+        - '#'
+        - !GetAtt
+          - DeployWaitCondition
+          - Data
   MASWorkspaceUrl:
     Description: >-
       Url to login to MAS Workspace, make sure you have imported the MAS public
       certificate into the browser
-    Value: !Select [0, !Split ["\"",!Select [0, !Split ["}",!Select [6, !Split ["#", !GetAtt DeployWaitCondition.Data]]]]]]
+    Value: !Select
+      - 0
+      - !Split
+        - '"'
+        - !Select
+          - 0
+          - !Split
+            - '}'
+            - !Select
+              - 6
+              - !Split
+                - '#'
+                - !GetAtt
+                  - DeployWaitCondition
+                  - Data
   DeploymentStatus:
-    Description: >-
-      Status of the deployment.
-    Value:  !Select [1, !Split ["\"", !Select [1, !Split [":", !Select [0, !Split ["#", !GetAtt DeployWaitCondition.Data]]]]]]
+    Description: Status of the deployment.
+    Value: !Select
+      - 1
+      - !Split
+        - '"'
+        - !Select
+          - 1
+          - !Split
+            - ':'
+            - !Select
+              - 0
+              - !Split
+                - '#'
+                - !GetAtt
+                  - DeployWaitCondition
+                  - Data
   DeploymentDescription:
-    Description: >-
-      Status description of the deployment.
-    Value: !Select [1, !Split ["#", !GetAtt DeployWaitCondition.Data]]
+    Description: Status description of the deployment.
+    Value: !Select
+      - 1
+      - !Split
+        - '#'
+        - !GetAtt
+          - DeployWaitCondition
+          - Data

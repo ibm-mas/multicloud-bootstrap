@@ -128,6 +128,15 @@ Parameters:
     AllowedValues:
       - true
       - false
+  OperationalMode:
+    Description: >-
+      Non-production installations can be used for internal development and testing activities only.
+    Type: String
+    Default: Production
+    MinLength: '1'
+    AllowedValues:
+      - Production
+      - Non-production
 Metadata:
   'AWS::CloudFormation::Interface':
     ParameterGroups:
@@ -185,6 +194,10 @@ Metadata:
           default: Email notification
         Parameters:
           - EmailNotification
+      - Label:
+          default: Operational Mode
+        Parameters:
+          - OperationalMode
 Mappings:
   RegionMap:
     us-east-1:
@@ -227,7 +240,7 @@ Mappings:
       HVM64: ami-0872ea1a62d5925b8
     sa-east-1:
       HVM64: ami-02db20519b43317bb
-    
+
 Resources:
   DeployWaitConditionHandle:
     Type: 'AWS::CloudFormation::WaitConditionHandle'
@@ -260,7 +273,6 @@ Resources:
                   - 'iam:CreateUser'
                   - 'iam:AttachUserPolicy'
                   - 'iam:CreateAccessKey'
-                  - 's3:GetObject'
                   - 's3:PutObject'
                   - 's3:DeleteObject'
                   - 's3:DeleteBucket'
@@ -290,7 +302,10 @@ Resources:
                       - s3
                       - ''
                       - ''
-                      - '*/*'
+                      - !Join
+                        - /
+                        - - !Ref DeploymentConfigBucket
+                          - '*'
                   - !Join
                     - ':'
                     - - arn
@@ -316,6 +331,7 @@ Resources:
                   - 'ses:ListIdentities'
                   - 'route53:ListHostedZones'
                   - 'ses:GetIdentityVerificationAttributes'
+                  - 's3:GetObject'
                   - 'logs:CreateLogGroup'
                   - 'logs:CreateLogStream'
                   - 'logs:PutLogEvents'
@@ -596,6 +612,8 @@ Resources:
             - ''' '''' '''
             - !Ref EmailNotification
             - ''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''
+            - ''' '''
+            - !Ref OperationalMode
             - ''' "dev" '
             - '2>&1 | tee mas-provisioning.log; '
       Tags:
