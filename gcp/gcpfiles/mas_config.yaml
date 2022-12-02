@@ -1,0 +1,35 @@
+imports:
+- path: solution.jinja
+
+resources:
+- name: solution
+  type: solution.jinja
+  properties:
+    zone: "Deployment Zone"
+    input_offeringType: 'Select your preferred Suite offering type:: MAS Core + Cloud Pak for Data or MAS Core + Manage (no Cloud Pak for Data)'
+    input_region: 'Deployment Region, for example: us-central1'
+    input_publicDomain: 'Provide the public Cloud domain that you created in the Cloud Domains, for example: masocpgcpdevedge.com'
+    input_clusterSize: 'Select your preferred cluster size. Choose from: small (3M, 3W, total memory: 288GB), medium (3M, 5W, total memory: 416GB), or large (5M, 7W, total memory: 608GB).'
+    input_entitledRegistryKey: 'Enter the registry key that you downloaded from the IBM Container Library.'
+    input_openShiftPullSecret: 'Enter the JSON text from the pull secret file that you downloaded from the Red Hat Hybrid Cloud Console.'
+    input_masLicenseUrl: 'Enter the URL (preferebly with XXX token) of your Suite license key file kept on the Cloud Storage Bucket, for example: https://storage.googleapis.com/masocp-deploy-bucket/masocpfile/entitlement.lic (Applicable only for BYOL product)'
+    input_masManageDBUser: 'Enter the username that the Maximo Manage application uses to connect to the database.db2inst1'
+    input_masManageDBPassword: 'Enter the password that the Maximo Manage application uses to connect to the database.'
+    input_masManageDBJdbcUrl: 'Enter the URL location of the database that the Maximo Manage application connects to, for example: jdbc:db2://1.2.3.4:50051/FTMDB:sslConnection=true'
+    input_masManageDBCertificateUrl: 'Enter the Blob SAS location of the databases public certificate, for example: https://storage.googleapis.com/masocp-deploy-bucket/masocpfile/db2.crt'
+    input_importDemoData: 'Indicate whether you want to import demo data into the database. This might be useful for development or test environments, for example : True'
+    input_sshPublicKey: 'Provide the public SSH key that you want to add to the bootnode, bastion host and cluster nodes.'
+    input_slsEndpointUrl: 'Enter the endpoint URL that you retrieved from the masocp-<unique-string> OpenShift route in the SLS namespace (ibm-sls-<unique-string>). URL should not have slash (/) at the end.'
+    input_slsRegistrationKey: 'Enter the status.registrationKey value that you retrieved from the LicenseService instance YAML in the SLS namespace (ibm-sls-<unique-string>).'
+    input_slsPublicCertificateUrl: 'Enter the URL (preferebly with SAS token) of the services public certificate that you retrieved from the ca.crt file in the <unique-string>-sls-cfg secret in the MAS core namespace (mas-<unique-string>-core).'
+    input_udsEndpointUrl: 'Enter the endpoint URL that you retrieved from the uds-endpoint OpenShift route in the ibm-common-services namespace. URL should not have slash (/) at the end.'
+    input_udsAPIKey: 'Enter the services API key that you retrieved from the uds-api-key secret in the ibm-common-services namespace.'
+    input_udsPublicCertificateUrl: 'Enter the URL (preferebly with SAS token) of the services public certificate that you retrieved from the ca-bundle.pem file in the <unique-string>-uds-cfg route in the MAS core namespace.'
+    input_googleCloudServiceAccount: 'Enter the HTTP URL of the service account key file'
+    input_googleProjectId: 'Enter Google Cloud accounts Project Id'
+    input_emailNotification: "Indicate whether you want to receive emails that contain the connection details and credentials for the Suite. These emails are sent using the provided SMTP server details. for example: True"
+    input_smtpHost: 'Hostname of IP address of the SMTP server.'
+    input_smtpPort: 'Port of the SMTP server.'
+    input_smtpUsername: 'Username to be used with SMTP server.'
+    input_smtpPassword: 'Password to be used with SMTP server.'
+    input_notificattionEmailAddress: 'Enter the notification Email address'
