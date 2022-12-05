@@ -10,7 +10,7 @@ dnf -y remove polkit
 dnf update -y
 
 ## Install pre-reqs
-dnf install git httpd-tools java python38 unzip wget zip -y
+dnf install git httpd-tools java pip unzip wget zip -y
 
 
 # Install AWS cli
@@ -45,27 +45,7 @@ unzip terraform_${TERRAFORM_VER}_linux_amd64.zip
 mv terraform /usr/local/bin/
 terraform version
 rm -rf terraform_${TERRAFORM_VER}_linux_amd64.zip
-echo "**************************1"
-#Python3.8
-ln -s --force /usr/bin/python3.8 /usr/bin/python
-echo "**************************2"
-python3 --version
-echo "**************************3"
-ln -s --force /usr/bin/python3.8 /usr/bin/python3
-echo "**************************4"
-python3 --version
-echo "**************************5"
-pip install --upgrade pip
-echo "**************************6"
 
-ln -s --force /usr/bin/pip3.8 /usr/bin/pip
-echo "**************************7"
-pip --version
-echo "**************************8"
-ln -s --force /usr/bin/pip3.8 /usr/bin/pip3
-echo "**************************9"
-pip3 --version
-echo "**************************10"
 pip install awscli --upgrade --user
 pip install pyyaml
 pip install jaydebeapi
