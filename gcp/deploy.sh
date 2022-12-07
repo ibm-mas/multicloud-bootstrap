@@ -103,15 +103,15 @@ sleep 5
 log "Logged into using service account"
 
 ## Create bastion host
-cd $GIT_REPO_HOME/gcp
-set +e
-./create-bastion-host.sh
-retcode=$?
-if [[ $retcode -ne 0 ]]; then
-  log "Bastion host creation failed in Terraform step"
-  exit 22
-fi
-set -e
+# cd $GIT_REPO_HOME/gcp
+# set +e
+# ./create-bastion-host.sh
+# retcode=$?
+# if [[ $retcode -ne 0 ]]; then
+#   log "Bastion host creation failed in Terraform step"
+#   exit 22
+# fi
+# set -e
 
 ## Create deployment context bucket
 log "==== Deployment context bucket creation started ===="

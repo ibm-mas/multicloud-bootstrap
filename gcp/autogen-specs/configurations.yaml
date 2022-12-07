@@ -338,7 +338,6 @@ spec:
             notificattionEmailAddress=`getMetadata notificattionEmailAddress`
             googleProjectId=`getMetadata googleProjectId`
             googleCloudServiceAccount=`getMetadata googleCloudServiceAccount`
-            randomStr=i$(cat /dev/urandom | tr -dc '[:alpha:]' |  tr [:upper:] [:lower:] | fold -w ${1:-5} | head -n 1)
             ssh-keyscan github.com >> ~/.ssh/known_hosts
             cd /root
             git clone https://github.com/ibm-mas/ansible-devops.git
