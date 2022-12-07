@@ -346,7 +346,7 @@ spec:
             git clone -b edge-gcp-support https://github.com/ibm-mas/multicloud-bootstrap.git
             cd multicloud-bootstrap
             find . -type f -name "*.sh" -exec chmod +x {} \;;
-            ./init-async.sh gcp "$offeringType" "$region" null "$clusterSize" "$randomStr" "$publicDomain" null "$sshPublicKey" null  "$entitledRegistryKey" "$openShiftPullSecret" "$masLicenseUrl" '' '' '' '' '' '' "$masManageDBUser" "$masManageDBPassword" "$masManageDBJdbcUrl" "$masManageDBCertificateUrl" "$importDemoData" '' '' '' '' "$emailNotification" "$notificattionEmailAddress" "$smtpHost" "$smtpPort" "$smtpUsername" "$smtpPassword" '' '' '' '' "$googleProjectId" "$googleCloudServiceAccount" '' '' '' '' '' '' '' '' '' '' '' 'dev' > mas-provisioning.log 2>&1;
+            ./init-async.sh gcp "$offeringType" "$region" null "$clusterSize" "{{ uniqstr }}" "$publicDomain" null "$sshPublicKey" null  "$entitledRegistryKey" "$openShiftPullSecret" "$masLicenseUrl" '' '' '' '' '' '' "$masManageDBUser" "$masManageDBPassword" "$masManageDBJdbcUrl" "$masManageDBCertificateUrl" "$importDemoData" '' '' '' '' "$emailNotification" "$notificattionEmailAddress" "$smtpHost" "$smtpPort" "$smtpUsername" "$smtpPassword" '' '' '' '' "$googleProjectId" "$googleCloudServiceAccount" '' '' '' '' '' '' '' '' '' '' '' 'dev' > mas-provisioning.log 2>&1;
           else
             echo "second execution"
           fi
