@@ -398,18 +398,7 @@ else
 fi
 log "===== PRE-VALIDATION COMPLETED ($PRE_VALIDATION) ====="
 
-# Setting operationMode annotation if pre-validation checks are passed
-if [[ $PRE_VALIDATION == "pass" ]]; then
-  log "Before: OPERATIONAL_MODE=${OPERATIONAL_MODE}  MAS_ANNOTATIONS=${MAS_ANNOTATIONS} "
-  if [[ $OPERATIONAL_MODE == "Non-production"  ]]; then
-    if [[ -n "$MAS_ANNOTATIONS" ]]; then
-      export MAS_ANNOTATIONS="mas.ibm.com/operationalMode=nonproduction,${MAS_ANNOTATIONS}"
-    else
-      export MAS_ANNOTATIONS="mas.ibm.com/operationalMode=nonproduction"
-    fi
-  fi
-  log "After: MAS_ANNOTATIONS=${MAS_ANNOTATIONS} "
-fi
+
 # Perform the MAS deployment only if pre-validation checks are passed
 if [[ $PRE_VALIDATION == "pass" ]]; then
   ## If user provided input of Openshift API url along with creds, then use the provided details for deployment of other components like CP4D, MAS etc.
