@@ -10,19 +10,19 @@ dnf -y remove polkit
 dnf update -y
 
 ## Install pre-reqs
-dnf install git httpd-tools java python38 unzip wget zip -y
-ln -s --force /usr/bin/python3.8 /usr/bin/python
-ln -s --force /usr/bin/pip3.8 /usr/bin/pip
+dnf install git httpd-tools java python39 unzip wget zip pip  container-tools -y
+ln -s --force /usr/bin/python3.9 /usr/bin/python
+ln -s --force /usr/bin/pip3.9 /usr/bin/pip
 
-ln -s --force /usr/bin/python3.8 /usr/bin/python3
-ln -s --force /usr/bin/pip3.8 /usr/bin/pip3
+ln -s --force /usr/bin/python3.9 /usr/bin/python3
+ln -s --force /usr/bin/pip3.9 /usr/bin/pip3
 
-pip install --upgrade pip
+pip install --upgrade pip --user
 
 pip install awscli --upgrade --user
 pip install pyyaml
 pip install jaydebeapi
-
+pip install oauthlib==3.2.0
 # Install AWS cli
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
 unzip -o awscliv2.zip
@@ -36,7 +36,7 @@ chmod +x jq
 mv -f jq /usr/local/bin
 
 # Install podman
-dnf module install -y container-tools
+#dnf module install -y container-tools
 
 ## Download Openshift CLI and move to /usr/local/bin
 wget "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.10.35/openshift-client-linux-4.10.35.tar.gz"
@@ -71,5 +71,4 @@ rm -rf amazon-cloudwatch-agent.rpm
 
 # Remove the SSH keys
 rm -rf /home/ec2-user/.ssh/authorized_keys /root/.ssh/authorized_keys
-
 echo "Bootnode preparation completed"
