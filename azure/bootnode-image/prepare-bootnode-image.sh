@@ -32,20 +32,8 @@ dnf -y remove polkit
 dnf update -y
 
 ## Install pre-reqs
-dnf install git httpd-tools java python38 unzip wget zip -y
-ln -s --force /usr/bin/python3.8 /usr/bin/python
-ln -s --force /usr/bin/pip3.8 /usr/bin/pip
+dnf install git httpd-tools java  unzip wget zip -y
 
-ln -s --force /usr/bin/python3.8 /usr/bin/python3
-ln -s --force /usr/bin/pip3.8 /usr/bin/pip3
-pip install --upgrade pip
-pip3 install pyyaml
-pip3 install jaydebeapi
-pip3 install jmespath
-pip3 install yq
-sudo yum install -y jq
-python3 -m pip install dotmap
-python3 -m pip install yq
 #Install openshift-install 4.10.35
 wget https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/4.10.35/openshift-client-linux-4.10.35.tar.gz
 tar -xvf openshift-client-linux-4.10.35.tar.gz
@@ -87,6 +75,34 @@ mv jq /usr/local/bin
 
 # Install podman
 dnf module install -y container-tools
+
+#Install the required Python development libraries
+dnf install gcc openssl-devel bzip2-devel libffi-devel make  -y
+
+
+wget "https://www.python.org/ftp/python/3.9.14/Python-3.9.14.tgz"
+tar xzf Python-3.9.14.tgz
+rm -rf Python-3.9.14.tgz
+cd Python-3.9.14
+./configure --enable-optimizations
+make altinstall
+python3.9 -V
+rm -rf /usr/local/lib/python3.9/unittest
+rm -rf /usr/local/lib/python3.9/test
+
+ln -s --force /usr/local/bin/python3.9 /usr/bin/python
+ln -s --force /usr/local/bin/pip3.9 /usr/bin/pip
+ln -s --force /usr/local/bin/python3.9 /usr/bin/python3
+ln -s --force /usr/local/bin/pip3.9 /usr/bin/pip3
+
+pip install --upgrade pip
+pip3 install pyyaml
+pip3 install jaydebeapi
+pip3 install jmespath
+pip3 install yq
+
+python3 -m pip install dotmap
+python3 -m pip install yq
 
 ## Install terraform
 TERRAFORM_VER=`curl -s https://api.github.com/repos/hashicorp/terraform/releases/latest |  grep tag_name | cut -d: -f2 | tr -d \"\,\v | awk '{$1=$1};1'`

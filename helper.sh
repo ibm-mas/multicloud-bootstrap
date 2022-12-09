@@ -217,4 +217,19 @@ validate_prouduct_type() {
   else
     log "MAS product code not found, skipping custom annotations for Suite CR"
   fi
+  log "CLUSTER_TYPE: $CLUSTER_TYPE"
+  log "OPERATIONAL_MODE: $OPERATIONAL_MODE"
+  log "hyperscaler in MAS_ANNOTATIONS: $MAS_ANNOTATIONS"
+  if [[ $CLUSTER_TYPE == "azure" ]]; then
+    export MAS_ANNOTATIONS="mas.ibm.com/hyperscalerProvider=azure,mas.ibm.com/hyperscalerChannel=azure"
+  fi  
+  log "hyperscaler in MAS_ANNOTATIONS: $MAS_ANNOTATIONS"  
+  if [[ $OPERATIONAL_MODE == "Non-production"  ]]; then
+    if [[ -n "$MAS_ANNOTATIONS" ]]; then
+      export MAS_ANNOTATIONS="mas.ibm.com/operationalMode=nonproduction,${MAS_ANNOTATIONS}"
+    else
+      export MAS_ANNOTATIONS="mas.ibm.com/operationalMode=nonproduction"
+    fi
+  fi
+  log "hyperscaler + operational mode MAS_ANNOTATIONS: $MAS_ANNOTATIONS"
 }
