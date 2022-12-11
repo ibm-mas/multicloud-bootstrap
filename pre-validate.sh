@@ -212,41 +212,8 @@ else
     cd $GIT_REPO_HOME
     if [[ ${MAS_LICENSE_URL,,} =~ ^https? ]]; then
         mas_license=$(wget --server-response "$MAS_LICENSE_URL" -O entitlement.lic 2>&1 | awk '/^  HTTP/{print $2}')
-
-        ######################################################################################
-        # Hack to handle trial version
-        line_number=$(grep -n SERVER entitlement.lic | cut -d : -f1)
-        echo "License on line number = $line_number"
-
-        if [[ $line_number = 1 ]]
-        then
-            real_mac=`awk 'NR==1{print $3}' entitlement.lic`
-        elif [[ $line_number = 2 ]]
-        then
-            real_mac=`awk 'NR==2{print $3}' entitlement.lic`
-        else
-            echo "Incorrect License file"
-            exit 1
-        fi
-
-        regex="^([0-9A-Fa-f]{12})$"
-
-        if [[ $real_mac =~ $regex ]]; then
-            echo "$real_mac is a real MAC Id"
-            spoof_mac=$real_mac
-        else
-            echo "$real_mac appears to be evaluation version"
-            # spoof_mac_cap=`xxd -u -l 6 -p /dev/urandom`
-            spoof_mac_cap=`od -N6 -x < /dev/urandom | head -n1 |  cut -b9- | sed 's/ //gi'`
-            spoof_mac="${spoof_mac_cap,,}"
-            echo "MAC Id is $spoof_mac now"
-
-            sed -i "s/${real_mac}/${spoof_mac}/g" entitlement.lic
-        fi
-        ######################################################################################
-        # Hack over
-        ######################################################################################
-
+        # Removed leading #
+        sed -i '/^#/d' entitlement.lic
 
         if [ $mas_license -ne 200 ]; then
             log "Invalid MAS License URL"
@@ -254,79 +221,14 @@ else
         fi
     elif [[ ${MAS_LICENSE_URL,,} =~ ^s3 ]]; then
         mas_license=$(aws s3 cp "$MAS_LICENSE_URL" entitlement.lic --region us-east-1 2>/dev/null)
-
-        ######################################################################################
-        # Hack to handle trial version
-        line_number=$(grep -n SERVER entitlement.lic | cut -d : -f1)
-        echo "License on line number = $line_number"
-
-        if [[ $line_number = 1 ]]
-        then
-            real_mac=`awk 'NR==1{print $3}' entitlement.lic`
-        elif [[ $line_number = 2 ]]
-        then
-            real_mac=`awk 'NR==2{print $3}' entitlement.lic`
-        else
-            echo "Incorrect License file"
-            exit 1
-        fi
-
-        regex="^([0-9A-Fa-f]{12})$"
-
-        if [[ $real_mac =~ $regex ]]; then
-            echo "$real_mac is a real MAC Id"
-            spoof_mac=$real_mac
-        else
-            echo "$real_mac appears to be evaluation version"
-            # spoof_mac_cap=`xxd -u -l 6 -p /dev/urandom`
-            spoof_mac_cap=`od -N6 -x < /dev/urandom | head -n1 |  cut -b9- | sed 's/ //gi'`
-            spoof_mac="${spoof_mac_cap,,}"
-            echo "MAC Id is $spoof_mac now"
-
-            sed -i "s/${real_mac}/${spoof_mac}/g" entitlement.lic
-        fi
-        ######################################################################################
-        # Hack over
-        ######################################################################################
+        # Removed leading #
+        sed -i '/^#/d' entitlement.lic
 
         ret=$?
         if [ $ret -ne 0 ]; then
         mas_license=$(aws s3 cp "$MAS_LICENSE_URL" entitlement.lic --region $DEPLOY_REGION 2>/dev/null)
-        ######################################################################################
-        # Hack to handle trial version
-        line_number=$(grep -n SERVER entitlement.lic | cut -d : -f1)
-        echo "License on line number = $line_number"
-
-        if [[ $line_number = 1 ]]
-        then
-            real_mac=`awk 'NR==1{print $3}' entitlement.lic`
-        elif [[ $line_number = 2 ]]
-        then
-            real_mac=`awk 'NR==2{print $3}' entitlement.lic`
-        else
-            echo "Incorrect License file"
-            exit 1
-        fi
-
-        regex="^([0-9A-Fa-f]{12})$"
-
-        if [[ $real_mac =~ $regex ]]; then
-            echo "$real_mac is a real MAC Id"
-            spoof_mac=$real_mac
-        else
-            echo "$real_mac appears to be evaluation version"
-            # spoof_mac_cap=`xxd -u -l 6 -p /dev/urandom`
-            spoof_mac_cap=`od -N6 -x < /dev/urandom | head -n1 |  cut -b9- | sed 's/ //gi'`
-            spoof_mac="${spoof_mac_cap,,}"
-            echo "MAC Id is $spoof_mac now"
-
-            sed -i "s/${real_mac}/${spoof_mac}/g" entitlement.lic
-        fi
-        ######################################################################################
-        # Hack over
-        ######################################################################################
-
-
+        # Removed leading #
+        sed -i '/^#/d' entitlement.lic
 
         ret=$?
         if [ $ret -ne 0 ]; then
