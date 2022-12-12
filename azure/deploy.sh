@@ -25,7 +25,6 @@ log " SP_NAME: $SP_NAME"
 log " SLS_STORAGE_CLASS: $SLS_STORAGE_CLASS"
 log " UDS_STORAGE_CLASS: $UDS_STORAGE_CLASS"
 log " SSH_PUB_KEY: $SSH_PUB_KEY"
-
 ## Download files from S3 bucket
 # Download MAS license
 log "==== Downloading MAS license ===="

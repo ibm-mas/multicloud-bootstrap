@@ -29,10 +29,11 @@
 #   BOOTSTRAP_AUTOMATION_TAG_OR_BRANCH: If you want to build the image with specific bootstrap automation code tag or branch, provide that value. 
 #     Specific branch is normally used when testing the changes from your feature branch.
 #     Specific tag is normally used when the bootstrap code is locked for a specific release.
-#     
+#   SSH_KEY - Pass your private key ssh-key for the region - Paste the private key
+#   PUBLIC_SSH_KEY - Pass your public key for the region - Path of the .pem file
 # Example commands:
 # 1. To create a VM image from Ansible collection '10.0.0' and bootstrap branch 'sp-new-1',
-#    ./bootnode-image-step-1.sh "00000000-2502-4b05-0000-744604c6531d" "10.0.0" "" "sp-new-1"
+#    ./bootnode-image-step-1.sh "00000000-2502-4b05-0000-744604c6531d" "10.0.0" "" "sp-new-1" "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCnKJvCbAH0YPXzaAGs/y1VGBJ7iK19Xwo5gNrAWxk0WiMueLuVsTMG3VIoE9Dmsg5ZOBjuQb6oOe43cONR2im92/GRnRF7siNgbXVQlgbm3o66c3Tu6zZhH8BF47sfaZuSB+5795f8NuGx3rcsnS5dhL+xpo40s+9bqxo4ni+0YdYNNciOKg5cnIiEnLfL2sPddx80xWmFUMhjO10SWvx00/GeCRiRNKBzWDyOkYxxcbBlK/l2KA0KU7GHlUAmT1YzFd6akOGzc7T9yD/gQ0PshXBgXpMRjr4HILZABZAOIKXi7z7cXsYwLhBOmI6lF7A83zNfNv4uzP936E7Z41wNmfI+1DsNBiHBN2p2DSWoL3xChYlV5OWxiHsUQt6o+8tGKjjLmU3JZBAk6lRf4JpkG7ODoVOPSblUBP7prQ69TACAGR9E7fQNeeKucVTyiek0a35b2vfh3bryVVNdnLTF8+yUu08K7q2kn3pQpr/wDqmlY13FSExqPaCHhDk= generated-by-azure" "path/blr-key.pem"
 # 2. To create a VM image from latest Ansible automation code and latest bootstrap code,
 #    ./bootnode-image-step-1.sh "00000000-2502-4b05-0000-744604c6531d" "" "" ""
 
@@ -47,9 +48,9 @@ ANSIBLE_COLLECTION_VERSION=$2
 ANSIBLE_COLLECTION_BRANCH=$3
 BOOTSTRAP_AUTOMATION_TAG_OR_BRANCH=$4
 
-# Variables
-SSH_KEY="ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCZsnnoLyMnmObhjDLHNh9ksowEb1dV1eb8Ssw7vdzLFoWVf+Upm1xtH2vOybaDfE/rES+aQIsjrKhwlGM+o2ViM9skQJIX/34/gzt3r+SUG4bzRvAtmPofAoQTrvRKWwL47K8nNPVcqHoV1TMEL9R+F8UTwQGbhz5FuxEt0eReOBCxNQnuLPLChawaml7LSNNaRka6tBQ/QeA/oJdo82sn/tpNZFNivOn8+fo+HNQPvirFJKLmsiER2HFuhH6p3wHYA1IMqzzOcWv52cRRIONyowyPbuCCVzbdXSHWt2JtcyvkwAqc2a5DuhxTeioYP+xAij9r/Xkc/x94sXAsAJtz imported-openssh-key"
 
+# Variables
+SSH_KEY=$5
 echo "Script parameters:"
 echo "SUBID=$SUBID"
 echo "ANSIBLE_COLLECTION_VERSION=$ANSIBLE_COLLECTION_VERSION"
@@ -70,8 +71,8 @@ echo $output
 vmip=$(echo $output | jq '.publicIpAddress' | tr -d '"')
 echo "VM IP address: $vmip"
 
-ssh -i /tmp/key-santosh-pawar.pem -o StrictHostKeyChecking=no azureuser@$vmip "cd /tmp; curl -skSL 'https://raw.githubusercontent.com/ibm-mas/multicloud-bootstrap/main/azure/bootnode-image/prepare-bootnode-image.sh' -o prepare-bootnode-image.sh; chmod +x prepare-bootnode-image.sh; sudo su - root -c \"/tmp/prepare-bootnode-image.sh '$ANSIBLE_COLLECTION_VERSION' '$ANSIBLE_COLLECTION_BRANCH' '$BOOTSTRAP_AUTOMATION_TAG_OR_BRANCH'\""
-az vm deallocate --resource-group masocp-bootnode-vm-rg-${UNIQSTR} --name bootnode-prep 
+ssh -i $6 -o StrictHostKeyChecking=no azureuser@$vmip "cd /tmp; curl -skSL 'https://raw.githubusercontent.com/ibm-mas/multicloud-bootstrap/mas89-alpha/azure/bootnode-image/prepare-bootnode-image.sh' -o prepare-bootnode-image.sh; chmod +x prepare-bootnode-image.sh; sudo su - root -c \"/tmp/prepare-bootnode-image.sh '$ANSIBLE_COLLECTION_VERSION' '$ANSIBLE_COLLECTION_BRANCH' '$BOOTSTRAP_AUTOMATION_TAG_OR_BRANCH'\""
+az vm deallocate --resource-group masocp-bootnode-vm-rg-${UNIQSTR} --name bootnode-prep
 az vm generalize --resource-group masocp-bootnode-vm-rg-${UNIQSTR} --name bootnode-prep
 az image create --resource-group masocp-bootnode-vm-rg-${UNIQSTR} --name masocp-bootnode-img-${UNIQSTR} --source bootnode-prep --hyper-v-generation V2
 az group create --name masocp-bootnode-image-rg-${UNIQSTR} --location eastus2
@@ -84,7 +85,8 @@ az sig image-version update --resource-group masocp-bootnode-image-rg-${UNIQSTR}
 echo " Replicating the images to supported regions in the background, it may take around 30 minutes to complete. Please check the replication status from Azure portal."
 
 # Delete the VM resource group
-az group delete -y --name masocp-bootnode-vm-rg-${UNIQSTR}
+az group delete -y --name masocp-bootnode-vm-rg-${UNIQSTR} --no-wait
+az group wait --name masocp-bootnode-vm-rg-${UNIQSTR} --deleted
 
 echo "========================================="
 echo "Bootnode image creation step-1 completed."

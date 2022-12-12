@@ -156,6 +156,7 @@ export CPD_PRIMARY_STORAGE_CLASS="ocs-storagecluster-cephfs"
 export CPD_OPERATORS_NAMESPACE="ibm-cpd-operators-${UNIQ_STR}"
 export CPD_INSTANCE_NAMESPACE="ibm-cpd-${UNIQ_STR}"
 export CPD_SERVICES_NAMESPACE="cpd-services-${UNIQ_STR}"
+export CPD_PRODUCT_VERSION=4.5.0
 
 # DB2WH variables
 export DB2_META_STORAGE_CLASS=${CPD_PRIMARY_STORAGE_CLASS}
@@ -175,7 +176,7 @@ export CPD_SERVICE_STORAGE_CLASS=ocs-storagecluster-cephfs
 
 echo
 echoBlue "==== Installing Ansible Collection ===="
-export MAS_DEVOPS_COLLECTION_VERSION=10.0.0
+export MAS_DEVOPS_COLLECTION_VERSION=12.3.0
 echo -e "\nMAS_DEVOPS_COLLECTION_VERSION : $MAS_DEVOPS_COLLECTION_VERSION\n"
 ansible-galaxy collection install ibm.mas_devops:==${MAS_DEVOPS_COLLECTION_VERSION}
 echoBlue "==== Installed Ansible Collection Successfully ===="

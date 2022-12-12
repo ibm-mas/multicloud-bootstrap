@@ -15,6 +15,9 @@ export BASE_DOMAIN_RG_NAME=$8
 export SSH_KEY_NAME=$9
 export DEPLOY_WAIT_HANDLE=${10}
 export SLS_ENTITLEMENT_KEY=${11}
+
+
+
 export OCP_PULL_SECRET=${12}
 export MAS_LICENSE_URL=${13}
 export SLS_URL=${14}
@@ -53,7 +56,8 @@ export EXISTING_PUBLIC_SUBNET1_ID=${46}
 export EXISTING_PUBLIC_SUBNET2_ID=${47}
 export EXISTING_PUBLIC_SUBNET3_ID=${48}
 export PRIVATE_CLUSTER=${49}
-export ENV_TYPE=${50}
+export OPERATIONAL_MODE=${50}
+export ENV_TYPE=${51}
 export GIT_REPO_HOME=$(pwd)
 # Load helper functions
 . helper.sh
@@ -68,6 +72,7 @@ export -f get_uds_api_key
 export -f validate_prouduct_type
 
 export GIT_REPO_HOME=$(pwd)
+
 
 ## Configure CloudWatch agent
 if [[ $CLUSTER_TYPE == "aws" ]]; then
@@ -182,7 +187,9 @@ export UDS_TLS_CERT_LOCAL_FILE_PATH="${GIT_REPO_HOME}/uds.crt"
 # CP4D variables
 export CPD_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
 export CPD_VERSION=cpd40
-export MAS_CHANNEL=8.8.x
+export CPD_PRODUCT_VERSION=4.5.0
+export MAS_CHANNEL=8.9.x
+export MAS_CATALOG_VERSION=v8-amd64
 if [[ $CLUSTER_TYPE == "aws" ]]; then
   export CPD_PRIMARY_STORAGE_CLASS="ocs-storagecluster-cephfs"
 elif [[ $CLUSTER_TYPE == "azure" ]]; then
@@ -198,7 +205,7 @@ export DB2_DATA_STORAGE_CLASS=$CPD_PRIMARY_STORAGE_CLASS
 export DB2_BACKUP_STORAGE_CLASS=$CPD_PRIMARY_STORAGE_CLASS
 export DB2_LOGS_STORAGE_CLASS=$CPD_PRIMARY_STORAGE_CLASS
 export DB2_TEMP_STORAGE_CLASS=$CPD_PRIMARY_STORAGE_CLASS
-export DB2_INSTANCE_NAME=db2wh-db01
+export DB2_INSTANCE_NAME=db2-db01
 export DB2_VERSION=11.5.7.0-cn2
 export ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
 # not reqd its hardcoded as db2_namespace: db2u
@@ -212,8 +219,8 @@ export MAS_APP_ID=manage
 export MAS_APPWS_JDBC_BINDING="workspace-application"
 export MAS_JDBC_CERT_LOCAL_FILE=$GIT_REPO_HOME/db.crt
 export MAS_CLOUD_AUTOMATION_VERSION=1.0
-export MAS_DEVOPS_COLLECTION_VERSION=11.0.0
-export MAS_APP_CHANNEL=8.4.x
+export MAS_DEVOPS_COLLECTION_VERSION=11.7.2
+export MAS_APP_CHANNEL=8.5.x
 if [ -z "$EXISTING_NETWORK" ]; then
   export new_or_existing_vpc_subnet="new"
   export enable_permission_quota_check=true
@@ -230,7 +237,7 @@ if [[ -z "$EXISTING_NETWORK" && $CLUSTER_TYPE == "azure" ]]; then
 else
   export INSTALLATION_MODE="UPI"
 fi
-log "==== INSTALLATION MODE: ${INSTALLATION_MODE}"
+#log "==== INSTALLATION MODE: ${INSTALLATION_MODE}"
 
 RESP_CODE=0
 
@@ -261,8 +268,12 @@ case $CLUSTER_SIZE in
     ;;
 esac
 
+
+
+
 # Log the variable values
 log "Below are common deployment parameters,"
+log " OPERATIONAL_MODE: $OPERATIONAL_MODE"
 log " CLUSTER_TYPE: $CLUSTER_TYPE"
 log " OFFERING_TYPE: $OFFERING_TYPE"
 log " DEPLOY_REGION: $DEPLOY_REGION"
@@ -275,6 +286,10 @@ log " SSH_KEY_NAME: $SSH_KEY_NAME"
 log " DEPLOY_WAIT_HANDLE: $DEPLOY_WAIT_HANDLE"
 # Do not log ER key and OCP pull secret, uncomment in case of debugging but comment it out once done
 #log " SLS_ENTITLEMENT_KEY: $SLS_ENTITLEMENT_KEY"
+#log " MAS_ENTITLEMENT_KEY: $MAS_ENTITLEMENT_KEY"
+#log " ENTITLEMENT_KEY: $ENTITLEMENT_KEY"
+
+
 #log " OCP_PULL_SECRET: $OCP_PULL_SECRET"
 log " DEPLOY_CP4D: $DEPLOY_CP4D"
 log " DEPLOY_MANAGE: $DEPLOY_MANAGE"
@@ -337,6 +352,7 @@ log " UDS_CONTACT_EMAIL: $UDS_CONTACT_EMAIL"
 log " UDS_CONTACT_FIRSTNAME: $UDS_CONTACT_FIRSTNAME"
 log " UDS_CONTACT_LASTNAME: $UDS_CONTACT_LASTNAME"
 log " CPD_PRIMARY_STORAGE_CLASS: $CPD_PRIMARY_STORAGE_CLASS"
+log " CPD_PRODUCT_VERSION: $CPD_PRODUCT_VERSION"
 log " MAS_APP_ID: $MAS_APP_ID"
 log " MAS_WORKSPACE_ID: $MAS_WORKSPACE_ID"
 log " MAS_JDBC_CERT_LOCAL_FILE: $MAS_JDBC_CERT_LOCAL_FILE"
@@ -381,6 +397,7 @@ else
   PRE_VALIDATION=pass
 fi
 log "===== PRE-VALIDATION COMPLETED ($PRE_VALIDATION) ====="
+
 
 # Perform the MAS deployment only if pre-validation checks are passed
 if [[ $PRE_VALIDATION == "pass" ]]; then
@@ -480,7 +497,21 @@ if [[ $PRE_VALIDATION == "pass" ]]; then
     RESP_CODE=0
   else
     mark_provisioning_failed $retcode
+     if [[ $retcode -eq 2 ]]; then
+          log "OCP Creation Successful ,Suite Deployment failed"
+          log "===== PROVISIONING COMPLETED ====="
+          export STATUS=FAILURE
+          export STATUS_MSG="OCP Creation Successful,Failed in the Ansible playbook execution"
+          export MESSAGE_TEXT="Please import the attached certificate into the browser to access MAS UI."
+          export OPENSHIFT_CLUSTER_CONSOLE_URL="https:\/\/console-openshift-console.apps.${CLUSTER_NAME}.${BASE_DOMAIN}"
+          export OPENSHIFT_CLUSTER_API_URL="https:\/\/api.${CLUSTER_NAME}.${BASE_DOMAIN}:6443"
+          export MAS_URL_INIT_SETUP="NA"
+          export MAS_URL_ADMIN="NA"
+          export MAS_URL_WORKSPACE="NA"
+          RESP_CODE=2
+        fi
   fi
+
 fi
 
 log " STATUS=$STATUS"
@@ -492,7 +523,7 @@ if [[ $CLUSTER_TYPE == "aws" ]]; then
   cd $GIT_REPO_HOME/$CLUSTER_TYPE
   # Complete the CFT stack creation successfully
   log "Sending completion signal to CloudFormation stack."
-  curl -k -X PUT -H 'Content-Type:' --data-binary "{\"Status\":\"SUCCESS\",\"Reason\":\"MAS deployment complete\",\"UniqueId\":\"ID-$CLUSTER_TYPE-$CLUSTER_SIZE-$CLUSTER_NAME\",\"Data\":\"${STATUS}#${STATUS_MSG}\"}" "$DEPLOY_WAIT_HANDLE"
+   curl -k -X PUT -H 'Content-Type:' --data-binary "{\"Status\":\"SUCCESS\",\"Reason\":\"MAS deployment complete\",\"UniqueId\":\"ID-$CLUSTER_TYPE-$CLUSTER_SIZE-$CLUSTER_NAME\",\"Data\":\"${STATUS}#${STATUS_MSG}#${OPENSHIFT_CLUSTER_CONSOLE_URL}#${OPENSHIFT_CLUSTER_API_URL}#${MAS_URL_INIT_SETUP}#${MAS_URL_ADMIN}#${MAS_URL_WORKSPACE}\"}" "$DEPLOY_WAIT_HANDLE"
 fi
 
 # Send email notification

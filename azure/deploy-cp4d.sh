@@ -143,7 +143,6 @@ if [[ $? -gt 0 ]]; then
 else
   echoGreen "\nOpenShift Login is successful."
 fi
-
 echoBlue "\n==== Execution started at $(date) ===="
 
 export MAS_INSTANCE_ID="${UNIQ_STR}"
@@ -154,11 +153,12 @@ export MAS_CONFIG_SCOPE="wsapp"
 # CP4D variables
 export CPD_ENTITLEMENT_KEY=${ER_KEY}
 export CPD_VERSION=cpd40
-export MAS_CHANNEL=8.7.x
+export MAS_CHANNEL=8.9.x
 export CPD_PRIMARY_STORAGE_CLASS="azurefiles-premium"
 export CPD_OPERATORS_NAMESPACE="ibm-cpd-operators-${UNIQ_STR}"
 export CPD_INSTANCE_NAMESPACE="ibm-cpd-${UNIQ_STR}"
 export CPD_SERVICES_NAMESPACE="cpd-services-${UNIQ_STR}"
+export CPD_PRODUCT_VERSION=4.5.0
 
 # DB2WH variables
 export DB2_META_STORAGE_CLASS=${CPD_PRIMARY_STORAGE_CLASS}
@@ -175,7 +175,7 @@ export CPD_SERVICE_STORAGE_CLASS=azurefiles-premium
 
 echo
 echoBlue "==== Installing Ansible Collection ===="
-export MAS_DEVOPS_COLLECTION_VERSION=10.0.0
+export MAS_DEVOPS_COLLECTION_VERSION=11.7.2
 echo -e "\nMAS_DEVOPS_COLLECTION_VERSION : $MAS_DEVOPS_COLLECTION_VERSION\n"
 ansible-galaxy collection install ibm.mas_devops:==${MAS_DEVOPS_COLLECTION_VERSION}
 echoBlue "==== Installed Ansible Collection Successfully ===="
