@@ -393,7 +393,7 @@ Resources:
       Role: !GetAtt
         - LambdaRole
         - Arn
-      Runtime: python3.8
+      Runtime: python3.9
       Tags:
         - Key: Name
           Value: RandomizerLambda
@@ -432,7 +432,7 @@ Resources:
       Role: !GetAtt
         - LambdaRole
         - Arn
-      Runtime: python3.8
+      Runtime: python3.9
       Code:
         ZipFile: |
           import boto3
@@ -479,7 +479,7 @@ Resources:
       Role: !GetAtt
         - LambdaRole
         - Arn
-      Runtime: python3.8
+      Runtime: python3.9
       Code:
         ZipFile: |
           import boto3
@@ -570,7 +570,7 @@ Resources:
             - 'git clone https://github.com/ibm-mas/ansible-devops.git;'
             - cd ansible-devops;
             - rm -rf multicloud-bootstrap 1>/dev/null 2>&1;
-            - 'git clone -b mas89-alpha https://github.com/ibm-mas/multicloud-bootstrap.git;'
+            - 'git clone https://github.com/ibm-mas/multicloud-bootstrap.git;'
             - cd multicloud-bootstrap;
             - 'find . -type f -name "*.sh" -exec chmod +x {} \;;'
             - ./init.sh "aws" "
@@ -627,7 +627,7 @@ Resources:
             - ''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''
             - ''' '''
             - !Ref OperationalMode
-            - ''' "prod" '
+            - ''' "dev" '
             - '2>&1 | tee mas-provisioning.log; '
       Tags:
         - Key: Name

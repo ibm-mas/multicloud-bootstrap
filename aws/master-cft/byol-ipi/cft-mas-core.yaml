@@ -397,7 +397,7 @@ Resources:
       Role: !GetAtt
         - LambdaRole
         - Arn
-      Runtime: python3.8
+      Runtime: python3.9
       Tags:
         - Key: Name
           Value: RandomizerLambda
@@ -436,7 +436,7 @@ Resources:
       Role: !GetAtt
         - LambdaRole
         - Arn
-      Runtime: python3.8
+      Runtime: python3.9
       Code:
         ZipFile: |
           import boto3
@@ -483,7 +483,7 @@ Resources:
       Role: !GetAtt
         - LambdaRole
         - Arn
-      Runtime: python3.8
+      Runtime: python3.9
       Code:
         ZipFile: |
           import boto3
@@ -575,7 +575,7 @@ Resources:
             - cd ansible-devops;
             - rm -rf multicloud-bootstrap 1>/dev/null 2>&1;
             - >-
-              git clone -b byol-ocp-410.1
+              git clone -b 2.0.1
               https://github.com/ibm-mas/multicloud-bootstrap.git;
             - cd multicloud-bootstrap;
             - 'find . -type f -name "*.sh" -exec chmod +x {} \;;'
