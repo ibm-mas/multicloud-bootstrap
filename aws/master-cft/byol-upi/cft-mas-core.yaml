@@ -251,6 +251,10 @@ Metadata:
           - ExistingPublicSubnet1Id
           - ExistingPublicSubnet2Id
           - ExistingPublicSubnet3Id
+      - Label:
+          default: Operational Mode
+        Parameters:
+          - OperationalMode
 Mappings:
   RegionMap:
     us-east-1:
