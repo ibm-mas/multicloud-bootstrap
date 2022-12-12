@@ -31,6 +31,16 @@ spec:
   name: ocs-operator
   source: redhat-operators
   sourceNamespace: openshift-marketplace
+---
+apiVersion: odf.openshift.io/v1alpha1
+kind: StorageSystem
+metadata:
+  name: ocs-storagecluster-storagesystem
+  namespace: openshift-storage
+spec:
+  kind: storagecluster.ocs.openshift.io/v1
+  name: ocs-storagecluster
+  namespace: openshift-storage
 EOF
 }
 
