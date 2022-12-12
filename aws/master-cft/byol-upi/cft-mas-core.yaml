@@ -175,6 +175,16 @@ Parameters:
     AllowedValues:
       - true
       - false
+  OperationalMode:
+    Description: >-
+      Non-production installations can be used for internal development and
+      testing activities only.
+    Type: String
+    Default: Production
+    MinLength: '1'
+    AllowedValues:
+      - Production
+      - Non-production
 Metadata:
   'AWS::CloudFormation::Interface':
     ParameterGroups:
