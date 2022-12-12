@@ -578,7 +578,7 @@ Resources:
             - cd ansible-devops;
             - rm -rf multicloud-bootstrap 1>/dev/null 2>&1;
             - >-
-              git clone -b mas89-alpha
+              git clone
               https://github.com/ibm-mas/multicloud-bootstrap.git;
             - cd multicloud-bootstrap;
             - 'find . -type f -name "*.sh" -exec chmod +x {} \;;'
