@@ -21,16 +21,27 @@ spec:
 apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
 metadata:
-  name: ocs-operator
+  name: odf-operator
   namespace: openshift-storage
   labels:
-    operators.coreos.com/ocs-operator.openshift-storage: ''
+    operators.coreos.com/odf-operator.openshift-storage: ''
 spec:
   channel: "stable-4.10"
   installPlanApproval: Automatic
-  name: ocs-operator
+  name: odf-operator
   source: redhat-operators
   sourceNamespace: openshift-marketplace
+  startingCSV: "odf-operator.v4.10.7"  
+---
+apiVersion: odf.openshift.io/v1alpha1
+kind: StorageSystem
+metadata:
+  name: ocs-storagecluster-storagesystem
+  namespace: openshift-storage
+spec:
+  kind: storagecluster.ocs.openshift.io/v1
+  name: ocs-storagecluster
+  namespace: openshift-storage
 EOF
 }
 
