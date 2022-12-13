@@ -1,0 +1,14 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: use-scc-hostmount-anyuid
+  namespace: "{{ nfs_storage_provisioner_namespace }}"
+rules:
+- apiGroups:
+  - security.openshift.io
+  resourceNames:
+  - hostmount-anyuid
+  resources:
+  - securitycontextconstraints
+  verbs:
+  - use

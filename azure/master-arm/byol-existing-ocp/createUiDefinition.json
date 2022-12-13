@@ -467,7 +467,7 @@
             "offeringType": "[steps('ApplicationSettings').offeringType]",
             "entitledRegistryKey": "[steps('ApplicationSettings').entitledRegistryKey]",
             "masLicenseUrl": "[steps('ApplicationSettings').masLicenseUrl]",
-	    "operationalMode": "[steps('ApplicationSettings').operationalMode]",
+	        "operationalMode": "[steps('ApplicationSettings').operationalMode]",
             "openShiftClusterApiUrl": "[steps('ExistingInfrastructure').openShiftClusterApiUrl]",
             "openShiftUser": "[steps('ExistingInfrastructure').openShiftUser]",
             "openShiftPwd": "[steps('ExistingInfrastructure').openShiftPwd]",

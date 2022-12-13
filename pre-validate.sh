@@ -7,6 +7,8 @@ if [[ $CLUSTER_TYPE == "aws" ]]; then
 elif [[ $CLUSTER_TYPE == "azure" ]]; then
     # az account list-locations --query "[].{Name:name}" -o table|grep -Ev '^(Name|-)'|tr '\n' ';'
     SUPPORTED_REGIONS="eastus;eastus2;southcentralus;westus2;westus3;australiaeast;southeastasia;northeurope;swedencentral;uksouth;westeurope;centralus;southafricanorth;centralindia;eastasia;japaneast;koreacentral;canadacentral;francecentral;germanywestcentral;norwayeast;brazilsouth"
+elif [[ $CLUSTER_TYPE == "gcp" ]]; then
+    SUPPORTED_REGIONS="asia-east1;asia-east2;asia-northeast1;asia-northeast2;asia-northeast3;asia-south1;asia-south2;asia-southeast1;asia-southeast2;australia-southeast12;europe-central2;europe-north1;europe-southwest1;europe-west1;europe-west2;europe-west3;europe-west4;europe-west6;europe-west8;europe-west9;northamerica-northeast1;northamerica-northeast2;southamerica-east1;southamerica-west1;us-central1;us-east1;us-east4;us-east5;us-south1;us-west1;us-west2;us-west3;us-west4"
 else
     SUPPORTED_REGIONS=$DEPLOY_REGION
 fi
@@ -117,6 +119,8 @@ if [[ $DEPLOY_MANAGE == "true" ]]; then
                 elif [[ ${MAS_JDBC_CERT_URL,,} =~ ^https? ]]; then
                     wget "$MAS_JDBC_CERT_URL" -O db.crt
                 fi
+            elif [[ $CLUSTER_TYPE == "gcp" ]]; then
+                wget "$MAS_JDBC_CERT_URL" -O db.crt
             fi
             export MAS_DB2_JAR_LOCAL_PATH=$GIT_REPO_HOME/lib/db2jcc4.jar
             if [[ ${MAS_JDBC_URL,, } =~ ^jdbc:db2? ]]; then
@@ -197,7 +201,7 @@ fi
 ## MAS_ANNOTATIONS environment variable is used in suit-install role of MAS Installtion
 
 if [[ $CLUSTER_TYPE == "aws" ]]; then
-    #validating product type for helper.sh
+    # Validating product type for helper.sh
     validate_prouduct_type
 fi
 # Check if MAS license is provided

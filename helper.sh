@@ -215,7 +215,7 @@ validate_prouduct_type() {
   log "hyperscaler in MAS_ANNOTATIONS: $MAS_ANNOTATIONS"
   if [[ $CLUSTER_TYPE == "azure" ]]; then
     export MAS_ANNOTATIONS="mas.ibm.com/hyperscalerProvider=azure,mas.ibm.com/hyperscalerChannel=azure"
-  fi  
+  fi   
   log "hyperscaler in MAS_ANNOTATIONS: $MAS_ANNOTATIONS"  
   if [[ $OPERATIONAL_MODE == "Non-production"  ]]; then
     if [[ -n "$MAS_ANNOTATIONS" ]]; then

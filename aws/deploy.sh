@@ -19,6 +19,8 @@ IAM_POLICY_NAME="masocp-policy-${RANDOM_STR}"
 IAM_USER_NAME="masocp-user-${RANDOM_STR}"
 # SLS variables
 export SLS_STORAGE_CLASS=gp2
+# UDS variables
+export UDS_STORAGE_CLASS=gp2
 # CP4D variables
 export CPD_METADATA_STORAGE_CLASS=gp2
 export CPD_SERVICE_STORAGE_CLASS="ocs-storagecluster-cephfs"
@@ -199,7 +201,7 @@ EOT
 
   set -e
 
-  # Backup Terraform configuration
+  # Backup deployment context
   cd $GIT_REPO_HOME
   rm -rf /tmp/mas-multicloud
   mkdir /tmp/mas-multicloud
@@ -207,7 +209,7 @@ EOT
   cd /tmp
   zip -r $BACKUP_FILE_NAME mas-multicloud/*
   set +e
-  aws s3 cp $BACKUP_FILE_NAME $DEPLOYMENT_CONTEXT_UPLOAD_PATH --region $DEPLOY_REGION 
+  aws s3 cp $BACKUP_FILE_NAME $DEPLOYMENT_CONTEXT_UPLOAD_PATH --region $DEPLOY_REGION
   retcode=$?
   if [[ $retcode -ne 0 ]]; then
     aws s3 cp $BACKUP_FILE_NAME $DEPLOYMENT_CONTEXT_UPLOAD_PATH --region us-east-1
@@ -218,7 +220,7 @@ EOT
     exit 23
   fi
   set -e
-  log "OCP cluster Terraform configuration backed up at $DEPLOYMENT_CONTEXT_UPLOAD_PATH in file $CLUSTER_NAME.zip"
+  log "OCP cluster deployment context backed up at $DEPLOYMENT_CONTEXT_UPLOAD_PATH in file $CLUSTER_NAME.zip"
 
   # Create a secret in the Cloud to keep OCP access credentials
   cd $GIT_REPO_HOME
