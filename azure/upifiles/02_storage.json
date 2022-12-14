@@ -32,7 +32,7 @@
             "osType": "Linux",
             "osState": "Generalized",
             "blobUri": "[parameters('vhdBlobURL')]",
-            "storageAccountType": "Standard_LRS"
+            "storageAccountType": "Premium_LRS"
           }
         }
       }
