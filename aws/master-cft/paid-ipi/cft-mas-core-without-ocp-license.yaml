@@ -203,7 +203,7 @@ Metadata:
 Mappings:
   RegionMap:
     us-east-1:
-      HVM64: ami-073adc95ec6baf82c
+      HVM64: ami-01be123bce5d349ea
     us-east-2:
       HVM64: ami-xxxxxxxxxxxxxxxxx
     us-west-2:
@@ -266,7 +266,6 @@ Resources:
                   - 'iam:CreateUser'
                   - 'iam:AttachUserPolicy'
                   - 'iam:CreateAccessKey'
-                  - 's3:GetObject'
                   - 's3:PutObject'
                   - 's3:DeleteObject'
                   - 's3:DeleteBucket'
@@ -296,7 +295,10 @@ Resources:
                       - s3
                       - ''
                       - ''
-                      - '*/*'
+                      - !Join
+                        - /
+                        - - !Ref DeploymentConfigBucket
+                          - '*'
                   - !Join
                     - ':'
                     - - arn
@@ -322,6 +324,7 @@ Resources:
                   - 'ses:ListIdentities'
                   - 'route53:ListHostedZones'
                   - 'ses:GetIdentityVerificationAttributes'
+                  - 's3:GetObject'
                   - 'logs:CreateLogGroup'
                   - 'logs:CreateLogStream'
                   - 'logs:PutLogEvents'
@@ -380,7 +383,7 @@ Resources:
       Role: !GetAtt
         - LambdaRole
         - Arn
-      Runtime: python3.7
+      Runtime: python3.9
       Tags:
         - Key: Name
           Value: RandomizerLambda
@@ -419,7 +422,7 @@ Resources:
       Role: !GetAtt
         - LambdaRole
         - Arn
-      Runtime: python3.7
+      Runtime: python3.9
       Code:
         ZipFile: |
           import boto3
@@ -466,7 +469,7 @@ Resources:
       Role: !GetAtt
         - LambdaRole
         - Arn
-      Runtime: python3.7
+      Runtime: python3.9
       Code:
         ZipFile: |
           import boto3
