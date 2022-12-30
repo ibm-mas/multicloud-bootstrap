@@ -290,8 +290,8 @@ spec:
         port: '443'
         protocol: TCP
       images:
-      - name: sp-edge-bootnode-build-20221104  # {"$ref":"#/definitions/io.k8s.cli.setters.image"}
-        project: sp-edge-ocp-cluster-ipi # {"$ref":"#/definitions/io.k8s.cli.setters.projectId"}
+      - name: masocp-bootnode-20221230  # {"$ref":"#/definitions/io.k8s.cli.setters.image"}
+        project: pk-ocp-cluster-ipi # {"$ref":"#/definitions/io.k8s.cli.setters.projectId"}
       machineType:
         defaultMachineType:
           gceMachineType: e2-medium
@@ -343,7 +343,7 @@ spec:
             git clone https://github.com/ibm-mas/ansible-devops.git
             cd ansible-devops
             rm -rf multicloud-bootstrap 1>/dev/null 2>&1
-            git clone -b edge-gcp-support https://github.com/ibm-mas/multicloud-bootstrap.git
+            git clone -b pk-gcp-support https://github.com/ibm-mas/multicloud-bootstrap.git
             cd multicloud-bootstrap
             find . -type f -name "*.sh" -exec chmod +x {} \;;
             ./init-async.sh gcp "$offeringType" "$region" null "$clusterSize" "{{ uniqstr }}" "$publicDomain" null "$sshPublicKey" null  "$entitledRegistryKey" "$openShiftPullSecret" "$masLicenseUrl" '' '' '' '' '' '' "$masManageDBUser" "$masManageDBPassword" "$masManageDBJdbcUrl" "$masManageDBCertificateUrl" "$importDemoData" '' '' '' '' "$emailNotification" "$notificattionEmailAddress" "$smtpHost" "$smtpPort" "$smtpUsername" "$smtpPassword" '' '' '' '' "$googleProjectId" "$googleCloudServiceAccount" '' '' '' '' '' '' '' '' '' '' '' 'dev' > mas-provisioning.log 2>&1;
