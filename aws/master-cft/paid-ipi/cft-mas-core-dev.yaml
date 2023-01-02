@@ -193,7 +193,7 @@ Metadata:
 Mappings:
   RegionMap:
     us-east-1:
-      HVM64: ami-07494308bf779622b
+      HVM64: ami-01be123bce5d349ea
     us-east-2:
       HVM64: ami-0da4f91ded4bac1bd
     us-west-2:
@@ -232,7 +232,7 @@ Mappings:
       HVM64: ami-0872ea1a62d5925b8
     sa-east-1:
       HVM64: ami-02db20519b43317bb
-    
+
 Resources:
   DeployWaitConditionHandle:
     Type: 'AWS::CloudFormation::WaitConditionHandle'
@@ -265,7 +265,6 @@ Resources:
                   - 'iam:CreateUser'
                   - 'iam:AttachUserPolicy'
                   - 'iam:CreateAccessKey'
-                  - 's3:GetObject'
                   - 's3:PutObject'
                   - 's3:DeleteObject'
                   - 's3:DeleteBucket'
@@ -295,7 +294,10 @@ Resources:
                       - s3
                       - ''
                       - ''
-                      - '*/*'
+                      - !Join
+                        - /
+                        - - !Ref DeploymentConfigBucket
+                          - '*'
                   - !Join
                     - ':'
                     - - arn
@@ -321,6 +323,7 @@ Resources:
                   - 'ses:ListIdentities'
                   - 'route53:ListHostedZones'
                   - 'ses:GetIdentityVerificationAttributes'
+                  - 's3:GetObject'
                   - 'logs:CreateLogGroup'
                   - 'logs:CreateLogStream'
                   - 'logs:PutLogEvents'
@@ -379,7 +382,7 @@ Resources:
       Role: !GetAtt
         - LambdaRole
         - Arn
-      Runtime: python3.8
+      Runtime: python3.9
       Tags:
         - Key: Name
           Value: RandomizerLambda
@@ -418,7 +421,7 @@ Resources:
       Role: !GetAtt
         - LambdaRole
         - Arn
-      Runtime: python3.8
+      Runtime: python3.9
       Code:
         ZipFile: |
           import boto3
@@ -465,7 +468,7 @@ Resources:
       Role: !GetAtt
         - LambdaRole
         - Arn
-      Runtime: python3.8
+      Runtime: python3.9
       Code:
         ZipFile: |
           import boto3
@@ -556,7 +559,7 @@ Resources:
             - 'git clone https://github.com/ibm-mas/ansible-devops.git;'
             - cd ansible-devops;
             - rm -rf multicloud-bootstrap 1>/dev/null 2>&1;
-            - 'git clone -b mas89-alpha https://github.com/ibm-mas/multicloud-bootstrap.git;'
+            - 'git clone https://github.com/ibm-mas/multicloud-bootstrap.git;'
             - cd multicloud-bootstrap;
             - 'find . -type f -name "*.sh" -exec chmod +x {} \;;'
             - ./init.sh "aws" "
