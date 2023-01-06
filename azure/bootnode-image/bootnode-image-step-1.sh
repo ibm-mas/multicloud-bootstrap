@@ -66,7 +66,7 @@ fi
 UNIQSTR=$(date +%Y%m%d%H%M%S)
 echo "Unique string: $UNIQSTR"
 az group create --name masocp-bootnode-vm-rg-${UNIQSTR} --location eastus2
-output=$(az vm create --resource-group masocp-bootnode-vm-rg-${UNIQSTR} --name bootnode-prep --image RedHat:RHEL:82gen2:latest --admin-username azureuser --ssh-key-values "$SSH_KEY" --size Standard_D2s_v3 --public-ip-sku Standard)
+output=$(az vm create --resource-group masocp-bootnode-vm-rg-${UNIQSTR} --name bootnode-prep --image RedHat:RHEL:90-gen2:latest --admin-username azureuser --ssh-key-values "$SSH_KEY" --size Standard_D2s_v3 --public-ip-sku Standard)
 echo $output
 vmip=$(echo $output | jq '.publicIpAddress' | tr -d '"')
 echo "VM IP address: $vmip"
