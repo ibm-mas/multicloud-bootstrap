@@ -32,11 +32,11 @@ dnf -y remove polkit
 dnf update -y
 
 ## Install pre-reqs
-dnf install git httpd-tools java python39 unzip wget zip pip  container-tools -y
-ln -s --force /usr/bin/python3.9 /usr/bin/python
-ln -s --force /usr/bin/pip3.9 /usr/bin/pip
-ln -s --force /usr/bin/python3.9 /usr/bin/python3
-ln -s --force /usr/bin/pip3.9 /usr/bin/pip3
+dnf install git httpd-tools java python39 unzip wget zip pip  container-tools  -y
+#required az keyvault
+ pip install oauthlib==3.2.0
+ pip install  azure-cli
+
 
 #Install openshift-install 4.10.35
 wget https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/4.10.35/openshift-client-linux-4.10.35.tar.gz
@@ -56,14 +56,14 @@ openshift-install version
 rm -rf openshift-install-linux.tar.gz
 
 # Install Azure cli
-rpm --import https://packages.microsoft.com/keys/microsoft.asc
-echo -e "[azure-cli]
-name=Azure CLI
-baseurl=https://packages.microsoft.com/yumrepos/azure-cli
-enabled=1
-gpgcheck=1
-gpgkey=https://packages.microsoft.com/keys/microsoft.asc" | tee /etc/yum.repos.d/azure-cli.repo
-dnf install azure-cli -y
+#rpm --import https://packages.microsoft.com/keys/microsoft.asc
+#echo -e "[azure-cli]
+#name=Azure CLI
+#baseurl=https://packages.microsoft.com/yumrepos/azure-cli
+#enabled=1
+#gpgcheck=1
+#gpgkey=https://packages.microsoft.com/keys/microsoft.asc" | tee /etc/yum.repos.d/azure-cli.repo
+#dnf install azure-cli -y
 
 # Install AzureCopy cli
 wget -q https://aka.ms/downloadazcopy-v10-linux -O azcopy_linux_amd64.tar.gz
