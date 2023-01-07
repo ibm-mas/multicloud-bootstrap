@@ -159,8 +159,10 @@ export VHD_BLOB_URL=`az storage blob url --account-name $SA_NAME --account-key $
 
 az deployment group create -g $RESOURCE_GROUP \
   --template-file "02_storage.json" \
+  --name "$INFRA_ID-storage"
   --parameters vhdBlobURL="$VHD_BLOB_URL" \
   --parameters baseName="$INFRA_ID"
+az group deployment wait --created --name $INFRA_ID-storage --resource-group $RESOURCE_GROUP
 if [ $? -ne 0 ]; then
     log "ERROR: Failed to complete storage deployment"
     exit 1
@@ -171,8 +173,10 @@ log "===== Storage deployment completed successfully ====="
 log "===== Creation of Load-balancers started  ====="
 az deployment group create -g $RESOURCE_GROUP \
   --template-file "03_infra.json" \
+  --name "$INFRA_ID-loadbalancer"
   --parameters privateDNSZoneName="${CLUSTER_NAME}.${BASE_DOMAIN}" \
   --parameters baseName="$INFRA_ID"
+az group deployment wait --created --name $INFRA_ID-loadbalancer --resource-group $RESOURCE_GROUP
 if [ $? -ne 0 ]; then
     log "ERROR: Failed to complete load balancer deployment"
     exit 1
