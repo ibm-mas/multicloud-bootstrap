@@ -106,6 +106,26 @@ accessdetails=$(aws iam create-access-key --user-name ${IAM_USER_NAME})
 export AWS_ACCESS_KEY_ID=$(echo $accessdetails | jq '.AccessKey.AccessKeyId' | tr -d "\"")
 export AWS_SECRET_ACCESS_KEY=$(echo $accessdetails | jq '.AccessKey.SecretAccessKey' | tr -d "\"")
 log " AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID"
+
+# TODO enclose with condition : based on user selection to use letsencrypt starts
+# TODO hardcoding need to get it dynamically from user selection from CFT
+# Variable for role suite_dns
+export DNS_PROVIDER="route53"
+export AWS_HOSTED_ZONE_ID="Z06693421T2UIZHSZ9AYY"
+export AWS_HOSTED_ZONE="${BASE_DOMAIN}"
+# TODO hardcoding, accept email from user?
+export AWS_EMAIL="myawsemail@aws.com"
+export ROUTE53_ISSUER_NAME="${MAS_INSTANCE_ID}-route53-le-prod"
+# Variable for role suite_install
+export MAS_CLUSTER_ISSUER="${MAS_INSTANCE_ID}-route53-le-prod"
+export MAS_DOMAIN="${MAS_INSTANCE_ID}.${BASE_DOMAIN}"
+log " AWS_HOSTED_ZONE_ID: $AWS_HOSTED_ZONE_ID"
+log " AWS_EMAIL: $AWS_EMAIL"
+log " ROUTE53_ISSUER_NAME: $ROUTE53_ISSUER_NAME"
+log " MAS_CLUSTER_ISSUER: $MAS_CLUSTER_ISSUER"
+log " MAS_DOMAIN: $MAS_DOMAIN"
+#TODO enclose with condition : based on user selection to use letsencrypt ends
+
 # Put some delay for IAM permissions to be applied in the backend
 sleep 60
 
