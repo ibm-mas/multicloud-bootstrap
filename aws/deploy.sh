@@ -1,6 +1,7 @@
 #!/bin/bash
 set -e
-
+pip3.8 install boto3
+pip3.8 install botocore
 #validating product type for helper.sh
 validate_prouduct_type
 
