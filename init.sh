@@ -453,6 +453,8 @@ if [[ $PRE_VALIDATION == "pass" ]]; then
       echo "=== Building and Installing Ansible Collection Locally ==="
       cd $GIT_REPO_HOME/../ibm/mas_devops
       ansible-galaxy collection build
+      #TODO
+      ansible-galaxy collection install community.aws
       ansible-galaxy collection install ibm-mas_devops-*.tar.gz
       echo "=== Ansible Collection built and installed locally Successfully ==="
     else
