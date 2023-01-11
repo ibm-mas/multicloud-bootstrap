@@ -343,6 +343,7 @@ if [[ (-z $SLS_URL) || (-z $SLS_REGISTRATION_KEY) || (-z $SLS_PUB_CERT_URL) ]]; 
   fi
 
   log "==== SLS deployment started ===="
+  export ROLE_NAME=suite_dns && ansible-playbook ibm.mas_devops.run_role  
   export ROLE_NAME=sls && ansible-playbook ibm.mas_devops.run_role
   log "==== SLS deployment completed ===="
 
@@ -386,7 +387,7 @@ fi
 
 ## Deploy MAS
 log "==== MAS deployment started ===="
-export ROLE_NAME=suite_dns && ansible-playbook ibm.mas_devops.run_role
+#export ROLE_NAME=suite_dns && ansible-playbook ibm.mas_devops.run_role
 export ROLE_NAME=suite_install && ansible-playbook ibm.mas_devops.run_role
 export ROLE_NAME=suite_config && ansible-playbook ibm.mas_devops.run_role
 export ROLE_NAME=suite_verify && ansible-playbook ibm.mas_devops.run_role
