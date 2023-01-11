@@ -386,6 +386,7 @@ fi
 
 ## Deploy MAS
 log "==== MAS deployment started ===="
+export ROLE_NAME=suite_dns && ansible-playbook ibm.mas_devops.run_role
 export ROLE_NAME=suite_install && ansible-playbook ibm.mas_devops.run_role
 export ROLE_NAME=suite_config && ansible-playbook ibm.mas_devops.run_role
 export ROLE_NAME=suite_verify && ansible-playbook ibm.mas_devops.run_role
