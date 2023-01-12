@@ -111,6 +111,8 @@ log " AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID"
 # TODO enclose with condition : based on user selection to use letsencrypt starts
 # TODO hardcoding need to get it dynamically from user selection from CFT
 # Variable for role suite_dns
+
+export CUSTOM_DOMAIN="${MAS_INSTANCE_ID}.${BASE_DOMAIN}"
 export DNS_PROVIDER="route53"
 export AWS_HOSTED_ZONE_ID="Z06693421T2UIZHSZ9AYY"
 export AWS_HOSTED_ZONE="${BASE_DOMAIN}"
