@@ -145,8 +145,8 @@
                                     "value": "Production"
                                 },
                                 {
-                                    "label": "Non-Production",
-                                    "value": "Non-Production"
+                                    "label": "Non-production",
+                                    "value": "Non-production"
                                 }
                             ],
                             "required": true
