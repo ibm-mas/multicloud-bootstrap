@@ -16,7 +16,18 @@ export SSH_KEY_NAME=$9
 export DEPLOY_WAIT_HANDLE=${10}
 export SLS_ENTITLEMENT_KEY=${11}
 
+#separated it with <<Entitlement Key>>-DEV-<<Enterprise ID>>-PASSWORD-<<Enterprise Password>>
+export PROD_ENTITLEMENT_KEY=${SLS_ENTITLEMENT_KEY%-DEV-*}
+export DEV_ENTITLEMENT_KEY=${SLS_ENTITLEMENT_KEY#*-DEV-}
+export ENTERPRISE_ID=${DEV_ENTITLEMENT_KEY%-PASSWORD-*}
+export ENTERPRISE_PASSWORD=${DEV_ENTITLEMENT_KEY#*-PASSWORD-}
+export SLS_ENTITLEMENT_KEY=$PROD_ENTITLEMENT_KEY
 
+#echo $DEV_ENTITLEMENT_KEY
+#echo $PROD_ENTITLEMENT_KEY
+#echo $SLS_ENTITLEMENT_KEY
+#echo $ENTERPRISE_ID
+#echo $ENTERPRISE_PASSWORD
 
 export OCP_PULL_SECRET=${12}
 export MAS_LICENSE_URL=${13}
@@ -241,7 +252,7 @@ export CPD_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
 export CPD_VERSION=cpd40
 export CPD_PRODUCT_VERSION=4.5.0
 export MAS_CHANNEL=8.9.x
-export MAS_CATALOG_VERSION=v8-amd64
+export MAS_CATALOG_VERSION=v9-master-amd64 #PK TODO
 if [[ $CLUSTER_TYPE == "aws" ]]; then
   export CPD_PRIMARY_STORAGE_CLASS="ocs-storagecluster-cephfs"
 elif [[ $CLUSTER_TYPE == "azure" ]]; then
@@ -263,7 +274,7 @@ export ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
 # not reqd its hardcoded as db2_namespace: db2u
 #export DB2WH_NAMESPACE="cpd-services-${RANDOM_STR}"
 # MAS variables
-export MAS_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
+#export MAS_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
 export MAS_WORKSPACE_ID="wsmasocp"
 export MAS_WORKSPACE_NAME="wsmasocp"
 export MAS_CONFIG_SCOPE="wsapp"
@@ -321,7 +332,18 @@ case $CLUSTER_SIZE in
 esac
 
 
-
+# STARTS
+export ARTIFACTORY_USERNAME=$ENTERPRISE_ID
+export ARTIFACTORY_APIKEY=$ENTERPRISE_PASSWORD
+export MAS_ENTITLEMENT_USERNAME=$ENTERPRISE_ID
+export MAS_ENTITLEMENT_KEY=$ENTERPRISE_PASSWORD
+export MAS_CHANNEL=m2dev810
+export MAS_CATALOG_VERSION=v9-master-amd64
+export MAS_ICR_CP=wiotp-docker-local.artifactory.swg-devops.com
+export MAS_ICR_CPOPEN=wiotp-docker-local.artifactory.swg-devops.com
+#echo $SLS_ENTITLEMENT_KEY
+#echo $MAS_ENTITLEMENT_KEY
+# ENDS
 
 # Log the variable values
 log "Below are common deployment parameters,"
