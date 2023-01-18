@@ -435,8 +435,7 @@
                 "recordDelimiter": {
                   "regexDelimiter": {
                     "pattern": "\\n",
-                    "matchIndex": 0,
-                    "numberdGroup": null
+                    "matchIndex": 0
                   }
                 }
               }
@@ -444,13 +443,7 @@
             "extractions": [
               {
                 "extractionName": "TimeGenerated",
-                "extractionType": "DateTime",
-                "extractionProperties": {
-                  "dateTimeExtraction": {
-                    "regex": null,
-                    "joinStringRegex": null
-                  }
-                }
+                "extractionType": "DateTime"
               }
             ]
           }
