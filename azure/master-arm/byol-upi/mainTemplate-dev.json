@@ -263,8 +263,8 @@
   },
   "variables": {
     "seller_subscription_id": "b2ca5467-2502-4b05-b78e-744604c6531d",
-    "seller_compute_gallery_name": "masbyolimagegallery20220808082537",
-    "seller_image_definition": "masocp-image-def-20220808082537",
+    "seller_compute_gallery_name": "masbyolimagegallery20221213212024",
+    "seller_image_definition": "masocp-image-def-20221213212024",
     "projectName": "[concat('u',substring(uniqueString(resourceGroup().id, deployment().name), 0, 5))]",
     "rgName": "[resourceGroup().name]",
     "vNetName": "[concat(variables('projectName'), '-vnet')]",
@@ -397,7 +397,7 @@
     },
     {
       "type": "Microsoft.OperationalInsights/workspaces",
-      "apiVersion": "2022-10-01",
+      "apiVersion": "2021-06-01",
       "name": "[variables('logAnalyticsWorkspace')]",
       "location": "[parameters('location')]",
       "properties": {
@@ -435,7 +435,8 @@
                 "recordDelimiter": {
                   "regexDelimiter": {
                     "pattern": "\\n",
-                    "matchIndex": 0
+                    "matchIndex": 0,
+                    "numberdGroup": "[json('null')]"
                   }
                 }
               }
@@ -443,7 +444,13 @@
             "extractions": [
               {
                 "extractionName": "TimeGenerated",
-                "extractionType": "DateTime"
+                "extractionType": "DateTime",
+                "extractionProperties": {
+                  "dateTimeExtraction": {
+                    "regex": "[json('null')]",
+                    "joinStringRegex": "[json('null')]"
+                  }
+                }
               }
             ]
           }
@@ -452,7 +459,7 @@
     },
     {
       "type": "Microsoft.Compute/virtualMachines",
-      "apiVersion": "2022-07-01",
+      "apiVersion": "2022-08-01",
       "name": "[variables('vmName')]",
       "location": "[parameters('location')]",
       "dependsOn": [
