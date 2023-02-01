@@ -8,7 +8,8 @@ export AZURE_REGION=${DEPLOY_REGION}
 export BASE_DOMAIN_RESOURCE_GROUP=${BASE_DOMAIN_RG_NAME}
 #Important Parameters 
 export RESOURCE_GROUP=${EXISTING_NETWORK_RG}
-
+#Shajeena
+export private-public=private
 export vnetName=${EXISTING_NETWORK}
 export INFRA_ID=($(echo $vnetName | tr '-' "\n"))
 
