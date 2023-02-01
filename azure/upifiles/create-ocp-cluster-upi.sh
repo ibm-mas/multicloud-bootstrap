@@ -273,7 +273,11 @@ sleep 120
 for i in `oc get csr --no-headers | grep -i pending |  awk '{ print $1 }'`; do oc adm certificate approve $i; done
 log "===== All CSR requests approved  ====="
 
-#Add *apps record in DNS zones 
+#Add *apps record in DNS zones
+#Shajeena
+# https://docs.openshift.com/container-platform/4.8/installing/installing_azure/installing-azure-private.html#private-clusters-about-azure_installing-azure-private
+# The following items are not required or created when you install a private cluster:
+# A BaseDomainResourceGroup Public IP addresses Public DNS records Public endpoints
 log "===== Adding DNS records to DNS zone  ====="
 export PUBLIC_IP_ROUTER=`oc -n openshift-ingress get service router-default --no-headers | awk '{print $4}'`
 az network dns record-set a add-record -g $BASE_DOMAIN_RESOURCE_GROUP -z ${BASE_DOMAIN} -n *.apps.${CLUSTER_NAME} -a $PUBLIC_IP_ROUTER --ttl 300
