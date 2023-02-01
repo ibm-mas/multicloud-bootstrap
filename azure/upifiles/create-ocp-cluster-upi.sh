@@ -278,13 +278,13 @@ log "===== All CSR requests approved  ====="
 # https://docs.openshift.com/container-platform/4.8/installing/installing_azure/installing-azure-private.html#private-clusters-about-azure_installing-azure-private
 # The following items are not required or created when you install a private cluster:
 # A BaseDomainResourceGroup Public IP addresses Public DNS records Public endpoints
-log "===== Adding DNS records to DNS zone  ====="
-export PUBLIC_IP_ROUTER=`oc -n openshift-ingress get service router-default --no-headers | awk '{print $4}'`
-az network dns record-set a add-record -g $BASE_DOMAIN_RESOURCE_GROUP -z ${BASE_DOMAIN} -n *.apps.${CLUSTER_NAME} -a $PUBLIC_IP_ROUTER --ttl 300
-if [ $? -ne 0 ]; then
-    log "ERROR: Unable to add dns records to public DNS zone"
-    exit 1
-fi
+#log "===== Adding DNS records to DNS zone  ====="
+#export PUBLIC_IP_ROUTER=`oc -n openshift-ingress get service router-default --no-headers | awk '{print $4}'`
+#az network dns record-set a add-record -g $BASE_DOMAIN_RESOURCE_GROUP -z ${BASE_DOMAIN} -n *.apps.${CLUSTER_NAME} -a $PUBLIC_IP_ROUTER --ttl 300
+#if [ $? -ne 0 ]; then
+ #   log "ERROR: Unable to add dns records to public DNS zone"
+  #  exit 1
+#fi
 export PUBLIC_IP_ROUTER=`oc -n openshift-ingress get service router-default --no-headers | awk '{print $4}'`
 az network private-dns record-set a create -g $RESOURCE_GROUP -z ${CLUSTER_NAME}.${BASE_DOMAIN} -n *.apps --ttl 300
 az network private-dns record-set a add-record -g $RESOURCE_GROUP -z ${CLUSTER_NAME}.${BASE_DOMAIN} -n *.apps -a $PUBLIC_IP_ROUTER
