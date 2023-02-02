@@ -178,49 +178,51 @@ resource "azurerm_subnet_network_security_group_association" "worker" {
 }
 
 
-#Create  azure bastion service to access OCP cluster nodes  
+#Create  azure bastion service to access OCP cluster nodes
 
-# Create bastion subnet in the vnet 
+# Create bastion subnet in the vnet
 
-resource "azurerm_subnet" "bastion_subnet" {
+  resource "azurerm_subnet" "bastion_subnet" {
+  count               = var.new-or-existing == "new" ? 1 : 0
   name                 = "AzureBastionSubnet"
   resource_group_name  = var.resource-group
   virtual_network_name = var.virtual-network-name
   address_prefix     =  var.bastion_cidr
   depends_on = [
-    azurerm_resource_group.cpdrg,
-    azurerm_virtual_network.cpdvirtualnetwork
-  ]
+  azurerm_resource_group.cpdrg,
+  azurerm_virtual_network.cpdvirtualnetwork
+]
 }
 
-#Create public IP 
-resource "azurerm_public_ip" "bastion_ip" {
+#Create public IP
+  resource "azurerm_public_ip" "bastion_ip" {
+  count              = var.new-or-existing == "new" ? 1 : 0
   name                = "bastion-ip"
   location            = var.region
   resource_group_name = var.resource-group
   allocation_method   = "Static"
   sku                 = "Standard"
   depends_on = [
-    azurerm_resource_group.cpdrg,
-    azurerm_virtual_network.cpdvirtualnetwork
-  ]
+  azurerm_resource_group.cpdrg,
+  azurerm_virtual_network.cpdvirtualnetwork
+]
 }
 
 #Create bastion host
-resource "azurerm_bastion_host" "bastion_host" {
-  name                = "azure-bastion-host"
-  location            = var.region
-  resource_group_name = var.resource-group
-
-  ip_configuration {
+  resource "azurerm_bastion_host" "bastion_host" {
+  count                     = var.new-or-existing == "new" ? 1 : 0
+    name                = "azure-bastion-host"
+    location            = var.region
+    resource_group_name = var.resource-group
+    ip_configuration {
     name                 = "bastion-configuration"
-    subnet_id            = azurerm_subnet.bastion_subnet.id
-    public_ip_address_id = azurerm_public_ip.bastion_ip.id
-  }
+    subnet_id            = azurerm_subnet.bastion_subnet[0].id
+    public_ip_address_id = azurerm_public_ip.bastion_ip[0].id
+}
   depends_on = [
-    azurerm_resource_group.cpdrg,
-    azurerm_virtual_network.cpdvirtualnetwork,
-    azurerm_subnet.bastion_subnet,
-    azurerm_public_ip.bastion_ip
-  ]
+  azurerm_resource_group.cpdrg,
+  azurerm_virtual_network.cpdvirtualnetwork,
+  azurerm_subnet.bastion_subnet,
+  azurerm_public_ip.bastion_ip
+]
 }
