@@ -29,6 +29,8 @@ new-or-existing         =  "existing"
 private-or-public-cluster = "private"
 existing-vnet-resource-group = "$EXISTING_NETWORK_RG"
 virtual-network-name = "$EXISTING_NETWORK"
+master-subnet-name = "$master-subnet-name"
+worker-subnet-name =  "$worker-subnet-name"
 EOT
 if [[ -f terraform.tfvars ]]; then
     chmod 600 terraform.tfvars
