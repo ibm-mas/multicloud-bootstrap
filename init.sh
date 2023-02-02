@@ -378,10 +378,12 @@ if [[ $CLUSTER_TYPE == "azure" ]]; then
   if [[ $INSTALLATION_MODE == "UPI" ]]; then
     VNET_NAME=$EXISTING_NETWORK
     export EXISTING_NETWORK_RG=`az network vnet list | jq --arg VNET_NAME $VNET_NAME '.[] | select(.name==$VNET_NAME).resourceGroup' | tr -d '"'`
-    export master-subnet-name=`az network  vnet subnet list --resource-group $EXISTING_NETWORK_RG --vnet-name $EXISTING_NETWORK  | jq  -r '.[].name'| grep master | tr -d '"'`
-    export worker-subnet-name=`az network  vnet subnet list --resource-group $EXISTING_NETWORK_RG --vnet-name $EXISTING_NETWORK  | jq  -r '.[].name'| grep worker | tr -d '"'`
+    export MASTER_SUBNET=`az network  vnet subnet list --resource-group $EXISTING_NETWORK_RG --vnet-name $EXISTING_NETWORK  | jq  -r '.[].name'| grep master | tr -d '"'`
+    export WORKER_SUBNET=`az network  vnet subnet list --resource-group $EXISTING_NETWORK_RG --vnet-name $EXISTING_NETWORK  | jq  -r '.[].name'| grep worker | tr -d '"'`
 
     log " EXISTING_NETWORK_RG: $EXISTING_NETWORK_RG"
+    log " MASTER_SUBNETG: $MASTER_SUBNET"
+    log " WORKER_SUBNET: $WORKER_SUBNET"
   fi
 fi
 
