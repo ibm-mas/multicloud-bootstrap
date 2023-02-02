@@ -62,17 +62,23 @@ if [[ $OPENSHIFT_USER_PROVIDE == "false" ]]; then
   cd $GIT_REPO_HOME
 
   ## Create OCP cluster
-  if [[ $INSTALLATION_MODE == "IPI" ]]; then
-    cd $GIT_REPO_HOME/azure
+
+  #If for UPI , create a seperate
+  cd $GIT_REPO_HOME/azure
     set +e
     ./create-ocp-cluster.sh
-    retcode=$?
-  else
-    cd $GIT_REPO_HOME/azure/upifiles
-    set +e
-    ./create-ocp-cluster-upi.sh
-    retcode=$?
-  fi
+   retcode=$?
+#  if [[ $INSTALLATION_MODE == "IPI" ]]; then
+#    cd $GIT_REPO_HOME/azure
+#    set +e
+#    ./create-ocp-cluster.sh
+#    retcode=$?
+#  else
+#    cd $GIT_REPO_HOME/azure/upifiles
+#    set +e
+#    ./create-ocp-cluster-upi.sh
+#    retcode=$?
+#  fi
   if [[ $retcode -ne 0 ]]; then
       log "OCP cluster creation failed"
       exit 21
