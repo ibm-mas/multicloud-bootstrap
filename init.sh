@@ -234,6 +234,8 @@ log " enable_permission_quota_check=$enable_permission_quota_check"
 
 if [[ -z "$EXISTING_NETWORK" && $CLUSTER_TYPE == "azure" ]]; then
   export INSTALLATION_MODE="IPI"
+  # Setting the name of the v-net
+  export EXISTING_NETWORK=${RANDOM_STR}-vnet
 else
   export INSTALLATION_MODE="UPI"
 fi
