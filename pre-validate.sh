@@ -121,7 +121,7 @@ if [[ $DEPLOY_MANAGE == "true" ]]; then
             export MAS_DB2_JAR_LOCAL_PATH=$GIT_REPO_HOME/lib/db2jcc4.jar
             if [[ ${MAS_JDBC_URL,, } =~ ^jdbc:db2? ]]; then
                 log "Connecting to the Database"
-                if python3 jdbc-prevalidate.py; then
+                if python jdbc-prevalidate.py; then
                     log "JDBC URL Validation = PASS"
                 else
                     log "ERROR: JDBC URL Validation = FAIL"

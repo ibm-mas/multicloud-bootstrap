@@ -108,6 +108,17 @@
         "description": "Enter the URL (preferebly with SAS token) of your Suite license key file kept on the Blob storage, for example: https://masocpstgaccount.blob.core.windows.net/masocpcontainer/entitlement.lic?[blob-sas-token] (Applicable only for BYOL product)"
       }
     },
+    "operationalMode": {
+      "type": "string",
+      "defaultValue": "Production",
+      "metadata": {
+        "description": "Non-production installations can be used for internal development and testing activities only."
+      },
+      "allowedValues": [
+        "Production",
+        "Non-production"
+      ]
+    },
     "masManageDBUser": {
       "type": "string",
       "metadata": {

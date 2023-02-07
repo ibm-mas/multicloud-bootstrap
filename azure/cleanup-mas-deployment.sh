@@ -4,7 +4,7 @@
 # Hence, make sure you do not have any other resources created in the same resource group.
 #
 # Parameters:
-#   -r RG_NAME: Bootnode resource group name. The cleanup process will find the OpenShift resource group automatically. 
+#   -r RG_NAME: Bootnode resource group name. The cleanup process will find the OpenShift resource group automatically.
 #     This is an optional parameter.
 #   -u UNIQUE_STR: Unique string using which the OpenShift resource group to be deleted.
 #     This is an optional parameter.
@@ -23,7 +23,7 @@ NC='\033[0m'
 usage() {
   echo "Usage: cleanup-mas-deployment.sh -r bootnode-resource-group -u unique-string"
   echo " "
-  echo "  - If resource group is present and it has the tag 'clusterUniqueString', you can delete the MAS instance by resource group name."
+  echo "  - If resource group is present and it has the tag 'clusterUniqueString', you can delete the Azure deployment by resource group name."
   echo "  - If you want to cleanup the resources based on the unique string, then provide the 'unique-string' parameter."
   echo "    In this case, the associated resource group won't be deleted even if it exists. It should be deleted explicitly."
   echo ""
@@ -72,7 +72,7 @@ echo " Unique string = $UNIQUE_STR"
 
 # Check if bootnode resource group or unique string is provided
 if [[ (-z $RG_NAME) && (-z $UNIQUE_STR) ]]; then
-  echoRed "ERROR: Both the parameters 'bootnode-resource-group' and 'unique-string' are empty, one of these should have a value" 
+  echoRed "ERROR: Both the parameters 'bootnode-resource-group' and 'unique-string' are empty, one of these should have a value"
   usage
 fi
 
@@ -103,7 +103,7 @@ if [[ -n $RG_NAME ]]; then
   set -e
 fi
 
-# Check if this is IPI installation or UPI. The IPI installation will have a VNet named 'ocpfourx-vnet' in bootnode VPC. The UPI instalation 
+# Check if this is IPI installation or UPI. The IPI installation will have a VNet named 'ocpfourx-vnet' in bootnode VPC. The UPI instalation
 # does not have it as the existing VNet will be in the different resource group than the bootnode resource group.
 ocpvnet=$(az resource list --resource-group $RG_NAME --resource-type Microsoft.Network/virtualNetworks --name "ocpfourx-vnet" | jq '. | length')
 if [[ $ocpvnet -eq 1 ]]; then
@@ -223,7 +223,7 @@ if [[ -n $RG_NAME ]]; then
   ROLEASMNTS=$(az role assignment list --all | jq ".[] | select(.resourceGroup == \"$RG_NAME\").id" | tr -d '"')
   echo "ROLEASMNTS = $ROLEASMNTS"
   if [[ -n $ROLEASMNTS ]]; then
-    echo "Found role assignments for this MAS instance"
+    echo "Found role assignments for this Azure deployment"
     roleasnmnts=""
     for inst in $ROLEASMNTS; do
       # Add to the list
@@ -233,7 +233,7 @@ if [[ -n $RG_NAME ]]; then
     az role assignment delete --ids $roleasnmnts
     sleep 10
   else
-    echo "No role assignments for this MAS instance"
+    echo "No role assignments for this Azure deployment"
   fi
   # Check if bootnode resource group exist
   rg=$(az group list | jq ".[] | select(.name | contains(\"$RG_NAME\")).name" | tr -d '"')

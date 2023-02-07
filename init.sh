@@ -15,18 +15,7 @@ export BASE_DOMAIN_RG_NAME=$8
 export SSH_KEY_NAME=$9
 export DEPLOY_WAIT_HANDLE=${10}
 export SLS_ENTITLEMENT_KEY=${11}
-#separated it with <<ER>>-DEV-<<EI>>-PASSWORD-<<EP>>
-export PROD_ENTITLEMENT_KEY=${SLS_ENTITLEMENT_KEY%-DEV-*}
-export DEV_ENTITLEMENT_KEY=${SLS_ENTITLEMENT_KEY#*-DEV-}
-export ENTERPRISE_ID=${DEV_ENTITLEMENT_KEY%-PASSWORD-*}
-export ENTERPRISE_PASSWORD=${DEV_ENTITLEMENT_KEY#*-PASSWORD-}
-export SLS_ENTITLEMENT_KEY=$PROD_ENTITLEMENT_KEY
 
-#echo $DEV_ENTITLEMENT_KEY
-#echo $PROD_ENTITLEMENT_KEY
-#echo $SLS_ENTITLEMENT_KEY
-#echo $ENTERPRISE_ID
-#echo $ENTERPRISE_PASSWORD
 
 
 export OCP_PULL_SECRET=${12}
@@ -219,7 +208,7 @@ export ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
 # not reqd its hardcoded as db2_namespace: db2u
 #export DB2WH_NAMESPACE="cpd-services-${RANDOM_STR}"
 # MAS variables
-#export MAS_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
+export MAS_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
 export MAS_WORKSPACE_ID="wsmasocp"
 export MAS_WORKSPACE_NAME="wsmasocp"
 export MAS_CONFIG_SCOPE="wsapp"
@@ -242,11 +231,10 @@ log " enable_permission_quota_check=$enable_permission_quota_check"
 
 if [[ -z "$EXISTING_NETWORK" && $CLUSTER_TYPE == "azure" ]]; then
   export INSTALLATION_MODE="IPI"
-  export EXISTING_NETWORK=$RANDOM_STR-ocp
 else
   export INSTALLATION_MODE="UPI"
 fi
-log "==== INSTALLATION MODE: ${INSTALLATION_MODE}"
+#log "==== INSTALLATION MODE: ${INSTALLATION_MODE}"
 
 RESP_CODE=0
 
@@ -299,6 +287,7 @@ echo 'CHECK 2'
 
 # Log the variable values
 log "Below are common deployment parameters,"
+log " OPERATIONAL_MODE: $OPERATIONAL_MODE"
 log " CLUSTER_TYPE: $CLUSTER_TYPE"
 log " OFFERING_TYPE: $OFFERING_TYPE"
 log " DEPLOY_REGION: $DEPLOY_REGION"
@@ -422,6 +411,7 @@ else
   PRE_VALIDATION=pass
 fi
 log "===== PRE-VALIDATION COMPLETED ($PRE_VALIDATION) ====="
+
 
 # Perform the MAS deployment only if pre-validation checks are passed
 if [[ $PRE_VALIDATION == "pass" ]]; then

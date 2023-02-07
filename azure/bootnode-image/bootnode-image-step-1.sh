@@ -71,7 +71,7 @@ echo $output
 vmip=$(echo $output | jq '.publicIpAddress' | tr -d '"')
 echo "VM IP address: $vmip"
 
-ssh -i $6 -o StrictHostKeyChecking=no azureuser@$vmip "cd /tmp; curl -skSL 'https://raw.githubusercontent.com/ibm-mas/multicloud-bootstrap/mas89-alpha/azure/bootnode-image/prepare-bootnode-image.sh' -o prepare-bootnode-image.sh; chmod +x prepare-bootnode-image.sh; sudo su - root -c \"/tmp/prepare-bootnode-image.sh '$ANSIBLE_COLLECTION_VERSION' '$ANSIBLE_COLLECTION_BRANCH' '$BOOTSTRAP_AUTOMATION_TAG_OR_BRANCH'\""
+ssh -i $6 -o StrictHostKeyChecking=no azureuser@$vmip "cd /tmp; curl -skSL 'https://raw.githubusercontent.com/ibm-mas/multicloud-bootstrap/upimergeold/azure/bootnode-image/prepare-bootnode-image.sh' -o prepare-bootnode-image.sh; chmod +x prepare-bootnode-image.sh; sudo su - root -c \"/tmp/prepare-bootnode-image.sh '$ANSIBLE_COLLECTION_VERSION' '$ANSIBLE_COLLECTION_BRANCH' '$BOOTSTRAP_AUTOMATION_TAG_OR_BRANCH'\""
 az vm deallocate --resource-group masocp-bootnode-vm-rg-${UNIQSTR} --name bootnode-prep
 az vm generalize --resource-group masocp-bootnode-vm-rg-${UNIQSTR} --name bootnode-prep
 az image create --resource-group masocp-bootnode-vm-rg-${UNIQSTR} --name masocp-bootnode-img-${UNIQSTR} --source bootnode-prep --hyper-v-generation V2
@@ -85,7 +85,8 @@ az sig image-version update --resource-group masocp-bootnode-image-rg-${UNIQSTR}
 echo " Replicating the images to supported regions in the background, it may take around 30 minutes to complete. Please check the replication status from Azure portal."
 
 # Delete the VM resource group
-az group delete -y --name masocp-bootnode-vm-rg-${UNIQSTR}
+az group delete -y --name masocp-bootnode-vm-rg-${UNIQSTR} --no-wait
+az group wait --name masocp-bootnode-vm-rg-${UNIQSTR} --deleted
 
 echo "========================================="
 echo "Bootnode image creation step-1 completed."

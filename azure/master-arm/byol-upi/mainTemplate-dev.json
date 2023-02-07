@@ -27,7 +27,7 @@
       "defaultValue": "Standard_D2s_v3",
       "allowedValues": [
         "Standard_D2s_v3"
-             ]
+      ]
     },
     "offeringType": {
       "type": "string",
