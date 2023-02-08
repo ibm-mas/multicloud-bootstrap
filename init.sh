@@ -374,7 +374,9 @@ if [[ $CLUSTER_TYPE == "azure" ]]; then
   log " AZURE_SUBSC_ID: $AZURE_SUBSC_ID"
   # Get Base domain RG name
   DNS_ZONE=$BASE_DOMAIN
-  export BASE_DOMAIN_RG_NAME=`az network dns zone list | jq --arg DNS_ZONE $DNS_ZONE '.[] | select(.name==$DNS_ZONE).resourceGroup' | tr -d '"'`
+  #export BASE_DOMAIN_RG_NAME=`az network dns zone list | jq --arg DNS_ZONE $DNS_ZONE '.[] | select(.name==$DNS_ZONE).resourceGroup' | tr -d '"'`
+  # Shajeena FOR PRIVATE
+  export BASE_DOMAIN_RG_NAME=`az network private-dns zone list | jq --arg DNS_ZONE $DNS_ZONE '.[] | select(.name==$DNS_ZONE).resourceGroup' | tr -d '"'`
   log " BASE_DOMAIN_RG_NAME: $BASE_DOMAIN_RG_NAME"
   # Get VNet RG name for UPI based installation
   if [[ $INSTALLATION_MODE == "UPI" ]]; then
