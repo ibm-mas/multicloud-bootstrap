@@ -28,7 +28,7 @@ worker-node-count       = "$WORKER_NODE_COUNT"
 virtual-network-name    = "$EXISTING_NETWORK"
 new-or-existing         =  "$new_or_existing_vpc_subnet"
 existing-vnet-resource-group = "$EXISTING_NETWORK_RG"
-private-or-public-cluster = "public"
+private-or-public-cluster = "private"
 EOT
 if [[ -f terraform.tfvars ]]; then
     chmod 600 terraform.tfvars
