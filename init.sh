@@ -225,9 +225,11 @@ if [ -z "$EXISTING_NETWORK" ]; then
   export new_or_existing_vpc_subnet="new"
   export enable_permission_quota_check=true
   export PRIVATE_CLUSTER=false
+  export private_or_public_cluster=public
 else
    export new_or_existing_vpc_subnet="exist"
    export enable_permission_quota_check=false
+   export private_or_public_cluster=public
 fi
 log " new_or_existing_vpc_subnet=$new_or_existing_vpc_subnet"
 log " enable_permission_quota_check=$enable_permission_quota_check"
@@ -374,12 +376,21 @@ if [[ $CLUSTER_TYPE == "azure" ]]; then
   log " AZURE_SUBSC_ID: $AZURE_SUBSC_ID"
   # Get Base domain RG name
   DNS_ZONE=$BASE_DOMAIN
-  #export BASE_DOMAIN_RG_NAME=`az network dns zone list | jq --arg DNS_ZONE $DNS_ZONE '.[] | select(.name==$DNS_ZONE).resourceGroup' | tr -d '"'`
-  # Shajeena FOR PRIVATE
-  export BASE_DOMAIN_RG_NAME=`az network private-dns zone list | jq --arg DNS_ZONE $DNS_ZONE '.[] | select(.name==$DNS_ZONE).resourceGroup' | tr -d '"'`
-  log " BASE_DOMAIN_RG_NAME: $BASE_DOMAIN_RG_NAME"
+  export BASE_DOMAIN_RG_NAME=`az network dns zone list | jq --arg DNS_ZONE $DNS_ZONE '.[] | select(.name==$DNS_ZONE).resourceGroup' | tr -d '"'`
+   log " BASE_DOMAIN_RG_NAME: $BASE_DOMAIN_RG_NAME"
   # Get VNet RG name for UPI based installation
   if [[ $INSTALLATION_MODE == "UPI" ]]; then
+    # Domain name with private dns - only available for UPI
+    if [[ $PRIVATE_CLUSTER == "true" ]]; then
+       # Shajeena FOR PRIVATE
+        export private_or_public_cluster="private"
+        export BASE_DOMAIN_RG_NAME=`az network private-dns zone list | jq --arg DNS_ZONE $DNS_ZONE '.[] | select(.name==$DNS_ZONE).resourceGroup' | tr -d '"'`
+         log " UPI PRIVATE CLUSTER - BASE_DOMAIN_RG_NAME: $BASE_DOMAIN_RG_NAME"
+      else
+         export private_or_public_cluster="public"
+         export BASE_DOMAIN_RG_NAME=`az network dns zone list | jq --arg DNS_ZONE $DNS_ZONE '.[] | select(.name==$DNS_ZONE).resourceGroup' | tr -d '"'`
+         log " UPI PUBLIC CLUSTER - BASE_DOMAIN_RG_NAME: $BASE_DOMAIN_RG_NAME"
+      fi
     VNET_NAME=$EXISTING_NETWORK
     export EXISTING_NETWORK_RG=`az network vnet list | jq --arg VNET_NAME $VNET_NAME '.[] | select(.name==$VNET_NAME).resourceGroup' | tr -d '"'`
     log " EXISTING_NETWORK_RG: $EXISTING_NETWORK_RG"
