@@ -218,6 +218,17 @@
           "false"
         ]
       },
+      "PrivateCluster": {
+        "defaultValue": "false",
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "type": "String",
+        "metadata": {
+          "description": "Select true to create a private OpenShift cluster."
+        }
+      },
       "openShiftClustervnetId": {
         "type": "string",
         "metadata": {
@@ -524,7 +535,7 @@
               "typeHandlerVersion": "2.0",
               "autoUpgradeMinorVersion": true,
               "protectedSettings": {
-                "commandToExecute": "[concat('sleep 120;', 'cd /root/ansible-devops/multicloud-bootstrap;', './init-async.sh azure ''', parameters('offeringType'), ''' ''', parameters('location'), ''' null ''', parameters('clusterSize'), ''' ''', variables('projectName'), ''' ''', parameters('publicDomain'), ''' null ''', parameters('sshPublicKey'), ''' null ''', parameters('entitledRegistryKey'), ''' ''', parameters('openShiftPullSecret'), ''' ''', parameters('masLicenseUrl'), ''' ''', parameters('slsEndpointUrl'), ''' ''', parameters('slsRegistrationKey'), ''' ''', parameters('slsPublicCertificateUrl'), ''' ''', parameters('udsEndpointUrl'), ''' ''', parameters('udsAPIKey'), ''' ''', parameters('udsPublicCertificateUrl'), ''' ''', parameters('masManageDBUser'), ''' ''', parameters('masManageDBPassword'), ''' ''', parameters('masManageDBJdbcUrl'), ''' ''', parameters('masManageDBCertificateUrl'), ''' ''', parameters('importDemoData'), ''' '''' '''' '''' ''', variables('rgName'), ''' ''', parameters('emailNotification'), ''' ''', parameters('notificattionEmailAddress'), ''' ''', parameters('smtpHost'), ''' ''', parameters('smtpPort'), ''' ''', parameters('smtpUsername'), ''' ''', parameters('smtpPassword'), ''' ''', parameters('azureServicePrincipalClientId'), ''' ''', parameters('azureServicePrincipalClientSecret'), ''' ''', variables('seller_subscription_id'), ''' ''', parameters('azureServicePrincipalTenantId'), ''' null null ''', parameters('openShiftClustervnetId'), ''' '''' null null null null null null null ''', parameters('operationalMode'), ''' prod ''', ''' > mas-provisioning.log 2>&1;')]"
+                "commandToExecute": "[concat('sleep 120;', 'cd /root/ansible-devops/multicloud-bootstrap;', './init-async.sh azure ''', parameters('offeringType'), ''' ''', parameters('location'), ''' null ''', parameters('clusterSize'), ''' ''', variables('projectName'), ''' ''', parameters('publicDomain'), ''' null ''', parameters('sshPublicKey'), ''' null ''', parameters('entitledRegistryKey'), ''' ''', parameters('openShiftPullSecret'), ''' ''', parameters('masLicenseUrl'), ''' ''', parameters('slsEndpointUrl'), ''' ''', parameters('slsRegistrationKey'), ''' ''', parameters('slsPublicCertificateUrl'), ''' ''', parameters('udsEndpointUrl'), ''' ''', parameters('udsAPIKey'), ''' ''', parameters('udsPublicCertificateUrl'), ''' ''', parameters('masManageDBUser'), ''' ''', parameters('masManageDBPassword'), ''' ''', parameters('masManageDBJdbcUrl'), ''' ''', parameters('masManageDBCertificateUrl'), ''' ''', parameters('importDemoData'), ''' '''' '''' '''' ''', variables('rgName'), ''' ''', parameters('emailNotification'), ''' ''', parameters('notificattionEmailAddress'), ''' ''', parameters('smtpHost'), ''' ''', parameters('smtpPort'), ''' ''', parameters('smtpUsername'), ''' ''', parameters('smtpPassword'), ''' ''', parameters('azureServicePrincipalClientId'), ''' ''', parameters('azureServicePrincipalClientSecret'), ''' ''', variables('seller_subscription_id'), ''' ''', parameters('azureServicePrincipalTenantId'), ''' null null ''', parameters('openShiftClustervnetId'), ''' '''' null null null null null null ''', parameters('PrivateCluster'),parameters('operationalMode'), ''' prod ''', ''' > mas-provisioning.log 2>&1;')]",
               }
             }
           }
