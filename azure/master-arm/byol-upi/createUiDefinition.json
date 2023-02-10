@@ -225,9 +225,27 @@
                             "validationMessage": "Contain lowercase letters only."
                         },
                         "visible": true
+                    },
+                    {
+                        "name": "PrivateCluster",
+                        "type": "Microsoft.Common.DropDown",
+                        "label": "PrivateCluster",
+                        "defaultValue": "false",
+                        "toolTip": "Select true to create a private OpenShift cluster.",
+                        "constraints": {
+                            "allowedValues": [
+                                {
+                                    "label": "true",
+                                    "value": "true"
+                                },
+                                {
+                                    "label": "false",
+                                    "value": "false"
+                                }
+                            ]
+                        },
+                        "visible": false
                     }
-
-                    
                 ]
             },
             {
@@ -507,6 +525,7 @@
             "masLicenseUrl": "[steps('ApplicationSettings').masLicenseUrl]",
             "operationalMode": "[steps('ApplicationSettings').operationalMode]",
             "openShiftClustervnetId": "[steps('ExistingNetworkInfrastructure').openShiftClustervnetId]",
+            "PrivateCluster": "[steps('ExistingNetworkInfrastructure').PrivateCluster]",
 
             "slsEndpointUrl": "[steps('ExistingInfrastructure').slsEndpointUrl]",
             "slsRegistrationKey": "[steps('ExistingInfrastructure').slsRegistrationKey]",
