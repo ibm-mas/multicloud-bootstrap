@@ -76,7 +76,7 @@ resource "azurerm_network_interface" "nfs" {
 
 resource "azurerm_network_security_group" "master" {
   count               = var.new-or-existing == "new" ? 1 : 0
-  name                = "master-nsg"
+  name                = var.master-nsg-name
   location            = var.region
   resource_group_name = var.resource-group
 
@@ -100,7 +100,7 @@ resource "azurerm_network_security_group" "master" {
 
 resource "azurerm_network_security_group" "worker" {
   count               = var.new-or-existing == "new" ? 1 : 0
-  name                = "worker-nsg"
+  name                = var.worker-nsg-name
   location            = var.region
   resource_group_name = var.resource-group
 
