@@ -263,9 +263,8 @@
   },
   "variables": {
     "seller_subscription_id": "b2ca5467-2502-4b05-b78e-744604c6531d",
-    "seller_resource_group": "EdgeTest",
-    "seller_compute_gallery_name": "masbyolimagegallery20220808082537",
-    "seller_image_definition": "masocp-image-def-20220808082537",
+    "seller_compute_gallery_name": "masbyolimagegallery20221213212024",
+    "seller_image_definition": "masocp-image-def-20221213212024",
     "projectName": "[concat('u',substring(uniqueString(resourceGroup().id, deployment().name), 0, 5))]",
     "rgName": "[resourceGroup().name]",
     "vNetName": "[concat(variables('projectName'), '-vnet')]",
@@ -284,7 +283,7 @@
   "resources": [
     {
       "type": "Microsoft.Network/networkSecurityGroups",
-      "apiVersion": "2020-11-01",
+      "apiVersion": "2022-07-01",
       "name": "[variables('networkSecurityGroupName')]",
       "location": "[parameters('location')]",
       "properties": {
@@ -308,7 +307,7 @@
     },
     {
       "type": "Microsoft.Network/publicIPAddresses",
-      "apiVersion": "2020-11-01",
+      "apiVersion": "2022-07-01",
       "name": "[variables('publicIPAddressName')]",
       "location": "[parameters('location')]",
       "properties": {
@@ -321,7 +320,7 @@
     {
       "comments": "Simple Network Security Group for subnet [variables('vNetSubnetName')]",
       "type": "Microsoft.Network/networkSecurityGroups",
-      "apiVersion": "2020-11-01",
+      "apiVersion": "2022-07-01",
       "name": "[variables('networkSecurityGroupName2')]",
       "location": "[parameters('location')]",
       "properties": {
@@ -344,7 +343,7 @@
     },
     {
       "type": "Microsoft.Network/virtualNetworks",
-      "apiVersion": "2020-11-01",
+      "apiVersion": "2022-07-01",
       "name": "[variables('vNetName')]",
       "location": "[parameters('location')]",
       "dependsOn": [
@@ -371,7 +370,7 @@
     },
     {
       "type": "Microsoft.Network/networkInterfaces",
-      "apiVersion": "2020-11-01",
+      "apiVersion": "2022-07-01",
       "name": "[variables('networkInterfaceName')]",
       "location": "[parameters('location')]",
       "dependsOn": [
@@ -437,7 +436,7 @@
                   "regexDelimiter": {
                     "pattern": "\\n",
                     "matchIndex": 0,
-                    "numberdGroup": null
+                    "numberdGroup": "[json('null')]"
                   }
                 }
               }
@@ -448,8 +447,8 @@
                 "extractionType": "DateTime",
                 "extractionProperties": {
                   "dateTimeExtraction": {
-                    "regex": null,
-                    "joinStringRegex": null
+                    "regex": "[json('null')]",
+                    "joinStringRegex": "[json('null')]"
                   }
                 }
               }
@@ -460,7 +459,7 @@
     },
     {
       "type": "Microsoft.Compute/virtualMachines",
-      "apiVersion": "2021-11-01",
+      "apiVersion": "2022-08-01",
       "name": "[variables('vmName')]",
       "location": "[parameters('location')]",
       "dependsOn": [
@@ -503,7 +502,7 @@
       },
       "resources": [
         {
-          "apiVersion": "2021-11-01",
+          "apiVersion": "2022-08-01",
           "type": "extensions",
           "name": "config-app",
           "location": "[parameters('location')]",
@@ -527,7 +526,7 @@
     },
     {
       "type": "Microsoft.Compute/virtualMachines/extensions",
-      "apiVersion": "2021-11-01",
+      "apiVersion": "2022-08-01",
       "name": "[concat(variables('vmName'),'/', 'OMSExtension')]",
       "location": "[parameters('location')]",
       "dependsOn": [
@@ -550,7 +549,7 @@
     },
     {
       "type": "Microsoft.Storage/storageAccounts",
-      "apiVersion": "2021-04-01",
+      "apiVersion": "2022-05-01",
       "name": "[variables('storageaccountName')]",
       "location": "[parameters('location')]",
       "sku": {
@@ -563,7 +562,7 @@
     },
     {
       "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
-      "apiVersion": "2021-09-01",
+      "apiVersion": "2022-05-01",
       "name": "[concat(variables('storageaccountName'), '/default/masocpcontainer')]",
       "dependsOn": [
         "[resourceId('Microsoft.Storage/storageAccounts', variables('storageaccountName'))]"
