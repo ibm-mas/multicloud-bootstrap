@@ -57,15 +57,15 @@ Parameters:
       s3://masocp-license/entitlement.lic
     Type: String
     MinLength: '1'
-  MASMessagingURL:
+  MASMessagingPlatform:
     Description: >-
-      Enter the URL location of the messaging platform
+      Enter the messaging platform (default is None)
     Type: String
-    Default: No Kafka
+    Default: None
     MinLength: '1'
     AllowedValues:
-      - No Kafka
-      - Apache Kafka
+      - None
+      - ApacheKafka
       - MSK
   MASManageDBUser:
     Description: >-
@@ -183,7 +183,7 @@ Metadata:
             Messaging Platform configuration (complete this section only if
             you need Kafka)
         Parameters:
-          - MASMessagingURL
+          - MASMessagingPlatform
       - Label:
           default: >-
             Maximo Manage database configuration (complete this section only if
@@ -645,7 +645,7 @@ Resources:
             - !Ref OperationalMode
             - ''' "dev" '
             - ''' '''
-            - !Ref MASMessagingURL
+            - !Ref MASMessagingPlatform
             - ''' '''
             - '2>&1 | tee mas-provisioning.log; '
       Tags:
