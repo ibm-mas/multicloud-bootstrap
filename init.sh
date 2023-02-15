@@ -70,6 +70,7 @@ export EXISTING_PUBLIC_SUBNET3_ID=${50}
 export PRIVATE_CLUSTER=${51}
 export OPERATIONAL_MODE=${52}
 export ENV_TYPE=${53}
+export MESSAGING_PLATFORM=${54}
 export GIT_REPO_HOME=$(pwd)
 # Load helper functions
 . helper.sh
@@ -84,6 +85,8 @@ export -f get_uds_api_key
 export -f validate_prouduct_type
 
 export GIT_REPO_HOME=$(pwd)
+
+log "MESSAGING_PLATFORM is - $MESSAGING_PLATFORM"
 
 ## Configure CloudWatch agent
 if [[ $CLUSTER_TYPE == "aws" ]]; then

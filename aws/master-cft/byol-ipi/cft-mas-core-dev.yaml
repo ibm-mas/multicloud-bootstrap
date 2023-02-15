@@ -57,6 +57,16 @@ Parameters:
       s3://masocp-license/entitlement.lic
     Type: String
     MinLength: '1'
+  MASMessagingURL:
+    Description: >-
+      Enter the URL location of the messaging platform
+    Type: String
+    Default: No Kafka
+    MinLength: '1'
+    AllowedValues:
+      - No Kafka
+      - Apache Kafka
+      - MSK
   MASManageDBUser:
     Description: >-
       Enter the username that the Maximo Manage application uses to connect to
@@ -168,6 +178,12 @@ Metadata:
           - EntitledRegistryKey
           - OpenShiftPullSecret
           - MASLicenseUrl
+      - Label:
+          default: >-
+            Messaging Platform configuration (complete this section only if
+            you need Kafka)
+        Parameters:
+          - MASMessagingURL
       - Label:
           default: >-
             Maximo Manage database configuration (complete this section only if
@@ -570,7 +586,7 @@ Resources:
             - 'git clone https://github.com/ibm-mas/ansible-devops.git;'
             - cd ansible-devops;
             - rm -rf multicloud-bootstrap 1>/dev/null 2>&1;
-            - 'git clone https://github.com/ibm-mas/multicloud-bootstrap.git;'
+            - 'git clone -b mas810-alpha-amit https://github.com/ibm-mas/multicloud-bootstrap.git;'
             - cd multicloud-bootstrap;
             - 'find . -type f -name "*.sh" -exec chmod +x {} \;;'
             - ./init.sh "aws" "
@@ -628,6 +644,9 @@ Resources:
             - ''' '''
             - !Ref OperationalMode
             - ''' "dev" '
+            - ''' '''
+            - !Ref MASMessagingURL
+            - ''' '''
             - '2>&1 | tee mas-provisioning.log; '
       Tags:
         - Key: Name
