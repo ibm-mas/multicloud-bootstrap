@@ -15,9 +15,6 @@ export BASE_DOMAIN_RG_NAME=$8
 export SSH_KEY_NAME=$9
 export DEPLOY_WAIT_HANDLE=${10}
 export SLS_ENTITLEMENT_KEY=${11}
-
-
-
 export OCP_PULL_SECRET=${12}
 export MAS_LICENSE_URL=${13}
 export SLS_URL=${14}
@@ -395,10 +392,10 @@ if [[ $CLUSTER_TYPE == "azure" ]]; then
        VNET_NAME=$EXISTING_NETWORK
        export EXISTING_NETWORK_RG=`az network vnet list | jq --arg VNET_NAME $VNET_NAME '.[] | select(.name==$VNET_NAME).resourceGroup' | tr -d '"'`
         #Assign the nsg name
-       export nsg_name =`az network vnet subnet list --resource-group $EXISTING_NETWORK_RG --vnet-name  $VNET_NAME|jq '.[0] | select(.name).networkSecurityGroup.id'|awk -F'/' '{print $9}'|tr -d '"'`
+       export nsg_name=az network vnet subnet list --resource-group $EXISTING_NETWORK_RG --vnet-name  $VNET_NAME|jq '.[0] | select(.name).networkSecurityGroup.id'|awk -F'/' '{print $9}'|tr -d '"'`
         #Assign the network subnet
-       export  master_subnet_name = `az network vnet subnet list --resource-group $EXISTING_NETWORK_RG --vnet-name $VNET_NAME|jq '.[] | select(.name).name'|grep master|tr -d '"'`
-       export  worker_subnet_name = `az network vnet subnet list --resource-group $EXISTING_NETWORK_RG --vnet-name $VNET_NAME|jq '.[] | select(.name).name'|grep worker|tr -d '"'`
+       export  master_subnet_name=`az network vnet subnet list --resource-group $EXISTING_NETWORK_RG --vnet-name $VNET_NAME|jq '.[] | select(.name).name'|grep master|tr -d '"'`
+       export  worker_subnet_name=`az network vnet subnet list --resource-group $EXISTING_NETWORK_RG --vnet-name $VNET_NAME|jq '.[] | select(.name).name'|grep worker|tr -d '"'`
        log " MASTER SUBNET NAME: $master_subnet_name "
        log " WORKER SUBNET NAME: $worker_subnet_name"
        log " NSG NAME: $nsg_name"
