@@ -26,13 +26,11 @@ openshift-password      = "$OCP_PASSWORD"
 master-node-count       = "$MASTER_NODE_COUNT"
 worker-node-count       = "$WORKER_NODE_COUNT"
 virtual-network-name    = "$EXISTING_NETWORK"
-new-or-existing         =  "$new_or_existing_vpc_subnet"
+new-or-existing         = "$new_or_existing_vpc_subnet"
 existing-vnet-resource-group = "$EXISTING_NETWORK_RG"
 private-or-public-cluster = "$private_or_public_cluster"
 master-subnet-name        =  "$master_subnet_name"
 worker-subnet-name        =  "$worker_subnet_name"
-master-nsg-name           =   "$nsg_name"
-worker-nsg-name           =   "$nsg_name"
 EOT
 
 if [[ -f terraform.tfvars ]]; then
