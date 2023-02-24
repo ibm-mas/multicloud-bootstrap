@@ -173,7 +173,7 @@ export OCP_VERSION="4.10.35"
 export MAS_IMAGE_TEST_DOWNLOAD="cp.icr.io/cp/mas/admin-dashboard:5.1.27"
 export BACKUP_FILE_NAME="deployment-backup-${CLUSTER_NAME}.zip"
 if [[ $CLUSTER_TYPE == "aws" ]]; then
-  export DEPLOYMENT_CONTEXT_UPLOAD_PATH="s3://masocp-${RANDOM_STR}-bucket-${DEPLOY_REGION}/ocp-cluster-provisioning-deployment-context/"
+  export DEPLOYMENT_CONTEXT_UPLOAD_PATH="s3://blr-s3bucket/masocp-${RANDOM_STR}-bucket-${DEPLOY_REGION}/ocp-cluster-provisioning-deployment-context/"
 elif [[ $CLUSTER_TYPE == "azure" ]]; then
   export DEPLOYMENT_CONTEXT_UPLOAD_PATH="ocp-cluster-provisioning-deployment-context/${BACKUP_FILE_NAME}"
   export STORAGE_ACNT_NAME="masocp${RANDOM_STR}stgaccount"
