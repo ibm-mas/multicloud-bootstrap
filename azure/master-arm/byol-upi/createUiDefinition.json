@@ -227,6 +227,19 @@
                         "visible": true
                     },
                     {
+                        "name": "vnetIdResourceGroup",
+                        "type": "Microsoft.Common.TextBox",
+                        "label": "VNet Name resource group",
+                        "defaultValue": "",
+                        "toolTip": "Vnet name resource group eg.masocp-vnet-rg",
+                        "constraints": {
+                            "required": true,
+                            "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
+                            "validationMessage": "Contain lowercase letters only."
+                        },
+                        "visible": true
+                    },
+                    {
                         "name": "PrivateCluster",
                         "type": "Microsoft.Common.DropDown",
                         "label": "PrivateCluster",
