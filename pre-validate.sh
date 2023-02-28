@@ -52,6 +52,16 @@ if [[ ($CLUSTER_TYPE == "aws") && (-n $BASE_DOMAIN) ]]; then
 else
     true
 fi
+# Check if provided hosted zone is public /private for azure
+if [[ ($CLUSTER_TYPE == "azure") && (-n $BASE_DOMAIN) ]]; then
+    if [[ $PRIVATE_CLUSTER == "false" ]]; then
+       PUBLIC_DNS_VALIDATION=`az network dns zone list  |grep -w $BASE_DOMAIN| tr -d '"'`
+          [[ ! -z "$PUBLIC_DNS_VALIDATION" ]] && log "Valid PUBLIC DNS selection" || log "Invalid PUBLIC DNS SELECTION"
+        else
+         PRIVATE_DNS_VALIDATION=`az network private-dns zone list |grep -w $BASE_DOMAIN| tr -d '"'`
+           [[ ! -z "$PRIVATE_DNS_VALIDATION" ]] && log "Valid PRIVATE DNS selection" || log "Invalid PRIVATE DNS SELECTION"
+    fi
+fi
 
 if [ $? -eq 0 ]; then
     log "MAS public domain verification = PASS"
