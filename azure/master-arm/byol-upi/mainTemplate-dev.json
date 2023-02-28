@@ -211,19 +211,32 @@
       "type": "string",
       "metadata": {
         "description": "Indicate whether you want to receive emails that contain the connection details and credentials for the Suite. These emails are sent using the provided SMTP server details."
-      },
+      }
+    },
+    "privateCluster": {
       "defaultValue": "false",
       "allowedValues": [
         "true",
         "false"
-      ]
+      ],
+      "type": "String",
+      "metadata": {
+        "description": "Select true to create a private OpenShift cluster."
+      }
     },
     "openShiftClustervnetId": {
-      "type": "string",
+      "defaultValue": "kxr601-vnet",
+      "type": "String",
       "metadata": {
         "description": "Enter the existing VNet name to create the OpenShift cluster resources into (required for UPI mode deployment)."
-      },
-      "defaultValue": ""
+      }
+    },
+    "vnetIdResourceGroup": {
+      "defaultValue": "kxr601-vnet-rg",
+      "type": "String",
+      "metadata": {
+        "description": "Enter the existing VNet resource group   (required for UPI mode deployment)."
+      }
     },
     "smtpHost": {
       "type": "string",
@@ -269,8 +282,8 @@
     "rgName": "[resourceGroup().name]",
     "vNetName": "[concat(variables('projectName'), '-vnet')]",
     "vNetAddressPrefixes": "10.0.0.0/16",
-    "vNetSubnetName": "default",
-    "vNetSubnetAddressPrefix": "10.0.0.0/24",
+    "vNetSubnetName": "bootnodeSubnet",
+    "vNetSubnetAddressPrefix": "10.0.4.0/24",
     "logAnalyticsWorkspace": "[concat('masocp-', variables('projectName'), '-logAnalyticsWorkspace')]",
     "logAnalyticsWorkspaceId": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('logAnalyticsWorkspace'))]",
     "vmName": "[concat('masocp-', variables('projectName'), '-bootnode-vm')]",
@@ -318,54 +331,59 @@
       }
     },
     {
-      "comments": "Simple Network Security Group for subnet [variables('vNetSubnetName')]",
-      "type": "Microsoft.Network/networkSecurityGroups",
-      "apiVersion": "2022-07-01",
-      "name": "[variables('networkSecurityGroupName2')]",
-      "location": "[parameters('location')]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2021-04-01",
+      "name": "existingvnetTemplate",
+      "resourceGroup": "[parameters('vnetIdResourceGroup')]",
+      "subscriptionid": "[parameters('seller_subscription_id')]",
       "properties": {
-        "securityRules": [
-          {
-            "name": "default-allow-22",
-            "properties": {
-              "priority": 1000,
-              "access": "Allow",
-              "direction": "Inbound",
-              "destinationPortRange": "22",
-              "protocol": "Tcp",
-              "sourceAddressPrefix": "[parameters('bootnodeSGIngressCidrIp')]",
-              "sourcePortRange": "*",
-              "destinationAddressPrefix": "*"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "type": "Microsoft.Network/virtualNetworks",
-      "apiVersion": "2022-07-01",
-      "name": "[variables('vNetName')]",
-      "location": "[parameters('location')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName2'))]"
-      ],
-      "properties": {
-        "addressSpace": {
-          "addressPrefixes": [
-            "[variables('vNetAddressPrefixes')]"
-          ]
-        },
-        "subnets": [
-          {
-            "name": "[variables('vNetSubnetName')]",
-            "properties": {
-              "addressPrefix": "[variables('vNetSubnetAddressPrefix')]",
-              "networkSecurityGroup": {
-                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName2'))]"
+        "mode": "Incremental",
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "parameters": {},
+          "variables": {},
+          "resources": [
+            {
+              "type": "Microsoft.Network/networkSecurityGroups",
+              "apiVersion": "2022-07-01",
+              "name": "[variables('networkSecurityGroupName2')]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "securityRules": [
+                  {
+                    "name": "default-allow-22",
+                    "properties": {
+                      "priority": 1000,
+                      "access": "Allow",
+                      "direction": "Inbound",
+                      "destinationPortRange": "22",
+                      "protocol": "Tcp",
+                      "sourceAddressPrefix": "[parameters('bootnodeSGIngressCidrIp')]",
+                      "sourcePortRange": "*",
+                      "destinationAddressPrefix": "*"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "type": "Microsoft.Network/virtualNetworks/subnets",
+              "apiVersion": "2022-07-01",
+              "name": "[format('{0}/{1}', parameters('openShiftClustervnetId'), variables('vNetSubnetName'))]",
+              "location": "[parameters('location')]",
+              "dependsOn": [
+                "[resourceId(parameters('vnetIdResourceGroup'),'Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName2'))]"
+              ],
+              "properties": {
+                "addressPrefix": "[variables('vNetSubnetAddressPrefix')]",
+                "networkSecurityGroup": {
+                  "id": "[resourceId(parameters('vnetIdResourceGroup'),'Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName2'))]"
+                }
               }
             }
-          }
-        ]
+          ]
+        }
       }
     },
     {
@@ -375,7 +393,7 @@
       "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIPAddressName'))]",
-        "[resourceId('Microsoft.Network/virtualNetworks', variables('vNetName'))]",
+        "existingvnetTemplate",
         "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]"
       ],
       "properties": {
@@ -388,7 +406,7 @@
                 "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIPAddressName'))]"
               },
               "subnet": {
-                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('vNetSubnetName'))]"
+                "id": "[resourceId(parameters('vnetIdResourceGroup'),'Microsoft.Network/virtualNetworks/subnets', parameters('openShiftClustervnetId'), variables('vNetSubnetName'))]"
               }
             }
           }
@@ -518,7 +536,7 @@
             "typeHandlerVersion": "2.0",
             "autoUpgradeMinorVersion": true,
             "protectedSettings": {
-              "commandToExecute": "[concat('sleep 120;', 'cd /root/ansible-devops/multicloud-bootstrap;', './init-async.sh azure ''', parameters('offeringType'), ''' ''', parameters('location'), ''' null ''', parameters('clusterSize'), ''' ''', variables('projectName'), ''' ''', parameters('publicDomain'), ''' null ''', parameters('sshPublicKey'), ''' null ''', parameters('entitledRegistryKey'), ''' ''', parameters('openShiftPullSecret'), ''' ''', parameters('masLicenseUrl'), ''' ''', parameters('slsEndpointUrl'), ''' ''', parameters('slsRegistrationKey'), ''' ''', parameters('slsPublicCertificateUrl'), ''' ''', parameters('udsEndpointUrl'), ''' ''', parameters('udsAPIKey'), ''' ''', parameters('udsPublicCertificateUrl'), ''' ''', parameters('masManageDBUser'), ''' ''', parameters('masManageDBPassword'), ''' ''', parameters('masManageDBJdbcUrl'), ''' ''', parameters('masManageDBCertificateUrl'), ''' ''', parameters('importDemoData'), ''' '''' '''' '''' ''', variables('rgName'), ''' ''', parameters('emailNotification'), ''' ''', parameters('notificattionEmailAddress'), ''' ''', parameters('smtpHost'), ''' ''', parameters('smtpPort'), ''' ''', parameters('smtpUsername'), ''' ''', parameters('smtpPassword'), ''' ''', parameters('azureServicePrincipalClientId'), ''' ''', parameters('azureServicePrincipalClientSecret'), ''' ''', variables('seller_subscription_id'), ''' ''', parameters('azureServicePrincipalTenantId'), ''' null null null null ''', parameters('openShiftClustervnetId'), ''' '''' null null null null null null null ''', parameters('operationalMode'), ''' dev ''', ''' > mas-provisioning.log 2>&1;')]"
+              "commandToExecute": "[concat('sleep 120;', 'cd /root/ansible-devops/multicloud-bootstrap;', './init-async.sh azure ''', parameters('offeringType'), ''' ''', parameters('location'), ''' null ''', parameters('clusterSize'), ''' ''', variables('projectName'), ''' ''', parameters('publicDomain'), ''' null ''', parameters('sshPublicKey'), ''' null ''', parameters('entitledRegistryKey'), ''' ''', parameters('openShiftPullSecret'), ''' ''', parameters('masLicenseUrl'), ''' ''', parameters('slsEndpointUrl'), ''' ''', parameters('slsRegistrationKey'), ''' ''', parameters('slsPublicCertificateUrl'), ''' ''', parameters('udsEndpointUrl'), ''' ''', parameters('udsAPIKey'), ''' ''', parameters('udsPublicCertificateUrl'), ''' ''', parameters('masManageDBUser'), ''' ''', parameters('masManageDBPassword'), ''' ''', parameters('masManageDBJdbcUrl'), ''' ''', parameters('masManageDBCertificateUrl'), ''' ''', parameters('importDemoData'), ''' '''' '''' '''' ''', variables('rgName'), ''' ''', parameters('emailNotification'), ''' ''', parameters('notificattionEmailAddress'), ''' ''', parameters('smtpHost'), ''' ''', parameters('smtpPort'), ''' ''', parameters('smtpUsername'), ''' ''', parameters('smtpPassword'), ''' ''', parameters('azureServicePrincipalClientId'), ''' ''', parameters('azureServicePrincipalClientSecret'), ''' ''', variables('seller_subscription_id'), ''' ''', parameters('azureServicePrincipalTenantId'), ''' null null null null ''', parameters('openShiftClustervnetId'), ''' '''' null null null null null null null ''', parameters('privateCluster'),''' ''' ,parameters('operationalMode'), ''' dev ''', ''' > mas-provisioning.log 2>&1;')]"
               }
           }
         }
