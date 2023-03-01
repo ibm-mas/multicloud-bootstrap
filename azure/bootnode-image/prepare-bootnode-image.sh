@@ -28,6 +28,9 @@ echo "BOOTSTRAP_AUTOMATION_TAG_OR_BRANCH=$BOOTSTRAP_AUTOMATION_TAG_OR_BRANCH"
 # Remove unnecessary packages
 dnf -y remove polkit
 
+# Enable repository
+sed -i 's/enabled=0/enabled=1/g' /etc/yum.repos.d/rh-cloud-rhel8-eus.repo
+
 # Update all packages to latest
 dnf update -y
 
