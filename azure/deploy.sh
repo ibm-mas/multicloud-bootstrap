@@ -211,13 +211,35 @@ if [[ $DEPLOY_CP4D == "true" ]]; then
   log "==== CP4D deployment completed ===="
 fi
 
+## Deploy Manage
+if [[ $DEPLOY_MANAGE == "true" && (-z $MAS_JDBC_USER) && (-z $MAS_JDBC_PASSWORD) && (-z $MAS_JDBC_URL) && (-z $MAS_JDBC_CERT_URL) ]]; then
+  log "==== Configure db2 for manage started ===="
+  export ROLE_NAME=cp4d && ansible-playbook ibm.mas_devops.run_role  
+  export ROLE_NAME=db2 && ansible-playbook ibm.mas_devops.run_role
+  export ROLE_NAME=suite_db2_setup_for_manage && ansible-playbook ibm.mas_devops.run_role
+  log "==== Configure db2 for manage started ===="
+fi
+
 ## Create MAS Workspace
 log "==== MAS Workspace generation started ===="
 export ROLE_NAME=gencfg_workspace && ansible-playbook ibm.mas_devops.run_role
 log "==== MAS Workspace generation completed ===="
 
 if [[ $DEPLOY_MANAGE == "true" ]]; then
+  if [[ (-z $MAS_JDBC_USER) && (-z $MAS_JDBC_PASSWORD) && (-z $MAS_JDBC_URL) && (-z $MAS_JDBC_CERT_URL) ]]; then
+      log "==== Configure db2 for manage completed ===="
+  else
+    log "==== Configure JDBC  started ===="
+    export SSL_ENABLED="true"
+    export ROLE_NAME=gencfg_jdbc && ansible-playbook ibm.mas_devops.run_role
+    log "==== Configure JDBC completed ===="  
+  fi
+fi
+
+
+if [[ $DEPLOY_MANAGE == "true" ]]; then
   log "==== Configure JDBC  started ===="
+  export SSL_ENABLED="true"
   export ROLE_NAME=gencfg_jdbc && ansible-playbook ibm.mas_devops.run_role
   log "==== Configure JDBC completed ===="
 fi
