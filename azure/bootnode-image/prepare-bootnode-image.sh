@@ -31,7 +31,8 @@ dnf -y remove polkit
 # Enable repository
 echo "Updating Repo to download rpms"
 #sed -i 's/enabled=0/enabled=1/g' /etc/yum.repos.d/rh-cloud-rhel8-eus.repo
-sudo yum-config-manager --disable rhel-8-for-x86_64-baseos-eus-rhui-rpms rhel-8-for-x86_64-appstream-eus-rhui-source-rpms
+sudo yum-config-manager --disable rhel-8-for-x86_64-baseos-eus-rhui-rpms
+sudo yum-config-manager --disable  rhel-8-for-x86_64-appstream-eus-rhui-rpms
 cat /etc/yum.repos.d/rh-cloud-rhel8-eus.repo
 echo "Repo update complete!"
 
