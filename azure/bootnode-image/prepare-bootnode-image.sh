@@ -28,8 +28,8 @@ echo "BOOTSTRAP_AUTOMATION_TAG_OR_BRANCH=$BOOTSTRAP_AUTOMATION_TAG_OR_BRANCH"
 # Remove unnecessary packages
 dnf -y remove polkit
 
-# Enable repository
-echo "Updating Repo to download rpms"
+# Enable repos
+echo "Update Repo file to disable 2 repos"
 #sed -i 's/enabled=0/enabled=1/g' /etc/yum.repos.d/rh-cloud-rhel8-eus.repo
 sudo yum-config-manager --disable rhel-8-for-x86_64-baseos-eus-rhui-rpms
 sudo yum-config-manager --disable  rhel-8-for-x86_64-appstream-eus-rhui-rpms
@@ -38,6 +38,12 @@ echo "Repo update complete!"
 
 # Update all packages to latest
 dnf update -y
+
+# Enable repos
+echo "Enable Repos again"
+sudo yum-config-manager --enable rhel-8-for-x86_64-baseos-eus-rhui-rpms
+sudo yum-config-manager --enable  rhel-8-for-x86_64-appstream-eus-rhui-rpms
+
 
 ## Install pre-reqs
 dnf install git httpd-tools java  unzip wget zip -y
