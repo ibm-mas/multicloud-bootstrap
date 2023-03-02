@@ -74,65 +74,7 @@ fi
 #    SCRIPT_STATUS=25
 #fi
 
-# JDBC CFT inputs validation and connection test
-if [[ $DEPLOY_MANAGE == "true" ]]; then
-    if [[ (-z $MAS_JDBC_USER) && (-z $MAS_JDBC_PASSWORD) && (-z $MAS_JDBC_URL) && (-z $MAS_JDBC_CERT_URL) ]]; then
-        log "ERROR: Database details are not specified for MAS Manage deployment"
-        SCRIPT_STATUS=14
-    else
-        if [ -z "$MAS_JDBC_USER" ]; then
-            log "ERROR: Database username is not specified"
-            SCRIPT_STATUS=14
-        elif [ -z "$MAS_JDBC_PASSWORD" ]; then
-            log "ERROR: Database password is not specified"
-            SCRIPT_STATUS=14
-        elif [ -z "$MAS_JDBC_URL" ]; then
-            log "ERROR: Database connection url is not specified"
-            SCRIPT_STATUS=14
-        elif [ -z "$MAS_JDBC_CERT_URL" ]; then
-            log "ERROR: Database certificate url is not specified"
-            SCRIPT_STATUS=14
-        else
-            log "Downloading DB certificate"
-            cd $GIT_REPO_HOME
-            if [[ $CLUSTER_TYPE == "aws" ]]; then
-                if [[ ${MAS_JDBC_CERT_URL,,} =~ ^s3 ]]; then
-                    aws s3 cp "$MAS_JDBC_CERT_URL" db.crt --region us-east-1
-                    ret=$?
-        		if [ $ret -ne 0 ]; then
-        			aws s3 cp "$MAS_JDBC_CERT_URL" db.crt --region $DEPLOY_REGION
-        			ret=$?
-        		if [ $ret -ne 0 ]; then
-            		log "Invalid DB certificate URL"
-            		SCRIPT_STATUS=31
-        		fi
-        		fi
-                elif [[ ${MAS_JDBC_CERT_URL,,} =~ ^https? ]]; then
-                    wget "$MAS_JDBC_CERT_URL" -O db.crt
-                fi
-            elif [[ $CLUSTER_TYPE == "azure" ]]; then
-                # https://myaccount.blob.core.windows.net/mycontainer/myblob regex
-                if [[ ${MAS_JDBC_CERT_URL,,} =~ ^https://.+blob\.core\.windows\.net.+ ]]; then
-                    azcopy copy "$MAS_JDBC_CERT_URL" db.crt
-                elif [[ ${MAS_JDBC_CERT_URL,,} =~ ^https? ]]; then
-                    wget "$MAS_JDBC_CERT_URL" -O db.crt
-                fi
-            fi
-            export MAS_DB2_JAR_LOCAL_PATH=$GIT_REPO_HOME/lib/db2jcc4.jar
-            if [[ ${MAS_JDBC_URL,, } =~ ^jdbc:db2? ]]; then
-                log "Connecting to the Database"
-                if python jdbc-prevalidate.py; then
-                    log "JDBC URL Validation = PASS"
-                else
-                    log "ERROR: JDBC URL Validation = FAIL"
-                    SCRIPT_STATUS=14
-                fi
-            else
-                log "Skipping JDBC URL validation, supported only for DB2"
-            fi
-        fi
-    fi
-fi
+
 
 # Check if all the existing SLS inputs are provided
 if [[ (-z $SLS_URL) && (-z $SLS_REGISTRATION_KEY) && (-z $SLS_PUB_CERT_URL) ]]; then
