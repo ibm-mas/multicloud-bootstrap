@@ -24,12 +24,9 @@ BOOTSTRAP_AUTOMATION_TAG_OR_BRANCH=$3
 echo "ANSIBLE_COLLECTION_VERSION=$ANSIBLE_COLLECTION_VERSION"
 echo "ANSIBLE_COLLECTION_BRANCH=$ANSIBLE_COLLECTION_BRANCH"
 echo "BOOTSTRAP_AUTOMATION_TAG_OR_BRANCH=$BOOTSTRAP_AUTOMATION_TAG_OR_BRANCH"
+echo "Trying with fix.........."
+dnf update --disablerepo=* --enablerepo='*microsoft*' rhui-azure-rhel8-eus
 
-yum --disablerepo='*' remove 'rhui-azure-rhel8'
-wget https://rhelimage.blob.core.windows.net/repositories/rhui-microsoft-azure-rhel8.config
-yum --config=rhui-microsoft-azure-rhel8.config install rhui-azure-rhel8
-yum update ca-certificates
-yum clean all
 
 # Remove unnecessary packages
 dnf -y remove polkit
