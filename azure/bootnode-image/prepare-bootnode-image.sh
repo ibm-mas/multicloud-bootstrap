@@ -25,7 +25,7 @@ echo "ANSIBLE_COLLECTION_VERSION=$ANSIBLE_COLLECTION_VERSION"
 echo "ANSIBLE_COLLECTION_BRANCH=$ANSIBLE_COLLECTION_BRANCH"
 echo "BOOTSTRAP_AUTOMATION_TAG_OR_BRANCH=$BOOTSTRAP_AUTOMATION_TAG_OR_BRANCH"
 echo "Trying with fix.........."
-dnf update --disablerepo=* --enablerepo='*microsoft*' rhui-azure-rhel8-eus
+dnf update -y --disablerepo=* --enablerepo='*microsoft*' rhui-azure-rhel8-eus
 
 
 # Remove unnecessary packages
