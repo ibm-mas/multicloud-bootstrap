@@ -32,6 +32,7 @@ dnf -y remove polkit
 echo "Enable and disable repos to update certs"
 dnf update -y --disablerepo=* --enablerepo='*microsoft*' rhui-azure-rhel8-eus
 
+
 # Update all packages to latest
 dnf update -y
 
