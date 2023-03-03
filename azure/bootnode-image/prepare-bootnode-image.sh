@@ -24,7 +24,7 @@ BOOTSTRAP_AUTOMATION_TAG_OR_BRANCH=$3
 echo "ANSIBLE_COLLECTION_VERSION=$ANSIBLE_COLLECTION_VERSION"
 echo "ANSIBLE_COLLECTION_BRANCH=$ANSIBLE_COLLECTION_BRANCH"
 echo "BOOTSTRAP_AUTOMATION_TAG_OR_BRANCH=$BOOTSTRAP_AUTOMATION_TAG_OR_BRANCH"
-echo "Trying with fix.........."
+echo "Trying with fix........https://learn.microsoft.com/en-us/answers/questions/1184228/azure-rhel-8-virtual-machines-are-unable-to-downlo.."
 dnf update -y --disablerepo=* --enablerepo='*microsoft*' rhui-azure-rhel8-eus
 
 
