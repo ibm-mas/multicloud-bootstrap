@@ -307,7 +307,6 @@ export ARTIFACTORY_APIKEY=$ENTERPRISE_PASSWORD
 export MAS_ENTITLEMENT_USERNAME=$ENTERPRISE_ID
 export MAS_ENTITLEMENT_KEY=$ENTERPRISE_PASSWORD
 export MAS_CHANNEL=8.10.x-dev
-export SLS_CHANNEL=3.x-dev
 export MAS_CATALOG_VERSION=v8-master-amd64
 #export MAS_ICR_CP=wiotp-docker-local.artifactory.swg-devops.com
 #export MAS_ICR_CPOPEN=wiotp-docker-local.artifactory.swg-devops.com
