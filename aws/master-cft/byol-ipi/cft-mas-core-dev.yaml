@@ -249,7 +249,7 @@ Resources:
                   - !Join
                     - ':'
                     - - arn
-                      - aws
+                      - aws-us-gov
                       - iam
                       - ''
                       - !Ref 'AWS::AccountId'
@@ -257,7 +257,7 @@ Resources:
                   - !Join
                     - ':'
                     - - arn
-                      - aws
+                      - aws-us-gov
                       - iam
                       - ''
                       - !Ref 'AWS::AccountId'
@@ -265,7 +265,7 @@ Resources:
                   - !Join
                     - ':'
                     - - arn
-                      - aws
+                      - aws-us-gov
                       - s3
                       - ''
                       - ''
@@ -276,7 +276,7 @@ Resources:
                   - !Join
                     - ':'
                     - - arn
-                      - aws
+                      - aws-us-gov
                       - ses
                       - '*'
                       - !Ref 'AWS::AccountId'
@@ -284,7 +284,7 @@ Resources:
                   - !Join
                     - ':'
                     - - arn
-                      - aws
+                      - aws-us-gov
                       - ses
                       - '*'
                       - !Ref 'AWS::AccountId'
