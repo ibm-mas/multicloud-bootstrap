@@ -80,7 +80,16 @@ if [[ $DEPLOY_MANAGE == "true" ]]; then
         log "ERROR: Database details are not specified for MAS Manage deployment"
         SCRIPT_STATUS=14
     else
-        if [ -z "$MAS_JDBC_CERT_URL" ]; then
+        if [ -z "$MAS_JDBC_USER" ]; then
+            log "ERROR: Database username is not specified"
+            SCRIPT_STATUS=14
+        elif [ -z "$MAS_JDBC_PASSWORD" ]; then
+            log "ERROR: Database password is not specified"
+            SCRIPT_STATUS=14
+        elif [ -z "$MAS_JDBC_URL" ]; then
+            log "ERROR: Database connection url is not specified"
+            SCRIPT_STATUS=14
+        elif [ -z "$MAS_JDBC_CERT_URL" ]; then
             log "ERROR: Database certificate url is not specified"
             SCRIPT_STATUS=14
         else
@@ -108,6 +117,18 @@ if [[ $DEPLOY_MANAGE == "true" ]]; then
                 elif [[ ${MAS_JDBC_CERT_URL,,} =~ ^https? ]]; then
                     wget "$MAS_JDBC_CERT_URL" -O db.crt
                 fi
+            fi
+            export MAS_ORACLE_JAR_LOCAL_PATH=$GIT_REPO_HOME/lib/ojdbc8.jar
+            if [[ ${MAS_JDBC_URL,, } =~ ^jdbc:oracle? ]]; then
+                log "Connecting to the Database"
+                if python jdbc-prevalidateOracle.py; then
+                    log "JDBC URL Validation = PASS"
+                else
+                    log "ERROR: JDBC URL Validation = FAIL"
+                    SCRIPT_STATUS=14
+                fi
+            else
+                log "Skipping JDBC URL validation, supported only for DB2"
             fi
         fi
     fi
