@@ -3,7 +3,7 @@ SCRIPT_STATUS=0
 
 # Check if region is supported
 if [[ $CLUSTER_TYPE == "aws" ]]; then
-    SUPPORTED_REGIONS="us-east-1;us-east-2;us-west-2;ca-central-1;eu-north-1;eu-west-1;eu-west-2;eu-west-3;eu-central-1;ap-northeast-1;ap-northeast-2;ap-northeast-3;ap-south-1;ap-southeast-1;ap-southeast-2;sa-east-1;ap-east-1;ap-southeast-3;eu-south-1;me-south-1;me-central-1;af-south-1"
+    SUPPORTED_REGIONS="us-gov-west-1;us-gov-east-1"
 elif [[ $CLUSTER_TYPE == "azure" ]]; then
     # az account list-locations --query "[].{Name:name}" -o table|grep -Ev '^(Name|-)'|tr '\n' ';'
     SUPPORTED_REGIONS="eastus;eastus2;southcentralus;westus2;westus3;australiaeast;southeastasia;northeurope;swedencentral;uksouth;westeurope;centralus;southafricanorth;centralindia;eastasia;japaneast;koreacentral;canadacentral;francecentral;germanywestcentral;norwayeast;brazilsouth"

@@ -50,7 +50,7 @@ elif [[ ${SLS_PUB_CERT_URL,,} =~ ^s3 ]]; then
   aws s3 cp "$SLS_PUB_CERT_URL" sls.crt --region $DEPLOY_REGION
   ret=$?
         if [ $ret -ne 0 ]; then
-        aws s3 cp "$SLS_PUB_CERT_URL" sls.crt --region us-east-1
+        aws s3 cp "$SLS_PUB_CERT_URL" sls.crt --region us-gov-west-1
         ret=$?
         if [ $ret -ne 0 ]; then
             log "Invalid SLS License URL"
@@ -70,7 +70,7 @@ elif [[ ${UDS_PUB_CERT_URL,,} =~ ^s3 ]]; then
   aws s3 cp "$UDS_PUB_CERT_URL" uds.crt --region $DEPLOY_REGION
   ret=$?
         if [ $ret -ne 0 ]; then
-        aws s3 cp "$UDS_PUB_CERT_URL" uds.crt --region us-east-1
+        aws s3 cp "$UDS_PUB_CERT_URL" uds.crt --region us-gov-west-1
         ret=$?
         if [ $ret -ne 0 ]; then
             log "Invalid UDS License URL"
