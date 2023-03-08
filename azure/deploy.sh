@@ -225,22 +225,13 @@ export ROLE_NAME=gencfg_workspace && ansible-playbook ibm.mas_devops.run_role
 log "==== MAS Workspace generation completed ===="
 
 if [[ $DEPLOY_MANAGE == "true" ]]; then
-  if [[ (-z $MAS_JDBC_USER) && (-z $MAS_JDBC_PASSWORD) && (-z $MAS_JDBC_URL) && (-z $MAS_JDBC_CERT_URL) ]]; then
-      log "==== Configure db2 for manage completed ===="
-  else
-    log "==== Configure JDBC  started ===="
+  if [[ (-n $MAS_JDBC_USER) && (-n $MAS_JDBC_PASSWORD) && (-n $MAS_JDBC_URL) && (-n $MAS_JDBC_CERT_URL) ]]; then
+
+    log "==== Configure JDBC started for external DB2 ===="
     export SSL_ENABLED="true"
     export ROLE_NAME=gencfg_jdbc && ansible-playbook ibm.mas_devops.run_role
-    log "==== Configure JDBC completed ===="  
+    log "==== Configure JDBC completed for external DB2 ===="  
   fi
-fi
-
-
-if [[ $DEPLOY_MANAGE == "true" ]]; then
-  log "==== Configure JDBC  started ===="
-  export SSL_ENABLED="true"
-  export ROLE_NAME=gencfg_jdbc && ansible-playbook ibm.mas_devops.run_role
-  log "==== Configure JDBC completed ===="
 fi
 
 ## Deploy MAS
