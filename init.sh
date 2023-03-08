@@ -424,7 +424,6 @@ if [[ $CLUSTER_TYPE == "azure" ]]; then
   if [[ $INSTALLATION_MODE == "UPI" ]]; then
     # Domain name with private dns - only available for UPI
     if [[ $PRIVATE_CLUSTER == "true" ]]; then
-       # Shajeena FOR PRIVATE
         export private_or_public_cluster="private"
         export BASE_DOMAIN_RG_NAME=`az network private-dns zone list | jq --arg DNS_ZONE $DNS_ZONE '.[] | select(.name==$DNS_ZONE).resourceGroup' | tr -d '"'`
          log " UPI PRIVATE CLUSTER - BASE_DOMAIN_RG_NAME: $BASE_DOMAIN_RG_NAME"
