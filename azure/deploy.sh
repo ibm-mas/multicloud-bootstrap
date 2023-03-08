@@ -228,7 +228,7 @@ if [[ $DEPLOY_MANAGE == "true" ]]; then
   if [[ (-n $MAS_JDBC_USER) && (-n $MAS_JDBC_PASSWORD) && (-n $MAS_JDBC_URL) && (-n $MAS_JDBC_CERT_URL) ]]; then
 
     log "==== Configure JDBC started for external DB2 ===="
-    export SSL_ENABLED="true"
+   # export SSL_ENABLED="true"
     export ROLE_NAME=gencfg_jdbc && ansible-playbook ibm.mas_devops.run_role
     log "==== Configure JDBC completed for external DB2 ===="  
   fi
