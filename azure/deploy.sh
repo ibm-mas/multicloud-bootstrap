@@ -213,11 +213,10 @@ fi
 
 ## Deploy Manage
 if [[ $DEPLOY_MANAGE == "true" && (-z $MAS_JDBC_USER) && (-z $MAS_JDBC_PASSWORD) && (-z $MAS_JDBC_URL) && (-z $MAS_JDBC_CERT_URL) ]]; then
-  log "==== Configure db2 for manage started ===="
-  export ROLE_NAME=cp4d && ansible-playbook ibm.mas_devops.run_role  
+  log "==== Configure internal db2 for manage started ===="
   export ROLE_NAME=db2 && ansible-playbook ibm.mas_devops.run_role
   export ROLE_NAME=suite_db2_setup_for_manage && ansible-playbook ibm.mas_devops.run_role
-  log "==== Configure db2 for manage started ===="
+  log "==== Configuration of internal db2 for manage completed ===="
 fi
 
 ## Create MAS Workspace
