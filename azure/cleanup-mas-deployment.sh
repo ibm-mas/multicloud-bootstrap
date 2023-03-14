@@ -145,6 +145,8 @@ else
 
   # Get domain and domain resource group
   BASE_DOMAIN=$(az deployment group list --resource-group $RG_NAME | jq ".[] | select(.properties.outputs.clusterUniqueString.value != null).properties.parameters.publicDomain.value" | tr -d '"')
+  DOMAINTYPE=$(az deployment group list --resource-group $RG_NAME | jq ".[] | select(.properties.outputs.clusterUniqueString.value != null).properties.parameters.privateCluster.value" | tr -d '"')
+  if [ $DOMAINTYPE == "false" ]; then
   BASE_DOMAIN_RG_NAME=$(az network dns zone list | jq --arg DNS_ZONE $BASE_DOMAIN '.[] | select(.name==$DNS_ZONE).resourceGroup' | tr -d '"')
   echo "BASE_DOMAIN=$BASE_DOMAIN"
   echo "BASE_DOMAIN_RG_NAME=$BASE_DOMAIN_RG_NAME"
@@ -170,6 +172,7 @@ else
       done
     fi
   fi
+fi
 fi
 
 
