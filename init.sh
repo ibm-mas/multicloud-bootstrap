@@ -215,7 +215,7 @@ export UDS_TLS_CERT_LOCAL_FILE_PATH="${GIT_REPO_HOME}/uds.crt"
 # CP4D variables
 export CPD_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
 export CPD_VERSION=cpd40
-export CPD_PRODUCT_VERSION=4.6.0
+export CPD_PRODUCT_VERSION=4.5.0
 #export MAS_CHANNEL=8.10.x TODO PK uncomment when 8.10 channel ready
 #export MAS_CATALOG_VERSION=v8-amd64  TODO PK uncomment when 8.10 channel ready
 if [[ $CLUSTER_TYPE == "aws" ]]; then
@@ -248,7 +248,7 @@ export MAS_APPWS_JDBC_BINDING="workspace-application"
 export MAS_JDBC_CERT_LOCAL_FILE=$GIT_REPO_HOME/db.crt
 export MAS_CLOUD_AUTOMATION_VERSION=1.0
 export MAS_DEVOPS_COLLECTION_VERSION=12.3.2
-export MAS_APP_CHANNEL=8.6.x
+export MAS_APP_CHANNEL=8.5.x
 if [ -z "$EXISTING_NETWORK" ]; then
   export new_or_existing_vpc_subnet="new"
   export enable_permission_quota_check=true
