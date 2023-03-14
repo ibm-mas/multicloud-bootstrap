@@ -577,7 +577,7 @@ Resources:
             - ''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''
             - ''' '''
             - !Ref OperationalMode
-            - ''' "dev" '
+            - ''' "prod" '
             - '2>&1 | tee mas-provisioning.log; '
       Tags:
         - Key: Name
