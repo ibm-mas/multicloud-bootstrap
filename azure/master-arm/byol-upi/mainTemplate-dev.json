@@ -32,7 +32,7 @@
     "offeringType": {
       "type": "string",
       "metadata": {
-        "description": "Select your preferred Suite offering type."
+        "description": "Select your preferred Suite offering type.For MAS Core + Manage: If db2 values are not provided,db2 will be internally deployed."
       },
       "defaultValue": "MAS Core + Cloud Pak for Data",
       "allowedValues": [
@@ -40,10 +40,10 @@
         "MAS Core + Manage (no Cloud Pak for Data)"
       ]
     },
-    "publicDomain": {
+    "HostedDomain": {
       "type": "string",
       "metadata": {
-        "description": "Provide the public App Service domain that you created in the App Service Domains, for example: mas4aws.myorg.com"
+        "description": "Provide the public App Service domain /Private DNS zones that you created in the App Service Domains /Private DNS zones, for example: mas4azure.com"
       },
       "defaultValue": ""
     },
@@ -213,23 +213,23 @@
         "true",
         "false"
       ],
-      "type": "String",
+      "type": "string",
       "metadata": {
         "description": "Select true to create a private OpenShift cluster."
       }
     },
     "openShiftClustervnetId": {
-      "defaultValue": "kxr601-vnet",
-      "type": "String",
+      "defaultValue": "",
+      "type": "string",
       "metadata": {
         "description": "Enter the existing VNet name to create the OpenShift cluster resources into (required for UPI mode deployment)."
       }
     },
     "vnetIdResourceGroup": {
       "defaultValue": "kxr601-vnet-rg",
-      "type": "String",
+      "type": "string",
       "metadata": {
-        "description": "Enter the existing VNet resource group   (required for UPI mode deployment)."
+        "description": "Enter resource group of openShiftClustervnetId :  (required for UPI mode deployment)."
       }
     },
     "emailNotification": {
@@ -287,7 +287,7 @@
     "rgName": "[resourceGroup().name]",
     "vNetName": "[concat(variables('projectName'), '-vnet')]",
     "vNetAddressPrefixes": "10.0.0.0/16",
-    "vNetSubnetName": "bootnodeSubnet",
+    "vNetSubnetName": "[concat('masocp-', variables('projectName'), '-bootnodeSubnet')]",
     "vNetSubnetAddressPrefix": "10.0.4.0/24",
     "logAnalyticsWorkspace": "[concat('masocp-', variables('projectName'), '-logAnalyticsWorkspace')]",
     "logAnalyticsWorkspaceId": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('logAnalyticsWorkspace'))]",
@@ -556,7 +556,7 @@
             "typeHandlerVersion": "2.0",
             "autoUpgradeMinorVersion": true,
             "protectedSettings": {
-              "commandToExecute": "[concat('sleep 120;', 'cd /root/ansible-devops/multicloud-bootstrap;', './init-async.sh azure ''', parameters('offeringType'), ''' ''', parameters('location'), ''' null ''', parameters('clusterSize'), ''' ''', variables('projectName'), ''' ''', parameters('publicDomain'), ''' null ''', parameters('sshPublicKey'), ''' null ''', parameters('entitledRegistryKey'), ''' ''', parameters('openShiftPullSecret'), ''' ''', parameters('masLicenseUrl'), ''' ''', parameters('slsEndpointUrl'), ''' ''', parameters('slsRegistrationKey'), ''' ''', parameters('slsPublicCertificateUrl'), ''' ''', parameters('udsEndpointUrl'), ''' ''', parameters('udsAPIKey'), ''' ''', parameters('udsPublicCertificateUrl'), ''' ''', parameters('masManageDBUser'), ''' ''', parameters('masManageDBPassword'), ''' ''', parameters('masManageDBJdbcUrl'), ''' ''', parameters('masManageDBCertificateUrl'), ''' ''', parameters('importDemoData'), ''' '''' '''' '''' ''', variables('rgName'), ''' ''', parameters('emailNotification'), ''' ''', parameters('notificattionEmailAddress'), ''' ''', parameters('smtpHost'), ''' ''', parameters('smtpPort'), ''' ''', parameters('smtpUsername'), ''' ''', parameters('smtpPassword'), ''' ''', parameters('azureServicePrincipalClientId'), ''' ''', parameters('azureServicePrincipalClientSecret'), ''' ''', variables('seller_subscription_id'), ''' ''', parameters('azureServicePrincipalTenantId'), ''' null null null null ''', parameters('openShiftClustervnetId'), ''' '''' null null null null null null ''', parameters('privateCluster'),''' ''' ,parameters('operationalMode'), ''' dev ''', ''' > mas-provisioning.log 2>&1;')]"
+              "commandToExecute": "[concat('sleep 120;', 'cd /root/ansible-devops/multicloud-bootstrap;', './init-async.sh azure ''', parameters('offeringType'), ''' ''', parameters('location'), ''' null ''', parameters('clusterSize'), ''' ''', variables('projectName'), ''' ''', parameters('HostedDomain'), ''' null ''', parameters('sshPublicKey'), ''' null ''', parameters('entitledRegistryKey'), ''' ''', parameters('openShiftPullSecret'), ''' ''', parameters('masLicenseUrl'), ''' ''', parameters('slsEndpointUrl'), ''' ''', parameters('slsRegistrationKey'), ''' ''', parameters('slsPublicCertificateUrl'), ''' ''', parameters('udsEndpointUrl'), ''' ''', parameters('udsAPIKey'), ''' ''', parameters('udsPublicCertificateUrl'), ''' ''', parameters('masManageDBUser'), ''' ''', parameters('masManageDBPassword'), ''' ''', parameters('masManageDBJdbcUrl'), ''' ''', parameters('masManageDBCertificateUrl'), ''' ''', parameters('importDemoData'), ''' '''' '''' '''' ''', variables('rgName'), ''' ''', parameters('emailNotification'), ''' ''', parameters('notificattionEmailAddress'), ''' ''', parameters('smtpHost'), ''' ''', parameters('smtpPort'), ''' ''', parameters('smtpUsername'), ''' ''', parameters('smtpPassword'), ''' ''', parameters('azureServicePrincipalClientId'), ''' ''', parameters('azureServicePrincipalClientSecret'), ''' ''', variables('seller_subscription_id'), ''' ''', parameters('azureServicePrincipalTenantId'), ''' null null null null ''', parameters('openShiftClustervnetId'), ''' '''' null null null null null null ''', parameters('privateCluster'),''' ''' ,parameters('operationalMode'), ''' dev ''', ''' > mas-provisioning.log 2>&1;')]"
             }
           }
         }
@@ -626,23 +626,23 @@
     },
     "openShiftConsoleUrl": {
       "type": "string",
-      "value": "[uri(concat('https://console-openshift-console.apps.masocp-', variables('projectName'), '.', parameters('publicDomain')), '')]"
+      "value": "[uri(concat('https://console-openshift-console.apps.masocp-', variables('projectName'), '.', parameters('HostedDomain')), '')]"
     },
     "openShiftApiUrl": {
       "type": "string",
-      "value": "[uri(concat('https://api.masocp-', variables('projectName'), '.', parameters('publicDomain')), '')]"
+      "value": "[uri(concat('https://api.masocp-', variables('projectName'), '.', parameters('HostedDomain')), '')]"
     },
     "masInitialSetupUrl": {
       "type": "string",
-      "value": "[uri(concat('https://admin.', variables('projectName'), '.apps.masocp-', variables('projectName'), '.', parameters('publicDomain'), '/initialsetup'), '')]"
+      "value": "[uri(concat('https://admin.', variables('projectName'), '.apps.masocp-', variables('projectName'), '.', parameters('HostedDomain'), '/initialsetup'), '')]"
     },
     "masAdminUrl": {
       "type": "string",
-      "value": "[uri(concat('https://admin.', variables('projectName'), '.apps.masocp-', variables('projectName'), '.', parameters('publicDomain')), '')]"
+      "value": "[uri(concat('https://admin.', variables('projectName'), '.apps.masocp-', variables('projectName'), '.', parameters('HostedDomain')), '')]"
     },
     "masWorkspaceUrl": {
       "type": "string",
-      "value": "[uri(concat('https://wsmasocp.home.', variables('projectName'), '.apps.masocp-', variables('projectName'), '.', parameters('publicDomain')), '')]"
+      "value": "[uri(concat('https://wsmasocp.home.', variables('projectName'), '.apps.masocp-', variables('projectName'), '.', parameters('HostedDomain')), '')]"
     }
   }
 }

@@ -215,7 +215,7 @@ export UDS_TLS_CERT_LOCAL_FILE_PATH="${GIT_REPO_HOME}/uds.crt"
 # CP4D variables
 export CPD_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
 export CPD_VERSION=cpd40
-export CPD_PRODUCT_VERSION=4.5.0
+export CPD_PRODUCT_VERSION=4.6.0
 #export MAS_CHANNEL=8.10.x TODO PK uncomment when 8.10 channel ready
 #export MAS_CATALOG_VERSION=v8-amd64  TODO PK uncomment when 8.10 channel ready
 if [[ $CLUSTER_TYPE == "aws" ]]; then
