@@ -40,7 +40,6 @@ export MAS_JDBC_USER=${20}
 export MAS_JDBC_PASSWORD=${21}
 export MAS_JDBC_URL=${22}
 export MAS_JDBC_CERT_URL=${23}
-export SSL_ENABLED=false
 export MAS_DB_IMPORT_DEMO_DATA=${24}
 export EXS_OCP_URL=${25}
 export EXS_OCP_USER=${26}
@@ -72,6 +71,7 @@ export PRIVATE_CLUSTER=${51}
 export OPERATIONAL_MODE=${52}
 export ENV_TYPE=${53}
 export GIT_REPO_HOME=$(pwd)
+export SSL_ENABLED="false"
 # Load helper functions
 . helper.sh
 export -f log
