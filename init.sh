@@ -40,6 +40,7 @@ export MAS_JDBC_USER=${20}
 export MAS_JDBC_PASSWORD=${21}
 export MAS_JDBC_URL=${22}
 export MAS_JDBC_CERT_URL=${23}
+export SSL_ENABLED=false
 export MAS_DB_IMPORT_DEMO_DATA=${24}
 export EXS_OCP_URL=${25}
 export EXS_OCP_USER=${26}
@@ -243,12 +244,13 @@ export ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
 export MAS_WORKSPACE_ID="wsmasocp"
 export MAS_WORKSPACE_NAME="wsmasocp"
 export MAS_CONFIG_SCOPE="wsapp"
+export SSL_ENABLED=false
 export MAS_APP_ID=manage
 export MAS_APPWS_JDBC_BINDING="workspace-application"
 export MAS_JDBC_CERT_LOCAL_FILE=$GIT_REPO_HOME/db.crt
 export MAS_CLOUD_AUTOMATION_VERSION=1.0
 export MAS_DEVOPS_COLLECTION_VERSION=12.3.2
-export MAS_APP_CHANNEL=8.6.x
+export MAS_APP_CHANNEL=8.5.x
 if [ -z "$EXISTING_NETWORK" ]; then
   export new_or_existing_vpc_subnet="new"
   export enable_permission_quota_check=true
@@ -297,7 +299,7 @@ case $CLUSTER_SIZE in
 esac
 
 
-# TODO PK below section needs to be removed when 8.10 channel ready - STARTS 
+# TODO PK below section needs to be removed when 8.10 channel ready - STARTS
 export ARTIFACTORY_USERNAME=$ENTERPRISE_ID
 export ARTIFACTORY_APIKEY=$ENTERPRISE_PASSWORD
 export MAS_ENTITLEMENT_USERNAME=$ENTERPRISE_ID
@@ -398,6 +400,7 @@ log " CPD_PRODUCT_VERSION: $CPD_PRODUCT_VERSION"
 log " MAS_APP_ID: $MAS_APP_ID"
 log " MAS_WORKSPACE_ID: $MAS_WORKSPACE_ID"
 log " MAS_JDBC_CERT_LOCAL_FILE: $MAS_JDBC_CERT_LOCAL_FILE"
+log " SSL_ENABLED: $SSL_ENABLED"
 
 # Get deployment options
 export DEPLOY_CP4D=$(echo $DEPLOY_CP4D | cut -d '=' -f 2)

@@ -24,6 +24,7 @@ export UDS_STORAGE_CLASS=gp2
 # CP4D variables
 export CPD_METADATA_STORAGE_CLASS=gp2
 export CPD_SERVICE_STORAGE_CLASS="ocs-storagecluster-cephfs"
+export SSL_ENABLED=false
 
 # Retrieve SSH public key
 TOKEN=$(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
@@ -214,7 +215,7 @@ EOT
   if [[ $retcode -ne 0 ]]; then
     aws s3 cp $BACKUP_FILE_NAME $DEPLOYMENT_CONTEXT_UPLOAD_PATH --region us-east-1
     retcode=$?
-  fi  
+  fi
   if [[ $retcode -ne 0 ]]; then
     log "Failed while uploading deployment context to S3"
     exit 23
@@ -362,6 +363,7 @@ log "==== MAS Workspace generation completed ===="
 
 if [[ $DEPLOY_MANAGE == "true" ]]; then
   log "==== Configure JDBC  started ===="
+  export SSL_ENABLED=false
   export ROLE_NAME=gencfg_jdbc && ansible-playbook ibm.mas_devops.run_role
   log "==== Configure JDBC completed ===="
 fi
