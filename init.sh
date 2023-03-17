@@ -71,7 +71,7 @@ export PRIVATE_CLUSTER=${51}
 export OPERATIONAL_MODE=${52}
 export ENV_TYPE=${53}
 export GIT_REPO_HOME=$(pwd)
-export SSL_ENABLED="false"
+export SSL_ENABLED=false
 # Load helper functions
 . helper.sh
 export -f log
