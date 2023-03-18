@@ -72,6 +72,7 @@ export OPERATIONAL_MODE=${52}
 export ENV_TYPE=${53}
 export GIT_REPO_HOME=$(pwd)
 export SSL_ENABLED=false
+export MAS_APPWS_BINDINGS_JDBC="workspace-application"
 # Load helper functions
 . helper.sh
 export -f log
