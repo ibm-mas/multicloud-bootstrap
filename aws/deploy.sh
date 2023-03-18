@@ -25,6 +25,7 @@ export UDS_STORAGE_CLASS=gp2
 export CPD_METADATA_STORAGE_CLASS=gp2
 export CPD_SERVICE_STORAGE_CLASS="ocs-storagecluster-cephfs"
 export SSL_ENABLED=false
+export MAS_APPWS_BINDINGS_JDBC="workspace-application"
 
 # Retrieve SSH public key
 TOKEN=$(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
@@ -364,6 +365,7 @@ log "==== MAS Workspace generation completed ===="
 if [[ $DEPLOY_MANAGE == "true" ]]; then
   log "==== Configure JDBC  started ===="
   export SSL_ENABLED=false
+  export MAS_APPWS_BINDINGS_JDBC="workspace-application"
   export ROLE_NAME=gencfg_jdbc && ansible-playbook ibm.mas_devops.run_role
   log "==== Configure JDBC completed ===="
 fi
