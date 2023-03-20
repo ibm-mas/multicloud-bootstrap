@@ -256,8 +256,8 @@
   },
   "variables": {
     "seller_subscription_id": "b2ca5467-2502-4b05-b78e-744604c6531d",
-    "seller_compute_gallery_name": "masbyolimagegallery20221213212024",
-    "seller_image_definition": "masocp-image-def-20221213212024",
+    "seller_compute_gallery_name": "masbyolimagegallery20230320120702",
+    "seller_image_definition": "masocp-image-def-20230320120702",
     "projectName": "[concat('i',substring(uniqueString(resourceGroup().id, deployment().name), 0, 5))]",
     "rgName": "[resourceGroup().name]",
     "vNetName": "bootnode-vnet",

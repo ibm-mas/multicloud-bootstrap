@@ -204,7 +204,7 @@
                     {
                         "name": "BootNodeVnetId",
                         "type": "Microsoft.Common.TextBox",
-                        "label": "VNet Idr",
+                        "label": "BootNodeVnetId",
                         "defaultValue": "",
                         "toolTip": "Enter the Vnet Id to create the bootnode into.  If existing OpenShift cluster is specified,\n   make sure it is reachable from this Vnet.",
                         "constraints": {
@@ -217,7 +217,7 @@
                     {
                         "name": "BootNodeVnetResourceGroup",
                         "type": "Microsoft.Common.TextBox",
-                        "label": "Bootnode Rg",
+                        "label": "BootNodeVnetResourceGroup",
                         "defaultValue": "",
                         "toolTip": "Enter the BootNodeVnetId's resource group ",
                         "constraints": {
