@@ -100,7 +100,7 @@
                         "type": "Microsoft.Common.DropDown",
                         "label": "Offering type",
                         "defaultValue": "MAS Core + Cloud Pak for Data",
-                        "toolTip": "Select your preferred Suite offering type.",
+                        "toolTip": "Select your preferred Suite offering type.For MAS Core + Manage: If db2 values are not provided,db2 will be internally deployed",
                         "constraints": {
                             "allowedValues": [
                                 {

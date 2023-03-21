@@ -215,7 +215,7 @@ export UDS_TLS_CERT_LOCAL_FILE_PATH="${GIT_REPO_HOME}/uds.crt"
 # CP4D variables
 export CPD_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
 export CPD_VERSION=cpd40
-export CPD_PRODUCT_VERSION=4.5.0
+export CPD_PRODUCT_VERSION=4.6.0
 #export MAS_CHANNEL=8.10.x TODO PK uncomment when 8.10 channel ready
 #export MAS_CATALOG_VERSION=v8-amd64  TODO PK uncomment when 8.10 channel ready
 if [[ $CLUSTER_TYPE == "aws" ]]; then
@@ -247,21 +247,25 @@ export MAS_APP_ID=manage
 export MAS_APPWS_JDBC_BINDING="workspace-application"
 export MAS_JDBC_CERT_LOCAL_FILE=$GIT_REPO_HOME/db.crt
 export MAS_CLOUD_AUTOMATION_VERSION=1.0
-export MAS_DEVOPS_COLLECTION_VERSION=12.3.2
+export MAS_DEVOPS_COLLECTION_VERSION=12.11.1
 export MAS_APP_CHANNEL=8.5.x
 if [ -z "$EXISTING_NETWORK" ]; then
   export new_or_existing_vpc_subnet="new"
   export enable_permission_quota_check=true
   export PRIVATE_CLUSTER=false
+  export private_or_public_cluster=public
 else
    export new_or_existing_vpc_subnet="exist"
    export enable_permission_quota_check=false
+   export private_or_public_cluster=public
 fi
 log " new_or_existing_vpc_subnet=$new_or_existing_vpc_subnet"
 log " enable_permission_quota_check=$enable_permission_quota_check"
 
 if [[ -z "$EXISTING_NETWORK" && $CLUSTER_TYPE == "azure" ]]; then
   export INSTALLATION_MODE="IPI"
+  # Setting the name of the v-net
+  export EXISTING_NETWORK=${RANDOM_STR}-vnet
 else
   export INSTALLATION_MODE="UPI"
 fi
@@ -418,9 +422,28 @@ if [[ $CLUSTER_TYPE == "azure" ]]; then
   log " BASE_DOMAIN_RG_NAME: $BASE_DOMAIN_RG_NAME"
   # Get VNet RG name for UPI based installation
   if [[ $INSTALLATION_MODE == "UPI" ]]; then
-    VNET_NAME=$EXISTING_NETWORK
-    export EXISTING_NETWORK_RG=`az network vnet list | jq --arg VNET_NAME $VNET_NAME '.[] | select(.name==$VNET_NAME).resourceGroup' | tr -d '"'`
-    log " EXISTING_NETWORK_RG: $EXISTING_NETWORK_RG"
+    # Domain name with private dns - only available for UPI
+    if [[ $PRIVATE_CLUSTER == "true" ]]; then
+        export private_or_public_cluster="private"
+        export BASE_DOMAIN_RG_NAME=`az network private-dns zone list | jq --arg DNS_ZONE $DNS_ZONE '.[] | select(.name==$DNS_ZONE).resourceGroup' | tr -d '"'`
+         log " UPI PRIVATE CLUSTER - BASE_DOMAIN_RG_NAME: $BASE_DOMAIN_RG_NAME"
+      else
+         export private_or_public_cluster="public"
+         export BASE_DOMAIN_RG_NAME=`az network dns zone list | jq --arg DNS_ZONE $DNS_ZONE '.[] | select(.name==$DNS_ZONE).resourceGroup' | tr -d '"'`
+         log " UPI PUBLIC CLUSTER - BASE_DOMAIN_RG_NAME: $BASE_DOMAIN_RG_NAME"
+      fi
+
+       VNET_NAME=$EXISTING_NETWORK
+       export EXISTING_NETWORK_RG=`az network vnet list | jq --arg VNET_NAME $VNET_NAME '.[] | select(.name==$VNET_NAME).resourceGroup' | tr -d '"'`
+        #Assign the nsg name
+      # export nsg_name=`az network vnet subnet list --resource-group $EXISTING_NETWORK_RG --vnet-name  $VNET_NAME|jq '.[0] | select(.name).networkSecurityGroup.id'|awk -F'/' '{print $9}'|tr -d '"'`
+        #Assign the network subnet
+       export  master_subnet_name=`az network vnet subnet list --resource-group $EXISTING_NETWORK_RG --vnet-name $VNET_NAME|jq '.[] | select(.name).name'|grep master|tr -d '"'`
+       export  worker_subnet_name=`az network vnet subnet list --resource-group $EXISTING_NETWORK_RG --vnet-name $VNET_NAME|jq '.[] | select(.name).name'|grep worker|tr -d '"'`
+       log " MASTER SUBNET NAME: $master_subnet_name "
+       log " WORKER SUBNET NAME: $worker_subnet_name"
+     #  log " NSG NAME: $nsg_name"
+       log " EXISTING_NETWORK_RG: $EXISTING_NETWORK_RG"
   fi
 fi
 

@@ -62,17 +62,11 @@ if [[ $OPENSHIFT_USER_PROVIDE == "false" ]]; then
   cd $GIT_REPO_HOME
 
   ## Create OCP cluster
-  if [[ $INSTALLATION_MODE == "IPI" ]]; then
     cd $GIT_REPO_HOME/azure
     set +e
     ./create-ocp-cluster.sh
     retcode=$?
-  else
-    cd $GIT_REPO_HOME/azure/upifiles
-    set +e
-    ./create-ocp-cluster-upi.sh
-    retcode=$?
-  fi
+
   if [[ $retcode -ne 0 ]]; then
       log "OCP cluster creation failed"
       exit 21
@@ -211,15 +205,27 @@ if [[ $DEPLOY_CP4D == "true" ]]; then
   log "==== CP4D deployment completed ===="
 fi
 
+## Deploy Manage
+if [[ $DEPLOY_MANAGE == "true" && (-z $MAS_JDBC_USER) && (-z $MAS_JDBC_PASSWORD) && (-z $MAS_JDBC_URL) && (-z $MAS_JDBC_CERT_URL) ]]; then
+  log "==== Configure internal db2 for manage started ===="
+  export ROLE_NAME=db2 && ansible-playbook ibm.mas_devops.run_role
+  export ROLE_NAME=suite_db2_setup_for_manage && ansible-playbook ibm.mas_devops.run_role
+  log "==== Configuration of internal db2 for manage completed ===="
+fi
+
 ## Create MAS Workspace
 log "==== MAS Workspace generation started ===="
 export ROLE_NAME=gencfg_workspace && ansible-playbook ibm.mas_devops.run_role
 log "==== MAS Workspace generation completed ===="
 
 if [[ $DEPLOY_MANAGE == "true" ]]; then
-  log "==== Configure JDBC  started ===="
-  export ROLE_NAME=gencfg_jdbc && ansible-playbook ibm.mas_devops.run_role
-  log "==== Configure JDBC completed ===="
+  if [[ (-n $MAS_JDBC_USER) && (-n $MAS_JDBC_PASSWORD) && (-n $MAS_JDBC_URL) && (-n $MAS_JDBC_CERT_URL) ]]; then
+
+    log "==== Configure JDBC started for external DB2 ===="
+    export SSL_ENABLED="true"
+    export ROLE_NAME=gencfg_jdbc && ansible-playbook ibm.mas_devops.run_role
+    log "==== Configure JDBC completed for external DB2 ===="  
+  fi
 fi
 
 ## Deploy MAS
@@ -239,6 +245,7 @@ if [[ $DEPLOY_MANAGE == "true" ]]; then
 
   # Configure app to use the DB
   log "==== MAS Manage configure app started ===="
+  export MAS_APPWS_BINDINGS_JDBC="workspace-application"
   export ROLE_NAME=suite_app_config && ansible-playbook ibm.mas_devops.run_role
   log "==== MAS Manage configure app completed ===="
 fi

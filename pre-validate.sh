@@ -52,6 +52,16 @@ if [[ ($CLUSTER_TYPE == "aws") && (-n $BASE_DOMAIN) ]]; then
 else
     true
 fi
+# Check if provided hosted zone is public /private for azure
+if [[ ($CLUSTER_TYPE == "azure") && (-n $BASE_DOMAIN) ]]; then
+    if [[ $PRIVATE_CLUSTER == "false" ]]; then
+       PUBLIC_DNS_VALIDATION=`az network dns zone list  |grep -w $BASE_DOMAIN| tr -d '"'`
+          [[ ! -z "$PUBLIC_DNS_VALIDATION" ]] && log "Valid PUBLIC DNS selection" || log "Invalid PUBLIC DNS SELECTION"
+        else
+         PRIVATE_DNS_VALIDATION=`az network private-dns zone list |grep -w $BASE_DOMAIN| tr -d '"'`
+           [[ ! -z "$PRIVATE_DNS_VALIDATION" ]] && log "Valid PRIVATE DNS selection" || log "Invalid PRIVATE DNS SELECTION"
+    fi
+fi
 
 if [ $? -eq 0 ]; then
     log "MAS public domain verification = PASS"
@@ -78,9 +88,10 @@ fi
 
 # JDBC CFT inputs validation and connection test
 if [[ $DEPLOY_MANAGE == "true" ]]; then
-    if [[ (-z $MAS_JDBC_USER) && (-z $MAS_JDBC_PASSWORD) && (-z $MAS_JDBC_URL) && (-z $MAS_JDBC_CERT_URL) ]]; then
-        log "ERROR: Database details are not specified for MAS Manage deployment"
-        SCRIPT_STATUS=14
+    if [[ (-z $MAS_JDBC_USER) && (-z $MAS_JDBC_PASSWORD) && (-z $MAS_JDBC_URL) && (-z $MAS_JDBC_CERT_URL) ]]; then	
+		log "New database will be provisioned for MAS Manage deployment"
+     #   log "ERROR: Database details are not specified for MAS Manage deployment"
+     #   SCRIPT_STATUS=14
     else
         if [ -z "$MAS_JDBC_USER" ]; then
             log "ERROR: Database username is not specified"

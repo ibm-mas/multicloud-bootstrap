@@ -66,12 +66,14 @@ fi
 UNIQSTR=$(date +%Y%m%d%H%M%S)
 echo "Unique string: $UNIQSTR"
 az group create --name masocp-bootnode-vm-rg-${UNIQSTR} --location eastus2
+
 output=$(az vm create --resource-group masocp-bootnode-vm-rg-${UNIQSTR} --name bootnode-prep --image RedHat:RHEL:82gen2:latest --admin-username azureuser --ssh-key-values "$SSH_KEY" --size Standard_D2s_v3 --public-ip-sku Standard)
 echo $output
 vmip=$(echo $output | jq '.publicIpAddress' | tr -d '"')
 echo "VM IP address: $vmip"
 
-ssh -i $6 -o StrictHostKeyChecking=no azureuser@$vmip "cd /tmp; curl -skSL 'https://raw.githubusercontent.com/ibm-mas/multicloud-bootstrap/main/azure/bootnode-image/prepare-bootnode-image.sh' -o prepare-bootnode-image.sh; chmod +x prepare-bootnode-image.sh; sudo su - root -c \"/tmp/prepare-bootnode-image.sh '$ANSIBLE_COLLECTION_VERSION' '$ANSIBLE_COLLECTION_BRANCH' '$BOOTSTRAP_AUTOMATION_TAG_OR_BRANCH'\""
+ssh -i $6 -o StrictHostKeyChecking=no azureuser@$vmip "cd /tmp; curl -skSL 'https://raw.githubusercontent.com/ibm-mas/multicloud-bootstrap/mas810-alpha-shajsyedFeb/azure/bootnode-image/prepare-bootnode-image.sh' -o prepare-bootnode-image.sh; chmod +x prepare-bootnode-image.sh; sudo su - root -c \"/tmp/prepare-bootnode-image.sh '$ANSIBLE_COLLECTION_VERSION' '$ANSIBLE_COLLECTION_BRANCH' '$BOOTSTRAP_AUTOMATION_TAG_OR_BRANCH'\""
+
 az vm deallocate --resource-group masocp-bootnode-vm-rg-${UNIQSTR} --name bootnode-prep
 az vm generalize --resource-group masocp-bootnode-vm-rg-${UNIQSTR} --name bootnode-prep
 az image create --resource-group masocp-bootnode-vm-rg-${UNIQSTR} --name masocp-bootnode-img-${UNIQSTR} --source bootnode-prep --hyper-v-generation V2
