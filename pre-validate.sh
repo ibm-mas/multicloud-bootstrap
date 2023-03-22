@@ -142,6 +142,7 @@ if [[ $DEPLOY_MANAGE == "true" ]]; then
         fi
     fi
 fi
+fi
 
 # Check if all the existing SLS inputs are provided
 if [[ (-z $SLS_URL) && (-z $SLS_REGISTRATION_KEY) && (-z $SLS_PUB_CERT_URL) ]]; then
