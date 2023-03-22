@@ -123,10 +123,15 @@ if [[ $DEPLOY_MANAGE == "true" ]]; then
                 wget "$MAS_JDBC_CERT_URL" -O db.crt
             fi
             export MAS_ORACLE_JAR_LOCAL_PATH=$GIT_REPO_HOME/lib/ojdbc8.jar
-            if [[ ${MAS_JDBC_URL,, } =~ ^jdbc:oracle? ]]; then
+	    export MAS_DB2_JAR_LOCAL_PATH=$GIT_REPO_HOME/lib/db2jcc4.jar
+            if [[ ${MAS_JDBC_URL,, } =~ ^jdbc:db2? ]]; then
+                log "Connecting to the Database"
+                if python jdbc-prevalidate.py; then
+                    log "DB2 JDBC URL Validation = PASS"
+	    elif [[ ${MAS_JDBC_URL,, } =~ ^jdbc:oracle? ]]; then
                 log "Connecting to the Database"
                 if python jdbc-prevalidateOracle.py; then
-                    log "JDBC URL Validation = PASS"
+                    log "Oracle JDBC URL Validation = PASS"
                 else
                     log "ERROR: JDBC URL Validation = FAIL"
                     SCRIPT_STATUS=14
