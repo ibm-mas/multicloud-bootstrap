@@ -366,9 +366,6 @@ if [[ $DEPLOY_MANAGE == "true" ]]; then
   log "==== Configure JDBC  started ===="
   export SSL_ENABLED=false
   export MAS_APPWS_BINDINGS_JDBC="workspace-application"
-  export MAS_APP_SETTINGS_TABLESPACE="MAXDATADB"
-  export MAS_APP_SETTINGS_INDEXSPACE="MAXINDEXDB"
-  export MAS_APP_SETTINGS_DB2_SCHEMA="MAXIMO"
   export ROLE_NAME=gencfg_jdbc && ansible-playbook ibm.mas_devops.run_role
   log "==== Configure JDBC completed ===="
 fi
