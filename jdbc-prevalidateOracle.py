@@ -7,7 +7,9 @@ con=jaydebeapi.connect('oracle.jdbc.driver.OracleDriver',
                         jars=os.getenv('MAS_ORACLE_JAR_LOCAL_PATH'),)
 
 if con :
-#    print("Connected to db successfully !")
+print("Connected to Oracle db successfully !")
+log "Oracle JDBC URL Validation = PASS"
+
     con.close()
     os._exit(0)
 else:
