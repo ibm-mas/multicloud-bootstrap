@@ -145,6 +145,63 @@ Parameters:
     AllowedValues:
       - Production
       - Non-production
+
+  MongoDeploymentMode:
+    Description: >-
+      A new mongo instance will be created on selection of 'Provision a new mongo instance'.
+      To use an existing mongo instance, please select 'Use an existing mongo instance' option
+    Type: String
+    Default: "Provision a new mongo instance"
+    MinLength: '1'
+    AllowedValues:
+      - "Provision a new mongo instance"
+      - "Use an existing mongo instance"
+  MongoDBProvider:
+    Description: >-
+      Please select the desired MongoDB provider. 
+      Please note: When selecting MongoDBProvider as MongoDB and MongoDeploymentMode as 'Provision a new mongo instance', a new "MongoDB Community Edition" instance will be provisioned
+    Type: String
+    Default: "MongoDB"
+    MinLength: '1'
+    AllowedValues:
+      - "MongoDB"
+      - "Amazon DocumentDB"
+  MongoAdminUsername:
+    Description: >-
+      Enter the Mongo Admin Username.
+    Type: String
+  MongoAdminPassword:
+    Description: >-
+      Enter the Mongo Admin Password.
+    Type: String
+    NoEcho: true
+  MongoHosts:
+    Description: >-
+      Enter the Mongo Hosts. eg., docdb-nonwqp-1.abc.ca-central-1.docdb.amazonaws.com:27017,docdb-nonwqp-2.def.ca-central-1.docdb.amazonaws.com:27017
+    Type: String
+  MongoCAPemFile:
+    Description: >-
+      Enter the S3 bucket URL where MongoCAPemFile was uploaded.
+    Type: String
+  DocumentDBProvisionedVPCId:
+    Description: >-
+      Enter the VPC ID where existing Amazon DocumentDB was provisioned.
+      Leave this field blank, if MongoDBProvider was selected as "MongoDB".
+      Please make sure this VPC ID resides in the current deployment region and does not have matching or overlapping IPv4 CIDR blocks 10.0.0.0/16.
+    Type: String
+
+  AWSMSKProvider:
+    Description: >-
+      Please select Yes, to provision a AWS MSK cluster
+    Type: String
+    Default: "No"
+    MinLength: '1'
+    AllowedValues:
+      - "No"
+      - "Yes"
+Conditions:
+  MongoUseExistingInstanceCondition: !Equals [!Ref MongoDeploymentMode, "Use an existing mongo instance"]
+
 Metadata:
   'AWS::CloudFormation::Interface':
     ParameterGroups:
@@ -171,13 +228,34 @@ Metadata:
       - Label:
           default: >-
             Maximo Manage database configuration (complete this section only if
-            you chose the 'MAS + Manage' offering type)
+            you chose the 'MAS + Manage' offering type. 
+            In case if this section is left empty and you chose 'MAS + Manage' offering type, 
+            then We will provision an internal DB2 instance for Manage)
         Parameters:
           - MASManageDBUser
           - MASManageDBPassword
           - MASManageDBJdbcUrl
           - MASManageDBCertificateUrl
           - ImportDemoData
+      - Label:
+          default: MongoDB Configuration
+        Parameters:
+          - MongoDeploymentMode
+          - MongoDBProvider
+      - Label:
+          default: >-
+            Existing MongoDB / DocumentDB configuration details 
+            (complete this section only if MongoDeploymentMode was selected as 'Use an existing mongo instance')
+        Parameters:
+          - MongoAdminUsername
+          - MongoAdminPassword
+          - MongoHosts
+          - MongoCAPemFile
+          - DocumentDBProvisionedVPCId
+      - Label:
+          default: AWS MSK Provision
+        Parameters:
+          - AWSMSKProvider	         
       - Label:
           default: >-
             Existing Suite License Service connection details (leave this
@@ -205,7 +283,7 @@ Metadata:
 Mappings:
   RegionMap:
     us-east-1:
-      HVM64: ami-07494308bf779622b
+      HVM64: ami-028c3019ed25237a4
     us-east-2:
       HVM64: ami-0da4f91ded4bac1bd
     us-west-2:
@@ -215,19 +293,19 @@ Mappings:
     ap-southeast-1:
       HVM64: ami-0e084c2cc29ec1720
     ap-southeast-2:
-      HVM64: ami-04b93bf7675dfbac1
+      HVM64: ami-093254aff333dcfe3
     ap-northeast-1:
       HVM64: ami-0786a7bec0e143591
     eu-central-1:
       HVM64: ami-09fbeb232efd55c04
     ap-south-1:
-      HVM64: ami-02190fd9502ff751c
+      HVM64: ami-09ee06d85c3bf30f9
     ap-northeast-2:
       HVM64: ami-0b5a78be9ec85d01b
     ap-northeast-3:
       HVM64: ami-0d96abb825f3fc970
     ca-central-1:
-      HVM64: ami-0268cd112c39d8715
+      HVM64: ami-05de5e08f0f2ebd49
     eu-south-1:
       HVM64: ami-045e0d5842edd2162
     eu-west-1:
@@ -567,10 +645,10 @@ Resources:
               # Initiate the provisioning process
             - ssh-keyscan github.com >> ~/.ssh/known_hosts;
             - cd /root;
-            - 'git clone https://github.com/ibm-mas/ansible-devops.git;'
+            - 'git clone -b pk-810-aws https://github.com/ibm-mas/ansible-devops.git;'
             - cd ansible-devops;
             - rm -rf multicloud-bootstrap 1>/dev/null 2>&1;
-            - 'git clone https://github.com/ibm-mas/multicloud-bootstrap.git;'
+            - 'git clone -b pk-810-aws https://github.com/ibm-mas/multicloud-bootstrap.git;'
             - cd multicloud-bootstrap;
             - 'find . -type f -name "*.sh" -exec chmod +x {} \;;'
             - ./init.sh "aws" "
@@ -624,9 +702,30 @@ Resources:
             - !Ref ImportDemoData
             - ''' '''' '''' '''' '''' '''
             - !Ref EmailNotification
-            - ''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''
+            - ''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''
+            - ''' '''
+            - !GetAtt
+              - CallLambdaFunctionGetSubnetForBootnode
+              - DefaultVPCId
+            - ''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''
             - ''' '''
             - !Ref OperationalMode
+            - ''' '''
+            - !If [MongoUseExistingInstanceCondition, "true", "false"]
+            - ''' '''
+            - !Ref MongoDBProvider
+            - ''' '''
+            - !If [MongoUseExistingInstanceCondition, !Ref MongoAdminUsername, ""]
+            - ''' '''
+            - !If [MongoUseExistingInstanceCondition, !Ref MongoAdminPassword, ""]
+            - ''' '''
+            - !If [MongoUseExistingInstanceCondition, !Ref MongoHosts, ""]
+            - ''' '''
+            - !If [MongoUseExistingInstanceCondition, !Ref MongoCAPemFile, ""]
+            - ''' '''
+            - !If [MongoUseExistingInstanceCondition, !Ref DocumentDBProvisionedVPCId, ""]
+            - ''' '''
+            - !Ref AWSMSKProvider	    
             - ''' "dev" '
             - '2>&1 | tee mas-provisioning.log; '
       Tags:

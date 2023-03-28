@@ -128,7 +128,31 @@ mark_provisioning_failed() {
   elif [[ $retcode -eq 30 ]]; then
     export STATUS_MSG="MAS+CP4D offering is not supported on ROSA cluster. Please select option to create a new cluster in a new deployment or provide a self-managed cluster."
   elif [[ $retcode -eq 31 ]]; then
-  export STATUS_MSG="Please provide a valid DB certificate URL.."
+    export STATUS_MSG="Please provide a valid DB certificate URL.."
+  elif [[ $retcode -eq 32 ]]; then
+    export STATUS_MSG="Failure in fetching the VPC id required to deploy document DB.."
+  elif [[ $retcode -eq 33 ]]; then
+    export STATUS_MSG="The Mongo DB details are missing or invalid."
+  elif [[ $retcode -eq 34 ]]; then
+    export STATUS_MSG="Please provide a valid Mongo CA PEM certificate URL.."
+  elif [[ $retcode -eq 35 ]]; then
+    export STATUS_MSG="Failure in creating VPC peering."
+  elif [[ $retcode -eq 36 ]]; then
+    export STATUS_MSG="Failure in creating IAM policy." 
+  elif [[ $retcode -eq 37 ]]; then
+    export STATUS_MSG="Failure in creating Create Route."
+  elif [[ $retcode -eq 38 ]]; then
+    export STATUS_MSG="Failure in connecting to existing Mongo DB instance."
+  elif [[ $retcode -eq 39 ]]; then
+    export STATUS_MSG="$DOCUMENTDB_VPC_ID is not found in region $DEPLOY_REGION"
+  elif [[ $retcode -eq 40 ]]; then
+    export STATUS_MSG="Failure in finding VPC in region $DEPLOY_REGION"
+  elif [[ $retcode -eq 41 ]]; then
+    export STATUS_MSG="Subnet ID associated with CIDR Block is not found"
+  elif [[ $retcode -eq 42 ]]; then
+    export STATUS_MSG="Failure in fetching the VPC id required to deploy AWS MSK.."
+  elif [[ $retcode -eq 43 ]]; then
+    export STATUS_MSG="Amazon DocumentDB is not supported in current deploy region $DEPLOY_REGION"    
   fi
   export MESSAGE_TEXT=NA
   export OPENSHIFT_CLUSTER_CONSOLE_URL=NA

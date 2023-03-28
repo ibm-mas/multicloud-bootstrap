@@ -375,6 +375,13 @@ if [[ $VPC_ID != "null" ]]; then
   fi
   echo "---------------------------------------------"
 
+  # 
+  VPCPEERID=$(aws ec2 describe-vpc-peering-connections --region ${REGION} --query "VpcPeeringConnections[?(RequesterVpcInfo.VpcId == '${VPC_ID}')].VpcPeeringConnectionId" --output text)
+  if [[ -n $VPCPEERID ]]; then
+    aws ec2 delete-vpc-peering-connection --vpc-peering-connection-id ${VPCPEERID} --region ${REGION}
+  fi
+  
+
   # Delete VPC
   aws ec2 delete-vpc --region $REGION --vpc-id $VPC_ID
 else
@@ -383,15 +390,18 @@ fi
 echo "---------------------------------------------"
 
 # Delete S3 bucket
-echo "Checking for S3 buckets"
-S3BUCKETS=$(aws s3api list-buckets --query 'Buckets[?contains(Name, `masocp-'"${UNIQ_STR}"'`) == `true`].[Name]' --output text)
+echo "Checking for S3 buckets - ${UNIQ_STR}"
+S3BUCKETS=$(aws s3api list-buckets --query 'Buckets[?contains(Name, `masocp-'"${UNIQ_STR}"'`) == `true`].[Name]' --region $REGION --output text)
 echo "S3BUCKETS = $S3BUCKETS"
 if [[ -n $S3BUCKETS ]]; then
   echo "Found S3 buckets for this AWS stack"
   for inst in $S3BUCKETS; do
-    inst=$(echo $inst | tr -d '\r\n')
-    aws s3 rb s3://$inst --force --region $REGION
-    echo "Deleted bucket $inst"
+    if [[ -n $inst ]]; then  
+      inst=$(echo $inst | tr -d '\r\n')
+      aws s3 rb s3://$inst --force --region $REGION
+      echo "Deleted bucket $inst"    
+    fi
+
   done
 else
   echo "No S3 buckets for this AWS stack"

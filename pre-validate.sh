@@ -88,10 +88,8 @@ fi
 
 # JDBC CFT inputs validation and connection test
 if [[ $DEPLOY_MANAGE == "true" ]]; then
-    if [[ (-z $MAS_JDBC_USER) && (-z $MAS_JDBC_PASSWORD) && (-z $MAS_JDBC_URL) && (-z $MAS_JDBC_CERT_URL) ]]; then	
-		log "New database will be provisioned for MAS Manage deployment"
-     #   log "ERROR: Database details are not specified for MAS Manage deployment"
-     #   SCRIPT_STATUS=14
+    if [[ (-z $MAS_JDBC_USER) && (-z $MAS_JDBC_PASSWORD) && (-z $MAS_JDBC_URL) && (-z $MAS_JDBC_CERT_URL) ]]; then
+        log "=== New internal DB2 database will be provisioned for MAS Manage deployment ==="
     else
         if [ -z "$MAS_JDBC_USER" ]; then
             log "ERROR: Database username is not specified"
@@ -101,9 +99,6 @@ if [[ $DEPLOY_MANAGE == "true" ]]; then
             SCRIPT_STATUS=14
         elif [ -z "$MAS_JDBC_URL" ]; then
             log "ERROR: Database connection url is not specified"
-            SCRIPT_STATUS=14
-        elif [ -z "$MAS_JDBC_CERT_URL" ]; then
-            log "ERROR: Database certificate url is not specified"
             SCRIPT_STATUS=14
         else
             log "Downloading DB certificate"
@@ -135,18 +130,39 @@ if [[ $DEPLOY_MANAGE == "true" ]]; then
             fi
             export MAS_DB2_JAR_LOCAL_PATH=$GIT_REPO_HOME/lib/db2jcc4.jar
             if [[ ${MAS_JDBC_URL,, } =~ ^jdbc:db2? ]]; then
-                log "Connecting to the Database"
-                if python jdbc-prevalidate.py; then
-                    log "JDBC URL Validation = PASS"
+                log "Connecting to DB2 Database"
+                if python jdbc-prevalidateDB2.py; then
+                    log "Db2 JDBC URL Validation = PASS"
                 else
-                    log "ERROR: JDBC URL Validation = FAIL"
+                    log "ERROR: Db2 JDBC URL Validation = FAIL"
+                    SCRIPT_STATUS=14
+                fi
+            elif [[ ${MAS_JDBC_URL,, } =~ ^jdbc:oracle? ]]; then
+                export MAS_ORACLE_JAR_LOCAL_PATH=$GIT_REPO_HOME/lib/ojdbc8.jar
+                log "Connecting to Oracle Database"
+                if python jdbc-prevalidateOracle.py; then
+                    log "Oracle JDBC URL Validation = PASS"
+				else
+                    log "ERROR: Oracle JDBC URL Validation = FAIL"
                     SCRIPT_STATUS=14
                 fi
             else
-                log "Skipping JDBC URL validation, supported only for DB2"
+                log "Skipping JDBC URL validation, supported only for DB2 and Oracle".
             fi
         fi
     fi
+fi
+
+#mongo pre-validation only for AWS currently. 
+if [[ $CLUSTER_TYPE == "aws" ]]; then
+    log "=== pre-validate-mongo.sh started ==="
+    sh $GIT_REPO_HOME/mongo/pre-validate-mongo.sh
+    SCRIPT_STATUS=$?
+    if [ $SCRIPT_STATUS -ne 0 ]; then
+        log "ERROR: MongoDB URL Validation FAILED in pre-validate-mongo.sh, exiting"
+        exit $SCRIPT_STATUS
+    fi
+    log "=== pre-validate-mongo.sh completed ==="
 fi
 
 # Check if all the existing SLS inputs are provided

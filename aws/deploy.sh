@@ -7,6 +7,8 @@ validate_prouduct_type
 # This script will initiate the provisioning process of MAS. It will perform following steps,
 
 ## Variables
+export MONGO_CA_PEM_LOCAL_FILE=$GIT_REPO_HOME/mongo/mongo-ca.pem
+log " MONGO_CA_PEM_LOCAL_FILE=${MONGO_CA_PEM_LOCAL_FILE}"
 export AWS_DEFAULT_REGION=$DEPLOY_REGION
 MASTER_INSTANCE_TYPE="m5.2xlarge"
 WORKER_INSTANCE_TYPE="m5.4xlarge"
@@ -97,19 +99,27 @@ else
   log " MAS LICENSE URL file is not available."
 fi
 
-## IAM
-# Create IAM policy
-cd $GIT_REPO_HOME/aws
-policyarn=$(aws iam create-policy --policy-name ${IAM_POLICY_NAME} --policy-document file://${GIT_REPO_HOME}/aws/iam/policy.json | jq '.Policy.Arn' | tr -d "\"")
-# Create IAM user
-aws iam create-user --user-name ${IAM_USER_NAME}
-aws iam attach-user-policy --user-name ${IAM_USER_NAME} --policy-arn $policyarn
-accessdetails=$(aws iam create-access-key --user-name ${IAM_USER_NAME})
-export AWS_ACCESS_KEY_ID=$(echo $accessdetails | jq '.AccessKey.AccessKeyId' | tr -d "\"")
-export AWS_SECRET_ACCESS_KEY=$(echo $accessdetails | jq '.AccessKey.SecretAccessKey' | tr -d "\"")
-log " AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID"
-# Put some delay for IAM permissions to be applied in the backend
-sleep 60
+if [ -f "/tmp/iam-user-created" ]; then
+  log "deploy.sh /tmp/iam-user-created exists; iam user creation skipped ..."
+else 
+  ## IAM
+  # Create IAM policy
+  cd $GIT_REPO_HOME/aws
+  policyarn=$(aws iam create-policy --policy-name ${IAM_POLICY_NAME} --policy-document file://${GIT_REPO_HOME}/aws/iam/policy.json | jq '.Policy.Arn' | tr -d "\"")
+  # Create IAM user
+  aws iam create-user --user-name ${IAM_USER_NAME}
+  aws iam attach-user-policy --user-name ${IAM_USER_NAME} --policy-arn $policyarn
+  accessdetails=$(aws iam create-access-key --user-name ${IAM_USER_NAME})
+  export AWS_ACCESS_KEY_ID=$(echo $accessdetails | jq '.AccessKey.AccessKeyId' | tr -d "\"")
+  export AWS_SECRET_ACCESS_KEY=$(echo $accessdetails | jq '.AccessKey.SecretAccessKey' | tr -d "\"")
+  log " AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID"
+  # on successful user and policy creation, create a file /tmp/iam-user-created
+  echo "COMPLETE" > /tmp/iam-user-created
+  chmod a+rw /tmp/iam-user-created  
+  # Put some delay for IAM permissions to be applied in the backend
+  sleep 60  
+fi
+
 
 if [[ $OPENSHIFT_USER_PROVIDE == "false" ]]; then
   ## Provisiong OCP cluster
@@ -182,6 +192,9 @@ EOT
   fi
   set -e
   log "==== OCP cluster creation completed ===="
+
+  export AWS_VPC_ID="$(terraform output -raw vpcid)"
+  log "AWS_VPC_ID ===> ${AWS_VPC_ID}"
 
   oc login -u $OCP_USERNAME -p $OCP_PASSWORD --server=https://api.${CLUSTER_NAME}.${BASE_DOMAIN}:6443
   log "==== Adding PID limits to worker nodes ===="
@@ -272,11 +285,152 @@ fi
 set -e
 log "==== OCP cluster configuration (Cert Manager) completed ===="
 
-## Deploy MongoDB
-log "==== MongoDB deployment started ===="
-export ROLE_NAME=mongodb && ansible-playbook ibm.mas_devops.run_role
-log "==== MongoDB deployment completed ===="
+log "==== AWS_VPC_ID = ${AWS_VPC_ID}"
+log "==== EXISTING_NETWORK = ${EXISTING_NETWORK}"
+log "==== BOOTNODE_VPC_ID = ${BOOTNODE_VPC_ID}"
+if [[ -n $AWS_VPC_ID ]]; then
+  export VPC_ID="${AWS_VPC_ID}" #ipi
+fi
+if [[ -n $EXISTING_NETWORK ]]; then
+  export VPC_ID="${EXISTING_NETWORK}" #upi
+fi
+if [[ -z $AWS_VPC_ID && -z $EXISTING_NETWORK  && -n $BOOTNODE_VPC_ID ]]; then
+  export VPC_ID="${BOOTNODE_VPC_ID}" #existing ocp
+fi
+if [[ -z $VPC_ID && $MONGO_FLAVOR == "Amazon DocumentDB" ]]; then
+  log "Failed to get the vpc id required to deploy documentdb"
+  exit 32
+fi
+export AWS_REGION=$DEPLOY_REGION
 
+log "==== MONGO_USE_EXISTING_INSTANCE = ${MONGO_USE_EXISTING_INSTANCE}"
+if [[ $MONGO_USE_EXISTING_INSTANCE == "true" ]]; then
+  if [[ $MONGO_FLAVOR == "Amazon DocumentDB" ]]; then
+    export DB_PROVIDER="aws"
+    log "==== aws/deploy.sh : Invoke docdb-create-vpc-peer.sh starts ===="
+    log "Existing instance of Amazon Document DB @ VPC_ID=$DOCUMENTDB_VPC_ID"    
+    export ACCEPTER_VPC_ID=${DOCUMENTDB_VPC_ID}
+    export REQUESTER_VPC_ID=${VPC_ID}
+    
+    sh $GIT_REPO_HOME/mongo/docdb/docdb-create-vpc-peer.sh
+    log "==== aws/deploy.sh : Invoke docdb-create-vpc-peer.sh ends ===="
+  fi
+  export MONGO_ADMIN_USERNAME="${MONGO_ADMIN_USERNAME}"
+  export MONGO_ADMIN_PASSWORD="${MONGO_ADMIN_PASSWORD}"
+  export MONGO_HOSTS="${MONGO_HOSTS}"
+  export MONGO_CA_PEM_FILE="${MONGO_CA_PEM_FILE}"
+  log "==== Existing MongoDB gencfg_mongo Started ===="
+  export ROLE_NAME=gencfg_mongo && ansible-playbook ibm.mas_devops.run_role
+  log "==== Existing MongoDB gencfg_mongo completed ===="
+else
+  ## Deploy MongoDB started
+  log "==== MongoDB deployment started ==== MONGO_FLAVOR=$MONGO_FLAVOR"
+  if [[ $MONGO_FLAVOR == "Amazon DocumentDB" ]]; then
+    log "Provision new instance of Amazon Document DB @ VPC_ID=$VPC_ID"
+    export DB_PROVIDER="aws"
+    export MONGODB_ACTION="provision"
+    export DOCDB_CLUSTER_NAME="docdb-${RANDOM_STR}"
+    export DOCDB_INSTANCE_IDENTIFIER_PREFIX="docdb-${RANDOM_STR}"
+    export DOCDB_INSTANCE_NUMBER=3
+    # IPv4 CIDR of private subnet
+    export DOCDB_CIDR_AZ1="10.0.128.0/20"
+    export DOCDB_CIDR_AZ2="10.0.144.0/20"
+    export DOCDB_CIDR_AZ3="10.0.160.0/20"
+
+    export DOCDB_INGRESS_CIDR="10.0.0.0/16"
+    export DOCDB_EGRESS_CIDR="10.0.0.0/16"
+
+    SUBNET_1=`aws ec2 describe-subnets --filters \
+	  "Name=cidr,Values=$DOCDB_CIDR_AZ1" \
+	  "Name=vpc-id,Values=$VPC_ID"  \
+    --query "Subnets[*].{SUBNET_ID:SubnetId , TAG_NAME:Tags[?Key=='Name'] | [0].Value }" --output=text`
+
+    SUBNET_ID1=`echo -e "$SUBNET_1" | awk '{print $1}'`
+    TAG_NAME1=`echo -e "$SUBNET_1" | awk '{print $2}'`
+    log "==== SUBNET_ID1=$SUBNET_ID1 and TAG_NAME1=$TAG_NAME1 ==== "
+
+    SUBNET_2=`aws ec2 describe-subnets --filters \
+	  "Name=cidr,Values=$DOCDB_CIDR_AZ2" \
+	  "Name=vpc-id,Values=$VPC_ID"  \
+    --query "Subnets[*].{SUBNET_ID:SubnetId , TAG_NAME:Tags[?Key=='Name'] | [0].Value }" --output=text`
+
+    SUBNET_ID2=`echo -e "$SUBNET_2" | awk '{print $1}'`
+    TAG_NAME2=`echo -e "$SUBNET_2" | awk '{print $2}'`
+    log "==== SUBNET_ID2=$SUBNET_ID2 and TAG_NAME2=$TAG_NAME2 ==== "
+
+    SUBNET_3=`aws ec2 describe-subnets --filters \
+	  "Name=cidr,Values=$DOCDB_CIDR_AZ3" \
+	  "Name=vpc-id,Values=$VPC_ID"  \
+    --query "Subnets[*].{SUBNET_ID:SubnetId , TAG_NAME:Tags[?Key=='Name'] | [0].Value }" --output=text`
+
+    SUBNET_ID3=`echo -e "$SUBNET_3" | awk '{print $1}'`
+    TAG_NAME3=`echo -e "$SUBNET_3" | awk '{print $2}'`    
+    log "==== SUBNET_ID3=$SUBNET_ID3 and TAG_NAME3=$TAG_NAME3 ==== "    
+
+    if [[ -z "$SUBNET_ID1" ]]; then
+      SCRIPT_STATUS=41
+      log "Subnet ID associated with CIDR Block 10.0.128.0/20 not found"
+      exit $SCRIPT_STATUS
+    fi
+    if [[ -z "$SUBNET_ID2" ]]; then
+      SCRIPT_STATUS=41
+      log "Subnet ID associated with CIDR Block 10.0.144.0/20 not found"
+      exit $SCRIPT_STATUS
+    fi
+    if [[ -z "$SUBNET_ID3" ]]; then
+      SCRIPT_STATUS=41
+      log "Subnet ID associated with CIDR Block 10.0.160.0/20 not found"
+      exit $SCRIPT_STATUS
+    fi
+    
+    #mongo docdb role expects subnet name tag to be in this format docdb-${RANDOM_STR}, required in the create instance flow
+    aws ec2 create-tags --resources $SUBNET_ID1  --tags Key=Name,Value=docdb-${RANDOM_STR}
+    aws ec2 create-tags --resources $SUBNET_ID2  --tags Key=Name,Value=docdb-${RANDOM_STR}
+    aws ec2 create-tags --resources $SUBNET_ID3  --tags Key=Name,Value=docdb-${RANDOM_STR}
+    log "==== DocumentDB deployment started ==== @VPC_ID=${VPC_ID} ==== DOCDB_CLUSTER_NAME = ${DOCDB_CLUSTER_NAME}"
+  fi
+  export ROLE_NAME=mongodb && ansible-playbook ibm.mas_devops.run_role
+  if [[ $MONGO_FLAVOR == "Amazon DocumentDB" && $MONGO_USE_EXISTING_INSTANCE == "false" ]]; then
+    #Renaming subnet name tag to its original value, required in the create instance flow
+    if [[ (-n $SUBNET_ID1) && (-n $SUBNET_ID2) && (-n $SUBNET_ID3) && (-n $TAG_NAME1) && (-n $TAG_NAME2) && (-n $TAG_NAME3) ]]; then
+      log "==== Tagging subnet name to its original value ===="
+      aws ec2 create-tags --resources $SUBNET_ID1  --tags Key=Name,Value=$TAG_NAME1
+      aws ec2 create-tags --resources $SUBNET_ID2  --tags Key=Name,Value=$TAG_NAME2
+      aws ec2 create-tags --resources $SUBNET_ID3  --tags Key=Name,Value=$TAG_NAME3    
+    fi
+  fi
+  
+  log "==== MongoDB deployment completed ===="
+  ## Deploy MongoDB completed
+fi
+
+if [[ -z $VPC_ID && $AWS_MSK_PROVIDER == "Yes" ]]; then
+  log "Failed to get the vpc id required to deploy AWS MSK"
+  exit 42
+fi
+log "==== AWS_MSK_PROVIDER=$AWS_MSK_PROVIDER VPC_ID=$VPC_ID ===="  
+if [[ $AWS_MSK_PROVIDER == "Yes" ]]; then
+  log "==== AWS MSK deployment started ===="
+  export KAFKA_CLUSTER_NAME="msk-${RANDOM_STR}"
+  export KAFKA_NAMESPACE="msk-${RANDOM_STR}"  
+  export AWS_KAFKA_USER_NAME="mskuser-${RANDOM_STR}"
+  export AWS_REGION="${DEPLOY_REGION}"
+  export KAFKA_VERSION="2.8.1"
+  export KAFKA_PROVIDER="aws"
+  export KAFKA_ACTION="provision"
+  export AWS_MSK_INSTANCE_TYPE="kafka.m5.large"
+  export AWS_MSK_VOLUME_SIZE="100"
+  export AWS_MSK_INSTANCE_NUMBER=3
+  # IPv4 CIDR of private subnet
+  export AWS_MSK_CIDR_AZ1="10.0.128.0/20"
+  export AWS_MSK_CIDR_AZ2="10.0.144.0/20"
+  export AWS_MSK_CIDR_AZ3="10.0.160.0/20"
+  
+  export AWS_MSK_INGRESS_CIDR="10.0.0.0/16"
+  export AWS_MSK_EGRESS_CIDR="10.0.0.0/16"
+  export ROLE_NAME=kafka && ansible-playbook ibm.mas_devops.run_role
+  log "==== AWS MSK deployment completed ===="
+fi
 ## Copying the entitlement.lic to MAS_CONFIG_DIR
 if [[ -n "$MAS_LICENSE_URL" ]]; then
   cp $GIT_REPO_HOME/entitlement.lic $MAS_CONFIG_DIR
@@ -360,10 +514,23 @@ log "==== MAS Workspace generation started ===="
 export ROLE_NAME=gencfg_workspace && ansible-playbook ibm.mas_devops.run_role
 log "==== MAS Workspace generation completed ===="
 
-if [[ $DEPLOY_MANAGE == "true" ]]; then
-  log "==== Configure JDBC  started ===="
+## Deploy Manage
+if [[ $DEPLOY_MANAGE == "true" && (-z $MAS_JDBC_USER) && (-z $MAS_JDBC_PASSWORD) && (-z $MAS_JDBC_URL) && (-z $MAS_JDBC_CERT_URL) ]]; then
+  log "==== Configure internal db2 for manage started ===="
+  export ROLE_NAME=db2 && ansible-playbook ibm.mas_devops.run_role
+  export ROLE_NAME=suite_db2_setup_for_manage && ansible-playbook ibm.mas_devops.run_role
+  log "==== Configure internal db2 for manage started ===="
+fi 
+
+if [[ $DEPLOY_MANAGE == "true" && (-n $MAS_JDBC_USER) && (-n $MAS_JDBC_PASSWORD) && (-n $MAS_JDBC_URL) ]]; then
+  export SSL_ENABLED=false
+  if [ -n "$MAS_JDBC_CERT_URL" ]; then
+    log "MAS_JDBC_CERT_URL is not empty, setting SSL_ENABLED as true"
+    export SSL_ENABLED=true
+  fi
+  log "==== Configure JDBC started for external DB2 ==== SSL_ENABLED = $SSL_ENABLED"
   export ROLE_NAME=gencfg_jdbc && ansible-playbook ibm.mas_devops.run_role
-  log "==== Configure JDBC completed ===="
+  log "==== Configure JDBC completed for external DB2 ===="
 fi
 
 ## Deploy MAS
@@ -382,6 +549,7 @@ if [[ $DEPLOY_MANAGE == "true" ]]; then
 
   # Configure app to use the DB
   log "==== MAS Manage configure app started ===="
+  export MAS_APPWS_BINDINGS_JDBC="workspace-application"
   export ROLE_NAME=suite_app_config && ansible-playbook ibm.mas_devops.run_role
   log "==== MAS Manage configure app completed ===="
 fi
