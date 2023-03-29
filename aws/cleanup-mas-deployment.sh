@@ -375,7 +375,7 @@ if [[ $VPC_ID != "null" ]]; then
   fi
   echo "---------------------------------------------"
 
-  # 
+  # delete vpc peering connection
   VPCPEERID=$(aws ec2 describe-vpc-peering-connections --region ${REGION} --query "VpcPeeringConnections[?(RequesterVpcInfo.VpcId == '${VPC_ID}')].VpcPeeringConnectionId" --output text)
   if [[ -n $VPCPEERID ]]; then
     aws ec2 delete-vpc-peering-connection --vpc-peering-connection-id ${VPCPEERID} --region ${REGION}
