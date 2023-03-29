@@ -308,6 +308,7 @@ if [[ $MONGO_USE_EXISTING_INSTANCE == "true" ]]; then
   if [[ $MONGO_FLAVOR == "Amazon DocumentDB" ]]; then
     export DB_PROVIDER="aws"
     export SLS_MONGO_RETRYWRITES=false
+    export RETRY_WRITES=$SLS_MONGO_RETRYWRITES
     log "==== aws/deploy.sh : Invoke docdb-create-vpc-peer.sh starts ===="
     log "Existing instance of Amazon Document DB @ VPC_ID=$DOCUMENTDB_VPC_ID"
     export ACCEPTER_VPC_ID=${DOCUMENTDB_VPC_ID}
