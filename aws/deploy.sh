@@ -307,8 +307,9 @@ log "==== MONGO_USE_EXISTING_INSTANCE = ${MONGO_USE_EXISTING_INSTANCE}"
 if [[ $MONGO_USE_EXISTING_INSTANCE == "true" ]]; then
   if [[ $MONGO_FLAVOR == "Amazon DocumentDB" ]]; then
     export DB_PROVIDER="aws"
+    export SLS_MONGO_RETRYWRITES=false
     log "==== aws/deploy.sh : Invoke docdb-create-vpc-peer.sh starts ===="
-    log "Existing instance of Amazon Document DB @ VPC_ID=$DOCUMENTDB_VPC_ID"    
+    log "Existing instance of Amazon Document DB @ VPC_ID=$DOCUMENTDB_VPC_ID"
     export ACCEPTER_VPC_ID=${DOCUMENTDB_VPC_ID}
     export REQUESTER_VPC_ID=${VPC_ID}
     
@@ -328,6 +329,7 @@ else
   if [[ $MONGO_FLAVOR == "Amazon DocumentDB" ]]; then
     log "Provision new instance of Amazon Document DB @ VPC_ID=$VPC_ID"
     export DB_PROVIDER="aws"
+    export SLS_MONGO_RETRYWRITES=false
     export MONGODB_ACTION="provision"
     export DOCDB_CLUSTER_NAME="docdb-${RANDOM_STR}"
     export DOCDB_INSTANCE_IDENTIFIER_PREFIX="docdb-${RANDOM_STR}"
@@ -417,7 +419,7 @@ if [[ $AWS_MSK_PROVIDER == "Yes" ]]; then
   export AWS_REGION="${DEPLOY_REGION}"
   export KAFKA_VERSION="2.8.1"
   export KAFKA_PROVIDER="aws"
-  export KAFKA_ACTION="provision"
+  export KAFKA_ACTION="install"
   export AWS_MSK_INSTANCE_TYPE="kafka.m5.large"
   export AWS_MSK_VOLUME_SIZE="100"
   export AWS_MSK_INSTANCE_NUMBER=3
@@ -477,12 +479,13 @@ if [[ (-z $SLS_URL) || (-z $SLS_REGISTRATION_KEY) || (-z $SLS_PUB_CERT_URL) ]]; 
   else
     log "Configuring sls for byol offering"
   fi
-
+  log "SLS_MONGO_RETRYWRITES=$SLS_MONGO_RETRYWRITES"
   log "==== SLS deployment started ===="
   export ROLE_NAME=sls && ansible-playbook ibm.mas_devops.run_role
   log "==== SLS deployment completed ===="
 
 else
+  log " SLS_MONGO_RETRYWRITES=$SLS_MONGO_RETRYWRITES "
   log "=== Using Existing SLS Deployment ==="
   export ROLE_NAME=sls && ansible-playbook ibm.mas_devops.run_role
   log "=== Generated SLS Config YAML ==="
