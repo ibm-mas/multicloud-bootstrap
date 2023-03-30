@@ -179,7 +179,7 @@ Parameters:
   MongoDeploymentMode:
     Description: >-
       A new mongo instance will be created on selection of 'Provision a new mongo instance'.
-      To use an existing mongo instance, please select 'Use an existing mongo instance' option
+      To use an existing mongo instance, select 'Use an existing mongo instance' option
     Type: String
     Default: "Provision a new mongo instance"
     MinLength: '1'
@@ -188,8 +188,8 @@ Parameters:
       - "Use an existing mongo instance"
   MongoDBProvider:
     Description: >-
-      Please select the desired MongoDB provider. 
-      Please note: When selecting MongoDBProvider as MongoDB and MongoDeploymentMode as 'Provision a new mongo instance', a new "MongoDB Community Edition" instance will be provisioned
+      Select the desired MongoDB provider. 
+      Note: When selecting MongoDBProvider as MongoDB and MongoDeploymentMode as 'Provision a new mongo instance', a new "MongoDB Community Edition" instance will be provisioned
     Type: String
     Default: "MongoDB"
     MinLength: '1'
@@ -217,11 +217,11 @@ Parameters:
     Description: >-
       Enter the VPC ID where existing Amazon DocumentDB was provisioned.
       Leave this field blank, if MongoDBProvider was selected as "MongoDB".
-      Please make sure this VPC ID resides in the current deployment region and does not have matching or overlapping IPv4 CIDR blocks 10.0.0.0/16.
+      Make sure this VPC ID resides in the current deployment region and does not have matching or overlapping IPv4 CIDR blocks 10.0.0.0/16.
     Type: String
   AWSMSKProvider:
     Description: >-
-      Please select Yes, to provision a AWS MSK cluster
+      Select Yes, to provision a AWS MSK cluster
     Type: String
     Default: "No"
     MinLength: '1'
@@ -637,10 +637,10 @@ Resources:
               # Initiate the provisioning process
             - ssh-keyscan github.com >> ~/.ssh/known_hosts;
             - cd /root;
-            - 'git clone -b pk-810-aws https://github.com/ibm-mas/ansible-devops.git;'
+            - 'git clone https://github.com/ibm-mas/ansible-devops.git;'
             - cd ansible-devops;
             - rm -rf multicloud-bootstrap 1>/dev/null 2>&1;
-            - 'git clone -b pk-810-aws https://github.com/ibm-mas/multicloud-bootstrap.git;'
+            - 'git clone -b mas810-alpha https://github.com/ibm-mas/multicloud-bootstrap.git;'
             - cd multicloud-bootstrap;
             - 'find . -type f -name "*.sh" -exec chmod +x {} \;;'
             - ./init.sh "aws" "
