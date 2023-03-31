@@ -244,7 +244,7 @@ export MAS_APP_ID=manage
 export MAS_APPWS_JDBC_BINDING="workspace-application"
 export MAS_JDBC_CERT_LOCAL_FILE=$GIT_REPO_HOME/db.crt
 export MAS_CLOUD_AUTOMATION_VERSION=1.0
-export MAS_DEVOPS_COLLECTION_VERSION=12.11.1
+export MAS_DEVOPS_COLLECTION_VERSION=12.16.1
 export MAS_APP_CHANNEL=8.6.x
 if [ -z "$EXISTING_NETWORK" ]; then
   export new_or_existing_vpc_subnet="new"
