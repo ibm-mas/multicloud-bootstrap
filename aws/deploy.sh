@@ -7,8 +7,6 @@ validate_prouduct_type
 # This script will initiate the provisioning process of MAS. It will perform following steps,
 
 ## Variables
-export MONGO_CA_PEM_LOCAL_FILE=$GIT_REPO_HOME/mongo/mongo-ca.pem
-log " MONGO_CA_PEM_LOCAL_FILE=${MONGO_CA_PEM_LOCAL_FILE}"
 export AWS_DEFAULT_REGION=$DEPLOY_REGION
 MASTER_INSTANCE_TYPE="m5.2xlarge"
 WORKER_INSTANCE_TYPE="m5.4xlarge"
@@ -320,9 +318,10 @@ if [[ $MONGO_USE_EXISTING_INSTANCE == "true" ]]; then
   export MONGODB_ADMIN_USERNAME="${MONGO_ADMIN_USERNAME}"
   export MONGODB_ADMIN_PASSWORD="${MONGO_ADMIN_PASSWORD}"
   export MONGODB_HOSTS="${MONGO_HOSTS}"
-  export MONGODB_CA_PEM_FILE="${MONGO_CA_PEM_FILE}"
+  export MONGODB_CA_PEM_LOCAL_FILE=$GIT_REPO_HOME/mongo/mongo-ca.pem
   export MONGODB_RETRY_WRITES=$SLS_MONGO_RETRYWRITES
-  log "==== Existing MongoDB gencfg_mongo Started MONGODB_RETRY_WRITES=$MONGODB_RETRY_WRITES ===="
+  log " MONGODB_ADMIN_USERNAME=$MONGODB_ADMIN_USERNAME MONGODB_HOSTS=$MONGODB_HOSTS MONGODB_CA_PEM_LOCAL_FILE=${MONGODB_CA_PEM_LOCAL_FILE} MONGODB_RETRY_WRITES=$MONGODB_RETRY_WRITES"
+  log "==== Existing MongoDB gencfg_mongo Started ===="
   export ROLE_NAME=gencfg_mongo && ansible-playbook ibm.mas_devops.run_role
   log "==== Existing MongoDB gencfg_mongo completed ===="
 else
