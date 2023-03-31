@@ -307,8 +307,8 @@ log "==== MONGO_USE_EXISTING_INSTANCE = ${MONGO_USE_EXISTING_INSTANCE}"
 if [[ $MONGO_USE_EXISTING_INSTANCE == "true" ]]; then
   if [[ $MONGO_FLAVOR == "Amazon DocumentDB" ]]; then
     export DB_PROVIDER="aws"
+    # setting to false, used be sls role
     export SLS_MONGO_RETRYWRITES=false
-    export RETRY_WRITES=$SLS_MONGO_RETRYWRITES
     log "==== aws/deploy.sh : Invoke docdb-create-vpc-peer.sh starts ===="
     log "Existing instance of Amazon Document DB @ VPC_ID=$DOCUMENTDB_VPC_ID"
     export ACCEPTER_VPC_ID=${DOCUMENTDB_VPC_ID}
@@ -317,11 +317,12 @@ if [[ $MONGO_USE_EXISTING_INSTANCE == "true" ]]; then
     sh $GIT_REPO_HOME/mongo/docdb/docdb-create-vpc-peer.sh
     log "==== aws/deploy.sh : Invoke docdb-create-vpc-peer.sh ends ===="
   fi
-  export MONGO_ADMIN_USERNAME="${MONGO_ADMIN_USERNAME}"
-  export MONGO_ADMIN_PASSWORD="${MONGO_ADMIN_PASSWORD}"
-  export MONGO_HOSTS="${MONGO_HOSTS}"
-  export MONGO_CA_PEM_FILE="${MONGO_CA_PEM_FILE}"
-  log "==== Existing MongoDB gencfg_mongo Started ===="
+  export MONGODB_ADMIN_USERNAME="${MONGO_ADMIN_USERNAME}"
+  export MONGODB_ADMIN_PASSWORD="${MONGO_ADMIN_PASSWORD}"
+  export MONGODB_HOSTS="${MONGO_HOSTS}"
+  export MONGODB_CA_PEM_FILE="${MONGO_CA_PEM_FILE}"
+  export MONGODB_RETRY_WRITES=$SLS_MONGO_RETRYWRITES
+  log "==== Existing MongoDB gencfg_mongo Started MONGODB_RETRY_WRITES=$MONGODB_RETRY_WRITES ===="
   export ROLE_NAME=gencfg_mongo && ansible-playbook ibm.mas_devops.run_role
   log "==== Existing MongoDB gencfg_mongo completed ===="
 else
@@ -330,8 +331,10 @@ else
   if [[ $MONGO_FLAVOR == "Amazon DocumentDB" ]]; then
     log "Provision new instance of Amazon Document DB @ VPC_ID=$VPC_ID"
     export DB_PROVIDER="aws"
+    # setting to false, used be sls role
     export SLS_MONGO_RETRYWRITES=false
-    export MONGODB_ACTION="provision"
+    #by default its create (provision) action in mongo role.
+    #export MONGODB_ACTION="provision"
     export DOCDB_CLUSTER_NAME="docdb-${RANDOM_STR}"
     export DOCDB_INSTANCE_IDENTIFIER_PREFIX="docdb-${RANDOM_STR}"
     export DOCDB_INSTANCE_NUMBER=3
