@@ -26,8 +26,21 @@ VersionsArray=( ibm-cert-manager-operator user-data-services-operator cpd-platfo
    fi     
 done
 
-# MongoDB
-getMongoVersion MongoDBCommunity
+#log "MONGO_FLAVOR=$MONGO_FLAVOR and MONGO_USE_EXISTING_INSTANCE=$MONGO_USE_EXISTING_INSTANCE"
+
+if [[ (-z $MONGO_USE_EXISTING_INSTANCE && -z $MONGO_FLAVOR) || ($MONGO_FLAVOR == "MongoDB" && $MONGO_USE_EXISTING_INSTANCE == "false" )  ]]; then
+	# MongoDB new
+	getMongoVersion MongoDBCommunity
+elif [[ ($MONGO_FLAVOR == "MongoDB" && $MONGO_USE_EXISTING_INSTANCE == "true") ]]; then 
+  # MongoDB existing
+	log "MAS Provisioned with an existing MongoDB instance"
+elif [[ ($MONGO_FLAVOR == "Amazon DocumentDB" && $MONGO_USE_EXISTING_INSTANCE == "false") ]]; then 
+  # Docdb new
+	log "MAS Provisioned with a new instance of Amazon DocumentDB"	
+elif [[ ($MONGO_FLAVOR == "Amazon DocumentDB" && $MONGO_USE_EXISTING_INSTANCE == "true") ]]; then 
+  # Docdb existing
+	log "MAS Provisioned with an existing Amazon DocumentDB"
+fi
 
 # MAS
 mas_version=$(oc get subscription ibm-mas-operator -n mas-$MAS_INSTANCE_ID-core  -o json | jq .status.installedCSV -r |  grep --perl-regexp '(?:(\d+)\.)?(?:(\d+)\.)?(?:(\d+)\.\d+)' --only-matching )

@@ -23,6 +23,8 @@ pip install awscli --upgrade --user
 pip install pyyaml
 pip install jaydebeapi
 pip install oauthlib==3.2.0
+pip install pymongo
+
 # Install AWS cli
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
 unzip -o awscliv2.zip

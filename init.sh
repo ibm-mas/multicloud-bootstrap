@@ -15,19 +15,6 @@ export BASE_DOMAIN_RG_NAME=$8
 export SSH_KEY_NAME=$9
 export DEPLOY_WAIT_HANDLE=${10}
 export SLS_ENTITLEMENT_KEY=${11}
-# TODO PK below section needs to be removed when 8.10 channel ready - STARTS
-#separated it with <<Entitlement Key>>-DEV-<<Enterprise ID>>-PASSWORD-<<Enterprise Password>>
-export PROD_ENTITLEMENT_KEY=${SLS_ENTITLEMENT_KEY%-DEV-*}
-export DEV_ENTITLEMENT_KEY=${SLS_ENTITLEMENT_KEY#*-DEV-}
-export ENTERPRISE_ID=${DEV_ENTITLEMENT_KEY%-PASSWORD-*}
-export ENTERPRISE_PASSWORD=${DEV_ENTITLEMENT_KEY#*-PASSWORD-}
-export SLS_ENTITLEMENT_KEY=$PROD_ENTITLEMENT_KEY
-#echo $DEV_ENTITLEMENT_KEY
-#echo $PROD_ENTITLEMENT_KEY
-#echo $SLS_ENTITLEMENT_KEY
-#echo $ENTERPRISE_ID
-#echo $ENTERPRISE_PASSWORD
-# TODO PK below section needs to be removed when 8.10 channel ready - ENDS
 export OCP_PULL_SECRET=${12}
 export MAS_LICENSE_URL=${13}
 export SLS_URL=${14}
@@ -40,7 +27,7 @@ export MAS_JDBC_USER=${20}
 export MAS_JDBC_PASSWORD=${21}
 export MAS_JDBC_URL=${22}
 export MAS_JDBC_CERT_URL=${23}
-export MAS_DB_IMPORT_DEMO_DATA=${24}
+export MAS_APP_SETTINGS_DEMODATA=${24}
 export EXS_OCP_URL=${25}
 export EXS_OCP_USER=${26}
 export EXS_OCP_PWD=${27}
@@ -69,7 +56,17 @@ export EXISTING_PUBLIC_SUBNET2_ID=${49}
 export EXISTING_PUBLIC_SUBNET3_ID=${50}
 export PRIVATE_CLUSTER=${51}
 export OPERATIONAL_MODE=${52}
-export ENV_TYPE=${53}
+
+#true if use existing instance selected, false if provision new instance selected
+export MONGO_USE_EXISTING_INSTANCE=${53}
+export MONGO_FLAVOR=${54}
+export MONGO_ADMIN_USERNAME=${55}
+export MONGO_ADMIN_PASSWORD=${56}
+export MONGO_HOSTS=${57}
+export MONGO_CA_PEM_FILE=${58}
+export DOCUMENTDB_VPC_ID=${59}
+export AWS_MSK_PROVIDER=${60}
+export ENV_TYPE=${61}
 export GIT_REPO_HOME=$(pwd)
 # Load helper functions
 . helper.sh
@@ -216,8 +213,8 @@ export UDS_TLS_CERT_LOCAL_FILE_PATH="${GIT_REPO_HOME}/uds.crt"
 export CPD_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
 export CPD_VERSION=cpd40
 export CPD_PRODUCT_VERSION=4.6.0
-#export MAS_CHANNEL=8.10.x TODO PK uncomment when 8.10 channel ready
-#export MAS_CATALOG_VERSION=v8-amd64  TODO PK uncomment when 8.10 channel ready
+export MAS_CHANNEL=8.10.x
+export MAS_CATALOG_VERSION=v8-amd64
 if [[ $CLUSTER_TYPE == "aws" ]]; then
   export CPD_PRIMARY_STORAGE_CLASS="ocs-storagecluster-cephfs"
 elif [[ $CLUSTER_TYPE == "azure" ]]; then
@@ -239,7 +236,7 @@ export ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
 # not reqd its hardcoded as db2_namespace: db2u
 #export DB2WH_NAMESPACE="cpd-services-${RANDOM_STR}"
 # MAS variables
-#export MAS_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY TODO PK uncomment when 8.10 channel ready
+export MAS_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
 export MAS_WORKSPACE_ID="wsmasocp"
 export MAS_WORKSPACE_NAME="wsmasocp"
 export MAS_CONFIG_SCOPE="wsapp"
@@ -247,8 +244,8 @@ export MAS_APP_ID=manage
 export MAS_APPWS_JDBC_BINDING="workspace-application"
 export MAS_JDBC_CERT_LOCAL_FILE=$GIT_REPO_HOME/db.crt
 export MAS_CLOUD_AUTOMATION_VERSION=1.0
-export MAS_DEVOPS_COLLECTION_VERSION=12.11.1
-export MAS_APP_CHANNEL=8.5.x
+export MAS_DEVOPS_COLLECTION_VERSION=12.17.0
+export MAS_APP_CHANNEL=8.6.x
 if [ -z "$EXISTING_NETWORK" ]; then
   export new_or_existing_vpc_subnet="new"
   export enable_permission_quota_check=true
@@ -301,25 +298,10 @@ case $CLUSTER_SIZE in
 esac
 
 
-# TODO PK below section needs to be removed when 8.10 channel ready - STARTS 
-export ARTIFACTORY_USERNAME=$ENTERPRISE_ID
-export ARTIFACTORY_APIKEY=$ENTERPRISE_PASSWORD
-export MAS_ENTITLEMENT_USERNAME=$ENTERPRISE_ID
-export MAS_ENTITLEMENT_KEY=$ENTERPRISE_PASSWORD
-export MAS_CHANNEL=8.10.x-dev
-export SLS_CHANNEL=3.x-dev
-export MAS_CATALOG_VERSION=v8-master-amd64
-#export MAS_ICR_CP=wiotp-docker-local.artifactory.swg-devops.com
-#export MAS_ICR_CPOPEN=wiotp-docker-local.artifactory.swg-devops.com
-export MAS_ICR_CP=docker-na-public.artifactory.swg-devops.com/wiotp-docker-local
-export MAS_ICR_CPOPEN=docker-na-public.artifactory.swg-devops.com/wiotp-docker-local/cpopen
-#echo $SLS_ENTITLEMENT_KEY
-#echo $MAS_ENTITLEMENT_KEY
-# TODO PK below section needs to be removed when 8.10 channel ready - ENDS
-
 # Log the variable values
 log "Below are common deployment parameters,"
 log " OPERATIONAL_MODE: $OPERATIONAL_MODE"
+log " AWS_MSK_PROVIDER: $AWS_MSK_PROVIDER"
 log " CLUSTER_TYPE: $CLUSTER_TYPE"
 log " OFFERING_TYPE: $OFFERING_TYPE"
 log " DEPLOY_REGION: $DEPLOY_REGION"
@@ -347,7 +329,7 @@ log " UDS_PUB_CERT_URL: $UDS_PUB_CERT_URL"
 log " MAS_JDBC_USER: $MAS_JDBC_USER"
 log " MAS_JDBC_URL: $MAS_JDBC_URL"
 log " MAS_JDBC_CERT_URL: $MAS_JDBC_CERT_URL"
-log " MAS_DB_IMPORT_DEMO_DATA: $MAS_DB_IMPORT_DEMO_DATA"
+log " MAS_APP_SETTINGS_DEMODATA: $MAS_APP_SETTINGS_DEMODATA"
 log " EXS_OCP_URL: $EXS_OCP_URL"
 log " EXS_OCP_USER: $EXS_OCP_USER"
 log " RG_NAME=$RG_NAME"
@@ -366,6 +348,12 @@ log " EMAIL_NOTIFICATION: $EMAIL_NOTIFICATION"
 log " EXISTING_NETWORK=$EXISTING_NETWORK"
 log " EXISTING_NETWORK_RG=$EXISTING_NETWORK_RG"
 log " ENV_TYPE=$ENV_TYPE"
+log " MONGO_USE_EXISTING_INSTANCE=${MONGO_USE_EXISTING_INSTANCE}"
+log " MONGO_FLAVOR=${MONGO_FLAVOR}"
+log " MONGO_ADMIN_USERNAME=${MONGO_ADMIN_USERNAME}"
+#log " MONGO_ADMIN_PASSWORD=${MONGO_ADMIN_PASSWORD}"
+log " MONGO_HOSTS=${MONGO_HOSTS}"
+log " MONGO_CA_PEM_FILE=${MONGO_CA_PEM_FILE}"
 log " EXISTING_PRIVATE_SUBNET1_ID=$EXISTING_PRIVATE_SUBNET1_ID"
 log " EXISTING_PRIVATE_SUBNET2_ID=$EXISTING_PRIVATE_SUBNET2_ID"
 log " EXISTING_PRIVATE_SUBNET3_ID=$EXISTING_PRIVATE_SUBNET3_ID"
