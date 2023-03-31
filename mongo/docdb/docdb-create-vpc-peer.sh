@@ -100,6 +100,20 @@ if [[ $MONGO_FLAVOR == "Amazon DocumentDB" ]]; then
 				if [[ -n $RTS ]]; then
 					log "Found routing tables for this AWS stack"
 					for VPC_1_ROUTE_TABLE_ID in $RTS; do
+
+						#check if the route with blackhole status exist 
+						EXISTING_ROUTE_TABLE_ID_WITH_BLACKHOLE_STATUS=`aws ec2 describe-route-tables --filters  \
+						--region $ACCEPTER_REGION \
+						"Name=route-table-id,Values=$VPC_1_ROUTE_TABLE_ID"  \
+						"Name=route.destination-cidr-block,Values=$VPC_2_CIDR" \
+						"Name=route.state,Values=blackhole" \
+						--query RouteTables[].RouteTableId  --output=text`
+
+						if [[ -n $EXISTING_ROUTE_TABLE_ID_WITH_BLACKHOLE_STATUS ]]; then
+							log "docdb-create-vpc-peer.sh : aws ec2 delete-route route-table-id $VPC_1_ROUTE_TABLE_ID destination-cidr-block $VPC_2_CIDR started"
+							aws ec2 delete-route --route-table-id $VPC_1_ROUTE_TABLE_ID --destination-cidr-block $VPC_2_CIDR --region $ACCEPTER_REGION
+						fi
+
 						#check if the route exist already
 						EXISTING_ROUTE_TABLE_ID=`aws ec2 describe-route-tables --filters  \
 						--region $ACCEPTER_REGION \
@@ -134,7 +148,20 @@ if [[ $MONGO_FLAVOR == "Amazon DocumentDB" ]]; then
 				if [[ -n $RTS ]]; then
 					log "Found routing tables for this AWS stack"
 					for VPC_2_ROUTE_TABLE_ID in $RTS; do
-						#check if the route exist already
+						#check if the route with blackhole status exist 
+						EXISTING_ROUTE_TABLE_ID_WITH_BLACKHOLE_STATUS=`aws ec2 describe-route-tables --filters  \
+						--region $ACCEPTER_REGION \
+						"Name=route-table-id,Values=$VPC_2_ROUTE_TABLE_ID"  \
+						"Name=route.destination-cidr-block,Values=$VPC_1_CIDR" \
+						"Name=route.state,Values=blackhole" \
+						--query RouteTables[].RouteTableId  --output=text`
+
+						if [[ -n $EXISTING_ROUTE_TABLE_ID_WITH_BLACKHOLE_STATUS ]]; then
+							log "docdb-create-vpc-peer.sh : aws ec2 delete-route route-table-id $VPC_2_ROUTE_TABLE_ID destination-cidr-block $VPC_1_CIDR started"
+							aws ec2 delete-route --route-table-id $VPC_2_ROUTE_TABLE_ID --destination-cidr-block $VPC_1_CIDR --region $ACCEPTER_REGION
+						fi
+
+						#check if the route exist already for same peer and dest vpc  
 						EXISTING_ROUTE_TABLE_ID=`aws ec2 describe-route-tables --filters  \
 						--region $ACCEPTER_REGION \
 						"Name=route-table-id,Values=$VPC_2_ROUTE_TABLE_ID"  \
