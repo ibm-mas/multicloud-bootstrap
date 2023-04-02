@@ -1,14 +1,13 @@
 #!/bin/bash
 SCRIPT_STATUS=0
-
-if [ -f "/tmp/iam-user-created" ]; then
+if [[ -f "/tmp/iam-user-created" && -n AWS_ACCESS_KEY_ID ]]; then
     log "mongo/docdb/docdb-create-iam-user.sh : /tmp/iam-user-created exists; docdb-create-iam-user.sh skipped ..."
 else 
     log "mongo/docdb/docdb-create-iam-user.sh : /tmp/iam-user-created not exists"
     log "mongo/docdb/docdb-create-iam-user.sh: .......... starts"
     # IAM variables
-    IAM_POLICY_NAME="masocp-policy-${RANDOM_STR}"
-    IAM_USER_NAME="masocp-user-${RANDOM_STR}"
+    IAM_POLICY_NAME="masocp-policy-docdb-${RANDOM_STR}"
+    IAM_USER_NAME="masocp-user-docdb-${RANDOM_STR}"
     ## IAM # Create IAM policy
     cd $GIT_REPO_HOME/aws
     policyarn=$(aws iam create-policy --policy-name ${IAM_POLICY_NAME} --policy-document file://${GIT_REPO_HOME}/aws/iam/policy.json | jq '.Policy.Arn' | tr -d "\"")
