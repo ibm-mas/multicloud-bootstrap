@@ -152,9 +152,7 @@ mark_provisioning_failed() {
   elif [[ $retcode -eq 42 ]]; then
     export STATUS_MSG="Failure in fetching the VPC id required to deploy AWS MSK.."
   elif [[ $retcode -eq 43 ]]; then
-    export STATUS_MSG="Amazon DocumentDB is not supported in current deploy region $DEPLOY_REGION"
-  elif [[ $retcode -eq 44 ]]; then
-    export STATUS_MSG="Failure in fetching the CIDR block associated with Subnet"
+    export STATUS_MSG="Amazon DocumentDB is not supported in current deploy region $DEPLOY_REGION"    
   fi
   export MESSAGE_TEXT=NA
   export OPENSHIFT_CLUSTER_CONSOLE_URL=NA

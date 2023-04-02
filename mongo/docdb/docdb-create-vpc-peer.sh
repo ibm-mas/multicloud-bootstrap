@@ -198,5 +198,5 @@ if [[ $MONGO_FLAVOR == "Amazon DocumentDB" ]]; then
         fi
     fi
 log "docdb-create-vpc-peer.sh .......... ends : SCRIPT_STATUS=$SCRIPT_STATUS"
-
+exit $SCRIPT_STATUS
 fi

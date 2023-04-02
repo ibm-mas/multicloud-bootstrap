@@ -21,7 +21,6 @@ if [[ $CLUSTER_TYPE == "aws" ]]; then
     log "MONGODB DB_PROVIDER=${DB_PROVIDER}"
 
     log "==== BOOTNODE_VPC_ID = ${BOOTNODE_VPC_ID}"
-    log "==== EXISTING_NETWORK = ${EXISTING_NETWORK}"
     log "==== Existing DocumentDB DOCUMENTDB_VPC_ID = ${DOCUMENTDB_VPC_ID}"
 
     # Mongo CFT inputs validation and connection test
@@ -73,17 +72,7 @@ if [[ $CLUSTER_TYPE == "aws" ]]; then
             fi
 
             export ACCEPTER_VPC_ID=${DOCUMENTDB_VPC_ID}
-            if [[ -n $BOOTNODE_VPC_ID ]]; then
-                log "Prevalidate Mongo : BOOTNODE_VPC_ID=${BOOTNODE_VPC_ID}"
-                export REQUESTER_VPC_ID=${BOOTNODE_VPC_ID}
-            elif [[ -n $EXISTING_NETWORK ]]; then
-                log "Prevalidate Mongo : EXISTING_NETWORK=${EXISTING_NETWORK}"
-                export REQUESTER_VPC_ID=${EXISTING_NETWORK}
-            else
-                log "Prevalidate Mongo : ERROR: BootNode VPC id is not specified"
-                SCRIPT_STATUS=43
-                exit $SCRIPT_STATUS
-            fi
+            export REQUESTER_VPC_ID=${BOOTNODE_VPC_ID}
             sh $GIT_REPO_HOME/mongo/docdb/docdb-create-vpc-peer.sh
             SCRIPT_STATUS=$?
             if [ $SCRIPT_STATUS -ne 0 ]; then

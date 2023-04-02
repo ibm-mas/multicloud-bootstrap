@@ -96,10 +96,10 @@ if [[ -n "$MAS_LICENSE_URL" ]]; then
 else
   log " MAS LICENSE URL file is not available."
 fi
-log "deploy.sh AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID"
-if [[ -f "/tmp/iam-user-created" && -n $AWS_ACCESS_KEY_ID ]]; then
-  log "deploy.sh /tmp/iam-user-created exists; iam user creation skipped AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID..."
-else
+
+if [ -f "/tmp/iam-user-created" ]; then
+  log "deploy.sh /tmp/iam-user-created exists; iam user creation skipped ..."
+else 
   ## IAM
   # Create IAM policy
   cd $GIT_REPO_HOME/aws
@@ -337,20 +337,13 @@ else
     export DOCDB_CLUSTER_NAME="docdb-${RANDOM_STR}"
     export DOCDB_INSTANCE_IDENTIFIER_PREFIX="docdb-${RANDOM_STR}"
     export DOCDB_INSTANCE_NUMBER=3
-    log "==== Invoke fetch-cidr-block.sh ===="
-    source $GIT_REPO_HOME/aws/utils/fetch-cidr-block.sh
-    if [ $? -ne 0 ]; then
-      SCRIPT_STATUS=44
-      exit $SCRIPT_STATUS
-    fi
-    # IPv4 CIDR of private or default subnet
-    export DOCDB_CIDR_AZ1="${CIDR_BLOCKS_0}"
-    export DOCDB_CIDR_AZ2="${CIDR_BLOCKS_1}"
-    export DOCDB_CIDR_AZ3="${CIDR_BLOCKS_2}"
-    export DOCDB_INGRESS_CIDR="${VPC_CIDR_BLOCK}"
-    export DOCDB_EGRESS_CIDR="${VPC_CIDR_BLOCK}"
-    log "DOCDB_CIDR_AZ1=${DOCDB_CIDR_AZ1}  DOCDB_CIDR_AZ2=${DOCDB_CIDR_AZ2} DOCDB_CIDR_AZ3=${DOCDB_CIDR_AZ3} VPC_CIDR_BLOCK=$VPC_CIDR_BLOCK"	
+    # IPv4 CIDR of private subnet
+    export DOCDB_CIDR_AZ1="10.0.128.0/20"
+    export DOCDB_CIDR_AZ2="10.0.144.0/20"
+    export DOCDB_CIDR_AZ3="10.0.160.0/20"
 
+    export DOCDB_INGRESS_CIDR="10.0.0.0/16"
+    export DOCDB_EGRESS_CIDR="10.0.0.0/16"
 
     SUBNET_1=`aws ec2 describe-subnets --filters \
 	  "Name=cidr,Values=$DOCDB_CIDR_AZ1" \
@@ -433,21 +426,13 @@ if [[ $AWS_MSK_PROVIDER == "Yes" ]]; then
   export AWS_MSK_INSTANCE_TYPE="kafka.m5.large"
   export AWS_MSK_VOLUME_SIZE="100"
   export AWS_MSK_INSTANCE_NUMBER=3
-
-  log "==== Invoke fetch-cidr-block.sh ===="
-  source $GIT_REPO_HOME/aws/utils/fetch-cidr-block.sh
-  if [ $? -ne 0 ]; then
-    SCRIPT_STATUS=44
-    exit $SCRIPT_STATUS
-  fi
-  # IPv4 CIDR of private or default subnet 
-  export AWS_MSK_CIDR_AZ1="${CIDR_BLOCKS_0}"
-  export AWS_MSK_CIDR_AZ2="${CIDR_BLOCKS_1}"
-  export AWS_MSK_CIDR_AZ3="${CIDR_BLOCKS_2}"
-  export AWS_MSK_INGRESS_CIDR="${VPC_CIDR_BLOCK}"
-  export AWS_MSK_EGRESS_CIDR="${VPC_CIDR_BLOCK}"
-  log "AWS_MSK_CIDR_AZ1=${AWS_MSK_CIDR_AZ1}  AWS_MSK_CIDR_AZ2=${AWS_MSK_CIDR_AZ2} AWS_MSK_CIDR_AZ3=${AWS_MSK_CIDR_AZ3} VPC_CIDR_BLOCK=$VPC_CIDR_BLOCK"
-
+  # IPv4 CIDR of private subnet
+  export AWS_MSK_CIDR_AZ1="10.0.128.0/20"
+  export AWS_MSK_CIDR_AZ2="10.0.144.0/20"
+  export AWS_MSK_CIDR_AZ3="10.0.160.0/20"
+  
+  export AWS_MSK_INGRESS_CIDR="10.0.0.0/16"
+  export AWS_MSK_EGRESS_CIDR="10.0.0.0/16"
   export ROLE_NAME=kafka && ansible-playbook ibm.mas_devops.run_role
   log "==== AWS MSK deployment completed ===="
 fi
