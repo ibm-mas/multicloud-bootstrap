@@ -292,7 +292,7 @@
     "publicIPAddressName": "[concat(variables('projectName'), '-ip')]",
     "networkInterfaceName": "[concat(variables('projectName'), '-nic')]",
     "networkSecurityGroupName": "[concat(variables('projectName'), '-nsg')]",
-    "networkSecurityGroupName2": "[concat(variables('vNetSubnetName'), '-nsg')]",
+    "networkSecurityGroupName2": "bootnodeSubnet-nsg",
     "storageaccountName": "[concat('masocp', variables('projectName'),'stgaccount')]"
   },
   "resources": [
