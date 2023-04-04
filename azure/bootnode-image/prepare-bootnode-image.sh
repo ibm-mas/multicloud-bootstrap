@@ -107,7 +107,7 @@ pip3 install yq
 
 python3 -m pip install dotmap
 python3 -m pip install yq
-cd ..
+cd /root
 rm -rf Python-3.9.14
 
 ## Install terraform
