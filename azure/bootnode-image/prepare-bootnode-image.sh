@@ -107,6 +107,9 @@ pip3 install yq
 
 python3 -m pip install dotmap
 python3 -m pip install yq
+echo "Deleting Python folder"
+cd /root
+rm -rf Python-3.9.14
 
 ## Install terraform
 TERRAFORM_VER=`curl -s https://api.github.com/repos/hashicorp/terraform/releases/latest |  grep tag_name | cut -d: -f2 | tr -d \"\,\v | awk '{$1=$1};1'`
@@ -153,7 +156,8 @@ fi
 echo "Cloning bootstrap automation from tag/branch $BOOTSTRAP_AUTOMATION_TAG_OR_BRANCH"
 git clone -b $BOOTSTRAP_AUTOMATION_TAG_OR_BRANCH https://github.com/ibm-mas/multicloud-bootstrap.git
 cd multicloud-bootstrap
-rm -rf aws azure/bootnode-image azure/master-arm
+echo "removing folders"
+rm -rf aws azure/bootnode-image azure/master-arm gcp mongo lib/ojdbc8.jar
 find . -type f -name "*.sh" -exec chmod +x {} \;
 
 # Clear bash history
