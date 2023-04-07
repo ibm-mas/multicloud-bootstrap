@@ -27,9 +27,12 @@ echo "BOOTSTRAP_AUTOMATION_TAG_OR_BRANCH=$BOOTSTRAP_AUTOMATION_TAG_OR_BRANCH"
 
 # Remove unnecessary packages
 dnf -y remove polkit
+echo "Enable and disable repos to update certs"
+dnf update -y --disablerepo=* --enablerepo='*microsoft*' rhui-azure-rhel8-eus
 
 # Update all packages to latest
 dnf update -y
+
 
 ## Install pre-reqs
 dnf install git httpd-tools java  unzip wget zip -y
