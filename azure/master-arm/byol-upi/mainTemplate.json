@@ -282,8 +282,6 @@
     "seller_subscription_id": "b2ca5467-2502-4b05-b78e-744604c6531d",
     "projectName": "[concat('u',substring(uniqueString(resourceGroup().id, deployment().name), 0, 5))]",
     "rgName": "[resourceGroup().name]",
-    "vNetName": "[concat(variables('projectName'), '-vnet')]",
-    "vNetAddressPrefixes": "10.0.0.0/16",
     "vNetSubnetName": "[concat('masocp-', variables('projectName'), '-bootnodeSubnet')]",
     "vNetSubnetAddressPrefix": "10.0.4.0/24",
     "logAnalyticsWorkspace": "[concat('masocp-', variables('projectName'), '-logAnalyticsWorkspace')]",
