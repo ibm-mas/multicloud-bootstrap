@@ -285,8 +285,6 @@
     "seller_image_definition": "masocp-image-def-20230320120702",
     "projectName": "[concat('u',substring(uniqueString(resourceGroup().id, deployment().name), 0, 5))]",
     "rgName": "[resourceGroup().name]",
-    "vNetName": "[concat(variables('projectName'), '-vnet')]",
-    "vNetAddressPrefixes": "10.0.0.0/16",
     "vNetSubnetName": "[concat('masocp-', variables('projectName'), '-bootnodeSubnet')]",
     "vNetSubnetAddressPrefix": "10.0.4.0/24",
     "logAnalyticsWorkspace": "[concat('masocp-', variables('projectName'), '-logAnalyticsWorkspace')]",

@@ -257,7 +257,7 @@
                                 }
                             ]
                         },
-                        "visible": false
+                        "visible": true
                     }
                 ]
             },
