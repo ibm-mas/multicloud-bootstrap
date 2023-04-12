@@ -97,7 +97,7 @@ else
   log " MAS LICENSE URL file is not available."
 fi
 log "deploy.sh AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID"
-if [[ -f "/tmp/iam-user-created" && -n $AWS_ACCESS_KEY_ID ]]; then
+if [[ -f "/tmp/iam-user-created" ]]; then
   log "deploy.sh /tmp/iam-user-created exists; iam user creation skipped AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID..."
 else
   ## IAM
