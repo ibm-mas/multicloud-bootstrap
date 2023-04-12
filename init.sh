@@ -331,8 +331,10 @@ export MAS_ENTITLEMENT_KEY=$ARTIFACTORY_TOKEN
 export MAS_CHANNEL=8.10.x-dev
 export MAS_APP_CHANNEL=8.6.x-dev
 export MAS_CATALOG_VERSION=v8-master-amd64
-export MAS_ICR_CP=wiotp-docker-local.artifactory.swg-devops.com
-export MAS_ICR_CPOPEN=wiotp-docker-local.artifactory.swg-devops.com
+#export MAS_ICR_CP=wiotp-docker-local.artifactory.swg-devops.com
+#export MAS_ICR_CPOPEN=wiotp-docker-local.artifactory.swg-devops.com
+export MAS_ICR_CP=docker-na-public.artifactory.swg-devops.com/wiotp-docker-local
+export MAS_ICR_CPOPEN=docker-na-public.artifactory.swg-devops.com/wiotp-docker-local/cpopen
 #echo $SLS_ENTITLEMENT_KEY
 #echo $MAS_ENTITLEMENT_KEY
 # TODO PK below section needs to be removed when 8.10 channel ready - ENDS
