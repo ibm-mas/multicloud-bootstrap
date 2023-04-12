@@ -15,6 +15,21 @@ export BASE_DOMAIN_RG_NAME=$8
 export SSH_KEY_NAME=$9
 export DEPLOY_WAIT_HANDLE=${10}
 export SLS_ENTITLEMENT_KEY=${11}
+
+# TODO PK below section needs to be removed when 8.10 channel ready - STARTS
+#separated it with <<Entitlement Key>>-DEV-<<Enterprise ID>>-PASSWORD-<<ARTIFACTORY_TOKEN from https://na.artifactory.swg-devops.com/ui/user_profile -> `Generate an Identity Token` >>
+export PROD_ENTITLEMENT_KEY=${SLS_ENTITLEMENT_KEY%-DEV-*}
+export DEV_ENTITLEMENT_KEY=${SLS_ENTITLEMENT_KEY#*-DEV-}
+export ENTERPRISE_ID=${DEV_ENTITLEMENT_KEY%-PASSWORD-*}
+export ARTIFACTORY_TOKEN=${DEV_ENTITLEMENT_KEY#*-PASSWORD-}
+export SLS_ENTITLEMENT_KEY=$PROD_ENTITLEMENT_KEY
+#echo $DEV_ENTITLEMENT_KEY
+#echo $PROD_ENTITLEMENT_KEY
+#echo $SLS_ENTITLEMENT_KEY
+#echo $ENTERPRISE_ID
+#echo $ARTIFACTORY_TOKEN
+# TODO PK below section needs to be removed when 8.10 channel ready - ENDS
+
 export OCP_PULL_SECRET=${12}
 export MAS_LICENSE_URL=${13}
 export SLS_URL=${14}
@@ -213,6 +228,12 @@ export UDS_TLS_CERT_LOCAL_FILE_PATH="${GIT_REPO_HOME}/uds.crt"
 export CPD_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
 export CPD_VERSION=cpd40
 export CPD_PRODUCT_VERSION=4.6.0
+
+#TODO PK uncomment when 8.10 channel ready
+#export MAS_CHANNEL=8.10.x
+#TODO PK uncomment when 8.10 channel ready
+#export MAS_CATALOG_VERSION=v8-amd64
+
 export MAS_CHANNEL=8.10.x
 export MAS_CATALOG_VERSION=v8-230328-amd64
 if [[ $CLUSTER_TYPE == "aws" ]]; then
@@ -236,7 +257,9 @@ export ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
 # not reqd its hardcoded as db2_namespace: db2u
 #export DB2WH_NAMESPACE="cpd-services-${RANDOM_STR}"
 # MAS variables
-export MAS_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
+
+# TODO PK uncomment below line when 8.10 channel ready
+#export MAS_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
 export MAS_WORKSPACE_ID="wsmasocp"
 export MAS_WORKSPACE_NAME="wsmasocp"
 export MAS_CONFIG_SCOPE="wsapp"
@@ -245,7 +268,8 @@ export MAS_APPWS_JDBC_BINDING="workspace-application"
 export MAS_JDBC_CERT_LOCAL_FILE=$GIT_REPO_HOME/db.crt
 export MAS_CLOUD_AUTOMATION_VERSION=1.0
 export MAS_DEVOPS_COLLECTION_VERSION=13.0.0
-export MAS_APP_CHANNEL=8.6.x
+# TODO PK uncomment below line when 8.10 channel ready
+# export MAS_APP_CHANNEL=8.6.x
 if [ -z "$EXISTING_NETWORK" ]; then
   export new_or_existing_vpc_subnet="new"
   export enable_permission_quota_check=true
@@ -297,6 +321,21 @@ case $CLUSTER_SIZE in
     ;;
 esac
 
+
+# TODO PK below section needs to be removed when 8.10 channel ready - STARTS 
+export ARTIFACTORY_USERNAME=$ENTERPRISE_ID
+#export ARTIFACTORY_APIKEY=$ARTIFACTORY_TOKEN
+export ARTIFACTORY_TOKEN=$ARTIFACTORY_TOKEN
+export MAS_ENTITLEMENT_USERNAME=$ENTERPRISE_ID
+export MAS_ENTITLEMENT_KEY=$ARTIFACTORY_TOKEN
+export MAS_CHANNEL=8.10.x-dev
+export MAS_APP_CHANNEL=8.6.x-dev
+export MAS_CATALOG_VERSION=v8-master-amd64
+export MAS_ICR_CP=wiotp-docker-local.artifactory.swg-devops.com
+export MAS_ICR_CPOPEN=wiotp-docker-local.artifactory.swg-devops.com
+#echo $SLS_ENTITLEMENT_KEY
+#echo $MAS_ENTITLEMENT_KEY
+# TODO PK below section needs to be removed when 8.10 channel ready - ENDS
 
 # Log the variable values
 log "Below are common deployment parameters,"
