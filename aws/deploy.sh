@@ -329,7 +329,7 @@ else
   log "==== MongoDB deployment started ==== MONGO_FLAVOR=$MONGO_FLAVOR"
   if [[ $MONGO_FLAVOR == "Amazon DocumentDB" ]]; then
     log "Provision new instance of Amazon Document DB @ VPC_ID=$VPC_ID"
-    export DB_PROVIDER="aws"
+    export MONGODB_PROVIDER="aws"
     # setting to false, used be sls role
     export SLS_MONGO_RETRYWRITES=false
     #by default its create (provision) action in mongo role.
