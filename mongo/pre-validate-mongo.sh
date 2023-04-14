@@ -12,13 +12,13 @@ if [[ $CLUSTER_TYPE == "aws" ]]; then
 
     if [[ $MONGO_FLAVOR == "MongoDB" ]]; then
         export RETRY_WRITES="true";
-        export DB_PROVIDER="community";
+        export MONGODB_PROVIDER="community";
     elif [[ $MONGO_FLAVOR == "Amazon DocumentDB" ]]; then
         export RETRY_WRITES="false";
-        export DB_PROVIDER="aws";
+        export MONGODB_PROVIDER="aws";
     fi
     log "MONGODB RETRY_WRITES=${RETRY_WRITES}"
-    log "MONGODB DB_PROVIDER=${DB_PROVIDER}"
+    log "MONGODB DB_PROVIDER=${MONGODB_PROVIDER}"
 
     log "==== BOOTNODE_VPC_ID = ${BOOTNODE_VPC_ID}"
     log "==== EXISTING_NETWORK = ${EXISTING_NETWORK}"
