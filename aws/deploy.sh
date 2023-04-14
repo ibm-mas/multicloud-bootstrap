@@ -304,7 +304,7 @@ export AWS_REGION=$DEPLOY_REGION
 log "==== MONGO_USE_EXISTING_INSTANCE = ${MONGO_USE_EXISTING_INSTANCE}"
 if [[ $MONGO_USE_EXISTING_INSTANCE == "true" ]]; then
   if [[ $MONGO_FLAVOR == "Amazon DocumentDB" ]]; then
-    export DB_PROVIDER="aws"
+    export MONGODB_PROVIDER="aws"
     # setting to false, used be sls role
     export SLS_MONGO_RETRYWRITES=false
     log "==== aws/deploy.sh : Invoke docdb-create-vpc-peer.sh starts ===="
