@@ -36,7 +36,7 @@ class AWSGenericHelper():
                                     'elastic-ips': 3,
                                     'application-load-ballancer': 2,
                                     'classic-load-ballancer': 3,
-                                    's3-buckets': 1
+                                    's3-buckets': -199
                                 }
                 },
         'portworx': {
