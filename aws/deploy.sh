@@ -361,6 +361,7 @@ log "==== MAS Workspace generation completed ===="
 
 if [[ $DEPLOY_MANAGE == "true" ]]; then
   log "==== Configure JDBC  started ===="
+  export MAS_APPWS_BINDINGS_JDBC="workspace-application"
   export ROLE_NAME=gencfg_jdbc && ansible-playbook ibm.mas_devops.run_role
   log "==== Configure JDBC completed ===="
 fi
