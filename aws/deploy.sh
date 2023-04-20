@@ -360,6 +360,8 @@ log "==== MAS Workspace generation completed ===="
 
 if [[ $DEPLOY_MANAGE == "true" ]]; then
   log "==== Configure JDBC  started ===="
+  export SSL_ENABLED=true
+  log "==== Configure JDBC started for external DB2 ==== SSL_ENABLED = $SSL_ENABLED"  
   export ROLE_NAME=gencfg_jdbc && ansible-playbook ibm.mas_devops.run_role
   log "==== Configure JDBC completed ===="
 fi
@@ -380,6 +382,7 @@ if [[ $DEPLOY_MANAGE == "true" ]]; then
 
   # Configure app to use the DB
   log "==== MAS Manage configure app started ===="
+  export MAS_APPWS_BINDINGS_JDBC="workspace-application"
   export ROLE_NAME=suite_app_config && ansible-playbook ibm.mas_devops.run_role
   log "==== MAS Manage configure app completed ===="
 fi
