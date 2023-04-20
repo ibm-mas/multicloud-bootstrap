@@ -70,6 +70,7 @@ export -f get_sls_registration_key
 export -f get_uds_endpoint_url
 export -f get_uds_api_key
 export -f validate_prouduct_type
+export MAS_APPWS_BINDINGS_JDBC="workspace-application"
 
 export GIT_REPO_HOME=$(pwd)
 

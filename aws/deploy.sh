@@ -22,6 +22,7 @@ export SLS_STORAGE_CLASS=gp2
 # CP4D variables
 export CPD_METADATA_STORAGE_CLASS=gp2
 export CPD_SERVICE_STORAGE_CLASS="ocs-storagecluster-cephfs"
+export MAS_APPWS_BINDINGS_JDBC="workspace-application"
 
 # Retrieve SSH public key
 TOKEN=$(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
@@ -207,12 +208,12 @@ EOT
   cd /tmp
   zip -r $BACKUP_FILE_NAME mas-multicloud/*
   set +e
-  aws s3 cp $BACKUP_FILE_NAME $DEPLOYMENT_CONTEXT_UPLOAD_PATH --region $DEPLOY_REGION 
+  aws s3 cp $BACKUP_FILE_NAME $DEPLOYMENT_CONTEXT_UPLOAD_PATH --region $DEPLOY_REGION
   retcode=$?
   if [[ $retcode -ne 0 ]]; then
     aws s3 cp $BACKUP_FILE_NAME $DEPLOYMENT_CONTEXT_UPLOAD_PATH --region us-east-1
     retcode=$?
-  fi  
+  fi
   if [[ $retcode -ne 0 ]]; then
     log "Failed while uploading deployment context to S3"
     exit 23
