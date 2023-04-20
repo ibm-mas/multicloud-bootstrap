@@ -28,8 +28,12 @@ echo "BOOTSTRAP_AUTOMATION_TAG_OR_BRANCH=$BOOTSTRAP_AUTOMATION_TAG_OR_BRANCH"
 # Remove unnecessary packages
 dnf -y remove polkit
 
+# Enable and disable repos to update certs
+echo "Enable and disable repos to update certs"
+dnf update -y --disablerepo=* --enablerepo='*microsoft*' rhui-azure-rhel8-eus
 # Update all packages to latest
 dnf update -y
+
 
 ## Install pre-reqs
 dnf install git httpd-tools java  unzip wget zip -y
@@ -103,6 +107,9 @@ pip3 install yq
 
 python3 -m pip install dotmap
 python3 -m pip install yq
+echo "Deleting Python folder"
+cd /root
+rm -rf Python-3.9.14
 
 ## Install terraform
 TERRAFORM_VER=`curl -s https://api.github.com/repos/hashicorp/terraform/releases/latest |  grep tag_name | cut -d: -f2 | tr -d \"\,\v | awk '{$1=$1};1'`
