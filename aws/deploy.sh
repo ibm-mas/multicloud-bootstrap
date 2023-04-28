@@ -19,10 +19,10 @@ IAM_POLICY_NAME="masocp-policy-${RANDOM_STR}"
 IAM_USER_NAME="masocp-user-${RANDOM_STR}"
 # SLS variables
 export SLS_STORAGE_CLASS=gp2
+export sls_channel=3.5
 # CP4D variables
 export CPD_METADATA_STORAGE_CLASS=gp2
 export CPD_SERVICE_STORAGE_CLASS="ocs-storagecluster-cephfs"
-export MAS_APPWS_BINDINGS_JDBC="workspace-application"
 
 # Retrieve SSH public key
 TOKEN=$(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
@@ -208,12 +208,12 @@ EOT
   cd /tmp
   zip -r $BACKUP_FILE_NAME mas-multicloud/*
   set +e
-  aws s3 cp $BACKUP_FILE_NAME $DEPLOYMENT_CONTEXT_UPLOAD_PATH --region $DEPLOY_REGION
+  aws s3 cp $BACKUP_FILE_NAME $DEPLOYMENT_CONTEXT_UPLOAD_PATH --region $DEPLOY_REGION 
   retcode=$?
   if [[ $retcode -ne 0 ]]; then
     aws s3 cp $BACKUP_FILE_NAME $DEPLOYMENT_CONTEXT_UPLOAD_PATH --region us-east-1
     retcode=$?
-  fi
+  fi  
   if [[ $retcode -ne 0 ]]; then
     log "Failed while uploading deployment context to S3"
     exit 23
@@ -361,7 +361,6 @@ log "==== MAS Workspace generation completed ===="
 
 if [[ $DEPLOY_MANAGE == "true" ]]; then
   log "==== Configure JDBC  started ===="
-  export MAS_APPWS_BINDINGS_JDBC="workspace-application"
   export ROLE_NAME=gencfg_jdbc && ansible-playbook ibm.mas_devops.run_role
   log "==== Configure JDBC completed ===="
 fi
