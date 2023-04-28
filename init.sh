@@ -59,6 +59,7 @@ export PRIVATE_CLUSTER=${49}
 export OPERATIONAL_MODE=${50}
 export ENV_TYPE=${51}
 export GIT_REPO_HOME=$(pwd)
+export sls_channel=3.5
 # Load helper functions
 . helper.sh
 export -f log
@@ -70,7 +71,6 @@ export -f get_sls_registration_key
 export -f get_uds_endpoint_url
 export -f get_uds_api_key
 export -f validate_prouduct_type
-export MAS_APPWS_BINDINGS_JDBC="workspace-application"
 
 export GIT_REPO_HOME=$(pwd)
 
@@ -188,9 +188,9 @@ export UDS_TLS_CERT_LOCAL_FILE_PATH="${GIT_REPO_HOME}/uds.crt"
 # CP4D variables
 export CPD_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
 export CPD_VERSION=cpd40
-export CPD_PRODUCT_VERSION=4.6.0
+export CPD_PRODUCT_VERSION=4.5.0
 export MAS_CHANNEL=8.9.x
-export MAS_CATALOG_VERSION=v8-230314-amd64
+export MAS_CATALOG_VERSION=v8-amd64
 if [[ $CLUSTER_TYPE == "aws" ]]; then
   export CPD_PRIMARY_STORAGE_CLASS="ocs-storagecluster-cephfs"
 elif [[ $CLUSTER_TYPE == "azure" ]]; then
@@ -220,7 +220,7 @@ export MAS_APP_ID=manage
 export MAS_APPWS_JDBC_BINDING="workspace-application"
 export MAS_JDBC_CERT_LOCAL_FILE=$GIT_REPO_HOME/db.crt
 export MAS_CLOUD_AUTOMATION_VERSION=1.0
-export MAS_DEVOPS_COLLECTION_VERSION=13.0.0
+export MAS_DEVOPS_COLLECTION_VERSION=12.3.2
 export MAS_APP_CHANNEL=8.5.x
 if [ -z "$EXISTING_NETWORK" ]; then
   export new_or_existing_vpc_subnet="new"
