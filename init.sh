@@ -59,6 +59,7 @@ export PRIVATE_CLUSTER=${49}
 export OPERATIONAL_MODE=${50}
 export ENV_TYPE=${51}
 export GIT_REPO_HOME=$(pwd)
+export sls_catalog_source=ibm-sls-operators
 export sls_channel=3.5.0
 # Load helper functions
 . helper.sh
