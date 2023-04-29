@@ -19,6 +19,7 @@ IAM_POLICY_NAME="masocp-policy-${RANDOM_STR}"
 IAM_USER_NAME="masocp-user-${RANDOM_STR}"
 # SLS variables
 export SLS_STORAGE_CLASS=gp2
+export sls_catalog_source=ibm-sls-operators
 export sls_channel=3.5.0
 # CP4D variables
 export CPD_METADATA_STORAGE_CLASS=gp2
