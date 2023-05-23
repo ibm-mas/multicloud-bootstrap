@@ -91,7 +91,7 @@ pip install --upgrade pip
 pip3 install jaydebeapi
 pip3 install jmespath
 pip3 install yq
-cffi
+
 
 python3 -m pip install dotmap
 python3 -m pip install yq
