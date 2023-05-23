@@ -30,7 +30,7 @@ dnf -y remove polkit
 
 # Enable and disable repos to update certs
 echo "Enable and disable repos to update certs"
-dnf update -y --disablerepo=* --enablerepo='*microsoft*' rhui-azure-rhel8-eus
+#dnf update -y --disablerepo=* --enablerepo='*microsoft*' rhui-azure-rhel8-eus
 
 # Update all packages to latest
 dnf update -y
@@ -38,14 +38,14 @@ dnf update -y
 ## Install pre-reqs
 dnf install git httpd-tools java  unzip wget zip -y
 
-#Install openshift-install 4.10.35
-wget https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/4.10.35/openshift-client-linux-4.10.35.tar.gz
-tar -xvf openshift-client-linux-4.10.35.tar.gz
+#Install openshift-install 4.12.18
+wget https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/4.12.18/openshift-client-linux-4.12.18.tar.gz
+tar -xvf openshift-client-linux-4.12.18.tar.gz
 chmod u+x oc kubectl
 mv -f oc /usr/local/bin
 mv -f kubectl /usr/local/bin
 oc version
-rm -rf openshift-client-linux-4.10.35.tar.gz
+rm -rf openshift-client-linux-4.12.18.tar.gz
 
 ## Download the  Openshift CLI and move to /usr/local/bin
 wget "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.10.35/openshift-install-linux.tar.gz"
