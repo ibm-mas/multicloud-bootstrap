@@ -36,7 +36,12 @@ echo "Enable and disable repos to update certs"
 dnf update -y
 
 ## Install pre-reqs
-dnf install git httpd-tools java  unzip wget zip -y
+dnf install git httpd-tools java python39 unzip wget zip pip  container-tools -y
+ln -s --force /usr/bin/python3.9 /usr/bin/python
+ln -s --force /usr/bin/pip3.9 /usr/bin/pip
+
+ln -s --force /usr/bin/python3.9 /usr/bin/python3
+ln -s --force /usr/bin/pip3.9 /usr/bin/pip3
 
 #Install openshift-install 4.12.18
 wget https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/4.12.18/openshift-client-linux-4.12.18.tar.gz
@@ -86,6 +91,7 @@ pip install --upgrade pip
 pip3 install jaydebeapi
 pip3 install jmespath
 pip3 install yq
+cffi
 
 python3 -m pip install dotmap
 python3 -m pip install yq
