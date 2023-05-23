@@ -41,13 +41,13 @@ mv -f jq /usr/local/bin
 #dnf module install -y container-tools
 
 ## Download Openshift CLI and move to /usr/local/bin
-wget "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.10.35/openshift-client-linux-4.10.35.tar.gz"
-tar -xvf openshift-client-linux-4.10.35.tar.gz
+wget "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.12.7/openshift-client-linux-4.12.7.tar.gz"
+tar -xvf openshift-client-linux-4.12.7.tar.gz
 chmod u+x oc kubectl
 mv -f oc /usr/local/bin
 mv -f kubectl /usr/local/bin
 oc version
-rm -rf openshift-client-linux-4.10.35.tar.gz
+rm -rf openshift-client-linux-4.12.7.tar.gz
 
 
 
