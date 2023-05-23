@@ -48,7 +48,7 @@ oc version
 rm -rf openshift-client-linux-4.12.18.tar.gz
 
 ## Download the  Openshift CLI and move to /usr/local/bin
-wget "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.10.35/openshift-install-linux.tar.gz"
+wget "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.12.18/openshift-install-linux.tar.gz"
 tar -xvf openshift-install-linux.tar.gz
 chmod u+x openshift-install
 mv -f openshift-install /usr/local/bin
