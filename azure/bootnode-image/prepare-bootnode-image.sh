@@ -78,38 +78,18 @@ chmod +x jq
 mv jq /usr/local/bin
 
 # Install podman
-dnf module install -y container-tools
+dnf  install -y container-tools pip
 
-#Install the required Python development libraries
-dnf install gcc openssl-devel bzip2-devel libffi-devel make  -y
-
-
-wget "https://www.python.org/ftp/python/3.9.14/Python-3.9.14.tgz"
-tar xzf Python-3.9.14.tgz
-rm -rf Python-3.9.14.tgz
-cd Python-3.9.14
-./configure --enable-optimizations
-make altinstall
-python3.9 -V
-rm -rf /usr/local/lib/python3.9/unittest
-rm -rf /usr/local/lib/python3.9/test
-
-ln -s --force /usr/local/bin/python3.9 /usr/bin/python
-ln -s --force /usr/local/bin/pip3.9 /usr/bin/pip
-ln -s --force /usr/local/bin/python3.9 /usr/bin/python3
-ln -s --force /usr/local/bin/pip3.9 /usr/bin/pip3
 
 pip install --upgrade pip
-pip3 install pyyaml
+
 pip3 install jaydebeapi
 pip3 install jmespath
 pip3 install yq
 
 python3 -m pip install dotmap
 python3 -m pip install yq
-echo "Deleting Python folder"
-cd /root
-rm -rf Python-3.9.14
+
 
 ## Install terraform
 TERRAFORM_VER=`curl -s https://api.github.com/repos/hashicorp/terraform/releases/latest |  grep tag_name | cut -d: -f2 | tr -d \"\,\v | awk '{$1=$1};1'`
