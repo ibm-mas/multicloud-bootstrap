@@ -60,14 +60,9 @@ mv -f openshift-install /usr/local/bin
 openshift-install version
 rm -rf openshift-install-linux.tar.gz
 
-# Install Azure cli
+# Install Azure cli for rhel9
 rpm --import https://packages.microsoft.com/keys/microsoft.asc
-echo -e "[azure-cli]
-name=Azure CLI
-baseurl=https://packages.microsoft.com/yumrepos/azure-cli
-enabled=1
-gpgcheck=1
-gpgkey=https://packages.microsoft.com/keys/microsoft.asc" | tee /etc/yum.repos.d/azure-cli.repo
+dnf install -y https://packages.microsoft.com/config/rhel/9.0/packages-microsoft-prod.rpm
 dnf install azure-cli -y
 
 # Install AzureCopy cli
@@ -91,7 +86,7 @@ pip install --upgrade pip
 pip3 install jaydebeapi
 pip3 install jmespath
 pip3 install yq
-pip3 install cffi
+
 
 python3 -m pip install dotmap
 python3 -m pip install yq
