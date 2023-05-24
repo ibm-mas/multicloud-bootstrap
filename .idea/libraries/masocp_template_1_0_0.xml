@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="masocp-template-1.0.0">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/gcp/releases/masocp-template-1.0.0.zip!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

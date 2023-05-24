@@ -274,19 +274,6 @@
     "storageaccountName": "[concat('masocp', variables('projectName'),'stgaccount')]"
   },
   "resources": [
-		{
-		  "type": "Microsoft.Resources/deployments",
-		  "apiVersion": "2021-04-01",
-		  "name": "pid-5a1e8d63-79c9-418d-b3af-b2a21a557aac-partnercenter",
-		  "properties": {
-			"mode": "Incremental",
-			"template": {
-				"$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-				"contentVersion": "1.0.0.0",
-				"resources": []
-				}
-			}
-		},	  	  
     {
       "type": "Microsoft.Network/networkSecurityGroups",
       "apiVersion": "2022-07-01",
@@ -532,25 +519,19 @@
     },
     {
       "type": "Microsoft.Compute/virtualMachines/extensions",
-      "apiVersion": "2022-08-01",
-      "name": "[concat(variables('vmName'),'/', 'OMSExtension')]",
+      "apiVersion": "2021-11-01",
+      "name": "[format('{0}/AzureMonitorLinuxAgent', variables('vmName'))]",
       "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.Compute/virtualMachines', variables('vmName'))]",
         "[resourceId('Microsoft.OperationalInsights/workspaces', variables('logAnalyticsWorkspace'))]"
       ],
       "properties": {
-        "publisher": "Microsoft.EnterpriseCloud.Monitoring",
-        "type": "OmsAgentForLinux",
-        "typeHandlerVersion": "1.4",
+        "publisher": "Microsoft.Azure.Monitor",
+        "type": "AzureMonitorLinuxAgent",
+        "typeHandlerVersion": "1.21",
         "autoUpgradeMinorVersion": true,
-        "settings": {
-          "workspaceId": "[reference(variables('logAnalyticsWorkspaceId'), '2021-06-01').customerId]",
-          "stopOnMultipleConnections": true
-        },
-        "protectedSettings": {
-          "workspaceKey": "[listKeys(variables('logAnalyticsWorkspaceId'), '2021-06-01').primarySharedKey]"
-        }
+        "enableAutomaticUpgrade": true
       }
     },
     {

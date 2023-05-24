@@ -212,9 +212,9 @@ export UDS_TLS_CERT_LOCAL_FILE_PATH="${GIT_REPO_HOME}/uds.crt"
 # CP4D variables
 export CPD_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
 export CPD_VERSION=cpd40
-export CPD_PRODUCT_VERSION=4.6.0
+export CPD_PRODUCT_VERSION=4.6.3
 export MAS_CHANNEL=8.10.x
-export MAS_CATALOG_VERSION=v8-230328-amd64
+export MAS_CATALOG_VERSION=v8-230518-amd64
 if [[ $CLUSTER_TYPE == "aws" ]]; then
   export CPD_PRIMARY_STORAGE_CLASS="ocs-storagecluster-cephfs"
 elif [[ $CLUSTER_TYPE == "azure" ]]; then
