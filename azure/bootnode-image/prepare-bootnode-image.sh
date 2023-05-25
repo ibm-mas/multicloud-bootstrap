@@ -83,14 +83,7 @@ dnf  install -y container-tools pip
 
 pip install --upgrade pip
 
-pip3 install jaydebeapi
-pip3 install jmespath
-pip3 install yq
-
-
-python3 -m pip install dotmap
-python3 -m pip install yq
-
+pip3 install jaydebeapi jmespath oauthlib yq jsonpatch kubernetes  PyYAML openshift dotmap oauthlib
 
 ## Install terraform
 TERRAFORM_VER=`curl -s https://api.github.com/repos/hashicorp/terraform/releases/latest |  grep tag_name | cut -d: -f2 | tr -d \"\,\v | awk '{$1=$1};1'`
@@ -101,7 +94,7 @@ mv terraform /usr/local/bin/
 rm -rf terraform_${TERRAFORM_VER}_linux_amd64.zip
 
 ## Install Ansible
-pip3 install ansible==4.9.0
+pip3 install ansible
 pip3 install openshift
 ansible-galaxy collection install community.kubernetes
 
