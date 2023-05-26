@@ -26,7 +26,7 @@ metadata:
   labels:
     operators.coreos.com/ocs-operator.openshift-storage: ''
 spec:
-  channel: "stable-4.12"
+  channel: "stable-4.10"
   installPlanApproval: Automatic
   name: ocs-operator
   source: redhat-operators
