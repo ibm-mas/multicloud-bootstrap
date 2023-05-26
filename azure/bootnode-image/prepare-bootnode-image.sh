@@ -83,7 +83,8 @@ dnf  install -y container-tools pip
 
 pip install --upgrade pip
 
-pip3 install jaydebeapi jmespath oauthlib yq jsonpatch kubernetes  PyYAML openshift dotmap oauthlib
+pip install jaydebeapi jmespath  yq jsonpatch kubernetes  PyYAML openshift dotmap
+pip install oauthlib==3.2.2
 
 ## Install terraform
 TERRAFORM_VER=`curl -s https://api.github.com/repos/hashicorp/terraform/releases/latest |  grep tag_name | cut -d: -f2 | tr -d \"\,\v | awk '{$1=$1};1'`
@@ -117,7 +118,7 @@ else
     rm -rf ansible-devops ibm-mas_devops-*.tar.gz
     rm -rf ansible-devops
 fi
-
+pip install oauthlib==3.2.2
 # Get the bootstrap github code
 cd /root
 rm -rf ansible-devops
