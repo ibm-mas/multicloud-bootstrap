@@ -27,5 +27,6 @@ echo "Driver version " $driver_version
 #Deploy premium Storage Class
 envsubst < azurefiles-premium.yaml | tee azurefiles-premium.yaml
 oc apply -f azurefiles-premium.yaml
-
+envsubst < managed-premium.yaml | tee managed-premium.yaml
+oc apply -f managed-premium.yaml
 oc apply -f persistent-volume-binder.yaml
