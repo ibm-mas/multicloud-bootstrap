@@ -296,7 +296,6 @@
     "vNetSubnetName": "[concat('masocp-', variables('projectName'), '-bootnodeSubnet')]",
     "vNetSubnetAddressPrefix": "10.0.5.0/24",
     "logAnalyticsWorkspace": "[concat('masocp-', variables('projectName'), '-logAnalyticsWorkspace')]",
-    "logAnalyticsWorkspaceId": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('logAnalyticsWorkspace'))]",
     "vmName": "[concat('masocp-', variables('projectName'), '-bootnode-vm')]",
     "publicIPAddressName": "[concat(variables('projectName'), '-ip')]",
     "networkInterfaceName": "[concat(variables('projectName'), '-nic')]",
@@ -563,25 +562,19 @@
     },
     {
       "type": "Microsoft.Compute/virtualMachines/extensions",
-      "apiVersion": "2022-08-01",
-      "name": "[concat(variables('vmName'),'/', 'OMSExtension')]",
+      "apiVersion": "2021-11-01",
+      "name": "[format('{0}/AzureMonitorLinuxAgent', variables('vmName'))]",
       "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.Compute/virtualMachines', variables('vmName'))]",
         "[resourceId('Microsoft.OperationalInsights/workspaces', variables('logAnalyticsWorkspace'))]"
       ],
       "properties": {
-        "publisher": "Microsoft.EnterpriseCloud.Monitoring",
-        "type": "OmsAgentForLinux",
-        "typeHandlerVersion": "1.4",
+        "publisher": "Microsoft.Azure.Monitor",
+        "type": "AzureMonitorLinuxAgent",
+        "typeHandlerVersion": "1.21",
         "autoUpgradeMinorVersion": true,
-        "settings": {
-          "workspaceId": "[reference(variables('logAnalyticsWorkspaceId'), '2021-06-01').customerId]",
-          "stopOnMultipleConnections": true
-        },
-        "protectedSettings": {
-          "workspaceKey": "[listKeys(variables('logAnalyticsWorkspaceId'), '2021-06-01').primarySharedKey]"
-        }
+        "enableAutomaticUpgrade": true
       }
     },
     {
