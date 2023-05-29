@@ -410,8 +410,8 @@ calculate_available_resource_quota() {
     test_check=$1_check
 
     az_quota_limit_temp=$(grep -B6 -A2 "$quota_string_pattern" $quota_usage_output_json)
-    az_limit=$(echo "$az_quota_limit_temp" | grep limit | awk '{gsub(/\"|\,/,"",$2)}1' | awk '{print $2}')
-    az_current_value=$(echo "$az_quota_limit_temp" | grep currentValue | awk '{gsub(/\"|\,/,"",$2)}1' | awk '{print $2}')
+    az_limit=$(echo "$az_quota_limit_temp" | grep limit  | awk '{print $2}')
+    az_current_value=$(echo "$az_quota_limit_temp" | grep currentValue | awk '{print $2}')
     az_available_quota=$(echo $az_limit $az_current_value | awk '{ print $1 - $2 }')
 
     # az_available_$quota_name_quota=$az_available_quota
