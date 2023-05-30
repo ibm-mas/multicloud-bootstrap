@@ -1,34 +1,10 @@
+---
 kind: StorageClass
 apiVersion: storage.k8s.io/v1
 metadata:
   name: ocs-storagecluster-cephfs
-  resourceVersion: '55386'
   annotations:
     description: Provides RWO and RWX Filesystem volumes
-  managedFields:
-    - manager: ocs-operator
-      operation: Update
-      apiVersion: storage.k8s.io/v1
-      fieldsType: FieldsV1
-      fieldsV1:
-        'f:allowVolumeExpansion': {}
-        'f:metadata':
-          'f:annotations':
-            .: {}
-            'f:description': {}
-        'f:parameters':
-          'f:csi.storage.k8s.io/controller-expand-secret-name': {}
-          'f:clusterID': {}
-          'f:csi.storage.k8s.io/controller-expand-secret-namespace': {}
-          'f:fsName': {}
-          .: {}
-          'f:csi.storage.k8s.io/provisioner-secret-namespace': {}
-          'f:csi.storage.k8s.io/node-stage-secret-name': {}
-          'f:csi.storage.k8s.io/node-stage-secret-namespace': {}
-          'f:csi.storage.k8s.io/provisioner-secret-name': {}
-        'f:provisioner': {}
-        'f:reclaimPolicy': {}
-        'f:volumeBindingMode': {}
 provisioner: openshift-storage.cephfs.csi.ceph.com
 parameters:
   clusterID: openshift-storage
