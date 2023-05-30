@@ -26,12 +26,11 @@ metadata:
   labels:
     operators.coreos.com/odf-operator.openshift-storage: ''
 spec:
-  channel: "stable-4.10"
+  channel: "stable-4.12"
   installPlanApproval: Automatic
   name: odf-operator
   source: redhat-operators
   sourceNamespace: openshift-marketplace
-  startingCSV: "odf-operator.v4.10.7"  
 ---
 apiVersion: odf.openshift.io/v1alpha1
 kind: StorageSystem
@@ -86,7 +85,7 @@ spec:
       portable: true
       replica: 3
       resources: {}
-  version: 4.10.0
+  version: 4.12.0
 EOF
 }
 

@@ -1,0 +1,28 @@
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: openshift-storage.noobaa.io
+  resourceVersion: '60914'
+  annotations:
+    description: Provides Object Bucket Claims (OBCs)
+  managedFields:
+    - manager: noobaa-operator
+      operation: Update
+      apiVersion: storage.k8s.io/v1
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:metadata':
+          'f:annotations':
+            .: {}
+            'f:description': {}
+        'f:parameters':
+          .: {}
+          'f:bucketclass': {}
+        'f:provisioner': {}
+        'f:reclaimPolicy': {}
+        'f:volumeBindingMode': {}
+provisioner: openshift-storage.noobaa.io/obc
+parameters:
+  bucketclass: noobaa-default-bucket-class
+reclaimPolicy: Delete
+volumeBindingMode: Immediate

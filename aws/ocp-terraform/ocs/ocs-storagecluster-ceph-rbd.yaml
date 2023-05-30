@@ -1,0 +1,50 @@
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: ocs-storagecluster-ceph-rbd
+  resourceVersion: '55229'
+  annotations:
+    description: 'Provides RWO Filesystem volumes, and RWO and RWX Block volumes'
+  managedFields:
+    - manager: ocs-operator
+      operation: Update
+      apiVersion: storage.k8s.io/v1
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:allowVolumeExpansion': {}
+        'f:metadata':
+          'f:annotations':
+            .: {}
+            'f:description': {}
+        'f:parameters':
+          'f:csi.storage.k8s.io/controller-expand-secret-name': {}
+          'f:clusterID': {}
+          'f:imageFeatures': {}
+          'f:csi.storage.k8s.io/controller-expand-secret-namespace': {}
+          'f:csi.storage.k8s.io/fstype': {}
+          .: {}
+          'f:csi.storage.k8s.io/provisioner-secret-namespace': {}
+          'f:pool': {}
+          'f:csi.storage.k8s.io/node-stage-secret-name': {}
+          'f:csi.storage.k8s.io/node-stage-secret-namespace': {}
+          'f:csi.storage.k8s.io/provisioner-secret-name': {}
+          'f:imageFormat': {}
+        'f:provisioner': {}
+        'f:reclaimPolicy': {}
+        'f:volumeBindingMode': {}
+provisioner: openshift-storage.rbd.csi.ceph.com
+parameters:
+  csi.storage.k8s.io/fstype: ext4
+  csi.storage.k8s.io/provisioner-secret-namespace: openshift-storage
+  csi.storage.k8s.io/provisioner-secret-name: rook-csi-rbd-provisioner
+  csi.storage.k8s.io/node-stage-secret-name: rook-csi-rbd-node
+  csi.storage.k8s.io/controller-expand-secret-name: rook-csi-rbd-provisioner
+  imageFormat: '2'
+  clusterID: openshift-storage
+  imageFeatures: layering
+  csi.storage.k8s.io/controller-expand-secret-namespace: openshift-storage
+  pool: ocs-storagecluster-cephblockpool
+  csi.storage.k8s.io/node-stage-secret-namespace: openshift-storage
+reclaimPolicy: Delete
+allowVolumeExpansion: true
+volumeBindingMode: Immediate

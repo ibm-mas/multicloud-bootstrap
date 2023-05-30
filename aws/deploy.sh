@@ -113,9 +113,9 @@ else
   log " AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID"
   # on successful user and policy creation, create a file /tmp/iam-user-created
   echo "COMPLETE" > /tmp/iam-user-created
-  chmod a+rw /tmp/iam-user-created  
+  chmod a+rw /tmp/iam-user-created
   # Put some delay for IAM permissions to be applied in the backend
-  sleep 60  
+  sleep 60
 fi
 
 
@@ -197,6 +197,11 @@ EOT
   oc login -u $OCP_USERNAME -p $OCP_PASSWORD --server=https://api.${CLUSTER_NAME}.${BASE_DOMAIN}:6443
   log "==== Adding PID limits to worker nodes ===="
   oc create -f $GIT_REPO_HOME/templates/container-runtime-config.yml
+  log "==== Creating storage classes namely, gp2, ocs-storagecluster-ceph-rbd, ocs-storagecluster-cephfs, & openshift-storage.noobaa.io ===="
+  oc apply -f $GIT_REPO_HOME/aws/ocp-terraform/ocs/gp2.yaml
+  oc apply -f $GIT_REPO_HOME/aws/ocp-terraform/ocs/ocs-storagecluster-cephfs.yaml
+  oc apply -f $GIT_REPO_HOME/aws/ocp-terraform/ocs/ocs-storagecluster-ceph-rbd.yaml
+  oc apply -f $GIT_REPO_HOME/aws/ocp-terraform/ocs/openshift-storage.noobaa.io.yaml
 
   ## Create bastion host
   cd $GIT_REPO_HOME/aws
@@ -225,7 +230,7 @@ EOT
   if [[ $retcode -ne 0 ]]; then
     aws s3 cp $BACKUP_FILE_NAME $DEPLOYMENT_CONTEXT_UPLOAD_PATH --region us-east-1
     retcode=$?
-  fi  
+  fi
   if [[ $retcode -ne 0 ]]; then
     log "Failed while uploading deployment context to S3"
     exit 23
@@ -311,7 +316,7 @@ if [[ $MONGO_USE_EXISTING_INSTANCE == "true" ]]; then
     log "Existing instance of Amazon Document DB @ VPC_ID=$DOCUMENTDB_VPC_ID"
     export ACCEPTER_VPC_ID=${DOCUMENTDB_VPC_ID}
     export REQUESTER_VPC_ID=${VPC_ID}
-    
+
     sh $GIT_REPO_HOME/mongo/docdb/docdb-create-vpc-peer.sh
     log "==== aws/deploy.sh : Invoke docdb-create-vpc-peer.sh ends ===="
   fi
@@ -349,7 +354,7 @@ else
     export DOCDB_CIDR_AZ3="${CIDR_BLOCKS_2}"
     export DOCDB_INGRESS_CIDR="${VPC_CIDR_BLOCK}"
     export DOCDB_EGRESS_CIDR="${VPC_CIDR_BLOCK}"
-    log "DOCDB_CIDR_AZ1=${DOCDB_CIDR_AZ1}  DOCDB_CIDR_AZ2=${DOCDB_CIDR_AZ2} DOCDB_CIDR_AZ3=${DOCDB_CIDR_AZ3} VPC_CIDR_BLOCK=$VPC_CIDR_BLOCK"	
+    log "DOCDB_CIDR_AZ1=${DOCDB_CIDR_AZ1}  DOCDB_CIDR_AZ2=${DOCDB_CIDR_AZ2} DOCDB_CIDR_AZ3=${DOCDB_CIDR_AZ3} VPC_CIDR_BLOCK=$VPC_CIDR_BLOCK"
 
 
     SUBNET_1=`aws ec2 describe-subnets --filters \
@@ -376,8 +381,8 @@ else
     --query "Subnets[*].{SUBNET_ID:SubnetId , TAG_NAME:Tags[?Key=='Name'] | [0].Value }" --output=text`
 
     SUBNET_ID3=`echo -e "$SUBNET_3" | awk '{print $1}'`
-    TAG_NAME3=`echo -e "$SUBNET_3" | awk '{print $2}'`    
-    log "==== SUBNET_ID3=$SUBNET_ID3 and TAG_NAME3=$TAG_NAME3 ==== "    
+    TAG_NAME3=`echo -e "$SUBNET_3" | awk '{print $2}'`
+    log "==== SUBNET_ID3=$SUBNET_ID3 and TAG_NAME3=$TAG_NAME3 ==== "
 
     if [[ -z "$SUBNET_ID1" ]]; then
       SCRIPT_STATUS=41
@@ -394,7 +399,7 @@ else
       log "Subnet ID associated with CIDR Block 10.0.160.0/20 not found"
       exit $SCRIPT_STATUS
     fi
-    
+
     #mongo docdb role expects subnet name tag to be in this format docdb-${RANDOM_STR}, required in the create instance flow
     aws ec2 create-tags --resources $SUBNET_ID1  --tags Key=Name,Value=docdb-${RANDOM_STR}
     aws ec2 create-tags --resources $SUBNET_ID2  --tags Key=Name,Value=docdb-${RANDOM_STR}
@@ -408,10 +413,10 @@ else
       log "==== Tagging subnet name to its original value ===="
       aws ec2 create-tags --resources $SUBNET_ID1  --tags Key=Name,Value=$TAG_NAME1
       aws ec2 create-tags --resources $SUBNET_ID2  --tags Key=Name,Value=$TAG_NAME2
-      aws ec2 create-tags --resources $SUBNET_ID3  --tags Key=Name,Value=$TAG_NAME3    
+      aws ec2 create-tags --resources $SUBNET_ID3  --tags Key=Name,Value=$TAG_NAME3
     fi
   fi
-  
+
   log "==== MongoDB deployment completed ===="
   ## Deploy MongoDB completed
 fi
@@ -420,11 +425,11 @@ if [[ -z $VPC_ID && $AWS_MSK_PROVIDER == "Yes" ]]; then
   log "Failed to get the vpc id required to deploy AWS MSK"
   exit 42
 fi
-log "==== AWS_MSK_PROVIDER=$AWS_MSK_PROVIDER VPC_ID=$VPC_ID ===="  
+log "==== AWS_MSK_PROVIDER=$AWS_MSK_PROVIDER VPC_ID=$VPC_ID ===="
 if [[ $AWS_MSK_PROVIDER == "Yes" ]]; then
   log "==== AWS MSK deployment started ===="
   export KAFKA_CLUSTER_NAME="msk-${RANDOM_STR}"
-  export KAFKA_NAMESPACE="msk-${RANDOM_STR}"  
+  export KAFKA_NAMESPACE="msk-${RANDOM_STR}"
   export AWS_KAFKA_USER_NAME="mskuser-${RANDOM_STR}"
   export AWS_REGION="${DEPLOY_REGION}"
   export KAFKA_VERSION="2.8.1"
@@ -440,7 +445,7 @@ if [[ $AWS_MSK_PROVIDER == "Yes" ]]; then
     SCRIPT_STATUS=44
     exit $SCRIPT_STATUS
   fi
-  # IPv4 CIDR of private or default subnet 
+  # IPv4 CIDR of private or default subnet
   export AWS_MSK_CIDR_AZ1="${CIDR_BLOCKS_0}"
   export AWS_MSK_CIDR_AZ2="${CIDR_BLOCKS_1}"
   export AWS_MSK_CIDR_AZ3="${CIDR_BLOCKS_2}"
@@ -541,7 +546,7 @@ if [[ $DEPLOY_MANAGE == "true" && (-z $MAS_JDBC_USER) && (-z $MAS_JDBC_PASSWORD)
   export ROLE_NAME=db2 && ansible-playbook ibm.mas_devops.run_role
   export ROLE_NAME=suite_db2_setup_for_manage && ansible-playbook ibm.mas_devops.run_role
   log "==== Configure internal db2 for manage started ===="
-fi 
+fi
 
 if [[ $DEPLOY_MANAGE == "true" && (-n $MAS_JDBC_USER) && (-n $MAS_JDBC_PASSWORD) && (-n $MAS_JDBC_URL) ]]; then
   export SSL_ENABLED=false
