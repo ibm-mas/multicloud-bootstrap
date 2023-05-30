@@ -1,31 +1,13 @@
+---
 kind: StorageClass
 apiVersion: storage.k8s.io/v1
 metadata:
   name: gp2
-  resourceVersion: '3966'
   annotations:
-    storageclass.kubernetes.io/is-default-class: 'true'
-  managedFields:
-    - manager: Go-http-client
-      operation: Update
-      apiVersion: storage.k8s.io/v1
-      fieldsType: FieldsV1
-      fieldsV1:
-        'f:allowVolumeExpansion': {}
-        'f:metadata':
-          'f:annotations':
-            .: {}
-            'f:storageclass.kubernetes.io/is-default-class': {}
-        'f:parameters':
-          .: {}
-          'f:encrypted': {}
-          'f:type': {}
-        'f:provisioner': {}
-        'f:reclaimPolicy': {}
-        'f:volumeBindingMode': {}
+    storageclass.kubernetes.io/is-default-class: "true"
 provisioner: kubernetes.io/aws-ebs
 parameters:
-  encrypted: 'true'
+  encrypted: "true"
   type: gp2
 reclaimPolicy: Delete
 allowVolumeExpansion: true
