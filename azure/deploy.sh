@@ -117,7 +117,7 @@ envsubst </tmp/dockerconfig.json >/tmp/.dockerconfigjson
 oc set data secret/pull-secret -n openshift-config --from-file=/tmp/.dockerconfigjson
 
 # Run ansible playbook to create azurefiles storage class
-log "=== Creating azurefiles-premium Storage class on OCP cluster ==="
+log "=== Creating azurefiles-premium Storage class , managed-premium Storage class on OCP cluster ==="
 cd $GIT_REPO_HOME/azure/azurefiles
 ./azurefiles-premium.sh
 retcode=$?
