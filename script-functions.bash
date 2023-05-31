@@ -10,6 +10,7 @@ op_versions['Db2uCluster']=11.4
 op_versions['kafkas.kafka.strimzi.io']=2.4.9
 op_versions['ocpVersion48']='^4\.([8])(\.[0-9]+.*)*$'
 op_versions['ocpVersion410']='^4\.([1][0])?(\.[0-9][0-9]+.*)*$'
+op_versions['ocpVersion412']='^4\.([1][2])?(\.[0-9][0-9]+.*)*$'
 op_versions['ocpVersion411']='^4\.([1][1])?(\.[0-9][0-9]+.*)*$'
 op_versions['rosaVersion']='^4\.([1][0])?(\.[0-9]+.*)*$'
 op_versions['cpd-platform-operator']=2.0.7
@@ -61,6 +62,8 @@ function getOCPVersion() {
 	log " OCP version is $currentOpenshiftVersion"
 	if [[ ${currentOpenshiftVersion} =~ ${op_versions[ocpVersion410]} ]]; then
     	log " OCP Supported Version"
+    elif [[ ${currentOpenshiftVersion} =~ ${op_versions[ocpVersion412]} ]]; then
+    	log " OCP Supported Version"
 	elif [[ ${currentOpenshiftVersion} =~ ${op_versions[ocpVersion411]} ]]; then
 		log " OCP Version Not Supported"
 		#log " DEPLOY_CP4D: $DEPLOY_CP4D"
@@ -71,8 +74,8 @@ function getOCPVersion() {
 		#fi
 
   	else
-    	log " Unsupported Openshift version $currentOpenshiftVersion. Supported OpenShift versions are 4.8.x and 4.10.x"
-		export SERVICE_NAME=" Unsupported Openshift version $currentOpenshiftVersion. Supported OpenShift versions are 4.8.x and 4.10.x"
+    	log " Unsupported Openshift version $currentOpenshiftVersion. Supported OpenShift versions are 4.10.x and 4.12.x"
+		export SERVICE_NAME=" Unsupported Openshift version $currentOpenshiftVersion. Supported OpenShift versions are 4.10.x and 4.12.x"
 		SCRIPT_STATUS=29
 		return $SCRIPT_STATUS
  	fi
@@ -109,13 +112,13 @@ function getWorkerNodeDetails(){
 		else
 			memory=${memory::-2}
 		fi
-		
+
 		if [[ (${cpu} =~ ${requiredCPU} || ${cpu} =~ ${requiredCPU1}) ||  (${memory} -lt 31000000) ]]; then
 			log " Minimum CPU/Memory requirements not satisfied"
 			export SERVICE_NAME=" Minimum CPU/Memory requirements not satisfied"
 			SCRIPT_STATUS=29
 			return $SCRIPT_STATUS
-		fi		
+		fi
 
 	done;
 	log " Minimum CPU requirement satisfied"
@@ -134,8 +137,8 @@ function getOCS() {
 		return $SCRIPT_STATUS
 	else
 		log " OCS StorageClass is available"
-    fi    
-	
+    fi
+
 }
 
 function getazurefile() {
@@ -148,14 +151,14 @@ function getazurefile() {
 		return $SCRIPT_STATUS
 	else
 		log " azurefiles-premium StorageClass is available"
-    fi    
-	
+    fi
+
 }
 
 function getOPNamespace() {
 	check_for_csv_success=$(oc get csv  --all-namespaces | awk -v pattern="$1" '$2 ~ pattern  { print }'  | awk -F' ' '{print $NF}')
 	no_of_csv=$(oc get csv  --all-namespaces | awk -v pattern="$1" '$2 ~ pattern  { print }'  |  wc -l)
-	
+
 	if [ "$no_of_csv"  -gt 1 ]; then
 		log " Multiple ${1} installed."
 		export SERVICE_NAME=" Multiple ${1} installed"
@@ -214,7 +217,7 @@ function getOPNamespace() {
 						return $SCRIPT_STATUS
 					fi
 				else
-					log " $1 New instance Will Be Created"	
+					log " $1 New instance Will Be Created"
 				fi
 			elif  [[  $1 = "user-data-services-operator" ]]; then
 				instance=$(oc get analyticsproxies --all-namespaces -o json | jq -j '.items | length')
@@ -238,7 +241,7 @@ function getOPNamespace() {
 					fi
 				else
 					log " $1 New instance Will Be Created"
-				fi	
+				fi
 			elif  [[  $1 = "ibm-cert-manager-operator" ]]; then
 				instance=$(oc get CertManager --all-namespaces -o json | jq -j '.items | length')
 				if [[ $instance > 1 ]]; then
@@ -260,7 +263,7 @@ function getOPNamespace() {
 						return $SCRIPT_STATUS
 					fi
 				else
-					log " $1 New instance Will Be Created"	
+					log " $1 New instance Will Be Created"
 				fi
 			fi
 		else
@@ -298,7 +301,7 @@ function getVersion() {
 			if [[  ${op_namespaces[${1}]} ]]; then
 				export ${op_namespaces[${1}]}=$namespace
 			fi
-		else 
+		else
 			log " Instance Name for ${1} is not matching."
 			SCRIPT_STATUS=29
 			export SERVICE_NAME=" Instance Name for ${1} is not matching"
@@ -336,11 +339,11 @@ function getKafkaVersion() {
 			if [[  ${op_namespaces[kafkas.kafka.strimzi.io]} ]]; then
 				export ${op_namespaces[kafkas.kafka.strimzi.io]}=$namespace
 			fi
-		else 
+		else
 			log " Instance Name for Kafka is not matching."
 			SCRIPT_STATUS=29
 			export SERVICE_NAME=" Instance Name for Kafka is not matching"
-			return $SCRIPT_STATUS	
+			return $SCRIPT_STATUS
 		fi
   	else
     	log " Unsupported Kafka version $currentVersion."
