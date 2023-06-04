@@ -112,7 +112,7 @@ variable "master-instance-type" {
 }
 
 variable "worker-instance-type" {
-  default = "Standard_D32s_v3"
+  default = "Standard_D16s_v3"
 }
 
 variable "pull-secret-file-path" {
