@@ -23,6 +23,8 @@ pip install awscli --upgrade --user
 pip install pyyaml
 pip install jaydebeapi
 pip install oauthlib==3.2.0
+pip install pymongo
+
 # Install AWS cli
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
 unzip -o awscliv2.zip
@@ -39,13 +41,13 @@ mv -f jq /usr/local/bin
 #dnf module install -y container-tools
 
 ## Download Openshift CLI and move to /usr/local/bin
-wget "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.10.35/openshift-client-linux-4.10.35.tar.gz"
-tar -xvf openshift-client-linux-4.10.35.tar.gz
+wget "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.12.18/openshift-client-linux-4.12.18.tar.gz"
+tar -xvf openshift-client-linux-4.12.18.tar.gz
 chmod u+x oc kubectl
 mv -f oc /usr/local/bin
 mv -f kubectl /usr/local/bin
 oc version
-rm -rf openshift-client-linux-4.10.35.tar.gz
+rm -rf openshift-client-linux-4.12.18.tar.gz
 
 
 

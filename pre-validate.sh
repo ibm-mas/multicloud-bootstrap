@@ -7,6 +7,8 @@ if [[ $CLUSTER_TYPE == "aws" ]]; then
 elif [[ $CLUSTER_TYPE == "azure" ]]; then
     # az account list-locations --query "[].{Name:name}" -o table|grep -Ev '^(Name|-)'|tr '\n' ';'
     SUPPORTED_REGIONS="eastus;eastus2;southcentralus;westus2;westus3;australiaeast;southeastasia;northeurope;swedencentral;uksouth;westeurope;centralus;southafricanorth;centralindia;eastasia;japaneast;koreacentral;canadacentral;francecentral;germanywestcentral;norwayeast;brazilsouth"
+elif [[ $CLUSTER_TYPE == "gcp" ]]; then
+    SUPPORTED_REGIONS="asia-east1;asia-east2;asia-northeast1;asia-northeast2;asia-northeast3;asia-south1;asia-south2;asia-southeast1;asia-southeast2;australia-southeast12;europe-central2;europe-north1;europe-southwest1;europe-west1;europe-west2;europe-west3;europe-west4;europe-west6;europe-west8;europe-west9;northamerica-northeast1;northamerica-northeast2;southamerica-east1;southamerica-west1;us-central1;us-east1;us-east4;us-east5;us-south1;us-west1;us-west2;us-west3;us-west4"
 else
     SUPPORTED_REGIONS=$DEPLOY_REGION
 fi
@@ -50,6 +52,16 @@ if [[ ($CLUSTER_TYPE == "aws") && (-n $BASE_DOMAIN) ]]; then
 else
     true
 fi
+# Check if provided hosted zone is public /private for azure
+if [[ ($CLUSTER_TYPE == "azure") && (-n $BASE_DOMAIN) ]]; then
+    if [[ $PRIVATE_CLUSTER == "false" ]]; then
+       PUBLIC_DNS_VALIDATION=`az network dns zone list  |grep -w $BASE_DOMAIN| tr -d '"'`
+          [[ ! -z "$PUBLIC_DNS_VALIDATION" ]] && log "Valid PUBLIC DNS selection" || log "Invalid PUBLIC DNS SELECTION"
+        else
+         PRIVATE_DNS_VALIDATION=`az network private-dns zone list |grep -w $BASE_DOMAIN| tr -d '"'`
+           [[ ! -z "$PRIVATE_DNS_VALIDATION" ]] && log "Valid PRIVATE DNS selection" || log "Invalid PRIVATE DNS SELECTION"
+    fi
+fi
 
 if [ $? -eq 0 ]; then
     log "MAS public domain verification = PASS"
@@ -77,8 +89,7 @@ fi
 # JDBC CFT inputs validation and connection test
 if [[ $DEPLOY_MANAGE == "true" ]]; then
     if [[ (-z $MAS_JDBC_USER) && (-z $MAS_JDBC_PASSWORD) && (-z $MAS_JDBC_URL) && (-z $MAS_JDBC_CERT_URL) ]]; then
-        log "ERROR: Database details are not specified for MAS Manage deployment"
-        SCRIPT_STATUS=14
+        log "=== New internal DB2 database will be provisioned for MAS Manage deployment ==="
     else
         if [ -z "$MAS_JDBC_USER" ]; then
             log "ERROR: Database username is not specified"
@@ -88,9 +99,6 @@ if [[ $DEPLOY_MANAGE == "true" ]]; then
             SCRIPT_STATUS=14
         elif [ -z "$MAS_JDBC_URL" ]; then
             log "ERROR: Database connection url is not specified"
-            SCRIPT_STATUS=14
-        elif [ -z "$MAS_JDBC_CERT_URL" ]; then
-            log "ERROR: Database certificate url is not specified"
             SCRIPT_STATUS=14
         else
             log "Downloading DB certificate"
@@ -117,21 +125,44 @@ if [[ $DEPLOY_MANAGE == "true" ]]; then
                 elif [[ ${MAS_JDBC_CERT_URL,,} =~ ^https? ]]; then
                     wget "$MAS_JDBC_CERT_URL" -O db.crt
                 fi
+            elif [[ $CLUSTER_TYPE == "gcp" ]]; then
+                wget "$MAS_JDBC_CERT_URL" -O db.crt
             fi
             export MAS_DB2_JAR_LOCAL_PATH=$GIT_REPO_HOME/lib/db2jcc4.jar
             if [[ ${MAS_JDBC_URL,, } =~ ^jdbc:db2? ]]; then
-                log "Connecting to the Database"
-                if python jdbc-prevalidate.py; then
-                    log "JDBC URL Validation = PASS"
+                log "Connecting to DB2 Database"
+                if python jdbc-prevalidateDB2.py; then
+                    log "Db2 JDBC URL Validation = PASS"
                 else
-                    log "ERROR: JDBC URL Validation = FAIL"
+                    log "ERROR: Db2 JDBC URL Validation = FAIL"
+                    SCRIPT_STATUS=14
+                fi
+            elif [[ ${MAS_JDBC_URL,, } =~ ^jdbc:oracle? ]]; then
+                export MAS_ORACLE_JAR_LOCAL_PATH=$GIT_REPO_HOME/lib/ojdbc8.jar
+                log "Connecting to Oracle Database"
+                if python jdbc-prevalidateOracle.py; then
+                    log "Oracle JDBC URL Validation = PASS"
+				else
+                    log "ERROR: Oracle JDBC URL Validation = FAIL"
                     SCRIPT_STATUS=14
                 fi
             else
-                log "Skipping JDBC URL validation, supported only for DB2"
+                log "Skipping JDBC URL validation, supported only for DB2 and Oracle".
             fi
         fi
     fi
+fi
+
+#mongo pre-validation only for AWS currently. 
+if [[ $CLUSTER_TYPE == "aws" ]]; then
+    log "=== pre-validate-mongo.sh started ==="
+    sh $GIT_REPO_HOME/mongo/pre-validate-mongo.sh
+    SCRIPT_STATUS=$?
+    if [ $SCRIPT_STATUS -ne 0 ]; then
+        log "ERROR: MongoDB URL Validation FAILED in pre-validate-mongo.sh, exiting"
+        exit $SCRIPT_STATUS
+    fi
+    log "=== pre-validate-mongo.sh completed ==="
 fi
 
 # Check if all the existing SLS inputs are provided
@@ -197,7 +228,7 @@ fi
 ## MAS_ANNOTATIONS environment variable is used in suit-install role of MAS Installtion
 
 if [[ $CLUSTER_TYPE == "aws" ]]; then
-    #validating product type for helper.sh
+    # Validating product type for helper.sh
     validate_prouduct_type
 fi
 # Check if MAS license is provided

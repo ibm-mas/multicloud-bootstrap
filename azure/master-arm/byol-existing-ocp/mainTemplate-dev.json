@@ -32,7 +32,7 @@
     "offeringType": {
       "type": "string",
       "metadata": {
-        "description": "Select your preferred Suite offering type."
+        "description": "Select your preferred Suite offering type.For MAS Core + Manage: If db2 values are not provided,db2 will be internally deployed."
       },
       "defaultValue": "MAS Core + Cloud Pak for Data",
       "allowedValues": [
@@ -40,10 +40,10 @@
         "MAS Core + Manage (no Cloud Pak for Data)"
       ]
     },
-    "publicDomain": {
+    "hostedDomain": {
       "type": "string",
       "metadata": {
-        "description": "Provide the public App Service domain that you created in the App Service Domains, for example: mas4aws.myorg.com"
+        "description": "Provide the public App Service domain /Private DNS zones that you created in the App Service Domains /Private DNS zones, for example: mas4azure.com"
       },
       "defaultValue": ""
     },
@@ -228,6 +228,20 @@
         "description": "Enter Azure service principal tenant id."
       }
     },
+    "BootNodeVnetId": {
+      "defaultValue": "",
+      "type": "String",
+      "metadata": {
+        "description": "Enter the Vnet Id to create the bootnode into.  If existing OpenShift cluster is specified,\n   make sure it is reachable from this Vnet."
+      }
+    },
+    "BootNodeVnetResourceGroup": {
+      "defaultValue": "",
+      "type": "String",
+      "metadata": {
+        "description": "Enter the BootNodeVnetId's resource group ."
+      }
+    },
     "emailNotification": {
       "type": "string",
       "metadata": {
@@ -277,21 +291,18 @@
   },
   "variables": {
     "seller_subscription_id": "b2ca5467-2502-4b05-b78e-744604c6531d",
-    "seller_compute_gallery_name": "masbyolimagegallery20221213212024",
-    "seller_image_definition": "masocp-image-def-20221213212024",
+    "seller_compute_gallery_name": "masbyolimagegallery20230320120702",
+    "seller_image_definition": "masocp-image-def-20230320120702",
     "projectName": "[concat('e',substring(uniqueString(resourceGroup().id, deployment().name), 0, 5))]",
     "rgName": "[resourceGroup().name]",
-    "vNetName": "[concat(variables('projectName'), '-vnet')]",
-    "vNetAddressPrefixes": "10.0.0.0/16",
-    "vNetSubnetName": "default",
-    "vNetSubnetAddressPrefix": "10.0.0.0/24",
+    "vNetSubnetName": "[concat('masocp-', variables('projectName'), '-bootnodeSubnet')]",
+    "vNetSubnetAddressPrefix": "10.0.5.0/24",
     "logAnalyticsWorkspace": "[concat('masocp-', variables('projectName'), '-logAnalyticsWorkspace')]",
-    "logAnalyticsWorkspaceId": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('logAnalyticsWorkspace'))]",
     "vmName": "[concat('masocp-', variables('projectName'), '-bootnode-vm')]",
     "publicIPAddressName": "[concat(variables('projectName'), '-ip')]",
     "networkInterfaceName": "[concat(variables('projectName'), '-nic')]",
     "networkSecurityGroupName": "[concat(variables('projectName'), '-nsg')]",
-    "networkSecurityGroupName2": "[concat(variables('vNetSubnetName'), '-nsg')]",
+    "networkSecurityGroupName2": "bootnodeSubnet-nsg",
     "storageaccountName": "[concat('masocp', variables('projectName'),'stgaccount')]"
    },
   "resources": [
@@ -332,54 +343,59 @@
       }
     },
     {
-      "comments": "Simple Network Security Group for subnet [variables('vNetSubnetName')]",
-      "type": "Microsoft.Network/networkSecurityGroups",
-      "apiVersion": "2022-07-01",
-      "name": "[variables('networkSecurityGroupName2')]",
-      "location": "[parameters('location')]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2021-04-01",
+      "name": "existingvnetTemplate",
+      "resourceGroup": "[parameters('BootNodeVnetResourceGroup')]",
+      "subscriptionid": "[variables('seller_subscription_id')]",
       "properties": {
-        "securityRules": [
-          {
-            "name": "default-allow-22",
-            "properties": {
-              "priority": 1000,
-              "access": "Allow",
-              "direction": "Inbound",
-              "destinationPortRange": "22",
-              "protocol": "Tcp",
-              "sourceAddressPrefix": "[parameters('bootnodeSGIngressCidrIp')]",
-              "sourcePortRange": "*",
-              "destinationAddressPrefix": "*"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "type": "Microsoft.Network/virtualNetworks",
-      "apiVersion": "2022-07-01",
-      "name": "[variables('vNetName')]",
-      "location": "[parameters('location')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName2'))]"
-      ],
-      "properties": {
-        "addressSpace": {
-          "addressPrefixes": [
-            "[variables('vNetAddressPrefixes')]"
-          ]
-        },
-        "subnets": [
-          {
-            "name": "[variables('vNetSubnetName')]",
-            "properties": {
-              "addressPrefix": "[variables('vNetSubnetAddressPrefix')]",
-              "networkSecurityGroup": {
-                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName2'))]"
+        "mode": "Incremental",
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "parameters": {},
+          "variables": {},
+          "resources": [
+            {
+              "type": "Microsoft.Network/networkSecurityGroups",
+              "apiVersion": "2022-07-01",
+              "name": "[variables('networkSecurityGroupName2')]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "securityRules": [
+                  {
+                    "name": "default-allow-22",
+                    "properties": {
+                      "priority": 1000,
+                      "access": "Allow",
+                      "direction": "Inbound",
+                      "destinationPortRange": "22",
+                      "protocol": "Tcp",
+                      "sourceAddressPrefix": "[parameters('bootnodeSGIngressCidrIp')]",
+                      "sourcePortRange": "*",
+                      "destinationAddressPrefix": "*"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "type": "Microsoft.Network/virtualNetworks/subnets",
+              "apiVersion": "2022-07-01",
+              "name": "[format('{0}/{1}', parameters('BootNodeVnetId'), variables('vNetSubnetName'))]",
+              "location": "[parameters('location')]",
+              "dependsOn": [
+                "[resourceId(parameters('BootNodeVnetResourceGroup'),'Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName2'))]"
+              ],
+              "properties": {
+                "addressPrefix": "[variables('vNetSubnetAddressPrefix')]",
+                "networkSecurityGroup": {
+                  "id": "[resourceId(parameters('BootNodeVnetResourceGroup'),'Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName2'))]"
+                }
               }
             }
-          }
-        ]
+          ]
+        }
       }
     },
     {
@@ -389,7 +405,7 @@
       "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIPAddressName'))]",
-        "[resourceId('Microsoft.Network/virtualNetworks', variables('vNetName'))]",
+        "existingvnetTemplate",
         "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]"
       ],
       "properties": {
@@ -402,7 +418,7 @@
                 "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIPAddressName'))]"
               },
               "subnet": {
-                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('vNetSubnetName'))]"
+                "id": "[resourceId(parameters('BootNodeVnetResourceGroup'),'Microsoft.Network/virtualNetworks/subnets', parameters('BootNodeVnetId'), variables('vNetSubnetName'))]"
               }
             }
           }
@@ -532,33 +548,26 @@
             "typeHandlerVersion": "2.0",
             "autoUpgradeMinorVersion": true,
             "protectedSettings": {
-              "commandToExecute": "[concat('sleep 120;', 'cd /root/ansible-devops/multicloud-bootstrap;', './init-async.sh azure ''', parameters('offeringType'), ''' ''', parameters('location'), ''' null ''', parameters('clusterSize'), ''' ''', variables('projectName'), ''' ''', parameters('publicDomain'), ''' null ''', parameters('sshPublicKey'), ''' null ''', parameters('entitledRegistryKey'), ''' ''', parameters('openShiftPullSecret'), ''' ''', parameters('masLicenseUrl'), ''' ''', parameters('slsEndpointUrl'), ''' ''', parameters('slsRegistrationKey'), ''' ''', parameters('slsPublicCertificateUrl'), ''' ''', parameters('udsEndpointUrl'), ''' ''', parameters('udsAPIKey'), ''' ''', parameters('udsPublicCertificateUrl'), ''' ''', parameters('masManageDBUser'), ''' ''', parameters('masManageDBPassword'), ''' ''', parameters('masManageDBJdbcUrl'), ''' ''', parameters('masManageDBCertificateUrl'), ''' ''', parameters('importDemoData'), ''' ''', parameters('openShiftClusterApiUrl'), ''' ''', parameters('openShiftUser'), ''' ''', parameters('openShiftPwd'), ''' ''', variables('rgName'), ''' ''', parameters('emailNotification'), ''' ''', parameters('notificattionEmailAddress'), ''' ''', parameters('smtpHost'), ''' ''', parameters('smtpPort'), ''' ''', parameters('smtpUsername'), ''' ''', parameters('smtpPassword'), ''' ''', parameters('azureServicePrincipalClientId'), ''' ''', parameters('azureServicePrincipalClientSecret'), ''' ''', variables('seller_subscription_id'), ''' ''', parameters('azureServicePrincipalTenantId'), ''' null null '''' '''' null null null null null null null ''', parameters('operationalMode'), ''' dev ''', ''' > mas-provisioning.log 2>&1;')]"
-              }
+              "commandToExecute": "[concat('sleep 120;', 'cd /root/ansible-devops/multicloud-bootstrap;', './init-async.sh azure ''', parameters('offeringType'), ''' ''', parameters('location'), ''' null ''', parameters('clusterSize'), ''' ''', variables('projectName'), ''' ''', parameters('hostedDomain'), ''' null ''', parameters('sshPublicKey'), ''' null ''', parameters('entitledRegistryKey'), ''' ''', parameters('openShiftPullSecret'), ''' ''', parameters('masLicenseUrl'), ''' ''', parameters('slsEndpointUrl'), ''' ''', parameters('slsRegistrationKey'), ''' ''', parameters('slsPublicCertificateUrl'), ''' ''', parameters('udsEndpointUrl'), ''' ''', parameters('udsAPIKey'), ''' ''', parameters('udsPublicCertificateUrl'), ''' ''', parameters('masManageDBUser'), ''' ''', parameters('masManageDBPassword'), ''' ''', parameters('masManageDBJdbcUrl'), ''' ''', parameters('masManageDBCertificateUrl'), ''' ''', parameters('importDemoData'), ''' ''', parameters('openShiftClusterApiUrl'), ''' ''', parameters('openShiftUser'), ''' ''', parameters('openShiftPwd'), ''' ''', variables('rgName'), ''' ''', parameters('emailNotification'), ''' ''', parameters('notificattionEmailAddress'), ''' ''', parameters('smtpHost'), ''' ''', parameters('smtpPort'), ''' ''', parameters('smtpUsername'), ''' ''', parameters('smtpPassword'), ''' ''', parameters('azureServicePrincipalClientId'), ''' ''', parameters('azureServicePrincipalClientSecret'), ''' ''', variables('seller_subscription_id'), ''' ''', parameters('azureServicePrincipalTenantId'), ''' null null null null ''',parameters('BootNodeVnetId'),''' '''' null null null null null null null ''', parameters('operationalMode'), ''' '''' '''' '''' '''' '''' '''' '''' '''' dev ''', ''' > mas-provisioning.log 2>&1;')]"              }
           }
         }
       ]
     },
     {
       "type": "Microsoft.Compute/virtualMachines/extensions",
-      "apiVersion": "2022-08-01",
-      "name": "[concat(variables('vmName'),'/', 'OMSExtension')]",
+      "apiVersion": "2021-11-01",
+      "name": "[format('{0}/AzureMonitorLinuxAgent', variables('vmName'))]",
       "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.Compute/virtualMachines', variables('vmName'))]",
         "[resourceId('Microsoft.OperationalInsights/workspaces', variables('logAnalyticsWorkspace'))]"
       ],
       "properties": {
-        "publisher": "Microsoft.EnterpriseCloud.Monitoring",
-        "type": "OmsAgentForLinux",
-        "typeHandlerVersion": "1.4",
+        "publisher": "Microsoft.Azure.Monitor",
+        "type": "AzureMonitorLinuxAgent",
+        "typeHandlerVersion": "1.21",
         "autoUpgradeMinorVersion": true,
-        "settings": {
-          "workspaceId": "[reference(variables('logAnalyticsWorkspaceId'), '2021-06-01').customerId]",
-          "stopOnMultipleConnections": true
-        },
-        "protectedSettings": {
-          "workspaceKey": "[listKeys(variables('logAnalyticsWorkspaceId'), '2021-06-01').primarySharedKey]"
-        }
+        "enableAutomaticUpgrade": true
       }
     },
     {

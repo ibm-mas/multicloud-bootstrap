@@ -77,6 +77,12 @@ variable "worker-subnet-cidr" {
   default = "10.0.2.0/24"
 }
 
+variable "master-nsg-name" {
+  default = "master-nsg"
+}
+variable "worker-nsg-name" {
+  default = "worker-nsg"
+}
 #Bastion host variable
 variable "bastion_cidr" {
   default = "10.0.3.224/27"
@@ -179,7 +185,7 @@ variable "cpd-external-username" {
   default     = "cp"
 }
 variable "ocp_version" {
-  default = "4.10.35"
+  default = "4.12.18"
 }
 
 

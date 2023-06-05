@@ -19,6 +19,9 @@ output "openshift_password" {
   sensitive = true
 }
 
+output "vpcid" {
+  value = var.new_or_existing_vpc_subnet == "new" ? module.network[0].vpcid : var.vpc_id
+}
 
 # output "cpd_url" {
 #   description = "URL for cpd web console"

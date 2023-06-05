@@ -28,37 +28,41 @@ echo "BOOTSTRAP_AUTOMATION_TAG_OR_BRANCH=$BOOTSTRAP_AUTOMATION_TAG_OR_BRANCH"
 # Remove unnecessary packages
 dnf -y remove polkit
 
+# Enable and disable repos to update certs
+echo "Enable and disable repos to update certs"
+#dnf update -y --disablerepo=* --enablerepo='*microsoft*' rhui-azure-rhel8-eus
+
 # Update all packages to latest
 dnf update -y
 
 ## Install pre-reqs
-dnf install git httpd-tools java  unzip wget zip -y
+dnf install git httpd-tools java python39 unzip wget zip pip  container-tools -y
+ln -s --force /usr/bin/python3.9 /usr/bin/python
+ln -s --force /usr/bin/pip3.9 /usr/bin/pip
 
-#Install openshift-install 4.10.35
-wget https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/4.10.35/openshift-client-linux-4.10.35.tar.gz
-tar -xvf openshift-client-linux-4.10.35.tar.gz
+ln -s --force /usr/bin/python3.9 /usr/bin/python3
+ln -s --force /usr/bin/pip3.9 /usr/bin/pip3
+
+#Install openshift-install 4.12.18
+wget https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/4.12.18/openshift-client-linux-4.12.18.tar.gz
+tar -xvf openshift-client-linux-4.12.18.tar.gz
 chmod u+x oc kubectl
 mv -f oc /usr/local/bin
 mv -f kubectl /usr/local/bin
 oc version
-rm -rf openshift-client-linux-4.10.35.tar.gz
+rm -rf openshift-client-linux-4.12.18.tar.gz
 
 ## Download the  Openshift CLI and move to /usr/local/bin
-wget "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.10.35/openshift-install-linux.tar.gz"
+wget "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.12.18/openshift-install-linux.tar.gz"
 tar -xvf openshift-install-linux.tar.gz
 chmod u+x openshift-install
 mv -f openshift-install /usr/local/bin
 openshift-install version
 rm -rf openshift-install-linux.tar.gz
 
-# Install Azure cli
+# Install Azure cli for rhel9
 rpm --import https://packages.microsoft.com/keys/microsoft.asc
-echo -e "[azure-cli]
-name=Azure CLI
-baseurl=https://packages.microsoft.com/yumrepos/azure-cli
-enabled=1
-gpgcheck=1
-gpgkey=https://packages.microsoft.com/keys/microsoft.asc" | tee /etc/yum.repos.d/azure-cli.repo
+dnf install -y https://packages.microsoft.com/config/rhel/9.0/packages-microsoft-prod.rpm
 dnf install azure-cli -y
 
 # Install AzureCopy cli
@@ -74,35 +78,13 @@ chmod +x jq
 mv jq /usr/local/bin
 
 # Install podman
-dnf module install -y container-tools
+dnf  install -y container-tools pip
 
-#Install the required Python development libraries
-dnf install gcc openssl-devel bzip2-devel libffi-devel make  -y
-
-
-wget "https://www.python.org/ftp/python/3.9.14/Python-3.9.14.tgz"
-tar xzf Python-3.9.14.tgz
-rm -rf Python-3.9.14.tgz
-cd Python-3.9.14
-./configure --enable-optimizations
-make altinstall
-python3.9 -V
-rm -rf /usr/local/lib/python3.9/unittest
-rm -rf /usr/local/lib/python3.9/test
-
-ln -s --force /usr/local/bin/python3.9 /usr/bin/python
-ln -s --force /usr/local/bin/pip3.9 /usr/bin/pip
-ln -s --force /usr/local/bin/python3.9 /usr/bin/python3
-ln -s --force /usr/local/bin/pip3.9 /usr/bin/pip3
 
 pip install --upgrade pip
-pip3 install pyyaml
-pip3 install jaydebeapi
-pip3 install jmespath
-pip3 install yq
 
-python3 -m pip install dotmap
-python3 -m pip install yq
+pip install jaydebeapi jmespath  yq jsonpatch kubernetes  PyYAML openshift dotmap
+pip install oauthlib==3.2.2
 
 ## Install terraform
 TERRAFORM_VER=`curl -s https://api.github.com/repos/hashicorp/terraform/releases/latest |  grep tag_name | cut -d: -f2 | tr -d \"\,\v | awk '{$1=$1};1'`
@@ -113,7 +95,7 @@ mv terraform /usr/local/bin/
 rm -rf terraform_${TERRAFORM_VER}_linux_amd64.zip
 
 ## Install Ansible
-pip3 install ansible==4.9.0
+pip3 install ansible
 pip3 install openshift
 ansible-galaxy collection install community.kubernetes
 
@@ -136,7 +118,7 @@ else
     rm -rf ansible-devops ibm-mas_devops-*.tar.gz
     rm -rf ansible-devops
 fi
-
+pip install oauthlib==3.2.2
 # Get the bootstrap github code
 cd /root
 rm -rf ansible-devops
@@ -149,7 +131,8 @@ fi
 echo "Cloning bootstrap automation from tag/branch $BOOTSTRAP_AUTOMATION_TAG_OR_BRANCH"
 git clone -b $BOOTSTRAP_AUTOMATION_TAG_OR_BRANCH https://github.com/ibm-mas/multicloud-bootstrap.git
 cd multicloud-bootstrap
-rm -rf aws azure/bootnode-image azure/master-arm
+echo "removing folders"
+rm -rf aws azure/bootnode-image azure/master-arm gcp mongo lib/ojdbc8.jar
 find . -type f -name "*.sh" -exec chmod +x {} \;
 
 # Clear bash history
