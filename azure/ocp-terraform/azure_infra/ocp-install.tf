@@ -216,7 +216,7 @@ oc create -f ${local.ocptemplates}/insecure-registry-mc.yaml --kubeconfig ${self
 oc create -f ${local.ocptemplates}/sysctl-mc.yaml --kubeconfig ${self.triggers.ocp_directory}/auth/kubeconfig
 oc create -f ${local.ocptemplates}/limits-mc.yaml --kubeconfig ${self.triggers.ocp_directory}/auth/kubeconfig
 oc create -f ${local.ocptemplates}/crio-mc.yaml --kubeconfig ${self.triggers.ocp_directory}/auth/kubeconfig
-oc create -f ${local.ocptemplates}/chrony-mc.yaml --kubeconfig ${self.triggers.ocp_directory}/auth/kubeconfig
+#oc create -f ${local.ocptemplates}/chrony-mc.yaml --kubeconfig ${self.triggers.ocp_directory}/auth/kubeconfig
 oc create -f ${local.ocptemplates}/multipath-machineconfig.yaml --kubeconfig ${self.triggers.ocp_directory}/auth/kubeconfig
 oc patch configs.imageregistry.operator.openshift.io/cluster --type merge -p '{"spec":{"defaultRoute":true, "replicas":${var.worker-node-count}}}' --kubeconfig ${self.triggers.ocp_directory}/auth/kubeconfig
 echo 'Sleeping for 15 mins while MCs apply and the cluster restarts' 
