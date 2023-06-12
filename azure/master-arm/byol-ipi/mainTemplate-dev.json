@@ -258,7 +258,7 @@
     "seller_subscription_id": "b2ca5467-2502-4b05-b78e-744604c6531d",
     "seller_compute_gallery_name": "masbyolimagegallery20230527200350",
     "seller_image_definition": "masocp-image-def-20230527200350",
-    "projectName": "[concat('u',substring(uniqueString(resourceGroup().id, deployment().name), 0, 5))]",
+    "projectName": "[concat('i',substring(uniqueString(resourceGroup().id, deployment().name), 0, 5))]",
     "rgName": "[resourceGroup().name]",
     "vNetName": "bootnode-vnet",
     "vNetAddressPrefixes": "10.0.0.0/16",
