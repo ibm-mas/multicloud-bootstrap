@@ -27,7 +27,7 @@
       "defaultValue": "Standard_D2s_v3",
       "allowedValues": [
         "Standard_D2s_v3"
-             ]
+      ]
     },
     "offeringType": {
       "type": "string",
@@ -97,7 +97,7 @@
         "Production",
         "Non-production"
       ]
-    },    
+    },
     "masManageDBUser": {
       "type": "string",
       "metadata": {
@@ -256,8 +256,8 @@
   },
   "variables": {
     "seller_subscription_id": "b2ca5467-2502-4b05-b78e-744604c6531d",
-    "seller_compute_gallery_name": "masbyolimagegallery20230527200350",
-    "seller_image_definition": "masocp-image-def-20230527200350",
+    "seller_compute_gallery_name": "masbyolimagegallery20230605121806",
+    "seller_image_definition": "masocp-image-def-20230605121806",
     "projectName": "[concat('i',substring(uniqueString(resourceGroup().id, deployment().name), 0, 5))]",
     "rgName": "[resourceGroup().name]",
     "vNetName": "bootnode-vnet",
@@ -273,6 +273,19 @@
     "storageaccountName": "[concat('masocp', variables('projectName'),'stgaccount')]"
   },
   "resources": [
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "pid-5a1e8d63-79c9-418d-b3af-b2a21a557aac-partnercenter",
+      "properties": {
+        "mode": "Incremental",
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "resources": []
+        }
+      }
+    },
     {
       "type": "Microsoft.Network/networkSecurityGroups",
       "apiVersion": "2022-07-01",
