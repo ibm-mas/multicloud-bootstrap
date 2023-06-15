@@ -15,9 +15,6 @@ export BASE_DOMAIN_RG_NAME=$8
 export SSH_KEY_NAME=$9
 export DEPLOY_WAIT_HANDLE=${10}
 export SLS_ENTITLEMENT_KEY=${11}
-
-
-
 export OCP_PULL_SECRET=${12}
 export MAS_LICENSE_URL=${13}
 export SLS_URL=${14}
@@ -30,7 +27,7 @@ export MAS_JDBC_USER=${20}
 export MAS_JDBC_PASSWORD=${21}
 export MAS_JDBC_URL=${22}
 export MAS_JDBC_CERT_URL=${23}
-export MAS_DB_IMPORT_DEMO_DATA=${24}
+export MAS_APP_SETTINGS_DEMODATA=${24}
 export EXS_OCP_URL=${25}
 export EXS_OCP_USER=${26}
 export EXS_OCP_PWD=${27}
@@ -45,19 +42,31 @@ export AZURE_SP_CLIENT_ID=${35}
 export AZURE_SP_CLIENT_PWD=${36}
 export SELLER_SUBSCRIPTION_ID=${37}
 export TENANT_ID=${38}
-export BOOTNODE_VPC_ID=${39}
-export BOOTNODE_SUBNET_ID=${40}
-export EXISTING_NETWORK=${41}
-export EXISTING_NETWORK_RG=${42}
-export EXISTING_PRIVATE_SUBNET1_ID=${43}
-export EXISTING_PRIVATE_SUBNET2_ID=${44}
-export EXISTING_PRIVATE_SUBNET3_ID=${45}
-export EXISTING_PUBLIC_SUBNET1_ID=${46}
-export EXISTING_PUBLIC_SUBNET2_ID=${47}
-export EXISTING_PUBLIC_SUBNET3_ID=${48}
-export PRIVATE_CLUSTER=${49}
-export OPERATIONAL_MODE=${50}
-export ENV_TYPE=${51}
+export GOOGLE_PROJECTID=${39}
+export GOOGLE_APPLICATION_CREDENTIALS_FILE=${40}
+export BOOTNODE_VPC_ID=${41}
+export BOOTNODE_SUBNET_ID=${42}
+export EXISTING_NETWORK=${43}
+export EXISTING_NETWORK_RG=${44}
+export EXISTING_PRIVATE_SUBNET1_ID=${45}
+export EXISTING_PRIVATE_SUBNET2_ID=${46}
+export EXISTING_PRIVATE_SUBNET3_ID=${47}
+export EXISTING_PUBLIC_SUBNET1_ID=${48}
+export EXISTING_PUBLIC_SUBNET2_ID=${49}
+export EXISTING_PUBLIC_SUBNET3_ID=${50}
+export PRIVATE_CLUSTER=${51}
+export OPERATIONAL_MODE=${52}
+
+#true if use existing instance selected, false if provision new instance selected
+export MONGO_USE_EXISTING_INSTANCE=${53}
+export MONGO_FLAVOR=${54}
+export MONGO_ADMIN_USERNAME=${55}
+export MONGO_ADMIN_PASSWORD=${56}
+export MONGO_HOSTS=${57}
+export MONGO_CA_PEM_FILE=${58}
+export DOCUMENTDB_VPC_ID=${59}
+export AWS_MSK_PROVIDER=${60}
+export ENV_TYPE=${61}
 export GIT_REPO_HOME=$(pwd)
 # Load helper functions
 . helper.sh
@@ -72,7 +81,6 @@ export -f get_uds_api_key
 export -f validate_prouduct_type
 
 export GIT_REPO_HOME=$(pwd)
-
 
 ## Configure CloudWatch agent
 if [[ $CLUSTER_TYPE == "aws" ]]; then
@@ -109,9 +117,20 @@ EOT
   cd -
 fi
 
+## Configure Ops agent
+if [[ $CLUSTER_TYPE == "gcp" ]]; then
+  log "Configuring Ops agent"
+  # Update config file
+  sed -i "s/\[UNIQID\]/$RANDOM_STR/g" /etc/google-cloud-ops-agent/config.yaml
+  # Start Ops agent service
+  service google-cloud-ops-agent restart
+  sleep 5
+  cd -
+fi
+
 # Check for input parameters
-if [[ (-z $CLUSTER_TYPE) || (-z $DEPLOY_REGION) || (-z $ACCOUNT_ID) \
-   || (-z $RANDOM_STR) || (-z $SSH_KEY_NAME) || (-z $DEPLOY_WAIT_HANDLE) ]]; then
+if [[ (-z $CLUSTER_TYPE) || (-z $DEPLOY_REGION) || (-z $RANDOM_STR) || (-z $CLUSTER_SIZE) || (-z $SLS_ENTITLEMENT_KEY) \
+   || (-z $SSH_KEY_NAME) ]]; then
   log "ERROR: Required parameter not specified, please provide all the required inputs to the script."
   PRE_VALIDATION=fail
 fi
@@ -143,13 +162,17 @@ export OPENSHIFT_PULL_SECRET_FILE_PATH=${GIT_REPO_HOME}/pull-secret.json
 export MASTER_NODE_COUNT="3"
 export WORKER_NODE_COUNT="3"
 export AZ_MODE="multi_zone"
+export OCP_VERSION="4.12.18"
+
 export MAS_IMAGE_TEST_DOWNLOAD="cp.icr.io/cp/mas/admin-dashboard:5.1.27"
-export BACKUP_FILE_NAME="terraform-backup-${CLUSTER_NAME}.zip"
+export BACKUP_FILE_NAME="deployment-backup-${CLUSTER_NAME}.zip"
 if [[ $CLUSTER_TYPE == "aws" ]]; then
   export DEPLOYMENT_CONTEXT_UPLOAD_PATH="s3://masocp-${RANDOM_STR}-bucket-${DEPLOY_REGION}/ocp-cluster-provisioning-deployment-context/"
 elif [[ $CLUSTER_TYPE == "azure" ]]; then
   export DEPLOYMENT_CONTEXT_UPLOAD_PATH="ocp-cluster-provisioning-deployment-context/${BACKUP_FILE_NAME}"
   export STORAGE_ACNT_NAME="masocp${RANDOM_STR}stgaccount"
+elif [[ $CLUSTER_TYPE == "gcp" ]]; then
+  export DEPLOYMENT_CONTEXT_UPLOAD_PATH="gs://masocp-${RANDOM_STR}-bucket/ocp-cluster-provisioning-deployment-context/"
 fi
 # Mongo variables
 export MAS_INSTANCE_ID="${RANDOM_STR}"
@@ -166,7 +189,9 @@ export SLS_MONGODB_CFG_FILE="${MAS_CONFIG_DIR}/mongo-${MONGODB_NAMESPACE}.yml"
 
 # Exporting SLS_LICENSE_FILE only when product type is different than privatepublic(i.e. Paid offering)
 # Paid offering does not require entitlement.lic i.e. MAS license file.
-validate_prouduct_type
+if [[ $CLUSTER_TYPE == "aws" ]]; then
+  validate_prouduct_type
+fi
 if [[ ($PRODUCT_TYPE == "privatepublic") && ($CLUSTER_TYPE == "aws") ]];then
   log "Product type is privatepublic hence not exporting SLS_LICENSE_FILE variable"
 else
@@ -187,9 +212,9 @@ export UDS_TLS_CERT_LOCAL_FILE_PATH="${GIT_REPO_HOME}/uds.crt"
 # CP4D variables
 export CPD_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
 export CPD_VERSION=cpd40
-export CPD_PRODUCT_VERSION=4.5.0
-export MAS_CHANNEL=8.9.x
-export MAS_CATALOG_VERSION=v8-amd64
+export CPD_PRODUCT_VERSION=4.6.3
+export MAS_CHANNEL=8.10.x
+export MAS_CATALOG_VERSION=v8-230518-amd64
 if [[ $CLUSTER_TYPE == "aws" ]]; then
   export CPD_PRIMARY_STORAGE_CLASS="ocs-storagecluster-cephfs"
 elif [[ $CLUSTER_TYPE == "azure" ]]; then
@@ -219,25 +244,29 @@ export MAS_APP_ID=manage
 export MAS_APPWS_JDBC_BINDING="workspace-application"
 export MAS_JDBC_CERT_LOCAL_FILE=$GIT_REPO_HOME/db.crt
 export MAS_CLOUD_AUTOMATION_VERSION=1.0
-export MAS_DEVOPS_COLLECTION_VERSION=12.3.2
-export MAS_APP_CHANNEL=8.5.x
+export MAS_DEVOPS_COLLECTION_VERSION=13.11.0
+export MAS_APP_CHANNEL=8.6.x
 if [ -z "$EXISTING_NETWORK" ]; then
   export new_or_existing_vpc_subnet="new"
   export enable_permission_quota_check=true
   export PRIVATE_CLUSTER=false
+  export private_or_public_cluster=public
 else
    export new_or_existing_vpc_subnet="exist"
    export enable_permission_quota_check=false
+   export private_or_public_cluster=public
 fi
 log " new_or_existing_vpc_subnet=$new_or_existing_vpc_subnet"
 log " enable_permission_quota_check=$enable_permission_quota_check"
 
 if [[ -z "$EXISTING_NETWORK" && $CLUSTER_TYPE == "azure" ]]; then
   export INSTALLATION_MODE="IPI"
+  # Setting the name of the v-net
+  export EXISTING_NETWORK=${RANDOM_STR}-vnet
 else
   export INSTALLATION_MODE="UPI"
 fi
-#log "==== INSTALLATION MODE: ${INSTALLATION_MODE}"
+log "==== INSTALLATION MODE: ${INSTALLATION_MODE}"
 
 RESP_CODE=0
 
@@ -269,11 +298,10 @@ case $CLUSTER_SIZE in
 esac
 
 
-
-
 # Log the variable values
 log "Below are common deployment parameters,"
 log " OPERATIONAL_MODE: $OPERATIONAL_MODE"
+log " AWS_MSK_PROVIDER: $AWS_MSK_PROVIDER"
 log " CLUSTER_TYPE: $CLUSTER_TYPE"
 log " OFFERING_TYPE: $OFFERING_TYPE"
 log " DEPLOY_REGION: $DEPLOY_REGION"
@@ -288,8 +316,6 @@ log " DEPLOY_WAIT_HANDLE: $DEPLOY_WAIT_HANDLE"
 #log " SLS_ENTITLEMENT_KEY: $SLS_ENTITLEMENT_KEY"
 #log " MAS_ENTITLEMENT_KEY: $MAS_ENTITLEMENT_KEY"
 #log " ENTITLEMENT_KEY: $ENTITLEMENT_KEY"
-
-
 #log " OCP_PULL_SECRET: $OCP_PULL_SECRET"
 log " DEPLOY_CP4D: $DEPLOY_CP4D"
 log " DEPLOY_MANAGE: $DEPLOY_MANAGE"
@@ -303,7 +329,7 @@ log " UDS_PUB_CERT_URL: $UDS_PUB_CERT_URL"
 log " MAS_JDBC_USER: $MAS_JDBC_USER"
 log " MAS_JDBC_URL: $MAS_JDBC_URL"
 log " MAS_JDBC_CERT_URL: $MAS_JDBC_CERT_URL"
-log " MAS_DB_IMPORT_DEMO_DATA: $MAS_DB_IMPORT_DEMO_DATA"
+log " MAS_APP_SETTINGS_DEMODATA: $MAS_APP_SETTINGS_DEMODATA"
 log " EXS_OCP_URL: $EXS_OCP_URL"
 log " EXS_OCP_USER: $EXS_OCP_USER"
 log " RG_NAME=$RG_NAME"
@@ -316,10 +342,18 @@ log " SMTP_USERNAME=$SMTP_USERNAME"
 log " AZURE_SP_CLIENT_ID=$AZURE_SP_CLIENT_ID"
 log " SELLER_SUBSCRIPTION_ID=$SELLER_SUBSCRIPTION_ID"
 log " TENANT_ID=$TENANT_ID"
+log " GOOGLE_PROJECTID=$GOOGLE_PROJECTID"
+log " GOOGLE_APPLICATION_CREDENTIALS_FILE=$GOOGLE_APPLICATION_CREDENTIALS_FILE"
 log " EMAIL_NOTIFICATION: $EMAIL_NOTIFICATION"
 log " EXISTING_NETWORK=$EXISTING_NETWORK"
 log " EXISTING_NETWORK_RG=$EXISTING_NETWORK_RG"
 log " ENV_TYPE=$ENV_TYPE"
+log " MONGO_USE_EXISTING_INSTANCE=${MONGO_USE_EXISTING_INSTANCE}"
+log " MONGO_FLAVOR=${MONGO_FLAVOR}"
+log " MONGO_ADMIN_USERNAME=${MONGO_ADMIN_USERNAME}"
+#log " MONGO_ADMIN_PASSWORD=${MONGO_ADMIN_PASSWORD}"
+log " MONGO_HOSTS=${MONGO_HOSTS}"
+log " MONGO_CA_PEM_FILE=${MONGO_CA_PEM_FILE}"
 log " EXISTING_PRIVATE_SUBNET1_ID=$EXISTING_PRIVATE_SUBNET1_ID"
 log " EXISTING_PRIVATE_SUBNET2_ID=$EXISTING_PRIVATE_SUBNET2_ID"
 log " EXISTING_PRIVATE_SUBNET3_ID=$EXISTING_PRIVATE_SUBNET3_ID"
@@ -376,9 +410,28 @@ if [[ $CLUSTER_TYPE == "azure" ]]; then
   log " BASE_DOMAIN_RG_NAME: $BASE_DOMAIN_RG_NAME"
   # Get VNet RG name for UPI based installation
   if [[ $INSTALLATION_MODE == "UPI" ]]; then
-    VNET_NAME=$EXISTING_NETWORK
-    export EXISTING_NETWORK_RG=`az network vnet list | jq --arg VNET_NAME $VNET_NAME '.[] | select(.name==$VNET_NAME).resourceGroup' | tr -d '"'`
-    log " EXISTING_NETWORK_RG: $EXISTING_NETWORK_RG"
+    # Domain name with private dns - only available for UPI
+    if [[ $PRIVATE_CLUSTER == "true" ]]; then
+        export private_or_public_cluster="private"
+        export BASE_DOMAIN_RG_NAME=`az network private-dns zone list | jq --arg DNS_ZONE $DNS_ZONE '.[] | select(.name==$DNS_ZONE).resourceGroup' | tr -d '"'`
+         log " UPI PRIVATE CLUSTER - BASE_DOMAIN_RG_NAME: $BASE_DOMAIN_RG_NAME"
+      else
+         export private_or_public_cluster="public"
+         export BASE_DOMAIN_RG_NAME=`az network dns zone list | jq --arg DNS_ZONE $DNS_ZONE '.[] | select(.name==$DNS_ZONE).resourceGroup' | tr -d '"'`
+         log " UPI PUBLIC CLUSTER - BASE_DOMAIN_RG_NAME: $BASE_DOMAIN_RG_NAME"
+      fi
+
+       VNET_NAME=$EXISTING_NETWORK
+       export EXISTING_NETWORK_RG=`az network vnet list | jq --arg VNET_NAME $VNET_NAME '.[] | select(.name==$VNET_NAME).resourceGroup' | tr -d '"'`
+        #Assign the nsg name
+      # export nsg_name=`az network vnet subnet list --resource-group $EXISTING_NETWORK_RG --vnet-name  $VNET_NAME|jq '.[0] | select(.name).networkSecurityGroup.id'|awk -F'/' '{print $9}'|tr -d '"'`
+        #Assign the network subnet
+       export  master_subnet_name=`az network vnet subnet list --resource-group $EXISTING_NETWORK_RG --vnet-name $VNET_NAME|jq '.[] | select(.name).name'|grep master|tr -d '"'`
+       export  worker_subnet_name=`az network vnet subnet list --resource-group $EXISTING_NETWORK_RG --vnet-name $VNET_NAME|jq '.[] | select(.name).name'|grep worker|tr -d '"'`
+       log " MASTER SUBNET NAME: $master_subnet_name "
+       log " WORKER SUBNET NAME: $worker_subnet_name"
+     #  log " NSG NAME: $nsg_name"
+       log " EXISTING_NETWORK_RG: $EXISTING_NETWORK_RG"
   fi
 fi
 
@@ -397,7 +450,6 @@ else
   PRE_VALIDATION=pass
 fi
 log "===== PRE-VALIDATION COMPLETED ($PRE_VALIDATION) ====="
-
 
 # Perform the MAS deployment only if pre-validation checks are passed
 if [[ $PRE_VALIDATION == "pass" ]]; then
@@ -448,15 +500,15 @@ if [[ $PRE_VALIDATION == "pass" ]]; then
   chmod 600 $OPENSHIFT_PULL_SECRET_FILE_PATH
 
   ## Installing the collection depending on ENV_TYPE
-  if [[ $CLUSTER_TYPE == "aws" ]]; then
+  if [[ ($CLUSTER_TYPE == "aws") || ($CLUSTER_TYPE == "gcp") ]]; then
     if [[ $ENV_TYPE == "dev" ]]; then
-      echo "=== Building and Installing Ansible Collection Locally ==="
+      log "=== Building and Installing Ansible Collection Locally ==="
       cd $GIT_REPO_HOME/../ibm/mas_devops
       ansible-galaxy collection build
-      ansible-galaxy collection install ibm-mas_devops-*.tar.gz
-      echo "=== Ansible Collection built and installed locally Successfully ==="
+      ansible-galaxy collection install --force ibm-mas_devops-*.tar.gz
+      log "=== Ansible Collection built and installed locally Successfully ==="
     else
-      echo "MAS_DEVOPS_COLLECTION_VERSION=$MAS_DEVOPS_COLLECTION_VERSION"
+      log "MAS_DEVOPS_COLLECTION_VERSION=$MAS_DEVOPS_COLLECTION_VERSION"
       log "==== Installing Ansible Collection ===="
       ansible-galaxy collection install ibm.mas_devops:==${MAS_DEVOPS_COLLECTION_VERSION}
       log "==== Installed Ansible Collection Successfully ===="
@@ -485,7 +537,6 @@ if [[ $PRE_VALIDATION == "pass" ]]; then
     export MESSAGE_TEXT="Please import the attached certificate into the browser to access MAS UI."
     export OPENSHIFT_CLUSTER_CONSOLE_URL="https:\/\/console-openshift-console.apps.${CLUSTER_NAME}.${BASE_DOMAIN}"
     export OPENSHIFT_CLUSTER_API_URL="https:\/\/api.${CLUSTER_NAME}.${BASE_DOMAIN}:6443"
-    export OPENSHIFT_CLUSTER_API_URL="https:\/\/api.${CLUSTER_NAME}.${BASE_DOMAIN}:6443"
     export MAS_URL_INIT_SETUP="https:\/\/admin.${RANDOM_STR}.apps.${CLUSTER_NAME}.${BASE_DOMAIN}\/initialsetup"
     export MAS_URL_ADMIN="https:\/\/admin.${RANDOM_STR}.apps.${CLUSTER_NAME}.${BASE_DOMAIN}"
     export MAS_URL_WORKSPACE="https:\/\/$MAS_WORKSPACE_ID.home.${RANDOM_STR}.apps.${CLUSTER_NAME}.${BASE_DOMAIN}"
@@ -498,7 +549,7 @@ if [[ $PRE_VALIDATION == "pass" ]]; then
   else
     mark_provisioning_failed $retcode
      if [[ $retcode -eq 2 ]]; then
-          log "OCP Creation Successful ,Suite Deployment failed"
+          log "OCP Creation Successful, Suite Deployment failed"
           log "===== PROVISIONING COMPLETED ====="
           export STATUS=FAILURE
           export STATUS_MSG="OCP Creation Successful,Failed in the Ansible playbook execution"
@@ -511,7 +562,6 @@ if [[ $PRE_VALIDATION == "pass" ]]; then
           RESP_CODE=2
         fi
   fi
-
 fi
 
 log " STATUS=$STATUS"
@@ -545,6 +595,10 @@ if [[ $CLUSTER_TYPE == "aws" ]]; then
 elif [[ $CLUSTER_TYPE == "azure" ]]; then
   # Upload the log file to blob storage
   az storage blob upload --account-name ${STORAGE_ACNT_NAME} --container-name masocpcontainer --name ocp-cluster-provisioning-deployment-context/mas-provisioning.log --file $GIT_REPO_HOME/mas-provisioning.log
+elif [[ $CLUSTER_TYPE == "gcp" ]]; then
+  # Upload the log files to cloud storage
+  gsutil cp $GIT_REPO_HOME/mas-provisioning.log gs://masocp-${RANDOM_STR}-bucket/ocp-cluster-provisioning-deployment-context/
+  gsutil cp /root/openshift-install/config/${CLUSTER_NAME}/.openshift_install.log gs://${RANDOM_STR}-bucket/ocp-cluster-provisioning-deployment-context/
 fi
 log "Shutting down VM in a minute"
 shutdown -P "+1"

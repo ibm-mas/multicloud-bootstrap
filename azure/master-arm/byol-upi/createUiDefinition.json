@@ -83,11 +83,11 @@
                 "label": "Application Settings",
                 "elements": [
                     {
-                        "name": "publicDomain",
+                        "name": "HostedDomain",
                         "type": "Microsoft.Common.TextBox",
-                        "label": "Public domain",
+                        "label": "Hosted domain",
                         "defaultValue": "",
-                        "toolTip": "Provide the public App Service domain that you created in the App Service Domains, for example: mas4aws.myorg.com",
+                        "toolTip": "Provide the public App Service domain /Private DNS zones that you created in the App Service Domains /Private DNS zones, for example: mas4azure.com",
                         "constraints": {
                             "required": true,
                             "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
@@ -100,7 +100,7 @@
                         "type": "Microsoft.Common.DropDown",
                         "label": "Offering type",
                         "defaultValue": "MAS Core + Cloud Pak for Data",
-                        "toolTip": "Select your preferred Suite offering type.",
+                        "toolTip": "Select your preferred Suite offering type.For MAS Core + Manage: If db2 values are not provided,db2 will be internally deployed",
                         "constraints": {
                             "allowedValues": [
                                 {
@@ -218,16 +218,47 @@
                         "type": "Microsoft.Common.TextBox",
                         "label": "VNet Name",
                         "defaultValue": "",
-                        "toolTip": "Vnet name eg.masocp-vnet",
+                        "toolTip": "VNet Name eg.masocp-vnet",
                         "constraints": {
                             "required": true,
                             "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
                             "validationMessage": "Contain lowercase letters only."
                         },
                         "visible": true
+                    },
+                    {
+                        "name": "vnetIdResourceGroup",
+                        "type": "Microsoft.Common.TextBox",
+                        "label": "VNet Name resource group",
+                        "defaultValue": "",
+                        "toolTip": "Resource group of VNet eg.masocp-vnet-rg",
+                        "constraints": {
+                            "required": true,
+                            "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
+                            "validationMessage": "Contain lowercase letters only."
+                        },
+                        "visible": true
+                    },
+                    {
+                        "name": "PrivateCluster",
+                        "type": "Microsoft.Common.DropDown",
+                        "label": "PrivateCluster",
+                        "defaultValue": "false",
+                        "toolTip": "Select true to create a private OpenShift cluster.",
+                        "constraints": {
+                            "allowedValues": [
+                                {
+                                    "label": "true",
+                                    "value": "true"
+                                },
+                                {
+                                    "label": "false",
+                                    "value": "false"
+                                }
+                            ]
+                        },
+                        "visible": true
                     }
-
-                    
                 ]
             },
             {
@@ -499,7 +530,7 @@
             "azureServicePrincipalClientId": "[basics('azureServicePrincipalClientId')]",
             "azureServicePrincipalClientSecret": "[basics('azureServicePrincipalClientSecret')]",
 
-            "publicDomain": "[steps('ApplicationSettings').publicDomain]",
+            "HostedDomain": "[steps('ApplicationSettings').HostedDomain]",
             "offeringType": "[steps('ApplicationSettings').offeringType]",
             "clusterSize": "[steps('ApplicationSettings').clusterSize]",
             "entitledRegistryKey": "[steps('ApplicationSettings').entitledRegistryKey]",
@@ -507,7 +538,8 @@
             "masLicenseUrl": "[steps('ApplicationSettings').masLicenseUrl]",
             "operationalMode": "[steps('ApplicationSettings').operationalMode]",
             "openShiftClustervnetId": "[steps('ExistingNetworkInfrastructure').openShiftClustervnetId]",
-
+            "PrivateCluster": "[steps('ExistingNetworkInfrastructure').PrivateCluster]",
+            "vnetIdResourceGroup": "[steps('ExistingNetworkInfrastructure').vnetIdResourceGroup]",
             "slsEndpointUrl": "[steps('ExistingInfrastructure').slsEndpointUrl]",
             "slsRegistrationKey": "[steps('ExistingInfrastructure').slsRegistrationKey]",
             "slsPublicCertificateUrl": "[steps('ExistingInfrastructure').slsPublicCertificateUrl]",

@@ -12,7 +12,7 @@ export KAFKA_STORAGE_CLASS=managed-premium
 SP_NAME="http://${CLUSTER_NAME}-sp"
 # SLS variables
 export SLS_STORAGE_CLASS=managed-premium
-# BAS variables
+# UDS variables
 export UDS_STORAGE_CLASS=managed-premium
 # CP4D variables
 export CPD_METADATA_STORAGE_CLASS=managed-premium
@@ -62,17 +62,11 @@ if [[ $OPENSHIFT_USER_PROVIDE == "false" ]]; then
   cd $GIT_REPO_HOME
 
   ## Create OCP cluster
-  if [[ $INSTALLATION_MODE == "IPI" ]]; then
     cd $GIT_REPO_HOME/azure
     set +e
     ./create-ocp-cluster.sh
     retcode=$?
-  else
-    cd $GIT_REPO_HOME/azure/upifiles
-    set +e
-    ./create-ocp-cluster-upi.sh
-    retcode=$?
-  fi
+
   if [[ $retcode -ne 0 ]]; then
       log "OCP cluster creation failed"
       exit 21
@@ -87,7 +81,7 @@ if [[ $OPENSHIFT_USER_PROVIDE == "false" ]]; then
   log "==== Adding PID limits to worker nodes ===="
   oc create -f $GIT_REPO_HOME/templates/container-runtime-config.yml
 
-  # Backup Terraform configuration
+  # Backup deployment context
   rm -rf /tmp/ansible-devops
   mkdir /tmp/ansible-devops
   cp -r * /tmp/ansible-devops
@@ -98,11 +92,11 @@ if [[ $OPENSHIFT_USER_PROVIDE == "false" ]]; then
   az storage blob upload --account-name ${STORAGE_ACNT_NAME} --container-name masocpcontainer --name ${DEPLOYMENT_CONTEXT_UPLOAD_PATH} --file ${BACKUP_FILE_NAME}
   retcode=$?
   if [[ $retcode -ne 0 ]]; then
-    log "Failed while uploading deployment context to blob storage3"
+    log "Failed while uploading deployment context to blob storage"
     exit 23
   fi
   set -e
-  log "OCP cluster Terraform configuration backed up at $DEPLOYMENT_CONTEXT_UPLOAD_PATH in file $CLUSTER_NAME.zip"
+  log "OCP cluster deployment context backed up at $DEPLOYMENT_CONTEXT_UPLOAD_PATH in file $CLUSTER_NAME.zip"
 
 else
   log "==== Existing OCP cluster provided, skipping the cluster creation, Bastion host creation and S3 upload of deployment context ===="
@@ -123,7 +117,7 @@ envsubst </tmp/dockerconfig.json >/tmp/.dockerconfigjson
 oc set data secret/pull-secret -n openshift-config --from-file=/tmp/.dockerconfigjson
 
 # Run ansible playbook to create azurefiles storage class
-log "=== Creating azurefiles-premium Storage class on OCP cluster ==="
+log "=== Creating azurefiles-premium Storage class , managed-premium Storage class on OCP cluster ==="
 cd $GIT_REPO_HOME/azure/azurefiles
 ./azurefiles-premium.sh
 retcode=$?
@@ -211,15 +205,28 @@ if [[ $DEPLOY_CP4D == "true" ]]; then
   log "==== CP4D deployment completed ===="
 fi
 
+## Deploy Manage
+if [[ $DEPLOY_MANAGE == "true" && (-z $MAS_JDBC_USER) && (-z $MAS_JDBC_PASSWORD) && (-z $MAS_JDBC_URL) && (-z $MAS_JDBC_CERT_URL) ]]; then
+  log "==== Configure internal db2 for manage started ===="
+  export ROLE_NAME=db2 && ansible-playbook ibm.mas_devops.run_role
+  export ROLE_NAME=suite_db2_setup_for_manage && ansible-playbook ibm.mas_devops.run_role
+  log "==== Configuration of internal db2 for manage completed ===="
+fi
+
 ## Create MAS Workspace
 log "==== MAS Workspace generation started ===="
 export ROLE_NAME=gencfg_workspace && ansible-playbook ibm.mas_devops.run_role
 log "==== MAS Workspace generation completed ===="
 
-if [[ $DEPLOY_MANAGE == "true" ]]; then
-  log "==== Configure JDBC  started ===="
+if [[ $DEPLOY_MANAGE == "true" && (-n $MAS_JDBC_USER) && (-n $MAS_JDBC_PASSWORD) && (-n $MAS_JDBC_URL) ]]; then
+  export SSL_ENABLED=false
+  if [ -n "$MAS_JDBC_CERT_URL" ]; then
+    log "MAS_JDBC_CERT_URL is not empty, setting SSL_ENABLED as true"
+    export SSL_ENABLED=true
+  fi
+  log "==== Configure JDBC started for external DB2 ==== SSL_ENABLED = $SSL_ENABLED"
   export ROLE_NAME=gencfg_jdbc && ansible-playbook ibm.mas_devops.run_role
-  log "==== Configure JDBC completed ===="
+  log "==== Configure JDBC completed for external DB2 ===="
 fi
 
 ## Deploy MAS
@@ -239,6 +246,7 @@ if [[ $DEPLOY_MANAGE == "true" ]]; then
 
   # Configure app to use the DB
   log "==== MAS Manage configure app started ===="
+  export MAS_APPWS_BINDINGS_JDBC="workspace-application"
   export ROLE_NAME=suite_app_config && ansible-playbook ibm.mas_devops.run_role
   log "==== MAS Manage configure app completed ===="
 fi

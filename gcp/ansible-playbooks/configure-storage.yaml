@@ -1,0 +1,6 @@
+---
+- name: Configure NFS storage
+  hosts: localhost
+  gather_facts: no 
+  roles:
+    - "{{ storage_type }}"

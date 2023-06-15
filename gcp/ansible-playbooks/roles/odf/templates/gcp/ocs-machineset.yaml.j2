@@ -1,0 +1,213 @@
+---
+apiVersion: machine.openshift.io/v1beta1
+kind: MachineSet
+metadata:
+  annotations:
+    machine.openshift.io/GPU: '0'
+    machine.openshift.io/memoryMb: '65536'
+    machine.openshift.io/vCPU: '16'
+  name: {{clusterid}}-workerocs-a
+  namespace: openshift-machine-api
+  labels:
+    machine.openshift.io/cluster-api-cluster: {{clusterid}}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      machine.openshift.io/cluster-api-cluster: {{clusterid}}
+      machine.openshift.io/cluster-api-machineset: {{clusterid}}-workerocs-a
+  template:
+    metadata:
+      labels:
+        machine.openshift.io/cluster-api-cluster: {{clusterid}}
+        machine.openshift.io/cluster-api-machine-role: worker
+        machine.openshift.io/cluster-api-machine-type: worker
+        machine.openshift.io/cluster-api-machineset: {{clusterid}}-workerocs-a
+    spec:
+      lifecycleHooks: {}
+      taints:
+      - effect: NoSchedule
+        key: node.ocs.openshift.io/storage
+        value: "true"
+      metadata:
+        labels:
+          cluster.ocs.openshift.io/openshift-storage: ""
+          node-role.kubernetes.io/infra: ""
+          node-role.kubernetes.io/worker: ""
+          role: storage-node
+      providerSpec:
+        value:
+          machineType: e2-standard-16
+          userDataSecret:
+            name: worker-user-data
+          deletionProtection: false
+          networkInterfaces:
+            - network: {{clusterid}}-network
+              subnetwork: {{clusterid}}-worker-subnet
+          credentialsSecret:
+            name: gcp-cloud-credentials
+          zone: {{region}}-a
+          canIPForward: false
+          metadata:
+            creationTimestamp: null
+          projectID: {{projectid}}
+          region: {{region}}
+          kind: GCPMachineProviderSpec
+          disks:
+            - autoDelete: true
+              boot: true
+              image: >-
+                projects/rhcos-cloud/global/images/rhcos-410-84-202207061638-0-gcp-x86-64
+              labels: null
+              sizeGb: 128
+              type: pd-ssd
+          tags:
+            - {{clusterid}}-worker
+          serviceAccounts:
+            - email: {{serviceaccount_email}}
+              scopes:
+                - 'https://www.googleapis.com/auth/cloud-platform'
+          apiVersion: machine.openshift.io/v1beta1
+
+---
+apiVersion: machine.openshift.io/v1beta1
+kind: MachineSet
+metadata:
+  annotations:
+    machine.openshift.io/GPU: '0'
+    machine.openshift.io/memoryMb: '65536'
+    machine.openshift.io/vCPU: '16'
+  name: {{clusterid}}-workerocs-b
+  namespace: openshift-machine-api
+  labels:
+    machine.openshift.io/cluster-api-cluster: {{clusterid}}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      machine.openshift.io/cluster-api-cluster: {{clusterid}}
+      machine.openshift.io/cluster-api-machineset: {{clusterid}}-workerocs-b
+  template:
+    metadata:
+      labels:
+        machine.openshift.io/cluster-api-cluster: {{clusterid}}
+        machine.openshift.io/cluster-api-machine-role: worker
+        machine.openshift.io/cluster-api-machine-type: worker
+        machine.openshift.io/cluster-api-machineset: {{clusterid}}-workerocs-b
+    spec:
+      lifecycleHooks: {}
+      taints:
+      - effect: NoSchedule
+        key: node.ocs.openshift.io/storage
+        value: "true"
+      metadata:
+        labels:
+          cluster.ocs.openshift.io/openshift-storage: ""
+          node-role.kubernetes.io/infra: ""
+          node-role.kubernetes.io/worker: ""
+          role: storage-node
+      providerSpec:
+        value:
+          machineType: e2-standard-16
+          userDataSecret:
+            name: worker-user-data
+          deletionProtection: false
+          networkInterfaces:
+            - network: {{clusterid}}-network
+              subnetwork: {{clusterid}}-worker-subnet
+          credentialsSecret:
+            name: gcp-cloud-credentials
+          zone: {{region}}-b
+          canIPForward: false
+          metadata:
+            creationTimestamp: null
+          projectID: {{projectid}}
+          region: {{region}}
+          kind: GCPMachineProviderSpec
+          disks:
+            - autoDelete: true
+              boot: true
+              image: >-
+                projects/rhcos-cloud/global/images/rhcos-410-84-202207061638-0-gcp-x86-64
+              labels: null
+              sizeGb: 128
+              type: pd-ssd
+          tags:
+            - {{clusterid}}-worker
+          serviceAccounts:
+            - email: {{serviceaccount_email}}
+              scopes:
+                - 'https://www.googleapis.com/auth/cloud-platform'
+          apiVersion: machine.openshift.io/v1beta1
+
+---
+apiVersion: machine.openshift.io/v1beta1
+kind: MachineSet
+metadata:
+  annotations:
+    machine.openshift.io/GPU: '0'
+    machine.openshift.io/memoryMb: '65536'
+    machine.openshift.io/vCPU: '16'
+  name: {{clusterid}}-workerocs-c
+  namespace: openshift-machine-api
+  labels:
+    machine.openshift.io/cluster-api-cluster: {{clusterid}}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      machine.openshift.io/cluster-api-cluster: {{clusterid}}
+      machine.openshift.io/cluster-api-machineset: {{clusterid}}-workerocs-c
+  template:
+    metadata:
+      labels:
+        machine.openshift.io/cluster-api-cluster: {{clusterid}}
+        machine.openshift.io/cluster-api-machine-role: worker
+        machine.openshift.io/cluster-api-machine-type: worker
+        machine.openshift.io/cluster-api-machineset: {{clusterid}}-workerocs-c
+    spec:
+      lifecycleHooks: {}
+      taints:
+      - effect: NoSchedule
+        key: node.ocs.openshift.io/storage
+        value: "true"
+      metadata:
+        labels:
+          cluster.ocs.openshift.io/openshift-storage: ""
+          node-role.kubernetes.io/infra: ""
+          node-role.kubernetes.io/worker: ""
+          role: storage-node
+      providerSpec:
+        value:
+          machineType: e2-standard-16
+          userDataSecret:
+            name: worker-user-data
+          deletionProtection: false
+          networkInterfaces:
+            - network: {{clusterid}}-network
+              subnetwork: {{clusterid}}-worker-subnet
+          credentialsSecret:
+            name: gcp-cloud-credentials
+          zone: {{region}}-c
+          canIPForward: false
+          metadata:
+            creationTimestamp: null
+          projectID: {{projectid}}
+          region: {{region}}
+          kind: GCPMachineProviderSpec
+          disks:
+            - autoDelete: true
+              boot: true
+              image: >-
+                projects/rhcos-cloud/global/images/rhcos-410-84-202207061638-0-gcp-x86-64
+              labels: null
+              sizeGb: 128
+              type: pd-ssd
+          tags:
+            - {{clusterid}}-worker
+          serviceAccounts:
+            - email: {{serviceaccount_email}}
+              scopes:
+                - 'https://www.googleapis.com/auth/cloud-platform'
+          apiVersion: machine.openshift.io/v1beta1
+

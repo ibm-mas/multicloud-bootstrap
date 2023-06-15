@@ -202,6 +202,32 @@
                         "visible": true
                     },
                     {
+                        "name": "BootNodeVnetId",
+                        "type": "Microsoft.Common.TextBox",
+                        "label": "BootNodeVnetId",
+                        "defaultValue": "",
+                        "toolTip": "Enter the Vnet Id to create the bootnode into.  If existing OpenShift cluster is specified,\n   make sure it is reachable from this Vnet.",
+                        "constraints": {
+                            "required": true,
+                            "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
+                            "validationMessage": "Contain letters, numbers and special characters only."
+                        },
+                        "visible": true
+                    },
+                    {
+                        "name": "BootNodeVnetResourceGroup",
+                        "type": "Microsoft.Common.TextBox",
+                        "label": "BootNodeVnetResourceGroup",
+                        "defaultValue": "",
+                        "toolTip": "Enter the BootNodeVnetId's resource group ",
+                        "constraints": {
+                            "required": true,
+                            "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
+                            "validationMessage": "Contain letters, numbers and special characters only."
+                        },
+                        "visible": true
+                    },
+                    {
                         "name": "slsEndpointUrl",
                         "type": "Microsoft.Common.TextBox",
                         "label": "SLS endpoint URL",
@@ -467,10 +493,12 @@
             "offeringType": "[steps('ApplicationSettings').offeringType]",
             "entitledRegistryKey": "[steps('ApplicationSettings').entitledRegistryKey]",
             "masLicenseUrl": "[steps('ApplicationSettings').masLicenseUrl]",
-	    "operationalMode": "[steps('ApplicationSettings').operationalMode]",
+	        "operationalMode": "[steps('ApplicationSettings').operationalMode]",
             "openShiftClusterApiUrl": "[steps('ExistingInfrastructure').openShiftClusterApiUrl]",
             "openShiftUser": "[steps('ExistingInfrastructure').openShiftUser]",
             "openShiftPwd": "[steps('ExistingInfrastructure').openShiftPwd]",
+            "BootNodeVnetId": "[steps('ExistingInfrastructure').BootNodeVnetId]",
+            "BootNodeVnetResourceGroup": "[steps('ExistingInfrastructure').BootNodeVnetResourceGroup]",
             "slsEndpointUrl": "[steps('ExistingInfrastructure').slsEndpointUrl]",
             "slsRegistrationKey": "[steps('ExistingInfrastructure').slsRegistrationKey]",
             "slsPublicCertificateUrl": "[steps('ExistingInfrastructure').slsPublicCertificateUrl]",

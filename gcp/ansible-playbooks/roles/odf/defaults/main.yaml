@@ -1,0 +1,31 @@
+odf_channel: "{{ lookup('env', 'ODF_CHANNEL') | default('stable-4.10', true) }}"
+odf_namespace: "{{ lookup('env', 'ODF_NAMESPACE') | default('openshift-storage', true) }}"
+odf_operator: "{{ lookup('env', 'ODF_OPERATOR') | default('odf-operator', true) }}"
+odf_startingcsv: "{{ lookup('env', 'ODF_STARTINGCSV') | default('odf-operator.v4.10.7', true) }}"
+
+# Cloud Platform variable
+ipi_platform: "{{ lookup('env', 'IPI_PLATFORM') | default('gcp', true) }}"
+# StorageSystem variables
+odf_storagesystem_name: "{{ lookup('env', 'ODF_STORAGESYSTEM') | default('ocs-storagecluster-storagesystem', true) }}"
+
+# OCS StorageCluster variables 
+ocs_storagecluster_name: "{{ lookup('env', 'OCS_STORAGECLUSTER') | default('ocs-storagecluster', true) }}"
+ocs_storagecluster_storage_size: "{{ lookup('env', 'OCS_STORAGECLUSTER_SIZE') | default('512Gi', true) }}"
+ocs_storagecluster_deviceset_name: "{{ lookup('env', 'OCS_STORAGECLUSTER_DEVICESET') | default('ocs-deviceset-gcp-pd-ssd', true) }}"
+ocs_storagecluster_storageclass_name: "{{ lookup('env', 'OCS_STORAGECLUSTER_STORAGECLASS') | default('gce-pd-ssd', true) }}"
+ocs_storagecluster_version: "{{ lookup('env', 'OCS_STORAGECLUSTER_VERSION') | default('4.10.0', true) }}"
+ocs_storagecluster_replicas: "{{ lookup('env', 'OCS_STORAGECLUSTER_REPLICA') | default(3, true) }}"
+ocs_storagecluster_accessmode: "{{ lookup('env', 'OCS_STORAGECLUSTER_ACCESSMODE') | default('ReadWriteOnce', true) }}"
+
+# OCS machineset variables
+clusterid: "{{ lookup('env', 'CLUSTER_ID') }}"
+region: "{{ lookup('env', 'REGION') }}"
+
+#GCP machineset variables
+projectid: "{{ lookup('env', 'GCP_PROJECT_ID') }}"
+serviceaccount_email: "{{ lookup('env', 'GCP_SERVICEACC_EMAIL') }}"
+
+# Azure MachineSet variables
+vnet_rg : "{{ lookup('env', 'VNET_RG') }}"
+worker_subnet: "{{ lookup('env', 'WORKER_SUBNET_NAME') }}"
+vnet_name: "{{ lookup('env', 'VNET_NAME') }}"
