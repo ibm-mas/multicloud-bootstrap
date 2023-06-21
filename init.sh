@@ -220,21 +220,26 @@ if [[ $CLUSTER_TYPE == "aws" ]]; then
 elif [[ $CLUSTER_TYPE == "azure" ]]; then
   export CPD_PRIMARY_STORAGE_CLASS="azurefiles-premium"
 fi
+# DB2WH variables
 export CPD_OPERATORS_NAMESPACE="ibm-cpd-operators-${RANDOM_STR}"
 export CPD_INSTANCE_NAMESPACE="ibm-cpd-${RANDOM_STR}"
 #CPD_SERVICES_NAMESPACE is used in roles - cp4d, cp4dv3_install, cp4dv3_install_services and suite_dns
 export CPD_SERVICES_NAMESPACE="cpd-services-${RANDOM_STR}"
-# DB2WH variables
+export DB2WH_INSTANCE_NAME="db2wh-cpd-${RANDOM_STR}"
+export DB2WH_VERSION="11.5.8.0-CN1"
 export DB2_META_STORAGE_CLASS=$CPD_PRIMARY_STORAGE_CLASS
 export DB2_DATA_STORAGE_CLASS=$CPD_PRIMARY_STORAGE_CLASS
 export DB2_BACKUP_STORAGE_CLASS=$CPD_PRIMARY_STORAGE_CLASS
 export DB2_LOGS_STORAGE_CLASS=$CPD_PRIMARY_STORAGE_CLASS
 export DB2_TEMP_STORAGE_CLASS=$CPD_PRIMARY_STORAGE_CLASS
+export CPD_SERVICE_NAME="db2wh"
+
 export DB2_INSTANCE_NAME=db2wh-db01
 export DB2_VERSION=11.5.7.0-cn2
 export ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
 # not reqd its hardcoded as db2_namespace: db2u
-#export DB2WH_NAMESPACE="cpd-services-${RANDOM_STR}"
+export DB2WH_NAMESPACE="cpd-services-${RANDOM_STR}"
+export DB2WH_JDBC_USERNAME="db2inst1"
 # MAS variables
 export MAS_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
 export MAS_WORKSPACE_ID="wsmasocp"
