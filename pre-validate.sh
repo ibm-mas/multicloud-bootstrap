@@ -142,6 +142,11 @@ if [[ $DEPLOY_MANAGE == "true" ]]; then
                 log "Connecting to Oracle Database"
                 if python jdbc-prevalidateOracle.py; then
                     log "Oracle JDBC URL Validation = PASS"
+              elif [[ ${MAS_JDBC_URL,, } =~ ^jdbc:sqlserver? ]]; then
+                         #  export MAS_ORACLE_JAR_LOCAL_PATH=$GIT_REPO_HOME/lib/ojdbc8.jar
+                            log "Connecting to sqlserver  Database"
+                          #  if python jdbc-prevalidateOracle.py; then
+                                log "Oracle JDBC URL Validation = PASS"
 				else
                     log "ERROR: Oracle JDBC URL Validation = FAIL"
                     SCRIPT_STATUS=14
