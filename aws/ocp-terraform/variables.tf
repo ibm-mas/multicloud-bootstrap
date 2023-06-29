@@ -35,31 +35,31 @@ variable "new_or_existing_vpc_subnet" {
 ##############################
 variable "vpc_cidr" {
   description = "The CIDR block for the VPC, e.g: 10.0.0.0/16"
-  default     = "10.0.0.0/16"
+  default     = "17.0.0.0/16"
 }
 
 variable "master_subnet_cidr1" {
-  default = "10.0.0.0/20"
+  default = "17.0.0.0/20"
 }
 
 variable "master_subnet_cidr2" {
-  default = "10.0.16.0/20"
+  default = "17.0.16.0/20"
 }
 
 variable "master_subnet_cidr3" {
-  default = "10.0.32.0/20"
+  default = "17.0.32.0/20"
 }
 
 variable "worker_subnet_cidr1" {
-  default = "10.0.128.0/20"
+  default = "17.0.128.0/20"
 }
 
 variable "worker_subnet_cidr2" {
-  default = "10.0.144.0/20"
+  default = "17.0.144.0/20"
 }
 
 variable "worker_subnet_cidr3" {
-  default = "10.0.160.0/20"
+  default = "17.0.160.0/20"
 }
 
 ##############################
