@@ -436,25 +436,6 @@ if [[ $CLUSTER_TYPE == "azure" ]]; then
 fi
 
 cd $GIT_REPO_HOME
-log "==== aws/deploy.sh : Invoke db2-create-vpc-peer.sh starts ===="
-    log "Existing instance of db2 @ VPC_ID=$DB2ProvisionedVPCId"
-    export ACCEPTER_VPC_ID=${DB2ProvisionedVPCId}
-    export REQUESTER_VPC_ID=${BOOTNODE_VPC_ID}
-
-    sh $GIT_REPO_HOME/aws/db2-create-vpc-peer.sh
-    log "==== aws/deploy.sh : Invoke db2-create-vpc-peer.sh ends ===="
-
-     export MAS_DB2_JAR_LOCAL_PATH=$GIT_REPO_HOME/lib/db2jcc4.jar
-            if [[ ${MAS_JDBC_URL,, } =~ ^jdbc:db2? ]]; then
-                log "Connecting to DB2 Database"
-                if python jdbc-prevalidateDB2.py; then
-                    log "Db2 JDBC URL Validation = PASS"
-                else
-                    log "ERROR: Db2 JDBC URL Validation = FAIL"
-                    SCRIPT_STATUS=14
-                fi
-                fi
-
 # Perform prevalidation checks
 log "===== PRE-VALIDATION STARTED ====="
 ./pre-validate.sh
