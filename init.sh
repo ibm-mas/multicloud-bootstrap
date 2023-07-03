@@ -66,7 +66,8 @@ export MONGO_HOSTS=${57}
 export MONGO_CA_PEM_FILE=${58}
 export DOCUMENTDB_VPC_ID=${59}
 export AWS_MSK_PROVIDER=${60}
-export ENV_TYPE=${61}
+export DB2ProvisionedVPCId=${61}
+export ENV_TYPE=${62}
 export GIT_REPO_HOME=$(pwd)
 # Load helper functions
 . helper.sh
@@ -302,6 +303,7 @@ esac
 log "Below are common deployment parameters,"
 log " OPERATIONAL_MODE: $OPERATIONAL_MODE"
 log " AWS_MSK_PROVIDER: $AWS_MSK_PROVIDER"
+log " DB2ProvisionedVPCId: $DB2ProvisionedVPCId"
 log " CLUSTER_TYPE: $CLUSTER_TYPE"
 log " OFFERING_TYPE: $OFFERING_TYPE"
 log " DEPLOY_REGION: $DEPLOY_REGION"
