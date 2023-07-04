@@ -68,7 +68,6 @@ echo "Unique string: $UNIQSTR"
 az group create --name masocp-bootnode-vm-rg-${UNIQSTR} --location eastus2
 
 output=$(az vm create --resource-group masocp-bootnode-vm-rg-${UNIQSTR} --name bootnode-prep --image RedHat:RHEL:92-gen2:latest --admin-username azureuser --ssh-key-values "$SSH_KEY" --size Standard_D2ads_v5 --public-ip-sku Standard)
-az vm disk attach -g masocp-bootnode-vm-rg-${UNIQSTR}  --vm-name $output  --name myDataDisk --new  --size-gb 50
 
 echo $output
 vmip=$(echo $output | jq '.publicIpAddress' | tr -d '"')

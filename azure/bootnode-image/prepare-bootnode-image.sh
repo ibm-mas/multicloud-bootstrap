@@ -94,6 +94,14 @@ unzip terraform_${TERRAFORM_VER}_linux_amd64.zip
 mv terraform /usr/local/bin/
 rm -rf terraform_${TERRAFORM_VER}_linux_amd64.zip
 
+#Installig cpd-cli for db2wh
+
+
+wget https://github.com/IBM/cpd-cli/releases/download/v12.0.3/cpd-cli-linux-SE-12.0.3.tgz
+tar -zvzf cpd-cli-linux-SE-12.0.3.tgz
+mv cpd-cli /usr/local/bin/
+rm -rf cpd-cli-linux-SE-12.0.3.tgz
+
 ## Install Ansible
 pip3 install ansible
 pip3 install openshift
