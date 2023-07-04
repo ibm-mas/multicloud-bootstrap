@@ -533,7 +533,7 @@ if [[ $PRE_VALIDATION == "pass" ]]; then
   cd $CLUSTER_TYPE
   ./deploy.sh
   retcode=$?
-if [[ $DEPLOY_CP4D == "true" ]]; then
+if [[ $DEPLOY_CP4D == "true" &&  ($retcode -eq 0)]]; then
   log "==== CP4D db2 warehouse service enablement starts ===="
  ./cpd_vars.sh
  log "==== CP4D db2 warehouse service enablement completes ===="

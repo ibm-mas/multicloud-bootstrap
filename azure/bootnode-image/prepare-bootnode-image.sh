@@ -102,8 +102,8 @@ tar -zvxf cpd-cli-linux-SE-12.0.3.tgz
 rm -rf cpd-cli-linux-SE-12.0.3.tgz
 cd cpd-cli-linux-SE-12.0.3-43
 chmod +x cpd-cli
-mv cpd-cli /usr/local/bin/
-
+mv * /usr/local/bin/
+cd ..
 
 ## Install Ansible
 pip3 install ansible

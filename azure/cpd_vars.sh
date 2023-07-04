@@ -75,7 +75,15 @@ export VERSION=$CPD_PRODUCT_VERSION
 # To export the variable, you must uncomment the command.
 
 # export COMPONENTS=cpfs,scheduler,cpd_platform,<component-ID>
-
+echo $OCP_URL
+echo $OPENSHIFT_TYPE
+echo $IMAGE_ARCH
+echo $OCP_USERNAME
+echo $OCP_PASSWORD
+echo $PROJECT_CPFS_OPS
+echo $PROJECT_CPD_OPS
+echo $PROJECT_CATSRC
+echo $PROJECT_CPD_INSTANCE
 
 cpd-cli manage login-to-ocp --username=${OCP_USERNAME}  --password=${OCP_PASSWORD} --server=${OCP_URL}
 cpd-cli manage apply-olm --release=${VERSION} --cpd_operator_ns=${PROJECT_CPD_OPS} --components=db2wh
