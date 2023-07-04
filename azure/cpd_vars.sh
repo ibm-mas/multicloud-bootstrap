@@ -14,12 +14,12 @@
 # Cluster
 # ------------------------------------------------------------------------------
 
-export OCP_URL=https://api.masocp-igycll.masblrdomain.com:6443
+export OCP_URL=$OCP_SERVER
 export OPENSHIFT_TYPE=self-managed
 export IMAGE_ARCH=amd64
-export OCP_USERNAME=masocpuser
-export OCP_PASSWORD=mascll104032igy
-export OCP_TOKEN=sha256~0jqWJdtt1XVxeeGH7AZ8cUf9l30ZmlcvaqabNaRbNUg
+export OCP_USERNAME=$OCP_USERNAME
+export OCP_PASSWORD=$OCP_PASSWORD
+#export OCP_TOKEN=sha256~0jqWJdtt1XVxeeGH7AZ8cUf9l30ZmlcvaqabNaRbNUg
 
 
 # ------------------------------------------------------------------------------
@@ -27,9 +27,9 @@ export OCP_TOKEN=sha256~0jqWJdtt1XVxeeGH7AZ8cUf9l30ZmlcvaqabNaRbNUg
 # ------------------------------------------------------------------------------
 
 export PROJECT_CPFS_OPS=ibm-common-services
-export PROJECT_CPD_OPS=ibm-cpd-operators-igycll
+export PROJECT_CPD_OPS=ibm-cpd-operators-${RANDOM_STR}
 export PROJECT_CATSRC=openshift-marketplace
-export PROJECT_CPD_INSTANCE=ibm-cpd-igycll
+export PROJECT_CPD_INSTANCE=ibm-cpd-${RANDOM_STR}
 # export PROJECT_TETHERED=<enter the tethered project>
 
 
@@ -44,8 +44,7 @@ export STG_CLASS_FILE=azurefiles-premium
 # IBM Entitled Registry
 # ------------------------------------------------------------------------------
 
-export IBM_ENTITLEMENT_KEY=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJJQk0gTWFya2V0cGxhY2UiLCJpYXQiOjE2NDQ0MDk0MjIsImp0aSI6IjYwNzc2MzQzOGJhODQxMmNiZGRhNzVmNWM2MGEwNjIxIn0.A-9DGN1PAmw7x0opnrJnUpwhvfnsf2f-HAUByEWaLWY
-
+export IBM_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
 
 # ------------------------------------------------------------------------------
 # Private container registry
@@ -65,7 +64,7 @@ export IBM_ENTITLEMENT_KEY=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJJQk0g
 # Cloud Pak for Data version
 # ------------------------------------------------------------------------------
 
-export VERSION=4.6.3
+export VERSION=$CPD_PRODUCT_VERSION
 
 
 # ------------------------------------------------------------------------------
@@ -76,3 +75,9 @@ export VERSION=4.6.3
 # To export the variable, you must uncomment the command.
 
 # export COMPONENTS=cpfs,scheduler,cpd_platform,<component-ID>
+
+
+cpd-cli manage login-to-ocp --username=${OCP_USERNAME}  --password=${OCP_PASSWORD} --server=${OCP_URL}
+cpd-cli manage apply-olm --release=${VERSION} --cpd_operator_ns=${PROJECT_CPD_OPS} --components=db2wh
+cpd-cli manage apply-cr --components=db2wh --release=${VERSION} --cpd_instance_ns=${PROJECT_CPD_INSTANCE} --license_acceptance=true
+cpd-cli manage get-cr-status --cpd_instance_ns=${PROJECT_CPD_INSTANCE} --components=db2wh
