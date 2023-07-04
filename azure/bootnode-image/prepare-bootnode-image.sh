@@ -99,7 +99,7 @@ rm -rf terraform_${TERRAFORM_VER}_linux_amd64.zip
 
 wget https://github.com/IBM/cpd-cli/releases/download/v12.0.3/cpd-cli-linux-SE-12.0.3.tgz
 tar -zvxf cpd-cli-linux-SE-12.0.3.tgz
-cd cpd-cli-linux-SE-12.0.3
+cd cpd-cli-linux-SE-12.0.3-43
 mv cpd-cli /usr/local/bin/
 rm -rf cpd-cli-linux-SE-12.0.3.tgz
 
