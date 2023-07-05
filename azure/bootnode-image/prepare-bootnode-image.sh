@@ -63,7 +63,9 @@ rm -rf openshift-install-linux.tar.gz
 # Install Azure cli for rhel9
 rpm --import https://packages.microsoft.com/keys/microsoft.asc
 dnf install -y https://packages.microsoft.com/config/rhel/9.0/packages-microsoft-prod.rpm
-dnf install azure-cli -y
+#dnf install azure-cli -y
+#https://github.com/Azure/azure-cli/issues/26814
+dnf install azure-cli-2.49.0-1.el9 -y
 
 # Install AzureCopy cli
 wget -q https://aka.ms/downloadazcopy-v10-linux -O azcopy_linux_amd64.tar.gz
