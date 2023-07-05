@@ -533,14 +533,6 @@ if [[ $PRE_VALIDATION == "pass" ]]; then
   cd $CLUSTER_TYPE
   ./deploy.sh
   retcode=$?
-if [[ $DEPLOY_CP4D == "true" &&  ($retcode -eq 0)]]; then
-  log "==== CP4D db2 warehouse service enablement starts ===="
- ./cpd_vars.sh
- log "==== CP4D db2 warehouse service enablement completes ===="
-   retcode=$?
-fi
-
-
   log "Deployment return code is $retcode"
   if [[ $retcode -eq 0 ]]; then
     log "Deployment successful"
@@ -554,6 +546,11 @@ fi
     export MAS_URL_ADMIN="https:\/\/admin.${RANDOM_STR}.apps.${CLUSTER_NAME}.${BASE_DOMAIN}"
     export MAS_URL_WORKSPACE="https:\/\/$MAS_WORKSPACE_ID.home.${RANDOM_STR}.apps.${CLUSTER_NAME}.${BASE_DOMAIN}"
     cd ../
+    if [[ $DEPLOY_CP4D == "true" &&  ($retcode -eq 0)]]; then
+      log "==== CP4D db2 warehouse service enablement starts ===="
+     ./cpd_vars.sh
+     log "==== CP4D db2 warehouse service enablement completes ===="
+    fi
     ./get-product-versions.sh  #Execute the script to get the versions of various products
     # Create a secret in the Cloud to keep MAS access credentials
     cd $GIT_REPO_HOME
