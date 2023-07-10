@@ -242,6 +242,7 @@ export DB2WH_NAMESPACE="cpd-services-${RANDOM_STR}"
 export DB2WH_JDBC_USERNAME="db2inst1"
 # MAS variables
 export MAS_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
+export IBM_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
 export MAS_WORKSPACE_ID="wsmasocp"
 export MAS_WORKSPACE_NAME="wsmasocp"
 export MAS_CONFIG_SCOPE="wsapp"

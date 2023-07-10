@@ -283,7 +283,7 @@ Metadata:
 Mappings:
   RegionMap:
     us-east-1:
-      HVM64: ami-028c3019ed25237a4
+      HVM64: ami-0645cfae3e3b8078b
     us-east-2:
       HVM64: ami-0da4f91ded4bac1bd
     us-west-2:
