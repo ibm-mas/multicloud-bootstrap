@@ -197,13 +197,13 @@ EOT
   oc login -u $OCP_USERNAME -p $OCP_PASSWORD --server=https://api.${CLUSTER_NAME}.${BASE_DOMAIN}:6443
   log "==== Adding PID limits to worker nodes ===="
   oc create -f $GIT_REPO_HOME/templates/container-runtime-config.yml
-  log "==== Creating storage classes namely, gp2, ocs-storagecluster-ceph-rbd, ocs-storagecluster-cephfs, & openshift-storage.noobaa.io ===="
-  oc apply -f $GIT_REPO_HOME/aws/ocp-terraform/ocs/gp2.yaml
-  oc apply -f $GIT_REPO_HOME/aws/ocp-terraform/ocs/ocs-storagecluster-cephfs.yaml
-  oc apply -f $GIT_REPO_HOME/aws/ocp-terraform/ocs/ocs-storagecluster-ceph-rbd.yaml
-  oc apply -f $GIT_REPO_HOME/aws/ocp-terraform/ocs/openshift-storage.noobaa.io.yaml
-  # Ensure only gp2 is set as default storage class
-  oc patch storageclass gp3-csi -p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "false"}}}'
+  #PK log "==== Creating storage classes namely, gp2, ocs-storagecluster-ceph-rbd, ocs-storagecluster-cephfs, & openshift-storage.noobaa.io ===="
+  #PK oc apply -f $GIT_REPO_HOME/aws/ocp-terraform/ocs/gp2.yaml
+  #PK oc apply -f $GIT_REPO_HOME/aws/ocp-terraform/ocs/ocs-storagecluster-cephfs.yaml
+  #PK oc apply -f $GIT_REPO_HOME/aws/ocp-terraform/ocs/ocs-storagecluster-ceph-rbd.yaml
+  #PK oc apply -f $GIT_REPO_HOME/aws/ocp-terraform/ocs/openshift-storage.noobaa.io.yaml
+  #PK # Ensure only gp2 is set as default storage class
+  #PK oc patch storageclass gp3-csi -p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "false"}}}'
 
   ## Create bastion host
   cd $GIT_REPO_HOME/aws
@@ -269,6 +269,32 @@ set +e
 export ROLE_NAME=ibm_catalogs && ansible-playbook ibm.mas_devops.run_role
 export ROLE_NAME=common_services && ansible-playbook ibm.mas_devops.run_role
 export ROLE_NAME=cert_manager && ansible-playbook ibm.mas_devops.run_role
+
+
+log "========================================"
+log "==== Create EFS storage classs ===="
+log "==== CLUSTER_NAME=$CLUSTER_NAME ===="
+log "==== DEPLOY_REGION=$DEPLOY_REGION ===="
+log "==== RANDOM_STR=$RANDOM_STR ===="
+log "==== AWS_ACCESS_KEY_ID_ROSA=${AWS_ACCESS_KEY_ID_ROSA:0:8}<snip> ===="
+log "==== AWS_SECRET_ACCESS_KEY_ROSA=${AWS_SECRET_ACCESS_KEY_ROSA:0:8}<snip> ===="
+log "========================================"
+export CLUSTER_NAME=$CLUSTER_NAME
+export EFS_UNIQUE_ID=$RANDOM_STR
+export AWS_DEFAULT_REGION=$DEPLOY_REGION
+export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID_ROSA
+export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY_ROSA
+export ROLE_NAME=ocp_efs
+ansible-playbook ibm.mas_devops.run_role
+
+export MONGODB_STORAGE_CLASS=efs$RANDOM_STR
+export KAFKA_STORAGE_CLASS=efs$RANDOM_STR
+export SLS_STORAGE_CLASS=efs$RANDOM_STR
+export UDS_STORAGE_CLASS=efs$RANDOM_STR
+export CPD_METADATA_STORAGE_CLASS=efs$RANDOM_STR
+export CPD_SERVICE_STORAGE_CLASS=efs$RANDOM_STR
+log "========================================"
+
 if [[ $? -ne 0 ]]; then
   # One reason for this failure is catalog sources not having required state information, so recreate the catalog-operator pod
   # https://bugzilla.redhat.com/show_bug.cgi?id=1807128
