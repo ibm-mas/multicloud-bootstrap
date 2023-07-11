@@ -11,7 +11,7 @@ op_versions['kafkas.kafka.strimzi.io']=2.4.9
 op_versions['ocpVersion410']='^4\.([1][0])?(\.[0-9][0-9]+.*)*$'
 op_versions['ocpVersion411']='^4\.([1][1])?(\.[0-9][0-9]+.*)*$'
 op_versions['ocpVersion412']='^4\.([1][2])?(\.[0-9][0-9]+.*)*$'
-op_versions['rosaVersion']='^4\.([1][0])?(\.[0-9]+.*)*$'
+op_versions['rosaVersion']='^4\.([1][2])?(\.[0-9]+.*)*$'
 op_versions['cpd-platform-operator']=2.0.7
 op_versions['user-data-services-operator']=2.0.6
 op_versions['ibm-cert-manager-operator']=3.19.9
@@ -43,14 +43,14 @@ checkROSA(){
   		else
     		log " Unsupported ROSA version $currentOpenshiftVersion. Supported ROSA version is 4.10.x"
 			export SERVICE_NAME=" Unsupported ROSA version $currentOpenshiftVersion. Supported ROSA version is 4.10.x"
-			SCRIPT_STATUS=29
-			return $SCRIPT_STATUS
+			#SCRIPT_STATUS=29
+			#return $SCRIPT_STATUS
  		fi
 		log " DEPLOY_CP4D: $DEPLOY_CP4D"
 		export ROSA="true"
 		if [[ $DEPLOY_CP4D == "true" ]]; then
-			SCRIPT_STATUS=30
-			return $SCRIPT_STATUS
+			#SCRIPT_STATUS=30
+			#return $SCRIPT_STATUS
 		fi
 	fi
 
