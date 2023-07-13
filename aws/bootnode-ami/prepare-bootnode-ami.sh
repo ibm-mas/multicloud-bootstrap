@@ -71,6 +71,17 @@ wget https://s3.amazonaws.com/amazoncloudwatch-agent/redhat/amd64/latest/amazon-
 rpm -U ./amazon-cloudwatch-agent.rpm
 rm -rf amazon-cloudwatch-agent.rpm
 
+
+
+
+#Installig cpd-cli for db2wh
+wget https://github.com/IBM/cpd-cli/releases/download/v12.0.3/cpd-cli-linux-SE-12.0.3.tgz
+tar -zvxf cpd-cli-linux-SE-12.0.3.tgz
+rm -rf cpd-cli-linux-SE-12.0.3.tgz
+cd cpd-cli-linux-SE-12.0.3-43
+chmod +x cpd-cli
+mv * /usr/local/bin/
+
 # Remove the SSH keys
 rm -rf /home/ec2-user/.ssh/authorized_keys /root/.ssh/authorized_keys
 echo "Bootnode preparation completed"
