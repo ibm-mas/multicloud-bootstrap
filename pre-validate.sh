@@ -87,7 +87,7 @@ fi
 #fi
 
 # JDBC CFT inputs validation and connection test
-if [[ $DEPLOY_MANAGE == "true" ]]; then
+if [[ ($DEPLOY_MANAGE == "true") && (-z $DB2ProvisionedVPCId) ]]; then
     if [[ (-z $MAS_JDBC_USER) && (-z $MAS_JDBC_PASSWORD) && (-z $MAS_JDBC_URL) && (-z $MAS_JDBC_CERT_URL) ]]; then
         log "=== New internal DB2 database will be provisioned for MAS Manage deployment ==="
     else
@@ -133,9 +133,12 @@ if [[ $DEPLOY_MANAGE == "true" ]]; then
                 log "Connecting to DB2 Database"
                 if python jdbc-prevalidateDB2.py; then
                     log "Db2 JDBC URL Validation = PASS"
+                    log "Inside pre-validate.sh script file"
                 else
                     log "ERROR: Db2 JDBC URL Validation = FAIL"
+                    log "Inside pre-validate.sh script file"
                     SCRIPT_STATUS=14
+                    exit $SCRIPT_STATUS
                 fi
             elif [[ ${MAS_JDBC_URL,, } =~ ^jdbc:oracle? ]]; then
                 export MAS_ORACLE_JAR_LOCAL_PATH=$GIT_REPO_HOME/lib/ojdbc8.jar
@@ -153,7 +156,7 @@ if [[ $DEPLOY_MANAGE == "true" ]]; then
     fi
 fi
 
-#mongo pre-validation only for AWS currently. 
+#mongo pre-validation only for AWS currently.
 if [[ $CLUSTER_TYPE == "aws" ]]; then
     log "=== pre-validate-mongo.sh started ==="
     sh $GIT_REPO_HOME/mongo/pre-validate-mongo.sh
