@@ -308,6 +308,28 @@ if [[ -z $VPC_ID && $MONGO_FLAVOR == "Amazon DocumentDB" ]]; then
 fi
 export AWS_REGION=$DEPLOY_REGION
 
+if [[ -n $DB2ProvisionedVPCId ]]; then
+cd $GIT_REPO_HOME
+log "==== aws/deploy.sh : Invoke db2-create-vpc-peer.sh starts ===="
+    log "Existing instance of db2 @ VPC_ID=$DB2ProvisionedVPCId"
+    export ACCEPTER_VPC_ID=${DB2ProvisionedVPCId}
+    export REQUESTER_VPC_ID=${VPC_ID}
+
+    sh $GIT_REPO_HOME/aws/db2/db2-create-vpc-peer.sh
+    log "==== aws/deploy.sh : Invoke db2-create-vpc-peer.sh ends ===="
+
+     export MAS_DB2_JAR_LOCAL_PATH=$GIT_REPO_HOME/lib/db2jcc4.jar
+            if [[ ${MAS_JDBC_URL,, } =~ ^jdbc:db2? ]]; then
+                log "Connecting to DB2 Database"
+                if python jdbc-prevalidateDB2.py; then
+                    log "Db2 JDBC URL Validation = PASS"
+                else
+                    log "ERROR: Db2 JDBC URL Validation = FAIL"
+                    SCRIPT_STATUS=14
+                fi
+                fi
+ fi
+
 log "==== MONGO_USE_EXISTING_INSTANCE = ${MONGO_USE_EXISTING_INSTANCE}"
 if [[ $MONGO_USE_EXISTING_INSTANCE == "true" ]]; then
   if [[ $MONGO_FLAVOR == "Amazon DocumentDB" ]]; then
