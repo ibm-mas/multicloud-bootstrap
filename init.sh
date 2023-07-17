@@ -549,7 +549,7 @@ if [[ $PRE_VALIDATION == "pass" ]]; then
     cd ../
     if [[ $DEPLOY_CP4D == "true" &&  ($retcode -eq 0)]]; then
       log "==== CP4D db2 warehouse service enablement starts ===="
-     ./cpd_vars.sh
+   #  ./cpd_vars.sh
      log "==== CP4D db2 warehouse service enablement completes ===="
     fi
     ./get-product-versions.sh  #Execute the script to get the versions of various products
