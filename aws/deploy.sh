@@ -317,10 +317,6 @@ log "==== aws/deploy.sh : Invoke db2-create-vpc-peer.sh starts ===="
 
     sh $GIT_REPO_HOME/aws/db2/db2-create-vpc-peer.sh
     log "==== aws/deploy.sh : Invoke db2-create-vpc-peer.sh ends ===="
-
-     if [[ (-z $MAS_JDBC_USER) && (-z $MAS_JDBC_PASSWORD) && (-z $MAS_JDBC_URL) && (-z $MAS_JDBC_CERT_URL) ]]; then
-        log "=== New internal DB2 database will be provisioned for MAS Manage deployment ==="
-    else
         if [ -z "$MAS_JDBC_USER" ]; then
             log "ERROR: Database username is not specified"
             SCRIPT_STATUS=14
@@ -348,16 +344,7 @@ log "==== aws/deploy.sh : Invoke db2-create-vpc-peer.sh starts ===="
                 elif [[ ${MAS_JDBC_CERT_URL,,} =~ ^https? ]]; then
                     wget "$MAS_JDBC_CERT_URL" -O db.crt
                 fi
-            elif [[ $CLUSTER_TYPE == "azure" ]]; then
-                # https://myaccount.blob.core.windows.net/mycontainer/myblob regex
-                if [[ ${MAS_JDBC_CERT_URL,,} =~ ^https://.+blob\.core\.windows\.net.+ ]]; then
-                    azcopy copy "$MAS_JDBC_CERT_URL" db.crt
-                elif [[ ${MAS_JDBC_CERT_URL,,} =~ ^https? ]]; then
-                    wget "$MAS_JDBC_CERT_URL" -O db.crt
-                fi
-            elif [[ $CLUSTER_TYPE == "gcp" ]]; then
-                wget "$MAS_JDBC_CERT_URL" -O db.crt
-            fi
+           		fi
             export MAS_DB2_JAR_LOCAL_PATH=$GIT_REPO_HOME/lib/db2jcc4.jar
             if [[ ${MAS_JDBC_URL,, } =~ ^jdbc:db2? ]]; then
                 log "Connecting to DB2 Database"
@@ -371,7 +358,7 @@ log "==== aws/deploy.sh : Invoke db2-create-vpc-peer.sh starts ===="
                     exit $SCRIPT_STATUS
                 fi
  fi
-
+ fi
 log "==== MONGO_USE_EXISTING_INSTANCE = ${MONGO_USE_EXISTING_INSTANCE}"
 if [[ $MONGO_USE_EXISTING_INSTANCE == "true" ]]; then
   if [[ $MONGO_FLAVOR == "Amazon DocumentDB" ]]; then
@@ -643,4 +630,5 @@ if [[ $DEPLOY_MANAGE == "true" ]]; then
   export MAS_APPWS_BINDINGS_JDBC="workspace-application"
   export ROLE_NAME=suite_app_config && ansible-playbook ibm.mas_devops.run_role
   log "==== MAS Manage configure app completed ===="
+fi
 fi
