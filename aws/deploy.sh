@@ -318,15 +318,57 @@ log "==== aws/deploy.sh : Invoke db2-create-vpc-peer.sh starts ===="
     sh $GIT_REPO_HOME/aws/db2/db2-create-vpc-peer.sh
     log "==== aws/deploy.sh : Invoke db2-create-vpc-peer.sh ends ===="
 
-     export MAS_DB2_JAR_LOCAL_PATH=$GIT_REPO_HOME/lib/db2jcc4.jar
+     if [[ (-z $MAS_JDBC_USER) && (-z $MAS_JDBC_PASSWORD) && (-z $MAS_JDBC_URL) && (-z $MAS_JDBC_CERT_URL) ]]; then
+        log "=== New internal DB2 database will be provisioned for MAS Manage deployment ==="
+    else
+        if [ -z "$MAS_JDBC_USER" ]; then
+            log "ERROR: Database username is not specified"
+            SCRIPT_STATUS=14
+        elif [ -z "$MAS_JDBC_PASSWORD" ]; then
+            log "ERROR: Database password is not specified"
+            SCRIPT_STATUS=14
+        elif [ -z "$MAS_JDBC_URL" ]; then
+            log "ERROR: Database connection url is not specified"
+            SCRIPT_STATUS=14
+        else
+            log "Downloading DB certificate"
+            cd $GIT_REPO_HOME
+            if [[ $CLUSTER_TYPE == "aws" ]]; then
+                if [[ ${MAS_JDBC_CERT_URL,,} =~ ^s3 ]]; then
+                    aws s3 cp "$MAS_JDBC_CERT_URL" db.crt --region us-east-1
+                    ret=$?
+        		if [ $ret -ne 0 ]; then
+        			aws s3 cp "$MAS_JDBC_CERT_URL" db.crt --region $DEPLOY_REGION
+        			ret=$?
+        		if [ $ret -ne 0 ]; then
+            		log "Invalid DB certificate URL"
+            		SCRIPT_STATUS=31
+        		fi
+        		fi
+                elif [[ ${MAS_JDBC_CERT_URL,,} =~ ^https? ]]; then
+                    wget "$MAS_JDBC_CERT_URL" -O db.crt
+                fi
+            elif [[ $CLUSTER_TYPE == "azure" ]]; then
+                # https://myaccount.blob.core.windows.net/mycontainer/myblob regex
+                if [[ ${MAS_JDBC_CERT_URL,,} =~ ^https://.+blob\.core\.windows\.net.+ ]]; then
+                    azcopy copy "$MAS_JDBC_CERT_URL" db.crt
+                elif [[ ${MAS_JDBC_CERT_URL,,} =~ ^https? ]]; then
+                    wget "$MAS_JDBC_CERT_URL" -O db.crt
+                fi
+            elif [[ $CLUSTER_TYPE == "gcp" ]]; then
+                wget "$MAS_JDBC_CERT_URL" -O db.crt
+            fi
+            export MAS_DB2_JAR_LOCAL_PATH=$GIT_REPO_HOME/lib/db2jcc4.jar
             if [[ ${MAS_JDBC_URL,, } =~ ^jdbc:db2? ]]; then
                 log "Connecting to DB2 Database"
                 if python jdbc-prevalidateDB2.py; then
                     log "Db2 JDBC URL Validation = PASS"
+                    log "Inside pre-validate.sh script file"
                 else
                     log "ERROR: Db2 JDBC URL Validation = FAIL"
+                    log "Inside pre-validate.sh script file"
                     SCRIPT_STATUS=14
-                fi
+                    exit $SCRIPT_STATUS
                 fi
  fi
 
