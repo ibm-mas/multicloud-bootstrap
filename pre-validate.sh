@@ -87,7 +87,16 @@ fi
 #fi
 
 # JDBC CFT inputs validation and connection test
-if [[ ($DEPLOY_MANAGE == "true") && (-z $DB2ProvisionedVPCId) ]]; then
+if [[ ($DEPLOY_MANAGE == "true") && (-n $DB2ProvisionedVPCId) ]]; then
+cd $GIT_REPO_HOME
+log "==== aws/deploy.sh : Invoke db2-create-vpc-peer.sh starts ===="
+    log "Existing instance of db2 @ VPC_ID=$DB2ProvisionedVPCId"
+    export ACCEPTER_VPC_ID=${DB2ProvisionedVPCId}
+    export REQUESTER_VPC_ID=${BOOTNODE_VPC_ID}
+
+    sh $GIT_REPO_HOME/aws/db2/db2-create-vpc-peer.sh
+    log "==== aws/deploy.sh : Invoke db2-create-vpc-peer.sh ends ===="
+elif [[ ($DEPLOY_MANAGE == "true") && (-z $DB2ProvisionedVPCId) ]]; then
     if [[ (-z $MAS_JDBC_USER) && (-z $MAS_JDBC_PASSWORD) && (-z $MAS_JDBC_URL) && (-z $MAS_JDBC_CERT_URL) ]]; then
         log "=== New internal DB2 database will be provisioned for MAS Manage deployment ==="
     else
