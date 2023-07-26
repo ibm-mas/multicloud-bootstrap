@@ -138,7 +138,7 @@ if [[ $DEPLOY_MANAGE == "true" ]]; then
                     log "ERROR: Db2 JDBC URL Validation = FAIL"
                     SCRIPT_STATUS=14
                 fi
-             elif [[ ${MAS_JDBC_URL,, } =~ ^jdbc::sql? ]]; then
+             elif [[ ${MAS_JDBC_URL,, } =~ ^jdbc:sql? ]]; then
                   log "Connecting to MSSQL Database"
                   export MAS_JAR_LOCAL_PATH=$GIT_REPO_HOME/lib/sqljdbc.jar
                   if python jdbc-prevalidateMssql.py; then
