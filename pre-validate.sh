@@ -107,29 +107,30 @@ if [[ $DEPLOY_MANAGE == "true" ]]; then
                 if [[ ${MAS_JDBC_CERT_URL,,} =~ ^s3 ]]; then
                     aws s3 cp "$MAS_JDBC_CERT_URL" db.crt --region us-east-1
                     ret=$?
-        		if [ $ret -ne 0 ]; then
-        			aws s3 cp "$MAS_JDBC_CERT_URL" db.crt --region $DEPLOY_REGION
-        			ret=$?
-        		if [ $ret -ne 0 ]; then
-            		log "Invalid DB certificate URL"
-            		SCRIPT_STATUS=31
-        		fi
-        		fi
+        		        if [ $ret -ne 0 ]; then
+        		          	aws s3 cp "$MAS_JDBC_CERT_URL" db.crt --region $DEPLOY_REGION
+        			          ret=$?
+        		            if [ $ret -ne 0 ]; then
+            	          	log "Invalid DB certificate URL"
+            	    	      SCRIPT_STATUS=31
+        		            fi
+        		         fi
                 elif [[ ${MAS_JDBC_CERT_URL,,} =~ ^https? ]]; then
                     wget "$MAS_JDBC_CERT_URL" -O db.crt
                 fi
             elif [[ $CLUSTER_TYPE == "azure" ]]; then
                 # https://myaccount.blob.core.windows.net/mycontainer/myblob regex
-                if [[ ${MAS_JDBC_CERT_URL,,} =~ ^https://.+blob\.core\.windows\.net.+ ]]; then
+                 if [[ ${MAS_JDBC_CERT_URL,,} =~ ^https://.+blob\.core\.windows\.net.+ ]]; then
                     azcopy copy "$MAS_JDBC_CERT_URL" db.crt
-                elif [[ ${MAS_JDBC_CERT_URL,,} =~ ^https? ]]; then
+                 elif [[ ${MAS_JDBC_CERT_URL,,} =~ ^https? ]]; then
                     wget "$MAS_JDBC_CERT_URL" -O db.crt
                 fi
             elif [[ $CLUSTER_TYPE == "gcp" ]]; then
                 wget "$MAS_JDBC_CERT_URL" -O db.crt
             fi
-            export MAS_DB2_JAR_LOCAL_PATH=$GIT_REPO_HOME/lib/db2jcc4.jar
+
             if [[ ${MAS_JDBC_URL,, } =~ ^jdbc:db2? ]]; then
+               export MAS_DB2_JAR_LOCAL_PATH=$GIT_REPO_HOME/lib/db2jcc4.jar
                 log "Connecting to DB2 Database"
                 if python jdbc-prevalidateDB2.py; then
                     log "Db2 JDBC URL Validation = PASS"
@@ -137,34 +138,35 @@ if [[ $DEPLOY_MANAGE == "true" ]]; then
                     log "ERROR: Db2 JDBC URL Validation = FAIL"
                     SCRIPT_STATUS=14
                 fi
+             elif [[ ${MAS_JDBC_URL,, } =~ ^jdbc::sql? ]]; then
+                  log "Connecting to MSSQL Database"
+                  export MAS_JAR_LOCAL_PATH=$GIT_REPO_HOME/lib/sqljdbc.jar
+                  if python jdbc-prevalidateMssql.py; then
+                     export MAS_APP_SETTINGS_DB2_SCHEMA="dto"
+                     export MAS_APP_SETTINGS_TABLESPACE="PRIMARY"
+                     export MAS_APP_SETTINGS_INDEXSPACE="PRIMARY"
+                     log "MSSQL JDBC URL Validation = PASS"
+                  else
+                     log "ERROR: MSSQL JDBC URL Validation = FAIL"
+                     SCRIPT_STATUS=14
+                  fi
             elif [[ ${MAS_JDBC_URL,, } =~ ^jdbc:oracle? ]]; then
-                export MAS_ORACLE_JAR_LOCAL_PATH=$GIT_REPO_HOME/lib/ojdbc8.jar
-                log "Connecting to Oracle Database"
-                if python jdbc-prevalidateOracle.py; then
+                  export MAS_ORACLE_JAR_LOCAL_PATH=$GIT_REPO_HOME/lib/ojdbc8.jar
+                  log "Connecting to Oracle Database"
+                  if python jdbc-prevalidateOracle.py; then
                     log "Oracle JDBC URL Validation = PASS"
-				        else
+				          else
                     log "ERROR: Oracle JDBC URL Validation = FAIL"
                     SCRIPT_STATUS=14
-                fi
-              elif [[ ${MAS_JDBC_URL,, } =~ ^jdbc:sqlserver? ]]; then
-                    export MAS_JAR_LOCAL_PATH=$GIT_REPO_HOME/lib/sqljdbc.jar
-                    export MAS_APP_SETTINGS_DB2_SCHEMA="dto"
-                    export MAS_APP_SETTINGS_TABLESPACE="PRIMARY"
-                    export MAS_APP_SETTINGS_INDEXSPACE="PRIMARY"
-                    log "Connecting to sqlserver  Database"
-                     if python jdbc-prevalidateMssql.py; then
-                         log "sqlserver JDBC URL Validation = PASS"
-                    else
-                          log "ERROR: Sqlserver JDBC URL Validation = FAIL"
-                           SCRIPT_STATUS=14
+                  fi
             else
-                log "Skipping JDBC URL validation, supported only for DB2,Mssql and Oracle".
+                log "Skipping JDBC URL validation, supported only for DB2 MSSQL &  Oracle".
             fi
         fi
     fi
 fi
 
-#mongo pre-validation only for AWS currently. 
+#mongo pre-validation only for AWS currently.
 if [[ $CLUSTER_TYPE == "aws" ]]; then
     log "=== pre-validate-mongo.sh started ==="
     sh $GIT_REPO_HOME/mongo/pre-validate-mongo.sh
