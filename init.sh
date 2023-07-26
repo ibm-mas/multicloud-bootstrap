@@ -532,6 +532,17 @@ if [[ $PRE_VALIDATION == "pass" ]]; then
   log "===== PROVISIONING STARTED ====="
   log "Calling cloud specific automation ..."
   cd $CLUSTER_TYPE
+  # paramter adding for mssql - will remove if prevalidate sets it
+   log " FROM PREVALIDATE"
+  log " MAS_APP_SETTINGS_DB2_SCHEMA: $MAS_APP_SETTINGS_DB2_SCHEMA"
+  log " DEPLOY_MANAGEMAS_APP_SETTINGS_TABLESPACE: $MAS_APP_SETTINGS_TABLESPACE"
+  log " MAS_APP_SETTINGS_INDEXSPACE: $MAS_APP_SETTINGS_INDEXSPACE"
+
+     if [[ ${MAS_JDBC_URL,, } =~ ^jdbc:sqlserver? ]]; then
+         export MAS_APP_SETTINGS_DB2_SCHEMA="dto"
+         export MAS_APP_SETTINGS_TABLESPACE="PRIMARY"
+         export MAS_APP_SETTINGS_INDEXSPACE="PRIMARY"
+     fi
   ./deploy.sh
   retcode=$?
   log "Deployment return code is $retcode"

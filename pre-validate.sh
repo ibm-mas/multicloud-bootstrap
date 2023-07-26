@@ -142,12 +142,23 @@ if [[ $DEPLOY_MANAGE == "true" ]]; then
                 log "Connecting to Oracle Database"
                 if python jdbc-prevalidateOracle.py; then
                     log "Oracle JDBC URL Validation = PASS"
-				else
+				        else
                     log "ERROR: Oracle JDBC URL Validation = FAIL"
                     SCRIPT_STATUS=14
                 fi
+              elif [[ ${MAS_JDBC_URL,, } =~ ^jdbc:sqlserver? ]]; then
+                    export MAS_JAR_LOCAL_PATH=$GIT_REPO_HOME/lib/sqljdbc.jar
+                    export MAS_APP_SETTINGS_DB2_SCHEMA="dto"
+                    export MAS_APP_SETTINGS_TABLESPACE="PRIMARY"
+                    export MAS_APP_SETTINGS_INDEXSPACE="PRIMARY"
+                    log "Connecting to sqlserver  Database"
+                     if python jdbc-prevalidateMssql.py; then
+                         log "sqlserver JDBC URL Validation = PASS"
+                    else
+                          log "ERROR: Sqlserver JDBC URL Validation = FAIL"
+                           SCRIPT_STATUS=14
             else
-                log "Skipping JDBC URL validation, supported only for DB2 and Oracle".
+                log "Skipping JDBC URL validation, supported only for DB2,Mssql and Oracle".
             fi
         fi
     fi
