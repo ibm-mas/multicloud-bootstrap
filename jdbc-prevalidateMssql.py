@@ -6,7 +6,7 @@ con=jaydebeapi.connect('com.microsoft.sqlserver.jdbc.SQLServerDriver',
                         'password':os.getenv('MAS_JDBC_PASSWORD'),
                         'sslConnection':'true',
                         'sslCertLocation':os.getenv('MAS_JDBC_CERT_LOCAL_FILE')},
-                        jars=os.getenv('MAS_DB2_JAR_LOCAL_PATH'),)
+                        jars=os.getenv('MAS_JAR_LOCAL_PATH'),)
 
 if con :
 #    print("Connected to db successfully !")
