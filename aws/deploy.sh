@@ -308,6 +308,17 @@ if [[ -z $VPC_ID && $MONGO_FLAVOR == "Amazon DocumentDB" ]]; then
 fi
 export AWS_REGION=$DEPLOY_REGION
 
+if [[ -n $DBProvisionedVPCId ]]; then
+cd $GIT_REPO_HOME
+log "==== aws/deploy.sh : Invoke db-create-vpc-peer.sh starts ===="
+    log "Existing instance of db @ VPC_ID=$DBProvisionedVPCId"
+    export ACCEPTER_VPC_ID=${DBProvisionedVPCId}
+    export REQUESTER_VPC_ID=${VPC_ID}
+
+    sh $GIT_REPO_HOME/aws/db/db-create-vpc-peer.sh
+    log "==== aws/deploy.sh : Invoke db-create-vpc-peer.sh ends ===="
+fi
+
 log "==== MONGO_USE_EXISTING_INSTANCE = ${MONGO_USE_EXISTING_INSTANCE}"
 if [[ $MONGO_USE_EXISTING_INSTANCE == "true" ]]; then
   if [[ $MONGO_FLAVOR == "Amazon DocumentDB" ]]; then

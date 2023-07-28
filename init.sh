@@ -66,6 +66,7 @@ export MONGO_HOSTS=${57}
 export MONGO_CA_PEM_FILE=${58}
 export DOCUMENTDB_VPC_ID=${59}
 export AWS_MSK_PROVIDER=${60}
+export DBProvisionedVPCId=${61}
 export ENV_TYPE=${61}
 export GIT_REPO_HOME=$(pwd)
 # Load helper functions
@@ -308,6 +309,7 @@ esac
 log "Below are common deployment parameters,"
 log " OPERATIONAL_MODE: $OPERATIONAL_MODE"
 log " AWS_MSK_PROVIDER: $AWS_MSK_PROVIDER"
+log " DBProvisionedVPCId: $DBProvisionedVPCId"
 log " CLUSTER_TYPE: $CLUSTER_TYPE"
 log " OFFERING_TYPE: $OFFERING_TYPE"
 log " DEPLOY_REGION: $DEPLOY_REGION"
