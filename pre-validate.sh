@@ -86,7 +86,7 @@ fi
 #    SCRIPT_STATUS=25
 #fi
 
-if [[ -n $DB2ProvisionedVPCId ]]; then
+if [[ -n $DBProvisionedVPCId ]]; then
 cd $GIT_REPO_HOME
 log "==== Invoke db-create-vpc-peer.sh to create VPC Peering between bootnode VPC & database provisioned VPC ID starts ===="
 log "==== This VPC peering is done to pre-validate database connection ==="
