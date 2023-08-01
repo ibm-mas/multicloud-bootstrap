@@ -138,7 +138,7 @@ if [[ $DEPLOY_MANAGE == "true" ]]; then
                     SCRIPT_STATUS=14
                 fi
             elif [[ ${MAS_JDBC_URL,, } =~ ^jdbc:oracle? ]]; then
-                export MAS_ORACLE_JAR_LOCAL_PATH=$GIT_REPO_HOME/lib/ojdbc8.jar
+                export MAS_ORACLE_JAR_LOCAL_PATH=$GIT_REPO_HOME/lib/oraclethin.jar
                 log "Connecting to Oracle Database"
                 if python jdbc-prevalidateOracle.py; then
                     log "Oracle JDBC URL Validation = PASS"
@@ -153,7 +153,7 @@ if [[ $DEPLOY_MANAGE == "true" ]]; then
     fi
 fi
 
-#mongo pre-validation only for AWS currently. 
+#mongo pre-validation only for AWS currently.
 if [[ $CLUSTER_TYPE == "aws" ]]; then
     log "=== pre-validate-mongo.sh started ==="
     sh $GIT_REPO_HOME/mongo/pre-validate-mongo.sh
