@@ -172,7 +172,7 @@ variable "worker_instance_volume_size" {
 
 variable "worker_instance_volume_type" {
   type    = string
-  default = "io1"
+  default = "gp3"
 }
 
 variable "worker_replica_count" {
@@ -197,7 +197,7 @@ variable "master_instance_volume_size" {
 
 variable "master_instance_volume_type" {
   type    = string
-  default = "io1"
+  default = "gp3"
 }
 
 variable "master_replica_count" {
