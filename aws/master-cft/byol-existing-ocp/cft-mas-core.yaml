@@ -74,6 +74,11 @@ Parameters:
       Enter the HTTP or S3 location of the database's public certificate, for
       example: s3://masocp-license/db-certificate.crt
     Type: String
+  DBProvisionedVPCId:
+    Description: >-
+      Enter the VPC ID where your existing database (DB2 or Oracle or MSSQL) was provisioned on a private subnet to establish 
+      VPC Peering from this VPC & the VPC created during current stack deployment in order to establish database connection.
+    Type: String
   ImportDemoData:
     Description: >-
       Indicate whether you want to import demo data into the database. This
@@ -230,6 +235,7 @@ Metadata:
           - MASManageDBPassword
           - MASManageDBJdbcUrl
           - MASManageDBCertificateUrl
+          - DBProvisionedVPCId
           - ImportDemoData
       - Label:
           default: MongoDB Configuration
@@ -712,6 +718,8 @@ Resources:
             - !If [MongoUseExistingInstanceCondition, !Ref DocumentDBProvisionedVPCId, ""]
             - ''' '''
             - !Ref AWSMSKProvider
+            - ''' '''
+            - !Ref DBProvisionedVPCId
             - ''' "prod" '
             - '2>&1 | tee mas-provisioning.log; '
       Tags:
