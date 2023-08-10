@@ -27,7 +27,6 @@ data "template_file" "installconfig" {
     controlPlaneSubnet          = var.master-subnet-name
     computeSubnet               = var.worker-subnet-name
     networkResourceGroupName    = local.resource-group
-
     cluster-network-cidr =  var.cluster-network-cidr
     host-prefix          = 23
     virtual-network-cidr = var.virtual-network-cidr

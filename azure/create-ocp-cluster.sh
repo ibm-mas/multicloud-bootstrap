@@ -33,7 +33,6 @@ virtual-network-cidr    = "$virtual_network_cidr"
 master-subnet-cidr      =  "$master_subnet_cidr"
 worker-subnet-cidr      =  "$worker_subnet_cidr"
 bastion_cidr            =  "$bastion_cidr"
-cluster-network-cidr    =  "$cluster_network_cidr"
 EOT
 if [[ -f terraform.tfvars ]]; then
     chmod 600 terraform.tfvars

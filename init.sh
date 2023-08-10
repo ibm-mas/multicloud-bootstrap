@@ -434,7 +434,7 @@ if [[ $CLUSTER_TYPE == "azure" ]]; then
        Ip_range=$worker_subnet_cidr
        #10.0.3.224/27
        export bastion_cidr=`echo $Ip_range|cut -d "." -f 1`.`echo $Ip_range|cut -d "." -f 2`.3.224/27
-       export cluster_network_cidr=`echo $Ip_range|cut -d "." -f 1`.`echo $Ip_range|cut -d "." -f 2`.0.0/14
+       #export cluster_network_cidr=`echo $Ip_range|cut -d "." -f 1`.`echo $Ip_range|cut -d "." -f 2`.0.0/14
         log " MASTER SUBNET NAME: $master_subnet_name "
         log " WORKER SUBNET NAME: $worker_subnet_name"
         log " VNET CIDR RANGE: $virtual_network_cidr "
