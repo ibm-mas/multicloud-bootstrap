@@ -66,7 +66,6 @@ export MONGO_HOSTS=${57}
 export MONGO_CA_PEM_FILE=${58}
 export DOCUMENTDB_VPC_ID=${59}
 export AWS_MSK_PROVIDER=${60}
-export DBProvisionedVPCId=${61}
 export ENV_TYPE=${61}
 export GIT_REPO_HOME=$(pwd)
 # Load helper functions
@@ -221,29 +220,23 @@ if [[ $CLUSTER_TYPE == "aws" ]]; then
 elif [[ $CLUSTER_TYPE == "azure" ]]; then
   export CPD_PRIMARY_STORAGE_CLASS="azurefiles-premium"
 fi
-# DB2WH variables
 export CPD_OPERATORS_NAMESPACE="ibm-cpd-operators-${RANDOM_STR}"
 export CPD_INSTANCE_NAMESPACE="ibm-cpd-${RANDOM_STR}"
 #CPD_SERVICES_NAMESPACE is used in roles - cp4d, cp4dv3_install, cp4dv3_install_services and suite_dns
 export CPD_SERVICES_NAMESPACE="cpd-services-${RANDOM_STR}"
-export DB2WH_INSTANCE_NAME="db2wh-cpd-${RANDOM_STR}"
-export DB2WH_VERSION="11.5.8.0-CN1"
+# DB2WH variables
 export DB2_META_STORAGE_CLASS=$CPD_PRIMARY_STORAGE_CLASS
 export DB2_DATA_STORAGE_CLASS=$CPD_PRIMARY_STORAGE_CLASS
 export DB2_BACKUP_STORAGE_CLASS=$CPD_PRIMARY_STORAGE_CLASS
 export DB2_LOGS_STORAGE_CLASS=$CPD_PRIMARY_STORAGE_CLASS
 export DB2_TEMP_STORAGE_CLASS=$CPD_PRIMARY_STORAGE_CLASS
-export CPD_SERVICE_NAME="db2wh"
-
 export DB2_INSTANCE_NAME=db2wh-db01
 export DB2_VERSION=11.5.7.0-cn2
 export ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
 # not reqd its hardcoded as db2_namespace: db2u
-export DB2WH_NAMESPACE="cpd-services-${RANDOM_STR}"
-export DB2WH_JDBC_USERNAME="db2inst1"
+#export DB2WH_NAMESPACE="cpd-services-${RANDOM_STR}"
 # MAS variables
 export MAS_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
-export IBM_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
 export MAS_WORKSPACE_ID="wsmasocp"
 export MAS_WORKSPACE_NAME="wsmasocp"
 export MAS_CONFIG_SCOPE="wsapp"
@@ -309,7 +302,6 @@ esac
 log "Below are common deployment parameters,"
 log " OPERATIONAL_MODE: $OPERATIONAL_MODE"
 log " AWS_MSK_PROVIDER: $AWS_MSK_PROVIDER"
-log " DBProvisionedVPCId: $DBProvisionedVPCId"
 log " CLUSTER_TYPE: $CLUSTER_TYPE"
 log " OFFERING_TYPE: $OFFERING_TYPE"
 log " DEPLOY_REGION: $DEPLOY_REGION"
@@ -436,8 +428,20 @@ if [[ $CLUSTER_TYPE == "azure" ]]; then
         #Assign the network subnet
        export  master_subnet_name=`az network vnet subnet list --resource-group $EXISTING_NETWORK_RG --vnet-name $VNET_NAME|jq '.[] | select(.name).name'|grep master|tr -d '"'`
        export  worker_subnet_name=`az network vnet subnet list --resource-group $EXISTING_NETWORK_RG --vnet-name $VNET_NAME|jq '.[] | select(.name).name'|grep worker|tr -d '"'`
-       log " MASTER SUBNET NAME: $master_subnet_name "
-       log " WORKER SUBNET NAME: $worker_subnet_name"
+       export  virtual_network_cidr=`az network vnet show --resource-group $EXISTING_NETWORK_RG -n $VNET_NAME|jq -r '.addressSpace.addressPrefixes[0]'|tr -d '"'`
+       export  master_subnet_cidr=`az network vnet subnet show --resource-group $EXISTING_NETWORK_RG --vnet-name $VNET_NAME -n master-subnet|jq  -r '.addressPrefix'`
+       export  worker_subnet_cidr=`az network vnet subnet show --resource-group $EXISTING_NETWORK_RG --vnet-name $VNET_NAME -n worker-subnet|jq  -r '.addressPrefix'`
+       Ip_range=$worker_subnet_cidr
+       #10.0.3.224/27
+       export bastion_cidr=`echo $Ip_range|cut -d "." -f 1`.`echo $Ip_range|cut -d "." -f 2`.3.224/27
+       #export cluster_network_cidr=`echo $Ip_range|cut -d "." -f 1`.`echo $Ip_range|cut -d "." -f 2`.0.0/14
+        log " MASTER SUBNET NAME: $master_subnet_name "
+        log " WORKER SUBNET NAME: $worker_subnet_name"
+        log " VNET CIDR RANGE: $virtual_network_cidr "
+        log " MASTER SUBNET CIDR RANGE: $master_subnet_cidr "
+        log " WORKER SUBNET CIDR RANGE : $worker_subnet_cidr"
+        log " BASTION  CIDR RANGE : $bastion_cidr"
+        log " cluster_network_cidr : $cluster_network_cidr"
      #  log " NSG NAME: $nsg_name"
        log " EXISTING_NETWORK_RG: $EXISTING_NETWORK_RG"
   fi
@@ -549,11 +553,6 @@ if [[ $PRE_VALIDATION == "pass" ]]; then
     export MAS_URL_ADMIN="https:\/\/admin.${RANDOM_STR}.apps.${CLUSTER_NAME}.${BASE_DOMAIN}"
     export MAS_URL_WORKSPACE="https:\/\/$MAS_WORKSPACE_ID.home.${RANDOM_STR}.apps.${CLUSTER_NAME}.${BASE_DOMAIN}"
     cd ../
-    if [[ $DEPLOY_CP4D == "true" &&  ($retcode -eq 0)]]; then
-      log "==== CP4D db2 warehouse service enablement starts ===="
-     ./cpd_vars.sh
-     log "==== CP4D db2 warehouse service enablement completes ===="
-    fi
     ./get-product-versions.sh  #Execute the script to get the versions of various products
     # Create a secret in the Cloud to keep MAS access credentials
     cd $GIT_REPO_HOME
