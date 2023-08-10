@@ -1,6 +1,5 @@
 locals {
   cidr-prefix = split(".", var.virtual-network-cidr)[0]
-  cidr-prefix2 = split(".", var.virtual-network-cidr)[1]
 }
 
 data "template_file" "azurecreds" {
@@ -29,7 +28,7 @@ data "template_file" "installconfig" {
     computeSubnet               = var.worker-subnet-name
     networkResourceGroupName    = local.resource-group
 
-    cluster-network-cidr = "${local.cidr-prefix}.${local.cidr-prefix2}.0.0/14"
+    cluster-network-cidr =  var.cluster-network-cidr
     host-prefix          = 23
     virtual-network-cidr = var.virtual-network-cidr
     service-network-cidr = "192.30.0.0/16"

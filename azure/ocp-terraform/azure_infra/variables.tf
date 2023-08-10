@@ -76,9 +76,11 @@ variable "worker-subnet-name" {
 variable "worker-subnet-cidr" {
   default = "10.0.2.0/24"
 }
-
 variable "master-nsg-name" {
   default = "master-nsg"
+}
+variable "cluster-network-cidr" {
+  default = "10.128.0.0/14"
 }
 variable "worker-nsg-name" {
   default = "worker-nsg"
