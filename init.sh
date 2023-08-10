@@ -428,8 +428,18 @@ if [[ $CLUSTER_TYPE == "azure" ]]; then
         #Assign the network subnet
        export  master_subnet_name=`az network vnet subnet list --resource-group $EXISTING_NETWORK_RG --vnet-name $VNET_NAME|jq '.[] | select(.name).name'|grep master|tr -d '"'`
        export  worker_subnet_name=`az network vnet subnet list --resource-group $EXISTING_NETWORK_RG --vnet-name $VNET_NAME|jq '.[] | select(.name).name'|grep worker|tr -d '"'`
-       log " MASTER SUBNET NAME: $master_subnet_name "
-       log " WORKER SUBNET NAME: $worker_subnet_name"
+       export  virtual_network_cidr=`az network vnet show --resource-group $EXISTING_NETWORK_RG --vnet-name $VNET_NAME|jq -r '.addressSpace.addressPrefixes[0]'|tr -d '"'`
+       export  master_subnet_cidr=`az network vnet subnet show --resource-group $EXISTING_NETWORK_RG --vnet-name $VNET_NAME -n master-subnet|jq  -r '.addressPrefix'`
+       export  worker_subnet_cidr=`az network vnet subnet show --resource-group $EXISTING_NETWORK_RG --vnet-name $VNET_NAME -n worker-subnet|jq  -r '.addressPrefix'`
+       Ip_range=$worker_subnet_cidr
+       #10.0.3.224/27
+       export bastion_cidr=`echo $Ip_range|cut -d "." -f 1`.`echo $Ip_range|cut -d "." -f 2`.3.224/27
+        log " MASTER SUBNET NAME: $master_subnet_name "
+        log " WORKER SUBNET NAME: $worker_subnet_name"
+        log " VNET CIDR RANGE: $virtual_network_cidr "
+        log " MASTER SUBNET CIDR RANGE: $master_subnet_cidr "
+        log " WORKER SUBNET CIDR RANGE : $worker_subnet_cidr"
+        log " BASTION  CIDR RANGE : $bastion_cidr"
      #  log " NSG NAME: $nsg_name"
        log " EXISTING_NETWORK_RG: $EXISTING_NETWORK_RG"
   fi
