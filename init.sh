@@ -428,7 +428,7 @@ if [[ $CLUSTER_TYPE == "azure" ]]; then
         #Assign the network subnet
        export  master_subnet_name=`az network vnet subnet list --resource-group $EXISTING_NETWORK_RG --vnet-name $VNET_NAME|jq '.[] | select(.name).name'|grep master|tr -d '"'`
        export  worker_subnet_name=`az network vnet subnet list --resource-group $EXISTING_NETWORK_RG --vnet-name $VNET_NAME|jq '.[] | select(.name).name'|grep worker|tr -d '"'`
-       export  virtual_network_cidr=`az network vnet show --resource-group $EXISTING_NETWORK_RG --vnet-name $VNET_NAME|jq -r '.addressSpace.addressPrefixes[0]'|tr -d '"'`
+       export  virtual_network_cidr=`az network vnet show --resource-group $EXISTING_NETWORK_RG -n $VNET_NAME|jq -r '.addressSpace.addressPrefixes[0]'|tr -d '"'`
        export  master_subnet_cidr=`az network vnet subnet show --resource-group $EXISTING_NETWORK_RG --vnet-name $VNET_NAME -n master-subnet|jq  -r '.addressPrefix'`
        export  worker_subnet_cidr=`az network vnet subnet show --resource-group $EXISTING_NETWORK_RG --vnet-name $VNET_NAME -n worker-subnet|jq  -r '.addressPrefix'`
        Ip_range=$worker_subnet_cidr
