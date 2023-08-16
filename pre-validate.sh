@@ -315,7 +315,7 @@ if [[ $CLUSTER_TYPE == "azure" ]]; then
     export AZURE_SUBSC_ID=AZURE_VALIDATE_SUBSC_ID
   else
     log "ERROR: Subscription Id Invalid"
-    SCRIPT_STATUS=49
+    SCRIPT_STATUS=46
   fi
 fi
 
