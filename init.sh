@@ -470,6 +470,7 @@ if [[ $CLUSTER_TYPE == "azure" ]]; then
      #  log " NSG NAME: $nsg_name"
        log " EXISTING_NETWORK_RG: $EXISTING_NETWORK_RG"
   fi
+    log " VNET CIDR RANGE not upi: $virtual_network_cidr"
 fi
 
 
