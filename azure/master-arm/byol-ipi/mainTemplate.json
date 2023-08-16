@@ -61,13 +61,6 @@
         "description": "Use CIDR notation to enter the IP addresses that can access the bootnode. For example, 192.12.33.3/32. To allow access from all IP addresses, enter 0.0.0.0/0."
       }
     },
-    "vNetSubnetBootnodeAddressPrefix": {
-      "type": "string",
-      "defaultValue": "10.0.4.0/24",
-      "metadata": {
-        "description": "Enter the cidr range for bootnode's subnet. For example , 10.0.4.0/24 - Vnet cidr range is 10.0.0.0/16"
-      }
-    },
     "clusterSize": {
       "type": "string",
       "metadata": {
