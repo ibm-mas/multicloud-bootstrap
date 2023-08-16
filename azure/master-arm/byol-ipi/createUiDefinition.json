@@ -9,6 +9,14 @@
         },
         "basics": [
             {
+                "name": "subscriptionId",
+                "type": "Microsoft.Common.TextBox",
+                "label": "Subscription Id",
+                "defaultValue": "",
+                "toolTip": "Azure subscription id where all resources needs to be deployed:",
+                "visible": true
+            },
+            {
                 "name": "sshPublicKey",
                 "type": "Microsoft.Common.TextBox",
                 "label": "SSH public key",
@@ -25,7 +33,7 @@
                 "name": "bootnodeSGIngressCidrIp",
                 "type": "Microsoft.Common.TextBox",
                 "label": "Bootnode NSG Ingress CIDR IP range",
-                "defaultValue": "",
+                "defaultValue": "0.0.0.0/0",
                 "toolTip": "Use CIDR notation to enter the IP addresses that can access the bootnode. For example, 192.12.33.3/32. To allow access from all IP addresses, enter 0.0.0.0/0.",
                 "constraints": {
                     "required": true,
