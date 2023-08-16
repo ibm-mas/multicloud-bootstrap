@@ -23,10 +23,10 @@ metadata:
   name: ${clustername}
 networking:
   clusterNetwork:
-  - cidr: ${cluster-network-cidr}
+  - cidr: ${var.cluster-network-cidr}
     hostPrefix: ${host-prefix}
   machineNetwork:
-  - cidr: ${virtual-network-cidr}
+  - cidr: ${var.virtual-network-cidr}
   networkType: OpenShiftSDN
   serviceNetwork:
   - ${service-network-cidr}

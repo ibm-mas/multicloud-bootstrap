@@ -31,12 +31,12 @@ metadata:
   name: ${clustername}
 networking:
   clusterNetwork:
-  - cidr: ${cluster-network-cidr}
+  - cidr: ${var.cluster-network-cidr}
     hostPrefix: ${host-prefix}
-  machineCIDR: ${virtual-network-cidr}
+  machineCIDR: ${var.virtual-network-cidr}
   networkType: OpenShiftSDN
   serviceNetwork:
-  - ${service-network-cidr}
+  - ${var.service-network-cidr}
 platform:
   azure:
     baseDomainResourceGroupName: ${baseDomainResourceGroupName}
