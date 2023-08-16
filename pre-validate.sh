@@ -310,6 +310,7 @@ if [[ $CLUSTER_TYPE == "azure" ]]; then
 fi
 #Validate the subscriptionId
 if [[ $CLUSTER_TYPE == "azure" ]]; then
+   az login --service-principal -u ${AZURE_SP_CLIENT_ID} -p ${AZURE_SP_CLIENT_PWD} --tenant ${TENANT_ID}
   export AZURE_VALIDATE_SUBSC_ID=`az account list --query "[?id == '$SELLER_SUBSCRIPTION_ID'].{Id:id}" -o tsv`
   if [[ -n $AZURE_VALIDATE_SUBSC_ID ]]; then
     export AZURE_SUBSC_ID=AZURE_VALIDATE_SUBSC_ID
