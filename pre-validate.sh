@@ -118,29 +118,30 @@ if [[ $DEPLOY_MANAGE == "true" ]]; then
                 if [[ ${MAS_JDBC_CERT_URL,,} =~ ^s3 ]]; then
                     aws s3 cp "$MAS_JDBC_CERT_URL" db.crt --region us-east-1
                     ret=$?
-        		if [ $ret -ne 0 ]; then
-        			aws s3 cp "$MAS_JDBC_CERT_URL" db.crt --region $DEPLOY_REGION
-        			ret=$?
-        		if [ $ret -ne 0 ]; then
-            		log "Invalid DB certificate URL"
-            		SCRIPT_STATUS=31
-        		fi
-        		fi
+        		        if [ $ret -ne 0 ]; then
+        		          	aws s3 cp "$MAS_JDBC_CERT_URL" db.crt --region $DEPLOY_REGION
+        			          ret=$?
+        		            if [ $ret -ne 0 ]; then
+            	          	log "Invalid DB certificate URL"
+            	    	      SCRIPT_STATUS=31
+        		            fi
+        		         fi
                 elif [[ ${MAS_JDBC_CERT_URL,,} =~ ^https? ]]; then
                     wget "$MAS_JDBC_CERT_URL" -O db.crt
                 fi
             elif [[ $CLUSTER_TYPE == "azure" ]]; then
                 # https://myaccount.blob.core.windows.net/mycontainer/myblob regex
-                if [[ ${MAS_JDBC_CERT_URL,,} =~ ^https://.+blob\.core\.windows\.net.+ ]]; then
+                 if [[ ${MAS_JDBC_CERT_URL,,} =~ ^https://.+blob\.core\.windows\.net.+ ]]; then
                     azcopy copy "$MAS_JDBC_CERT_URL" db.crt
-                elif [[ ${MAS_JDBC_CERT_URL,,} =~ ^https? ]]; then
+                 elif [[ ${MAS_JDBC_CERT_URL,,} =~ ^https? ]]; then
                     wget "$MAS_JDBC_CERT_URL" -O db.crt
                 fi
             elif [[ $CLUSTER_TYPE == "gcp" ]]; then
                 wget "$MAS_JDBC_CERT_URL" -O db.crt
             fi
-            export MAS_DB2_JAR_LOCAL_PATH=$GIT_REPO_HOME/lib/db2jcc4.jar
+
             if [[ ${MAS_JDBC_URL,, } =~ ^jdbc:db2? ]]; then
+               export MAS_DB2_JAR_LOCAL_PATH=$GIT_REPO_HOME/lib/db2jcc4.jar
                 log "Connecting to DB2 Database"
                 if python jdbc-prevalidateDB2.py; then
                     log "Db2 JDBC URL Validation = PASS"
@@ -148,17 +149,29 @@ if [[ $DEPLOY_MANAGE == "true" ]]; then
                     log "ERROR: Db2 JDBC URL Validation = FAIL"
                     SCRIPT_STATUS=14
                 fi
+             elif [[ ${MAS_JDBC_URL,, } =~ ^jdbc:sql? ]]; then
+                  log "Connecting to MSSQL Database"
+                  export MAS_JAR_LOCAL_PATH=$GIT_REPO_HOME/lib/sqljdbc.jar
+                  if python jdbc-prevalidateMssql.py; then
+                     export MAS_APP_SETTINGS_DB2_SCHEMA="dto"
+                     export MAS_APP_SETTINGS_TABLESPACE="PRIMARY"
+                     export MAS_APP_SETTINGS_INDEXSPACE="PRIMARY"
+                     log "MSSQL JDBC URL Validation = PASS"
+                  else
+                     log "ERROR: MSSQL JDBC URL Validation = FAIL"
+                     SCRIPT_STATUS=14
+                  fi
             elif [[ ${MAS_JDBC_URL,, } =~ ^jdbc:oracle? ]]; then
-                export MAS_ORACLE_JAR_LOCAL_PATH=$GIT_REPO_HOME/lib/ojdbc8.jar
-                log "Connecting to Oracle Database"
-                if python jdbc-prevalidateOracle.py; then
+                  export MAS_ORACLE_JAR_LOCAL_PATH=$GIT_REPO_HOME/lib/ojdbc8.jar
+                  log "Connecting to Oracle Database"
+                  if python jdbc-prevalidateOracle.py; then
                     log "Oracle JDBC URL Validation = PASS"
-				else
+				          else
                     log "ERROR: Oracle JDBC URL Validation = FAIL"
                     SCRIPT_STATUS=14
-                fi
+                  fi
             else
-                log "Skipping JDBC URL validation, supported only for DB2 and Oracle".
+                log "Skipping JDBC URL validation, supported only for DB2 MSSQL &  Oracle".
             fi
         fi
     fi
@@ -294,6 +307,16 @@ if [[ $CLUSTER_TYPE == "azure" ]]; then
             SCRIPT_STATUS=26
         fi
     fi
+fi
+#Validate the subscriptionId
+if [[ $CLUSTER_TYPE == "azure" ]]; then
+  export AZURE_VALIDATE_SUBSC_ID=az account list --query "[?id == '$SELLER_SUBSCRIPTION_ID'].{Id:id}" -o tsv
+  if [[ -n $AZURE_VALIDATE_SUBSC_ID ]]; then
+    export AZURE_SUBSC_ID=AZURE_VALIDATE_SUBSC_ID
+  else
+    log "ERROR: Subscription Id Invalid"
+    SCRIPT_STATUS=49
+  fi
 fi
 
 # Check if all the subnet values are provided for existing VPC Id
