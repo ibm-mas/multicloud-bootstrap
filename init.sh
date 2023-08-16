@@ -427,6 +427,7 @@ if [[ $CLUSTER_TYPE == "azure" ]]; then
   # Get subscription ID
 
  # export AZURE_SUBSC_ID=`az account list | jq -r '.[].id'`
+ export AZURE_SUBSC_ID=`az account list --query "[?id == '$SELLER_SUBSCRIPTION_ID'].{Id:id}" -o tsv`
   log " AZURE_SUBSC_ID: $AZURE_SUBSC_ID"
   # Get Base domain RG name
   DNS_ZONE=$BASE_DOMAIN
