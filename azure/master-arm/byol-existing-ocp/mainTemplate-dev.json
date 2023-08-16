@@ -2,6 +2,13 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
+    "subscriptionId": {
+      "type": "string",
+      "metadata": {
+        "description": "Azure subscription id where all resources needs to be deployed:"
+      },
+      "defaultValue": "[subscription().subscriptionId]"
+    },
     "location": {
       "type": "string",
       "metadata": {
@@ -45,13 +52,20 @@
       "metadata": {
         "description": "Provide the public App Service domain /Private DNS zones that you created in the App Service Domains /Private DNS zones, for example: mas4azure.com"
       },
-      "defaultValue": ""
+      "defaultValue": "masblrdomain.com"
     },
     "bootnodeSGIngressCidrIp": {
       "type": "string",
       "defaultValue": "0.0.0.0/0",
       "metadata": {
         "description": "Use CIDR notation to enter the IP addresses that can access the bootnode. For example, 192.12.33.3/32. To allow access from all IP addresses, enter 0.0.0.0/0."
+      }
+    },
+    "vNetSubnetBootnodeAddressPrefix": {
+      "type": "string",
+      "defaultValue": "10.0.4.0/24",
+      "metadata": {
+        "description": "Provide the cidr range for bootnode's subnet. For example , 10.0.4.0/24 - Vnet cidr range is 10.0.0.0/16"
       }
     },
     "clusterSize": {
@@ -89,7 +103,7 @@
     },
     "entitledRegistryKey": {
       "type": "secureString",
-      "defaultValue": "",
+      "defaultValue": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJJQk0gTWFya2V0cGxhY2UiLCJpYXQiOjE2NDQ0MDk0MjIsImp0aSI6IjYwNzc2MzQzOGJhODQxMmNiZGRhNzVmNWM2MGEwNjIxIn0.A-9DGN1PAmw7x0opnrJnUpwhvfnsf2f-HAUByEWaLWY",
       "metadata": {
         "description": "Enter the registry key that you downloaded from the IBM Container Library."
       }
@@ -103,7 +117,7 @@
     },
     "masLicenseUrl": {
       "type": "string",
-      "defaultValue": "",
+      "defaultValue": "https://masocpstgacnt.blob.core.windows.net/masocpfiles/entitlement_2024.lic?sp=r&st=2023-07-13T10:06:34Z&se=2024-06-30T18:06:34Z&spr=https&sv=2022-11-02&sr=b&sig=HBDOSrTOfna0LCvYlryklnyUk231vAPSLQbehW7A9Vk%3D",
       "metadata": {
         "description": "Enter the URL (preferebly with SAS token) of your Suite license key file kept on the Blob storage, for example: https://masocpstgaccount.blob.core.windows.net/masocpcontainer/entitlement.lic?[blob-sas-token] (Applicable only for BYOL product)"
       }
@@ -160,7 +174,7 @@
     },
     "sshPublicKey": {
       "type": "string",
-      "defaultValue": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCZsnnoLyMnmObhjDLHNh9ksowEb1dV1eb8Ssw7vdzLFoWVf+Upm1xtH2vOybaDfE/rES+aQIsjrKhwlGM+o2ViM9skQJIX/34/gzt3r+SUG4bzRvAtmPofAoQTrvRKWwL47K8nNPVcqHoV1TMEL9R+F8UTwQGbhz5FuxEt0eReOBCxNQnuLPLChawaml7LSNNaRka6tBQ/QeA/oJdo82sn/tpNZFNivOn8+fo+HNQPvirFJKLmsiER2HFuhH6p3wHYA1IMqzzOcWv52cRRIONyowyPbuCCVzbdXSHWt2JtcyvkwAqc2a5DuhxTeioYP+xAij9r/Xkc/x94sXAsAJtz imported-openssh-key",
+      "defaultValue": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCnKJvCbAH0YPXzaAGs/y1VGBJ7iK19Xwo5gNrAWxk0WiMueLuVsTMG3VIoE9Dmsg5ZOBjuQb6oOe43cONR2im92/GRnRF7siNgbXVQlgbm3o66c3Tu6zZhH8BF47sfaZuSB+5795f8NuGx3rcsnS5dhL+xpo40s+9bqxo4ni+0YdYNNciOKg5cnIiEnLfL2sPddx80xWmFUMhjO10SWvx00/GeCRiRNKBzWDyOkYxxcbBlK/l2KA0KU7GHlUAmT1YzFd6akOGzc7T9yD/gQ0PshXBgXpMRjr4HILZABZAOIKXi7z7cXsYwLhBOmI6lF7A83zNfNv4uzP936E7Z41wNmfI+1DsNBiHBN2p2DSWoL3xChYlV5OWxiHsUQt6o+8tGKjjLmU3JZBAk6lRf4JpkG7ODoVOPSblUBP7prQ69TAAuskCAGR9E7fQNeeKucVTyiek0a35b2vfh3bryVVNdnLTF8+yUu08K7q2kn3pQpr/wDqmlY13FSExqPaCHhDk= generated-by-azure",
       "metadata": {
         "description": "Provide the public SSH key that you want to add to the bootnode, bastion host and cluster nodes."
       }
@@ -209,21 +223,21 @@
     },
     "azureServicePrincipalClientId": {
       "type": "string",
-      "defaultValue": "1bc717ac-ea87-4011-ac59-21e6942a2e2f",
+      "defaultValue": "3fd721c5-fe3c-4a10-b39d-afa313353005",
       "metadata": {
         "description": "Enter Azure service principal client Id."
       }
     },
     "azureServicePrincipalClientSecret": {
       "type": "secureString",
-      "defaultValue": "",
+      "defaultValue": "I87eHgZ6q6qrSyEup7nYhZmbAgwmNk~Tho",
       "metadata": {
         "description": "Enter Azure service principal client secret."
       }
     },
     "azureServicePrincipalTenantId": {
       "type": "string",
-      "defaultValue": "",
+      "defaultValue": "fcf67057-50c9-4ad4-98f3-ffca64add9e9",
       "metadata": {
         "description": "Enter Azure service principal tenant id."
       }
@@ -290,19 +304,18 @@
     }
   },
   "variables": {
-    "seller_subscription_id": "b2ca5467-2502-4b05-b78e-744604c6531d",
+
     "seller_compute_gallery_name": "masbyolimagegallery20230605121806",
     "seller_image_definition": "masocp-image-def-20230605121806",
     "projectName": "[concat('e',substring(uniqueString(resourceGroup().id, deployment().name), 0, 5))]",
     "rgName": "[resourceGroup().name]",
     "vNetSubnetName": "[concat('masocp-', variables('projectName'), '-bootnodeSubnet')]",
-    "vNetSubnetAddressPrefix": "10.0.5.0/24",
     "logAnalyticsWorkspace": "[concat('masocp-', variables('projectName'), '-logAnalyticsWorkspace')]",
     "vmName": "[concat('masocp-', variables('projectName'), '-bootnode-vm')]",
     "publicIPAddressName": "[concat(variables('projectName'), '-ip')]",
     "networkInterfaceName": "[concat(variables('projectName'), '-nic')]",
     "networkSecurityGroupName": "[concat(variables('projectName'), '-nsg')]",
-    "networkSecurityGroupName2": "bootnodeSubnet-nsg",
+    "networkSecurityGroupName2": "[concat(variables('projectName'), '-bootnodeSubnet-nsg')]",
     "storageaccountName": "[concat('masocp', variables('projectName'),'stgaccount')]"
   },
   "resources": [
@@ -360,7 +373,7 @@
       "apiVersion": "2022-09-01",
       "name": "existingvnetTemplate",
       "resourceGroup": "[parameters('BootNodeVnetResourceGroup')]",
-      "subscriptionid": "[variables('seller_subscription_id')]",
+      "subscriptionid": "[parameters('subscriptionId')]",
       "properties": {
         "mode": "Incremental",
         "template": {
@@ -401,7 +414,7 @@
                 "[resourceId(parameters('BootNodeVnetResourceGroup'),'Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName2'))]"
               ],
               "properties": {
-                "addressPrefix": "[variables('vNetSubnetAddressPrefix')]",
+                "addressPrefix": "[parameters('vNetSubnetBootnodeAddressPrefix')]",
                 "networkSecurityGroup": {
                   "id": "[resourceId(parameters('BootNodeVnetResourceGroup'),'Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName2'))]"
                 }
