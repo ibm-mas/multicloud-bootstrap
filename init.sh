@@ -220,23 +220,29 @@ if [[ $CLUSTER_TYPE == "aws" ]]; then
 elif [[ $CLUSTER_TYPE == "azure" ]]; then
   export CPD_PRIMARY_STORAGE_CLASS="azurefiles-premium"
 fi
+# DB2WH variables
 export CPD_OPERATORS_NAMESPACE="ibm-cpd-operators-${RANDOM_STR}"
 export CPD_INSTANCE_NAMESPACE="ibm-cpd-${RANDOM_STR}"
 #CPD_SERVICES_NAMESPACE is used in roles - cp4d, cp4dv3_install, cp4dv3_install_services and suite_dns
 export CPD_SERVICES_NAMESPACE="cpd-services-${RANDOM_STR}"
-# DB2WH variables
+export DB2WH_INSTANCE_NAME="db2wh-cpd-${RANDOM_STR}"
+export DB2WH_VERSION="11.5.8.0-CN1"
 export DB2_META_STORAGE_CLASS=$CPD_PRIMARY_STORAGE_CLASS
 export DB2_DATA_STORAGE_CLASS=$CPD_PRIMARY_STORAGE_CLASS
 export DB2_BACKUP_STORAGE_CLASS=$CPD_PRIMARY_STORAGE_CLASS
 export DB2_LOGS_STORAGE_CLASS=$CPD_PRIMARY_STORAGE_CLASS
 export DB2_TEMP_STORAGE_CLASS=$CPD_PRIMARY_STORAGE_CLASS
+export CPD_SERVICE_NAME="db2wh"
+
 export DB2_INSTANCE_NAME=db2wh-db01
 export DB2_VERSION=11.5.7.0-cn2
 export ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
 # not reqd its hardcoded as db2_namespace: db2u
-#export DB2WH_NAMESPACE="cpd-services-${RANDOM_STR}"
+export DB2WH_NAMESPACE="cpd-services-${RANDOM_STR}"
+export DB2WH_JDBC_USERNAME="db2inst1"
 # MAS variables
 export MAS_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
+export IBM_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
 export MAS_WORKSPACE_ID="wsmasocp"
 export MAS_WORKSPACE_NAME="wsmasocp"
 export MAS_CONFIG_SCOPE="wsapp"
@@ -397,12 +403,30 @@ export DEPLOY_MANAGE=$(echo $DEPLOY_MANAGE | cut -d '=' -f 2)
 log " DEPLOY_CP4D: $DEPLOY_CP4D"
 log " DEPLOY_MANAGE: $DEPLOY_MANAGE"
 
+cd $GIT_REPO_HOME
+# Perform prevalidation checks
+log "===== PRE-VALIDATION STARTED ====="
+./pre-validate.sh
+retcode=$?
+log "Pre validation return code is $retcode"
+if [[ $retcode -ne 0 ]]; then
+  log "Prevalidation checks failed"
+  PRE_VALIDATION=fail
+  mark_provisioning_failed $retcode
+else
+  log "Prevalidation checks successful"
+  PRE_VALIDATION=pass
+fi
+log "===== PRE-VALIDATION COMPLETED ($PRE_VALIDATION) ====="
+
 if [[ $CLUSTER_TYPE == "azure" ]]; then
   # Perform az login
   az login --service-principal -u ${AZURE_SP_CLIENT_ID} -p ${AZURE_SP_CLIENT_PWD} --tenant ${TENANT_ID}
   az resource list -n masocp-${RANDOM_STR}-bootnode-vm
+
   # Get subscription ID
-  export AZURE_SUBSC_ID=`az account list | jq -r '.[].id'`
+
+ # export AZURE_SUBSC_ID=`az account list | jq -r '.[].id'`
   log " AZURE_SUBSC_ID: $AZURE_SUBSC_ID"
   # Get Base domain RG name
   DNS_ZONE=$BASE_DOMAIN
@@ -447,21 +471,7 @@ if [[ $CLUSTER_TYPE == "azure" ]]; then
   fi
 fi
 
-cd $GIT_REPO_HOME
-# Perform prevalidation checks
-log "===== PRE-VALIDATION STARTED ====="
-./pre-validate.sh
-retcode=$?
-log "Pre validation return code is $retcode"
-if [[ $retcode -ne 0 ]]; then
-  log "Prevalidation checks failed"
-  PRE_VALIDATION=fail
-  mark_provisioning_failed $retcode
-else
-  log "Prevalidation checks successful"
-  PRE_VALIDATION=pass
-fi
-log "===== PRE-VALIDATION COMPLETED ($PRE_VALIDATION) ====="
+
 
 # Perform the MAS deployment only if pre-validation checks are passed
 if [[ $PRE_VALIDATION == "pass" ]]; then
@@ -538,6 +548,17 @@ if [[ $PRE_VALIDATION == "pass" ]]; then
   log "===== PROVISIONING STARTED ====="
   log "Calling cloud specific automation ..."
   cd $CLUSTER_TYPE
+  # paramter adding for mssql - will remove if prevalidate sets it
+   log " FROM PREVALIDATE"
+  log " MAS_APP_SETTINGS_DB2_SCHEMA: $MAS_APP_SETTINGS_DB2_SCHEMA"
+  log " DEPLOY_MANAGEMAS_APP_SETTINGS_TABLESPACE: $MAS_APP_SETTINGS_TABLESPACE"
+  log " MAS_APP_SETTINGS_INDEXSPACE: $MAS_APP_SETTINGS_INDEXSPACE"
+
+     if [[ ${MAS_JDBC_URL,, } =~ ^jdbc:sqlserver? ]]; then
+         export MAS_APP_SETTINGS_DB2_SCHEMA="dto"
+         export MAS_APP_SETTINGS_TABLESPACE="PRIMARY"
+         export MAS_APP_SETTINGS_INDEXSPACE="PRIMARY"
+     fi
   ./deploy.sh
   retcode=$?
   log "Deployment return code is $retcode"
@@ -553,6 +574,11 @@ if [[ $PRE_VALIDATION == "pass" ]]; then
     export MAS_URL_ADMIN="https:\/\/admin.${RANDOM_STR}.apps.${CLUSTER_NAME}.${BASE_DOMAIN}"
     export MAS_URL_WORKSPACE="https:\/\/$MAS_WORKSPACE_ID.home.${RANDOM_STR}.apps.${CLUSTER_NAME}.${BASE_DOMAIN}"
     cd ../
+    if [[ $DEPLOY_CP4D == "true" &&  ($retcode -eq 0)]]; then
+      log "==== CP4D db2 warehouse service enablement starts ===="
+     ./cpd_vars.sh
+     log "==== CP4D db2 warehouse service enablement completes ===="
+    fi
     ./get-product-versions.sh  #Execute the script to get the versions of various products
     # Create a secret in the Cloud to keep MAS access credentials
     cd $GIT_REPO_HOME
