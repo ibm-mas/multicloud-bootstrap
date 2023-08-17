@@ -59,10 +59,7 @@ variable "virtual-network-name" {
 variable "virtual-network-cidr" {
   default = "10.0.0.0/16"
 }
-  variable "vpc_cidr" {
-description = "The CIDR block for the VPC, e.g: 10.0.0.0/16"
-  default     = "10.0.0.0/16"
-}
+
 variable "master-subnet-name" {
   default = "master-subnet"
 }
