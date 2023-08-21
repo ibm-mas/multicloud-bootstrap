@@ -564,7 +564,7 @@ if [[ $PRE_VALIDATION == "pass" ]]; then
   log " MAS_APP_SETTINGS_INDEXSPACE: $MAS_APP_SETTINGS_INDEXSPACE"
 
      if [[ ${MAS_JDBC_URL,, } =~ ^jdbc:sqlserver? ]]; then
-         export MAS_APP_SETTINGS_DB2_SCHEMA="dto"
+         export MAS_APP_SETTINGS_DB2_SCHEMA="dbo"
          export MAS_APP_SETTINGS_TABLESPACE="PRIMARY"
          export MAS_APP_SETTINGS_INDEXSPACE="PRIMARY"
      fi
