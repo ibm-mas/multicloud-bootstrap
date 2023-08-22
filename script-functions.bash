@@ -57,7 +57,8 @@ checkROSA(){
 }
 function version_gt() {
   test "$(printf '%s\n' "$@" | sort -V | head -n 1)" != "$1";
-   }
+}
+
 function getOCPVersion() {
 	currentOpenshiftVersion=$(oc get clusterversion | awk  'NR==2 {print $2 }')
 	log " OCP version is $currentOpenshiftVersion"
@@ -169,7 +170,7 @@ function getOPNamespace() {
 		op_namespace=$(oc get csv  --all-namespaces | awk -v pattern="$1" '$2 ~ pattern  { print }'  | awk -F' ' '{print $1}')
 		op_version=$(oc get csv  --all-namespaces | awk -v pattern="$1" '$2 ~ pattern  { print }'  | awk -F' ' '{print $2}' |  grep --perl-regexp '(?:(\d+)\.)?(?:(\d+)\.)?(?:(\d+)\.\d+)' --only-matching )
 		log " $1 version is $op_version"
-		if [[ version_gt $op_version ${op_versions[${1}]} ]]; then
+		if  version_gt $op_version ${op_versions[${1}]} ; then
 			#log " $op_namespace"
 			log " $1 Supported Version"
 			if [[  ${op_namespaces[${1}]} ]]; then
@@ -294,7 +295,7 @@ function getVersion() {
 	fi
 	currentVersion=$(oc get $1 -n ${namespace}  -o json | jq .items[0].spec.version -r)
 	log " $1 version is $currentVersion"
-	if [[ version_gt $currentVersion ${op_versions[${1}]} ]]; then
+	if  version_gt $currentVersion ${op_versions[${1}]} ; then
 		log " $1 Supported Version"
 		instance_name=$(oc get $1 -n ${namespace}  -o json | jq .items[0].metadata.name -r)
 		log " $1 Instance Name : $instance_name"
@@ -332,7 +333,7 @@ function getKafkaVersion() {
 	fi
 	currentVersion=$(oc get kafkas.kafka.strimzi.io -n ${namespace}  -o json | jq .items[0].spec.kafka.version -r)
 	log " Kafka version is $currentVersion"
-	if [[ version_gt $currentVersion ${op_versions[kafkas.kafka.strimzi.io]} ]]; then
+	if  version_gt $currentVersion ${op_versions[kafkas.kafka.strimzi.io]} ; then
     	log " Kafka Supported Version"
 		instance_name=$(oc get kafkas.kafka.strimzi.io -n ${namespace}  -o json | jq .items[0].metadata.name -r)
 		log " $1 Instance Name : $instance_name"
