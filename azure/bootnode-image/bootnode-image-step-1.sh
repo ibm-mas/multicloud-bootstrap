@@ -77,7 +77,7 @@ ssh -i $6 -o StrictHostKeyChecking=no azureuser@$vmip "cd /tmp; curl -skSL 'http
 
 az vm deallocate --resource-group masocp-bootnode-vm-rg-${UNIQSTR} --name bootnode-prep
 az vm generalize --resource-group masocp-bootnode-vm-rg-${UNIQSTR} --name bootnode-prep
-az image create --resource-group masocp-bootnode-vm-rg-${UNIQSTR} --name masocp-bootnode-img-${UNIQSTR} --source bootnode-prep --hyper-v-generation V2
+az image create --resource-group masocp-bootnode-vm-rg-${UNIQSTR} --name masocp-bootnode-img-${UNIQSTR} --source bootnode-prep --hyper-v-generation V2 --features SecurityType=TrustedLaunch
 az group create --name masocp-bootnode-image-rg-${UNIQSTR} --location eastus2
 az sig create --resource-group masocp-bootnode-image-rg-${UNIQSTR} --location eastus2 --gallery-name masbyolimagegallery${UNIQSTR}
 az sig image-definition create --resource-group masocp-bootnode-image-rg-${UNIQSTR} --gallery-name masbyolimagegallery${UNIQSTR} --gallery-image-definition masocp-image-def-${UNIQSTR} --os-type Linux --publisher ibm-software --hyper-v-generation V2 --offer ibm-maximo-vm-offer --sku ibm-maximo-vm-offer-byol
