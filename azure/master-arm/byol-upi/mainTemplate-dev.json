@@ -5,7 +5,7 @@
     "subscriptionId": {
       "type": "string",
       "metadata": {
-        "description": "Azure subscription id where all resources needs to be deployed:"
+        "description": "Confirm your Azure subscription id  again,where all resources needs to be deployed:"
       },
       "defaultValue": "[subscription().subscriptionId]"
     },
@@ -65,7 +65,7 @@
       "type": "string",
       "defaultValue": "10.0.4.0/24",
       "metadata": {
-        "description": "Provide the cidr range for bootnode's subnet. For example , 10.0.4.0/24 - Vnet cidr range is 10.0.0.0/16"
+        "description": "Provide the cidr range for bootnode's subnet. For example , 10.0.4.0/24 - Vnet cidr range is 10.0.0.0/16."
       }
     },
     "clusterSize": {
