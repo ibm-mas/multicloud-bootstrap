@@ -490,7 +490,7 @@ if [[ $PRE_VALIDATION == "pass" ]]; then
     log "Openshift cluster details provided"
     # https://api.masocp-cluster.mas4aws.com/
     # https://api.ftmpsl-ocp-dev3.cp.fyre.ibm.com:6443/
-
+      export INSTALLATION_MODE="EXOCP"
     log "Debug: before: CLUSTER_NAME: $CLUSTER_NAME  BASE_DOMAIN: $BASE_DOMAIN"
     split_ocp_api_url $EXS_OCP_URL
     log "Debug: after: CLUSTER_NAME: $CLUSTER_NAME  BASE_DOMAIN: $BASE_DOMAIN"
@@ -583,7 +583,8 @@ if [[ $PRE_VALIDATION == "pass" ]]; then
     export MAS_URL_ADMIN="https:\/\/admin.${RANDOM_STR}.apps.${CLUSTER_NAME}.${BASE_DOMAIN}"
     export MAS_URL_WORKSPACE="https:\/\/$MAS_WORKSPACE_ID.home.${RANDOM_STR}.apps.${CLUSTER_NAME}.${BASE_DOMAIN}"
     cd ../
-    if [[ $DEPLOY_CP4D == "true" &&  ($retcode -eq 0)]]; then
+
+    if [[ $DEPLOY_CP4D == "true" &&  ($retcode -eq 0) && ($INSTALLATION_MODE !="EXOCP") ]]; then
       log "==== CP4D db2 warehouse service enablement starts ===="
      ./cpd_vars.sh
      log "==== CP4D db2 warehouse service enablement completes ===="
