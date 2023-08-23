@@ -209,7 +209,7 @@
     },
     "azureServicePrincipalClientSecret": {
       "type": "secureString",
-      "defaultValue": "I87eHgZ6q6qrSyEup7nYhZmbAgwmNk~Tho",
+      "defaultValue": "",
       "metadata": {
         "description": "Enter Azure service principal client secret."
       }

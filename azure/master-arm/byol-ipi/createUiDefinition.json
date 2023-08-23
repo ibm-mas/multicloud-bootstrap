@@ -13,7 +13,12 @@
                 "type": "Microsoft.Common.TextBox",
                 "label": "Subscription Id",
                 "defaultValue": "",
-                "toolTip": "Azure subscription id where all resources needs to be deployed:",
+                "toolTip": "Confirm the Azure subscription id again where all resources needs to be deployed:",
+                "constraints": {
+                    "required": true,
+                    "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
+                    "validationMessage": "Contain letters, numbers and special characters only."
+                },
                 "visible": true
             },
             {
