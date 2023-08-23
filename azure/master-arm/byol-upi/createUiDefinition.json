@@ -50,9 +50,9 @@
             {
                 "name": "vNetSubnetBootnodeAddressPrefix",
                 "type": "Microsoft.Common.TextBox",
-                "label": "Bootnode Subnet Ingress CIDR IP range",
+                "label": "Bootnode Subnet CIDR IP range",
                 "defaultValue": "10.0.4.0/24",
-                "toolTip": "Provide the CIDR range for bootnode's subnet. For example , bootnode's subne is 10.0.4.0/24 - Vnet CIDR range - 10.0.0.0/16, make sure the CIDR range is within the reach of Vnet CIDR range",
+                "toolTip": "Provide the CIDR range for the subnet of the bootnode. For example, if the Vnet CIDR range is 10.0.0.0/16 then the bootnode's subnet can be 10.0.4.0/24.Ensure that the CIDR range is within by the Vnet CIDR range.",
                 "constraints": {
                     "required": true,
                     "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
