@@ -4,8 +4,7 @@
   "parameters": {
     "subscriptionId": {
       "type": "string",
-      "metadata": {
-        "description": "Azure subscription id where all resources needs to be deployed:"
+      "metadata": {"description": "Confirm your Azure subscription id  again,where all resources needs to be deployed:"
       },
       "defaultValue": "[subscription().subscriptionId]"
     },
@@ -61,7 +60,7 @@
         "description": "Use CIDR notation to enter the IP addresses that can access the bootnode. For example, 192.12.33.3/32. To allow access from all IP addresses, enter 0.0.0.0/0."
       }
     },
-    "vNetSubnetBootnodeAddressPrefix": {
+    "vNetSubnetBootnodeCidrRange": {
       "type": "string",
       "defaultValue": "10.0.4.0/24",
       "metadata": {
@@ -103,7 +102,7 @@
     },
     "entitledRegistryKey": {
       "type": "secureString",
-      "defaultValue": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJJQk0gTWFya2V0cGxhY2UiLCJpYXQiOjE2NDQ0MDk0MjIsImp0aSI6IjYwNzc2MzQzOGJhODQxMmNiZGRhNzVmNWM2MGEwNjIxIn0.A-9DGN1PAmw7x0opnrJnUpwhvfnsf2f-HAUByEWaLWY",
+      "defaultValue": "",
       "metadata": {
         "description": "Enter the registry key that you downloaded from the IBM Container Library."
       }
@@ -230,7 +229,7 @@
     },
     "azureServicePrincipalClientSecret": {
       "type": "secureString",
-      "defaultValue": "I87eHgZ6q6qrSyEup7nYhZmbAgwmNk~Tho",
+      "defaultValue": "",
       "metadata": {
         "description": "Enter Azure service principal client secret."
       }
@@ -305,8 +304,8 @@
   },
   "variables": {
 
-    "seller_compute_gallery_name": "masbyolimagegallery20230605121806",
-    "seller_image_definition": "masocp-image-def-20230605121806",
+    "seller_compute_gallery_name": "masbyolimagegallery20230822185402",
+    "seller_image_definition": "masocp-image-def-20230822185402",
     "projectName": "[concat('e',substring(uniqueString(resourceGroup().id, deployment().name), 0, 5))]",
     "rgName": "[resourceGroup().name]",
     "vNetSubnetName": "[concat('masocp-', variables('projectName'), '-bootnodeSubnet')]",
@@ -414,7 +413,7 @@
                 "[resourceId(parameters('BootNodeVnetResourceGroup'),'Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName2'))]"
               ],
               "properties": {
-                "addressPrefix": "[parameters('vNetSubnetBootnodeAddressPrefix')]",
+                "addressPrefix": "[parameters('vNetSubnetBootnodeCidrRange')]",
                 "networkSecurityGroup": {
                   "id": "[resourceId(parameters('BootNodeVnetResourceGroup'),'Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName2'))]"
                 }
