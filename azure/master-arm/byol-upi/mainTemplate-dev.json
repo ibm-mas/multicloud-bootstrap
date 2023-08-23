@@ -5,7 +5,7 @@
     "subscriptionId": {
       "type": "string",
       "metadata": {
-        "description": "Confirm your Azure subscription id  again,where all resources needs to be deployed:"
+        "description": "Azure subscription id where all resources needs to be deployed:"
       },
       "defaultValue": "[subscription().subscriptionId]"
     },
@@ -65,7 +65,7 @@
       "type": "string",
       "defaultValue": "10.0.4.0/24",
       "metadata": {
-        "description": "Provide the cidr range for bootnode's subnet. For example , 10.0.4.0/24 - Vnet cidr range is 10.0.0.0/16."
+        "description": "Provide the cidr range for bootnode's subnet. For example , 10.0.4.0/24 - Vnet cidr range is 10.0.0.0/16"
       }
     },
     "clusterSize": {
@@ -82,7 +82,7 @@
     },
     "entitledRegistryKey": {
       "type": "secureString",
-      "defaultValue": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJJQk0gTWFya2V0cGxhY2UiLCJpYXQiOjE2NDQ0MDk0MjIsImp0aSI6IjYwNzc2MzQzOGJhODQxMmNiZGRhNzVmNWM2MGEwNjIxIn0.A-9DGN1PAmw7x0opnrJnUpwhvfnsf2f-HAUByEWaLWY",
+      "defaultValue": "",
       "metadata": {
         "description": "Enter the registry key that you downloaded from the IBM Container Library."
       }
@@ -294,9 +294,8 @@
     }
   },
   "variables": {
-    "subscriptionId": "[subscription().subscriptionId]",
-    "seller_compute_gallery_name": "masbyolimagegallery20230810210502",
-    "seller_image_definition": "masocp-image-def-20230810210502",
+    "seller_compute_gallery_name": "masbyolimagegallery20230817121635",
+    "seller_image_definition": "masocp-image-def-20230817121635",
     "projectName": "[concat('u',substring(uniqueString(resourceGroup().id, deployment().name), 0, 5))]",
     "rgName": "[resourceGroup().name]",
     "vNetSubnetName": "[concat('masocp-', variables('projectName'), '-bootnodeSubnet')]",
@@ -363,7 +362,7 @@
       "apiVersion": "2022-09-01",
       "name": "existingvnetTemplate",
       "resourceGroup": "[parameters('vnetIdResourceGroup')]",
-      "subscriptionId": "[variables('subscriptionId')]",
+      "subscriptionid": "[parameters('subscriptionId')]",
       "properties": {
         "mode": "Incremental",
         "template": {
@@ -566,7 +565,7 @@
             "typeHandlerVersion": "2.0",
             "autoUpgradeMinorVersion": true,
             "protectedSettings": {
-              "commandToExecute": "[concat('sleep 120;', 'cd /root/ansible-devops/multicloud-bootstrap;', './init-async.sh azure ''', parameters('offeringType'), ''' ''', parameters('location'), ''' null ''', parameters('clusterSize'), ''' ''', variables('projectName'), ''' ''', parameters('HostedDomain'), ''' null ''', parameters('sshPublicKey'), ''' null ''', parameters('entitledRegistryKey'), ''' ''', parameters('openShiftPullSecret'), ''' ''', parameters('masLicenseUrl'), ''' ''', parameters('slsEndpointUrl'), ''' ''', parameters('slsRegistrationKey'), ''' ''', parameters('slsPublicCertificateUrl'), ''' ''', parameters('udsEndpointUrl'), ''' ''', parameters('udsAPIKey'), ''' ''', parameters('udsPublicCertificateUrl'), ''' ''', parameters('masManageDBUser'), ''' ''', parameters('masManageDBPassword'), ''' ''', parameters('masManageDBJdbcUrl'), ''' ''', parameters('masManageDBCertificateUrl'), ''' ''', parameters('importDemoData'), ''' '''' '''' '''' ''', variables('rgName'), ''' ''', parameters('emailNotification'), ''' ''', parameters('notificattionEmailAddress'), ''' ''', parameters('smtpHost'), ''' ''', parameters('smtpPort'), ''' ''', parameters('smtpUsername'), ''' ''', parameters('smtpPassword'), ''' ''', parameters('azureServicePrincipalClientId'), ''' ''', parameters('azureServicePrincipalClientSecret'), ''' ''', variables('subscriptionId'), ''' ''', parameters('azureServicePrincipalTenantId'), ''' null null null null ''', parameters('openShiftClustervnetId'), ''' '''' null null null null null null ''', parameters('privateCluster'),''' ''' ,parameters('operationalMode'), ''' '''' '''' '''' '''' '''' '''' '''' '''' dev ''', ''' > mas-provisioning.log 2>&1;')]"
+              "commandToExecute": "[concat('sleep 120;', 'cd /root/ansible-devops/multicloud-bootstrap;', './init-async.sh azure ''', parameters('offeringType'), ''' ''', parameters('location'), ''' null ''', parameters('clusterSize'), ''' ''', variables('projectName'), ''' ''', parameters('HostedDomain'), ''' null ''', parameters('sshPublicKey'), ''' null ''', parameters('entitledRegistryKey'), ''' ''', parameters('openShiftPullSecret'), ''' ''', parameters('masLicenseUrl'), ''' ''', parameters('slsEndpointUrl'), ''' ''', parameters('slsRegistrationKey'), ''' ''', parameters('slsPublicCertificateUrl'), ''' ''', parameters('udsEndpointUrl'), ''' ''', parameters('udsAPIKey'), ''' ''', parameters('udsPublicCertificateUrl'), ''' ''', parameters('masManageDBUser'), ''' ''', parameters('masManageDBPassword'), ''' ''', parameters('masManageDBJdbcUrl'), ''' ''', parameters('masManageDBCertificateUrl'), ''' ''', parameters('importDemoData'), ''' '''' '''' '''' ''', variables('rgName'), ''' ''', parameters('emailNotification'), ''' ''', parameters('notificattionEmailAddress'), ''' ''', parameters('smtpHost'), ''' ''', parameters('smtpPort'), ''' ''', parameters('smtpUsername'), ''' ''', parameters('smtpPassword'), ''' ''', parameters('azureServicePrincipalClientId'), ''' ''', parameters('azureServicePrincipalClientSecret'), ''' ''', parameters('subscriptionId'), ''' ''', parameters('azureServicePrincipalTenantId'), ''' null null null null ''', parameters('openShiftClustervnetId'), ''' '''' null null null null null null ''', parameters('privateCluster'),''' ''' ,parameters('operationalMode'), ''' '''' '''' '''' '''' '''' '''' '''' '''' dev ''', ''' > mas-provisioning.log 2>&1;')]"
             }
           }
         }
@@ -623,10 +622,6 @@
     "masCloudAutomationVersion": {
       "type": "string",
       "value": "2.0"
-    },
-    "SubscritionId": {
-      "type": "string",
-      "value": "[variables('subscriptionId')]"
     },
     "clusterUniqueString": {
       "type": "string",
