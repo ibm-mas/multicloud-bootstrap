@@ -48,7 +48,7 @@
                 "visible": true
             },
             {
-                "name": "vNetSubnetBootnodeAddressPrefix",
+                "name": "vNetSubnetBootnodeCidrRange",
                 "type": "Microsoft.Common.TextBox",
                 "label": "Bootnode Subnet CIDR IP range",
                 "defaultValue": "10.0.4.0/24",

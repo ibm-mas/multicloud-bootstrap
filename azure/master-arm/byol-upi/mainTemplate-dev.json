@@ -61,7 +61,7 @@
         "description": "Use CIDR notation to enter the IP addresses that can access the bootnode. For example, 192.12.33.3/32. To allow access from all IP addresses, enter 0.0.0.0/0."
       }
     },
-    "vNetSubnetBootnodeAddressPrefix": {
+    "vNetSubnetBootnodeCidrRange": {
       "type": "string",
       "defaultValue": "10.0.4.0/24",
       "metadata": {
@@ -403,7 +403,7 @@
                 "[resourceId(parameters('vnetIdResourceGroup'),'Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName2'))]"
               ],
               "properties": {
-                "addressPrefix": "[parameters('vNetSubnetBootnodeAddressPrefix')]",
+                "addressPrefix": "[parameters('vNetSubnetBootnodeCidrRange')]",
                 "networkSecurityGroup": {
                   "id": "[resourceId(parameters('vnetIdResourceGroup'),'Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName2'))]"
                 }
