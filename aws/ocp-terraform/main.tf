@@ -106,12 +106,12 @@ module "ocp" {
   availability_zone3              = local.availability_zone3
   worker_instance_type            = var.worker_instance_type
   worker_instance_volume_iops     = var.worker_instance_volume_iops
-  worker_instance_volume_type     = $EBSVolumeType
+  worker_instance_volume_type     = var.worker_instance_volume_type
   worker_instance_volume_size     = var.worker_instance_volume_size
   worker_replica_count            = var.worker_replica_count
   master_instance_type            = var.master_instance_type
   master_instance_volume_iops     = var.master_instance_volume_iops
-  master_instance_volume_type     = $EBSVolumeType
+  master_instance_volume_type     = var.master_instance_volume_type
   master_instance_volume_size     = var.master_instance_volume_size
   master_replica_count            = var.master_replica_count
   cluster_network_cidr            = var.cluster_network_cidr
