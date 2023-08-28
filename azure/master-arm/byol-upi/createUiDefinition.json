@@ -60,32 +60,7 @@
                 },
                 "visible": true
             },
-            {
-                "name": "BootNodeVnetId",
-                "type": "Microsoft.Common.TextBox",
-                "label": "BootNodeVnetId",
-                "defaultValue": "",
-                "toolTip": "Enter the Vnet Id to create the bootnode into.  If existing OpenShift cluster is specified,\n   make sure it is reachable from this Vnet.",
-                "constraints": {
-                    "required": true,
-                    "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
-                    "validationMessage": "Contain letters, numbers and special characters only."
-                },
-                "visible": true
-            },
-            {
-                "name": "BootNodeVnetResourceGroup",
-                "type": "Microsoft.Common.TextBox",
-                "label": "BootNodeVnetResourceGroup",
-                "defaultValue": "",
-                "toolTip": "Enter the BootNodeVnetId's resource group.If existing OpenShift cluster is specified,\n   make sure it is reachable from this Vnet.",
-                "constraints": {
-                    "required": true,
-                    "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
-                    "validationMessage": "Contain letters, numbers and special characters only."
-                },
-                "visible": true
-            },
+
             {
                 "name": "azureServicePrincipalTenantId",
                 "type": "Microsoft.Common.TextBox",
@@ -576,12 +551,13 @@
         ],
         "outputs": {
             "location": "[location()]",
+            "subscriptionId":  "[basics('subscriptionId')]",
             "sshPublicKey": "[basics('sshPublicKey')]",
+            "vNetSubnetBootnodeCidrRange": "[basics('vNetSubnetBootnodeCidrRange')]",
             "bootnodeSGIngressCidrIp": "[basics('bootnodeSGIngressCidrIp')]",
             "azureServicePrincipalTenantId": "[basics('azureServicePrincipalTenantId')]",
             "azureServicePrincipalClientId": "[basics('azureServicePrincipalClientId')]",
             "azureServicePrincipalClientSecret": "[basics('azureServicePrincipalClientSecret')]",
-
             "HostedDomain": "[steps('ApplicationSettings').HostedDomain]",
             "offeringType": "[steps('ApplicationSettings').offeringType]",
             "clusterSize": "[steps('ApplicationSettings').clusterSize]",

@@ -485,6 +485,7 @@
         ],
         "outputs": {
             "location": "[location()]",
+            "subscriptionId": "[basics('subscriptionId')]",
             "sshPublicKey": "[basics('sshPublicKey')]",
             "bootnodeSGIngressCidrIp": "[basics('bootnodeSGIngressCidrIp')]",
             "azureServicePrincipalTenantId": "[basics('azureServicePrincipalTenantId')]",

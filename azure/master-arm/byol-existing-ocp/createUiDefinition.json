@@ -511,7 +511,9 @@
         ],
         "outputs": {
             "location": "[location()]",
+            "subscriptionId":  "[basics('subscriptionId')]",
             "sshPublicKey": "[basics('sshPublicKey')]",
+            "vNetSubnetBootnodeCidrRange": "[basics('vNetSubnetBootnodeCidrRange')]",
             "bootnodeSGIngressCidrIp": "[basics('bootnodeSGIngressCidrIp')]",
             "azureServicePrincipalTenantId": "[basics('azureServicePrincipalTenantId')]",
             "azureServicePrincipalClientId": "[basics('azureServicePrincipalClientId')]",
