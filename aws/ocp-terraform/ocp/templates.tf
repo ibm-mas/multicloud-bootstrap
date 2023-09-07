@@ -12,7 +12,7 @@ compute:
       - ${var.availability_zone1}%{if var.multi_zone}${indent(6, "\n- ${var.availability_zone2}\n- ${var.availability_zone3}")}%{endif}
       type: ${var.worker_instance_type}
       rootVolume:
-        iops: "${var.worker_instance_volume_type}== "io1" || "gp3" ? var.worker_instance_volume_iops
+        iops: ${var.worker_instance_volume_iops} 
         size: ${var.worker_instance_volume_size}
         type: ${var.worker_instance_volume_type}
   replicas: ${var.worker_replica_count}
