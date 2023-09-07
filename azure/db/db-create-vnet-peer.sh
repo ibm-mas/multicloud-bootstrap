@@ -31,7 +31,7 @@
       log "db-create-vnet-peer.sh : Validate the CIDR ranges of 2 Vnets -- Ends "
 
       log "Create a peering from $VnetId_1 to $VnetId_2 -- Starts"
-      export VNet_PEERING_CONNECTION_ID_1=`az network vnet peering create --name Database-OCP --resource-group $VnetId_1_RG --vnet-name $VnetId_1  --remote-vnet $vNet2Id --allow-vnet-access`
+      export VNet_PEERING_CONNECTION_ID_1=`az network vnet peering create --name Database-OCP --resource-group $VnetId_1_RG --vnet-name $VnetId_1  --remote-vnet $vNet2Id --allow-vnet-access --query peeringState`
       sleep 30
       log "db-create-vnet-peer.sh : VNet_PEERING_CONNECTION_ID=$VNet_PEERING_CONNECTION_ID_1"
       if [[  "${VNet_PEERING_CONNECTION_ID_1}" != "Initiated" ]]; then
@@ -42,7 +42,7 @@
 
       if [[  "${VNet_PEERING_CONNECTION_ID_1}" == "Initiated" ]]; then
           log "db-create-vnet-peer.sh : Azure vnet peering initialized "
-          export VNet_PEERING_CONNECTION_ID_2=`az network vnet peering create --name OCP-Database --resource-group $VnetId_2_RG --vnet-name $VnetId_2 --remote-vnet $vNet1Id --allow-vnet-access`
+          export VNet_PEERING_CONNECTION_ID_2=`az network vnet peering create --name OCP-Database --resource-group $VnetId_2_RG --vnet-name $VnetId_2 --remote-vnet $vNet1Id --allow-vnet-access --query peeringState`
         	export VNet_PEERING_CONNECTION_STATUS=`az network vnet peering show  --name DB-Database-Peering --resource-group  $VnetId_1_RG  --vnet-name  $VnetId_1  --query peeringState`
         	counter=0
         	while [[ $VNet_PEERING_CONNECTION_STATUS != "Connected" ]] && [[ $counter < 20 ]]; do
