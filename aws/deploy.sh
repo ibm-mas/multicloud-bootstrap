@@ -300,7 +300,7 @@ if [[ -n $EXISTING_NETWORK ]]; then
   export VPC_ID="${EXISTING_NETWORK}" #upi
 fi
 if [[ -z $AWS_VPC_ID && -z $EXISTING_NETWORK  && -n $BOOTNODE_VPC_ID ]]; then
-  export VPC_ID="${BOOTNODE_VPC_ID}" #existing ocp
+  export VPC_ID="${BOOTNODE_VPC_ID}" #existing ocp #new VPCID
 fi
 if [[ -z $VPC_ID && $MONGO_FLAVOR == "Amazon DocumentDB" ]]; then
   log "Failed to get the vpc id required to deploy documentdb"
@@ -315,7 +315,7 @@ log "==== aws/deploy.sh : Invoke db-create-vpc-peer.sh starts ===="
     export ACCEPTER_VPC_ID=${DBProvisionedVPCId}
     export REQUESTER_VPC_ID=${VPC_ID}
 
-    sh $GIT_REPO_HOME/aws/db/db-create-vpc-peer.sh
+    sh $GIT_REPO_HOME/aws/db/db-create-vnet-peer.sh
     log "==== aws/deploy.sh : Invoke db-create-vpc-peer.sh ends ===="
 fi
 
