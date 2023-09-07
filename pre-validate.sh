@@ -95,7 +95,7 @@ log "==== This VPC peering is done to pre-validate database connection ==="
     export ACCEPTER_VPC_ID=${DBProvisionedVPCId}
     export REQUESTER_VPC_ID=${BOOTNODE_VPC_ID}
 
-    sh $GIT_REPO_HOME/aws/db/db-create-vpc-peer.sh
+    sh $GIT_REPO_HOME/aws/db/db-create-vnet-peer.sh
     log "==== Invoke db-create-vpc-peer.sh ends ===="
 fi
 # JDBC CFT inputs validation and connection test
@@ -309,6 +309,36 @@ if [[ $CLUSTER_TYPE == "azure" ]]; then
         fi
     fi
 fi
+#Validate the subscriptionId
+if [[ $CLUSTER_TYPE == "azure" ]]; then
+   az login --service-principal -u ${AZURE_SP_CLIENT_ID} -p ${AZURE_SP_CLIENT_PWD} --tenant ${TENANT_ID}
+  export AZURE_VALIDATE_SUBSC_ID=`az account list --query "[?id == '$SELLER_SUBSCRIPTION_ID'].{Id:id}" -o tsv`
+  if [[ -n $AZURE_VALIDATE_SUBSC_ID ]]; then
+    export AZURE_SUBSC_ID=$AZURE_VALIDATE_SUBSC_ID
+     log " AZURE_SUBSC_ID: $AZURE_SUBSC_ID"
+  else
+    log "ERROR: Subscription Id Invalid"
+    SCRIPT_STATUS=46
+  fi
+fi
+
+
+#DBProvisionedVPCId
+`az network vnet list | jq --arg VNET_NAME $VNET_NAME '.[] | select(.name==$VNET_NAME).resourceGroup' | tr -d '"'`
+
+if [[ $CLUSTER_TYPE == "azure" ]]; then
+   az login --service-principal -u ${AZURE_SP_CLIENT_ID} -p ${AZURE_SP_CLIENT_PWD} --tenant ${TENANT_ID}
+  export ValidateDBProvisionedVPCId=`az network vnet list --query "[?name=='$DBProvisionedVPCId'].{Name:name}" -o tsv`
+  if [[ -n ValidateDBProvisionedVPCId ]]; then
+    export DBProvisionedVPCId=$ValidateDBProvisionedVPCId
+     log " DBProvisionedVPCId: $DBProvisionedVPCId"
+  else
+    log "ERROR: Database cluster /Node Vnet is invalid"
+    SCRIPT_STATUS=45
+  fi
+fi
+
+
 #Validate the subscriptionId
 if [[ $CLUSTER_TYPE == "azure" ]]; then
    az login --service-principal -u ${AZURE_SP_CLIENT_ID} -p ${AZURE_SP_CLIENT_PWD} --tenant ${TENANT_ID}
