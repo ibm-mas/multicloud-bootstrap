@@ -322,10 +322,6 @@ if [[ $CLUSTER_TYPE == "azure" ]]; then
   fi
 fi
 
-
-#DBProvisionedVPCId
-`az network vnet list | jq --arg VNET_NAME $VNET_NAME '.[] | select(.name==$VNET_NAME).resourceGroup' | tr -d '"'`
-
 if [[ $CLUSTER_TYPE == "azure" ]]; then
    az login --service-principal -u ${AZURE_SP_CLIENT_ID} -p ${AZURE_SP_CLIENT_PWD} --tenant ${TENANT_ID}
   export ValidateDBProvisionedVPCId=`az network vnet list --query "[?name=='$DBProvisionedVPCId'].{Name:name}" -o tsv`
