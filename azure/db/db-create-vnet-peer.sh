@@ -3,6 +3,8 @@
     export VnetId_2=$ACCEPTER_VPC_ID   #db
 	  export ACCEPTER_REGION=$DEPLOY_REGION
 
+ if [[  (-n $VnetId_1) &&  (-n $VnetId_2) ]] ;then
+
     log "db-create-vnet-peer.sh .......... starts"
     log "db-create-vnet-peer.sh : REQUESTER_VPC_ID : $REQUESTER_VPC_ID" # VPC_ID of cluster
     log "db-create-vnet-peer.sh : ACCEPTER_VPC_ID : $ACCEPTER_VPC_ID" #db_VPC_ID
@@ -56,6 +58,12 @@
             	exit $SCRIPT_STATUS
           fi
       fi
+    fi
+    else
+          SCRIPT_STATUS=35
+                log "db-create-vnet-peer.sh : Vnets are blank..."
+                exit $SCRIPT_STATUS
+
     fi
 
 
