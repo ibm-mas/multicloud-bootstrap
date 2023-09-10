@@ -162,7 +162,7 @@ variable "worker_instance_type" {
 
 variable "worker_instance_volume_iops" {
   type    = number
-  default = 2000
+  default = 4000
 }
 
 variable "worker_instance_volume_size" {
