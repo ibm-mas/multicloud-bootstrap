@@ -40,6 +40,7 @@ log " IAM_USER_NAME: $IAM_USER_NAME"
 log " SLS_STORAGE_CLASS: $SLS_STORAGE_CLASS"
 log " CPD_METADB_BLOCK_STORAGE_CLASS: $CPD_METADB_BLOCK_STORAGE_CLASS"
 log " SSH_PUB_KEY: $SSH_PUB_KEY"
+log "==== debug3 ===="
 
 ## Download files from S3 bucket
 # Download SLS certificate
@@ -177,10 +178,14 @@ EOT
   log "==== OCP cluster creation started ===="
   # Deploy OCP cluster
   sed -i "s/<REGION>/$DEPLOY_REGION/g" variables.tf
+  log "==== debug4 ===="
   terraform init -input=false
+  log "==== debug5 ===="
   terraform plan -input=false -out=tfplan
+  log "==== debug6 ===="
   set +e
   terraform apply -input=false -auto-approve
+  log "==== debug7 ===="
   if [[ -f terraform.tfstate ]]; then
     chmod 600 terraform.tfstate
   fi

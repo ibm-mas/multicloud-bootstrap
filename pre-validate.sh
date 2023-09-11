@@ -96,6 +96,7 @@ log "==== This VPC peering is done to pre-validate database connection ==="
 
     sh $GIT_REPO_HOME/aws/db/db-create-vpc-peer.sh
     log "==== Invoke db-create-vpc-peer.sh ends ===="
+    log "==== debug1 ===="
 fi
 # JDBC CFT inputs validation and connection test
 if [[ $DEPLOY_MANAGE == "true" ]]; then
@@ -142,6 +143,7 @@ if [[ $DEPLOY_MANAGE == "true" ]]; then
             export MAS_DB2_JAR_LOCAL_PATH=$GIT_REPO_HOME/lib/db2jcc4.jar
             if [[ ${MAS_JDBC_URL,, } =~ ^jdbc:db2? ]]; then
                 log "Connecting to DB2 Database"
+                log "==== debug2 ===="
                 if python jdbc-prevalidateDB2.py; then
                     log "Db2 JDBC URL Validation = PASS"
                 else
