@@ -37,6 +37,15 @@ Parameters:
       - small
       - medium
       - large
+  EBSVolumeType:
+    Description: Select your preferred EBS Volume type for worker nodes based on your performance requirements & cost of the volume types.
+      For more information on volume types, refer --> https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-volume-types.html
+    Type: String
+    Default: gp3
+    MinLength: '1'
+    AllowedValues:
+      - io1
+      - gp3
   EntitledRegistryKey:
     Description: Enter the registry key that you downloaded from the IBM Container Library.
     Type: String
@@ -73,9 +82,9 @@ Parameters:
     Type: String
   DBProvisionedVPCId:
     Description: >-
-      Enter the VPC ID where your existing database (DB2 or Oracle or MSSQL) was provisioned on a private subnet to establish 
+      Enter the VPC ID where your existing database (DB2 or Oracle or MSSQL) was provisioned on a private subnet to establish
       VPC Peering from this VPC & the VPC created during current stack deployment in order to establish database connection.
-    Type: String 
+    Type: String
   ImportDemoData:
     Description: >-
       Indicate whether you want to import demo data into the database. This
@@ -152,7 +161,7 @@ Parameters:
       - "Use an existing mongo instance"
   MongoDBProvider:
     Description: >-
-      Select the desired MongoDB provider. 
+      Select the desired MongoDB provider.
       Note: When selecting MongoDBProvider as MongoDB and MongoDeploymentMode as 'Provision a new mongo instance', a new "MongoDB Community Edition" instance will be provisioned
     Type: String
     Default: "MongoDB"
@@ -208,6 +217,7 @@ Metadata:
         Parameters:
           - PublicHostedZone
           - ClusterSize
+          - EBSVolumeType
       - Label:
           default: Cluster and bootnode access (you must complete this section)
         Parameters:
@@ -221,8 +231,8 @@ Metadata:
       - Label:
           default: >-
             Maximo Manage database configuration (complete this section only if
-            you chose the 'MAS + Manage' offering type. 
-            In case if this section is left empty and you chose 'MAS + Manage' offering type, 
+            you chose the 'MAS + Manage' offering type.
+            In case if this section is left empty and you chose 'MAS + Manage' offering type,
             then We will provision an internal DB2 instance for Manage)
         Parameters:
           - MASManageDBUser
@@ -238,18 +248,18 @@ Metadata:
           - MongoDBProvider
       - Label:
           default: >-
-            Existing MongoDB / DocumentDB configuration details 
+            Existing MongoDB / DocumentDB configuration details
             (complete this section only if MongoDeploymentMode was selected as 'Use an existing mongo instance')
         Parameters:
           - MongoAdminUsername
           - MongoAdminPassword
           - MongoHosts
           - MongoCAPemFile
-          - DocumentDBProvisionedVPCId          
+          - DocumentDBProvisionedVPCId
       - Label:
           default: AWS MSK Provision
         Parameters:
-          - AWSMSKProvider	         
+          - AWSMSKProvider
       - Label:
           default: >-
             Existing Suite License Service connection details (leave this
@@ -721,6 +731,9 @@ Resources:
             - !Ref AWSMSKProvider
             - ''' '''
             - !Ref DBProvisionedVPCId
+            - ''' '''
+            - !Ref EBSVolumeType
+            - ''' '''
             - ''' "dev" '
             - '2>&1 | tee mas-provisioning.log; '
       Tags:
