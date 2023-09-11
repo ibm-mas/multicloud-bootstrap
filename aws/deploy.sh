@@ -315,7 +315,7 @@ log "==== aws/deploy.sh : Invoke db-create-vpc-peer.sh starts ===="
     export ACCEPTER_VPC_ID=${DBProvisionedVPCId}
     export REQUESTER_VPC_ID=${VPC_ID}
 
-    sh $GIT_REPO_HOME/aws/db/db-create-vnet-peer.sh
+    sh $GIT_REPO_HOME/aws/db/db-create-vpc-peer.sh
     log "==== aws/deploy.sh : Invoke db-create-vpc-peer.sh ends ===="
 fi
 
