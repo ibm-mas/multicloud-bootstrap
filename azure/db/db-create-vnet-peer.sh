@@ -86,18 +86,10 @@
           fi
       fi
     fi
-    log Peering Completed"
+    log "Peering Completed"
     else
           SCRIPT_STATUS=35
                 log "db-create-vnet-peer.sh : Vnets are blank..."
                 exit $SCRIPT_STATUS
 
     fi
-
-
-
-
-
-
-
-
