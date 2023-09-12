@@ -325,7 +325,8 @@ fi
 if [[ $CLUSTER_TYPE == "azure" ]]; then
    az login --service-principal -u ${AZURE_SP_CLIENT_ID} -p ${AZURE_SP_CLIENT_PWD} --tenant ${TENANT_ID}
   export ValidateDBProvisionedVPCId=`az network vnet list --query "[?name=='$DBProvisionedVPCId'].{Name:name}" -o tsv`
-  if [[ -n ValidateDBProvisionedVPCId ]]; then
+  log "ValidateDBProvisionedVPCId -- $ValidateDBProvisionedVPCId"
+  if [[ -n $ValidateDBProvisionedVPCId ]]; then
     export DBProvisionedVPCId=$ValidateDBProvisionedVPCId
      log " DBProvisionedVPCId: $DBProvisionedVPCId"
   else
