@@ -166,13 +166,19 @@ fi
 
 # delete vpc peering connection filter as RequesterVpcInfo
   VPCPEERID=$(aws ec2 describe-vpc-peering-connections --region ${DEPLOY_REGION} --query "VpcPeeringConnections[?(RequesterVpcInfo.VpcId == '${REQUESTER_VPC_ID}')].VpcPeeringConnectionId" --output text)
+  log " VPCPEERID=$VPCPEERID "
   if [[ -n $VPCPEERID ]]; then
+  log "Inside IF Statement & before deleteion "
     aws ec2 delete-vpc-peering-connection --vpc-peering-connection-id ${VPCPEERID} --region ${DEPLOY_REGION}
+  log "Inside IF Statement & after deleteion "
   fi
   # delete vpc peering connection filter as AccepterVpcInfo
   VPCPEERID=$(aws ec2 describe-vpc-peering-connections --region ${DEPLOY_REGION} --query "VpcPeeringConnections[?(AccepterVpcInfo.VpcId == '${ACCEPTER_VPC_ID}')].VpcPeeringConnectionId" --output text)
+  log " VPCPEERID=$VPCPEERID "
   if [[ -n $VPCPEERID ]]; then
+  log "Inside IF Statement & before deleteion "
     aws ec2 delete-vpc-peering-connection --vpc-peering-connection-id ${VPCPEERID} --region ${DEPLOY_REGION}
+  log "Inside IF Statement & after deleteion "
   fi
 
 #mongo pre-validation only for AWS currently.
