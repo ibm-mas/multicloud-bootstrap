@@ -165,14 +165,14 @@ if [[ $DEPLOY_MANAGE == "true" ]]; then
 fi
 
 # delete vpc peering connection filter as RequesterVpcInfo
-  VPCPEERID=$(aws ec2 describe-vpc-peering-connections --region ${REGION} --query "VpcPeeringConnections[?(RequesterVpcInfo.VpcId == '${VPC_ID}')].VpcPeeringConnectionId" --output text)
+  VPCPEERID=$(aws ec2 describe-vpc-peering-connections --region ${DEPLOY_REGION} --query "VpcPeeringConnections[?(RequesterVpcInfo.VpcId == '${REQUESTER_VPC_ID}')].VpcPeeringConnectionId" --output text)
   if [[ -n $VPCPEERID ]]; then
-    aws ec2 delete-vpc-peering-connection --vpc-peering-connection-id ${VPCPEERID} --region ${REGION}
+    aws ec2 delete-vpc-peering-connection --vpc-peering-connection-id ${VPCPEERID} --region ${DEPLOY_REGION}
   fi
   # delete vpc peering connection filter as AccepterVpcInfo
-  VPCPEERID=$(aws ec2 describe-vpc-peering-connections --region ${REGION} --query "VpcPeeringConnections[?(AccepterVpcInfo.VpcId == '${VPC_ID}')].VpcPeeringConnectionId" --output text)
+  VPCPEERID=$(aws ec2 describe-vpc-peering-connections --region ${DEPLOY_REGION} --query "VpcPeeringConnections[?(AccepterVpcInfo.VpcId == '${ACCEPTER_VPC_ID}')].VpcPeeringConnectionId" --output text)
   if [[ -n $VPCPEERID ]]; then
-    aws ec2 delete-vpc-peering-connection --vpc-peering-connection-id ${VPCPEERID} --region ${REGION}
+    aws ec2 delete-vpc-peering-connection --vpc-peering-connection-id ${VPCPEERID} --region ${DEPLOY_REGION}
   fi
 
 #mongo pre-validation only for AWS currently.
