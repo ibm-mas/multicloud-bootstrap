@@ -180,7 +180,7 @@ fi
     aws ec2 delete-vpc-peering-connection --vpc-peering-connection-id ${VPCPEERID} --region ${DEPLOY_REGION}
   log "Inside IF Statement & after deleteion "
   fi
-
+  sleep 300
 #mongo pre-validation only for AWS currently.
 if [[ $CLUSTER_TYPE == "aws" ]]; then
     log "=== pre-validate-mongo.sh started ==="
