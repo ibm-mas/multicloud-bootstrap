@@ -85,18 +85,8 @@ fi
 #    log "ERROR: Record set with $UNIQ_STR already exists as $CNAME_REC"
 #    SCRIPT_STATUS=25
 #fi
-
-if [[ -n $DBProvisionedVPCId ]]; then
 cd $GIT_REPO_HOME
-log "==== Invoke db-create-vpc-peer.sh to create VPC Peering between bootnode VPC & database provisioned VPC ID starts ===="
-log "==== This VPC peering is done to pre-validate database connection ==="
-    log "Existing instance of db @ VPC_ID=$DBProvisionedVPCId"
-    export ACCEPTER_VPC_ID=${DBProvisionedVPCId}
-    export REQUESTER_VPC_ID=${BOOTNODE_VPC_ID}
-
-    sh $GIT_REPO_HOME/aws/db/db-create-vpc-peer.sh
-    log "==== Invoke db-create-vpc-peer.sh ends ===="
-fi
+if [[ -n $DBProvisionedVPCId ]]; then
 # JDBC CFT inputs validation and connection test
 if [[ $DEPLOY_MANAGE == "true" ]]; then
     if [[ (-z $MAS_JDBC_USER) && (-z $MAS_JDBC_PASSWORD) && (-z $MAS_JDBC_URL) && (-z $MAS_JDBC_CERT_URL) ]]; then
@@ -163,24 +153,8 @@ if [[ $DEPLOY_MANAGE == "true" ]]; then
         fi
     fi
 fi
+fi
 
-# delete vpc peering connection filter as RequesterVpcInfo
-  VPCPEERID=$(aws ec2 describe-vpc-peering-connections --region ${DEPLOY_REGION} --query "VpcPeeringConnections[?(RequesterVpcInfo.VpcId == '${REQUESTER_VPC_ID}')].VpcPeeringConnectionId" --output text)
-  log " VPCPEERID=$VPCPEERID "
-  if [[ -n $VPCPEERID ]]; then
-  log "Inside IF Statement & before deleteion "
-    aws ec2 delete-vpc-peering-connection --vpc-peering-connection-id ${VPCPEERID} --region ${DEPLOY_REGION}
-  log "Inside IF Statement & after deleteion "
-  fi
-  # delete vpc peering connection filter as AccepterVpcInfo
-  VPCPEERID=$(aws ec2 describe-vpc-peering-connections --region ${DEPLOY_REGION} --query "VpcPeeringConnections[?(AccepterVpcInfo.VpcId == '${ACCEPTER_VPC_ID}')].VpcPeeringConnectionId" --output text)
-  log " VPCPEERID=$VPCPEERID "
-  if [[ -n $VPCPEERID ]]; then
-  log "Inside IF Statement & before deleteion "
-    aws ec2 delete-vpc-peering-connection --vpc-peering-connection-id ${VPCPEERID} --region ${DEPLOY_REGION}
-  log "Inside IF Statement & after deleteion "
-  fi
-  sleep 300
 #mongo pre-validation only for AWS currently.
 if [[ $CLUSTER_TYPE == "aws" ]]; then
     log "=== pre-validate-mongo.sh started ==="
