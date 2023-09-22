@@ -140,7 +140,7 @@ if [[ $DEPLOY_MANAGE == "true" ]]; then
             elif [[ $CLUSTER_TYPE == "gcp" ]]; then
                 wget "$MAS_JDBC_CERT_URL" -O db.crt
             fi
-
+           #Removing the Validation check for now as DB are in private subnets in different Vnet/VPC , Validation requires peering of database with bootnode Vpc/Vnet.
             if [[ ${MAS_JDBC_URL,, } =~ ^jdbc:db2? ]]; then
                export MAS_DB2_JAR_LOCAL_PATH=$GIT_REPO_HOME/lib/db2jcc4.jar
                 log "Connecting to DB2 Database"

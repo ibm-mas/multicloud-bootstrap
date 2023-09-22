@@ -2,6 +2,8 @@
 	  export VnetId_1=$REQUESTER_VPC_ID #ocp
     export VnetId_2=$ACCEPTER_VPC_ID   #db
 	  export ACCEPTER_REGION=$DEPLOY_REGION
+	  export DBOCP="Database-OCP"
+    export OCPDB="DB-Database-Peering"
 
  if [[  (-n $VnetId_1) &&  (-n $VnetId_2) ]] ;then
 
@@ -44,8 +46,7 @@
       log "db-create-vnet-peer.sh : Validate the CIDR ranges of 2 Vnets -- Ends "
 
       log "Create a peering from $VnetId_1 to $VnetId_2 -- Starts"
-      export DBOCP="Database-OCP"
-      export OCPDB="DB-Database-Peering"
+
       export VNet_PEERING_CONNECTION_ID_1=`az network vnet peering create --name $DBOCP --resource-group $VnetId_1_RG --vnet-name $VnetId_1  --remote-vnet $vNet2Id --allow-vnet-access --query peeringState`
       sleep 30
       log "db-create-vnet-peer.sh : VNet_PEERING_CONNECTION_ID=$VNet_PEERING_CONNECTION_ID_1"
