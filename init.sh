@@ -68,9 +68,9 @@ export DOCUMENTDB_VPC_ID=${59}
 export AWS_MSK_PROVIDER=${60}
 export DBProvisionedVPCId=${61}
 export ExocpProvisionedVPCId=${62}
-export ENV_TYPE=${63}
-export EBSVolumeType=${64}
-export MANAGE_TABLESPACE=${65}
+export EBSVolumeType=${63}
+export MANAGE_TABLESPACE=${64}
+export ENV_TYPE=${65}
 export GIT_REPO_HOME=$(pwd)
 # Load helper functions
 . helper.sh
