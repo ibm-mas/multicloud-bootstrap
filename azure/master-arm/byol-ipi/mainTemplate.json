@@ -133,6 +133,20 @@
       },
       "defaultValue": ""
     },
+    "masManageTablespace": {
+      "type": "string",
+      "metadata": {
+        "description": "Enter the DB_SCHEMA ,TABLESPACE,INDEXSPACE values with ':' in between the values. Ex : For DB2 - maximo:maxdata:maxindex , Oracle -maximo:maxdata:maxindex , Mssql - dto:PRIMARY:PRIMARY"
+      },
+      "defaultValue": ""
+    },
+    "DBProvisionedVPCId": {
+      "type": "string",
+      "metadata": {
+        "description": "Enter the Vnet ID where your existing database (DB2 or Oracle or MSSQL) was provisioned to establish \n  Vnet Peering from this Vnet & the Existing OCP cluster's Vnet in order to establish database connection."
+      },
+      "defaultValue": ""
+    },
     "importDemoData": {
       "type": "string",
       "metadata": {
@@ -535,7 +549,7 @@
             "typeHandlerVersion": "2.0",
             "autoUpgradeMinorVersion": true,
             "protectedSettings": {
-              "commandToExecute": "[concat('sleep 120;', 'cd /root/ansible-devops/multicloud-bootstrap;', './init-async.sh azure ''', parameters('offeringType'), ''' ''', parameters('location'), ''' null ''', parameters('clusterSize'), ''' ''', variables('projectName'), ''' ''', parameters('publicDomain'), ''' null ''', parameters('sshPublicKey'), ''' null ''', parameters('entitledRegistryKey'), ''' ''', parameters('openShiftPullSecret'), ''' ''', parameters('masLicenseUrl'), ''' ''', parameters('slsEndpointUrl'), ''' ''', parameters('slsRegistrationKey'), ''' ''', parameters('slsPublicCertificateUrl'), ''' ''', parameters('udsEndpointUrl'), ''' ''', parameters('udsAPIKey'), ''' ''', parameters('udsPublicCertificateUrl'), ''' ''', parameters('masManageDBUser'), ''' ''', parameters('masManageDBPassword'), ''' ''', parameters('masManageDBJdbcUrl'), ''' ''', parameters('masManageDBCertificateUrl'), ''' ''', parameters('importDemoData'), ''' '''' '''' '''' ''', variables('rgName'), ''' ''', parameters('emailNotification'), ''' ''', parameters('notificattionEmailAddress'), ''' ''', parameters('smtpHost'), ''' ''', parameters('smtpPort'), ''' ''', parameters('smtpUsername'), ''' ''', parameters('smtpPassword'), ''' ''', parameters('azureServicePrincipalClientId'), ''' ''', parameters('azureServicePrincipalClientSecret'), ''' ''', parameters('subscriptionId'), ''' ''', parameters('azureServicePrincipalTenantId'), ''' null null null null '''' '''' null null null null null null null ''', parameters('operationalMode'), ''' '''' '''' '''' '''' '''' '''' '''' '''' dev ''', ''' > mas-provisioning.log 2>&1;')]"
+              "commandToExecute": "[concat('sleep 120;', 'cd /root/ansible-devops/multicloud-bootstrap;', './init-async.sh azure ''', parameters('offeringType'), ''' ''', parameters('location'), ''' null ''', parameters('clusterSize'), ''' ''', variables('projectName'), ''' ''', parameters('publicDomain'), ''' null ''', parameters('sshPublicKey'), ''' null ''', parameters('entitledRegistryKey'), ''' ''', parameters('openShiftPullSecret'), ''' ''', parameters('masLicenseUrl'), ''' ''', parameters('slsEndpointUrl'), ''' ''', parameters('slsRegistrationKey'), ''' ''', parameters('slsPublicCertificateUrl'), ''' ''', parameters('udsEndpointUrl'), ''' ''', parameters('udsAPIKey'), ''' ''', parameters('udsPublicCertificateUrl'), ''' ''', parameters('masManageDBUser'), ''' ''', parameters('masManageDBPassword'), ''' ''', parameters('masManageDBJdbcUrl'), ''' ''', parameters('masManageDBCertificateUrl'), ''' ''', parameters('importDemoData'), ''' '''' '''' '''' ''', variables('rgName'), ''' ''', parameters('emailNotification'), ''' ''', parameters('notificattionEmailAddress'), ''' ''', parameters('smtpHost'), ''' ''', parameters('smtpPort'), ''' ''', parameters('smtpUsername'), ''' ''', parameters('smtpPassword'), ''' ''', parameters('azureServicePrincipalClientId'), ''' ''', parameters('azureServicePrincipalClientSecret'), ''' ''', parameters('subscriptionId'), ''' ''', parameters('azureServicePrincipalTenantId'), ''' null null null null '''' '''' null null null null null null null ''', parameters('operationalMode'), ''' '''' '''' '''' '''' '''' '''' '''' '''' ''',parameters('DBProvisionedVPCId'),''' '''' '''' ''',parameters('masManageTablespace'),''' dev ''', ''' > mas-provisioning.log 2>&1;')]"
             }
           }
         }

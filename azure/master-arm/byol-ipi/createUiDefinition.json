@@ -367,6 +367,32 @@
                         "visible": true
                     },
                     {
+                        "name": "masManageTablespace",
+                        "type": "Microsoft.Common.TextBox",
+                        "label": "MAS Manage Database values",
+                        "defaultValue": "",
+                        "toolTip": "Manage Database setting : DB_SCHEMA ,TABLESPACE,INDEXSPACE values with ':' in between the values. Ex : For DB2 - maximo:maxdata:maxindex , Oracle -maximo:maxdata:maxindex , Mssql - dto:PRIMARY:PRIMARY",
+                        "constraints": {
+                            "required": "[or(not(empty(steps('DatabaseSettings').masManageDBUser)), not(empty(steps('DatabaseSettings').masManageDBPassword)), not(empty(steps('DatabaseSettings').masManageDBJdbcUrl)))]",
+                            "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
+                            "validationMessage": "Contain letters, numbers and special characters only."
+                        },
+                        "visible": true
+                    },
+                    {
+                        "name": "DBProvisionedVPCId",
+                        "type": "Microsoft.Common.TextBox",
+                        "label": "VNetId of Database",
+                        "defaultValue": "",
+                        "toolTip": "Enter the Vnet ID where your existing database (DB2 or Oracle or MSSQL) was provisioned to establish \n  Vnet Peering from this Vnet & the Existing OCP cluster's Vnet in order to establish database connection.",
+                        "constraints": {
+                            "required": "[or(not(empty(steps('DatabaseSettings').masManageDBUser)), not(empty(steps('DatabaseSettings').masManageDBPassword)), not(empty(steps('DatabaseSettings').masManageDBJdbcUrl)))]",
+                            "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
+                            "validationMessage": "Contain letters, numbers and special characters only."
+                        },
+                        "visible": true
+                    },
+                    {
                         "name": "importDemoData",
                         "type": "Microsoft.Common.DropDown",
                         "label": "Import demo data",

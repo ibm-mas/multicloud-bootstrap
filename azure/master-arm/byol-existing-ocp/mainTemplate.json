@@ -161,6 +161,27 @@
       },
       "defaultValue": ""
     },
+    "masManageTablespace": {
+      "type": "string",
+      "metadata": {
+        "description": "Enter the Manage Database setting : DB_SCHEMA ,TABLESPACE,INDEXSPACE values with ':' in between the values. Ex : For DB2 - maximo:maxdata:maxindex , Oracle -maximo:maxdata:maxindex , Mssql - dto:PRIMARY:PRIMARY"
+      },
+      "defaultValue": ""
+    },
+    "DBProvisionedVPCId": {
+      "type": "string",
+      "metadata": {
+        "description": "Enter the Vnet ID where your existing database (DB2 or Oracle or MSSQL) was provisioned to establish \n  Vnet Peering from this Vnet & the Existing OCP cluster's Vnet in order to establish database connection."
+      },
+      "defaultValue": ""
+    },
+    "ExocpProvisionedVPCId": {
+      "type": "string",
+      "metadata": {
+        "description": "Enter the  Existing OCP cluster's Vnet ID to establish \\n  Vnet Peering from this Vnet &  Vnet where your existing database VM is created, in order to establish database connection.\""
+      },
+      "defaultValue": ""
+    },
     "importDemoData": {
       "type": "string",
       "metadata": {
