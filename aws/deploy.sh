@@ -318,7 +318,7 @@ log "==== aws/deploy.sh : Invoke db-create-vpc-peer.sh starts ===="
     sh $GIT_REPO_HOME/aws/db/db-create-vpc-peer.sh
     log "==== aws/deploy.sh : Invoke db-create-vpc-peer.sh ends ===="
 fi
-
+sleep 300
 # JDBC CFT inputs validation and connection test
 if [[ $DEPLOY_MANAGE == "true" ]]; then
     if [[ (-z $MAS_JDBC_USER) && (-z $MAS_JDBC_PASSWORD) && (-z $MAS_JDBC_URL) && (-z $MAS_JDBC_CERT_URL) ]]; then
