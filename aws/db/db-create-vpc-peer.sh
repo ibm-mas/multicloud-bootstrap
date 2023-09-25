@@ -1,7 +1,7 @@
 #!/bin/bash
 	export VPC_1=$REQUESTER_VPC_ID
     export VPC_2=$ACCEPTER_VPC_ID
-	export ACCEPTER_REGION=$DEPLOY_REGION
+	export ACCEPTER_REGION=eu-central-1
 
     log "db-create-vpc-peer.sh .......... starts"
     log "db-create-vpc-peer.sh : REQUESTER_VPC_ID : $REQUESTER_VPC_ID" #BOOTNODE_VPC_ID or VPC_ID
