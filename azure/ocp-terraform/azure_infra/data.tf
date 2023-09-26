@@ -27,10 +27,10 @@
     controlPlaneSubnet          = var.master-subnet-name
     computeSubnet               = var.worker-subnet-name
     networkResourceGroupName    = local.resource-group
-    cluster-network-cidr = "10.128.0.0/14"
+    cluster-network-cidr = "${local.cidr-prefix}.128.0.0/14"
     host-prefix          = 23
     virtual-network-cidr = var.virtual-network-cidr
-    service-network-cidr = "192.30.0.0/16"
+    service-network-cidr = "172.30.0.0/16"
     private-public = var.private-or-public-cluster == "public" ? "External" : "Internal"
     deploymentZone  = var.zone
     workerNodeCount = var.worker-node-count
