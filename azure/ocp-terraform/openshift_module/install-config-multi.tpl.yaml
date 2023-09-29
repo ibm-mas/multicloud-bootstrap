@@ -1,42 +1,42 @@
 apiVersion: v1
 baseDomain: ${baseDomain}
 compute:
-- hyperthreading: Enabled
-  name: worker
-  platform: 
-    azure:
-      type: ${worker-instance-type}
-      osDisk:
-        diskSizeGB: 256
-      zones: 
-      - "1"
-      - "2"
-      - "3"
-  replicas: ${workerNodeCount}
+  - hyperthreading: Enabled
+    name: worker
+    platform:
+      azure:
+        type: ${worker-instance-type}
+        osDisk:
+          diskSizeGB: 256
+        zones:
+          - "1"
+          - "2"
+          - "3"
+    replicas: ${workerNodeCount}
 controlPlane:
   hyperthreading: Enabled
   name: master
-  platform: 
+  platform:
     azure:
       type: ${master-instance-type}
       osDisk:
         diskSizeGB: 256
-      zones: 
-      - "1"
-      - "2"
-      - "3"
+      zones:
+        - "1"
+        - "2"
+        - "3"
   replicas: ${masterNodeCount}
 metadata:
   creationTimestamp: null
   name: ${clustername}
 networking:
   clusterNetwork:
-  - cidr: ${cluster-network-cidr}
-    hostPrefix: ${host-prefix}
+    - cidr: ${cluster-network-cidr}
+      hostPrefix: ${host-prefix}
   machineCIDR: ${virtual-network-cidr}
   networkType: OpenShiftSDN
   serviceNetwork:
-  - ${service-network-cidr}
+    - ${service-network-cidr}
 platform:
   azure:
     baseDomainResourceGroupName: ${baseDomainResourceGroupName}

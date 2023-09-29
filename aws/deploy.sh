@@ -300,7 +300,7 @@ if [[ -n $EXISTING_NETWORK ]]; then
   export VPC_ID="${EXISTING_NETWORK}" #upi
 fi
 if [[ -z $AWS_VPC_ID && -z $EXISTING_NETWORK  && -n $BOOTNODE_VPC_ID ]]; then
-  export VPC_ID="${BOOTNODE_VPC_ID}" #existing ocp
+  export VPC_ID="${BOOTNODE_VPC_ID}" #existing ocp #new VPCID
 fi
 if [[ -z $VPC_ID && $MONGO_FLAVOR == "Amazon DocumentDB" ]]; then
   log "Failed to get the vpc id required to deploy documentdb"

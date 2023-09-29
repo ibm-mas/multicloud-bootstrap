@@ -96,8 +96,6 @@ unzip terraform_${TERRAFORM_VER}_linux_amd64.zip
 mv terraform /usr/local/bin/
 rm -rf terraform_${TERRAFORM_VER}_linux_amd64.zip
 
-
-
 ## Install Ansible
 pip3 install ansible
 pip3 install openshift

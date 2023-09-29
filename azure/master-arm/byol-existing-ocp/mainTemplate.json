@@ -2,6 +2,13 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
+    "subscriptionId": {
+      "type": "string",
+      "metadata": {
+        "description": "Azure subscription id where all resources needs to be deployed:"
+      },
+      "defaultValue": "[subscription().subscriptionId]"
+    },
     "location": {
       "type": "string",
       "metadata": {
@@ -52,6 +59,13 @@
       "defaultValue": "0.0.0.0/0",
       "metadata": {
         "description": "Use CIDR notation to enter the IP addresses that can access the bootnode. For example, 192.12.33.3/32. To allow access from all IP addresses, enter 0.0.0.0/0."
+      }
+    },
+    "vNetSubnetBootnodeCidrRange": {
+      "type": "string",
+      "defaultValue": "10.0.4.0/24",
+      "metadata": {
+        "description": "Provide the CIDR range for the subnet of the bootnode. For example, if the Vnet CIDR range is 10.0.0.0/16 then the bootnode's subnet can be 10.0.4.0/24.Ensure that the CIDR range is within by the Vnet CIDR range."
       }
     },
     "clusterSize": {
@@ -147,6 +161,27 @@
       },
       "defaultValue": ""
     },
+    "masManageTablespace": {
+      "type": "string",
+      "metadata": {
+        "description": "Enter the Manage Database setting : DB_SCHEMA ,TABLESPACE,INDEXSPACE values with ':' in between the values. Ex : For DB2 - maximo:maxdata:maxindex , Oracle -maximo:maxdata:maxindex , Mssql - dto:PRIMARY:PRIMARY"
+      },
+      "defaultValue": ""
+    },
+    "DBProvisionedVPCId": {
+      "type": "string",
+      "metadata": {
+        "description": "Enter the Vnet ID where your existing database (DB2 or Oracle or MSSQL) was provisioned to establish \n  Vnet Peering from this Vnet & the Existing OCP cluster's Vnet in order to establish database connection."
+      },
+      "defaultValue": ""
+    },
+    "ExocpProvisionedVPCId": {
+      "type": "string",
+      "metadata": {
+        "description": "Enter the  Existing OCP cluster's Vnet ID to establish \\n  Vnet Peering from this Vnet &  Vnet where your existing database VM is created, in order to establish database connection.\""
+      },
+      "defaultValue": ""
+    },
     "importDemoData": {
       "type": "string",
       "metadata": {
@@ -209,7 +244,7 @@
     },
     "azureServicePrincipalClientId": {
       "type": "string",
-      "defaultValue": "1bc717ac-ea87-4011-ac59-21e6942a2e2f",
+      "defaultValue": "",
       "metadata": {
         "description": "Enter Azure service principal client Id."
       }
@@ -290,17 +325,16 @@
     }
   },
   "variables": {
-    "seller_subscription_id": "b2ca5467-2502-4b05-b78e-744604c6531d",
+
     "projectName": "[concat('e',substring(uniqueString(resourceGroup().id, deployment().name), 0, 5))]",
     "rgName": "[resourceGroup().name]",
     "vNetSubnetName": "[concat('masocp-', variables('projectName'), '-bootnodeSubnet')]",
-    "vNetSubnetAddressPrefix": "10.0.5.0/24",
     "logAnalyticsWorkspace": "[concat('masocp-', variables('projectName'), '-logAnalyticsWorkspace')]",
     "vmName": "[concat('masocp-', variables('projectName'), '-bootnode-vm')]",
     "publicIPAddressName": "[concat(variables('projectName'), '-ip')]",
     "networkInterfaceName": "[concat(variables('projectName'), '-nic')]",
     "networkSecurityGroupName": "[concat(variables('projectName'), '-nsg')]",
-    "networkSecurityGroupName2": "bootnodeSubnet-nsg",
+    "networkSecurityGroupName2": "[concat(variables('projectName'), '-bootnodeSubnet-nsg')]",
     "storageaccountName": "[concat('masocp', variables('projectName'),'stgaccount')]"
   },
   "resources": [
@@ -358,7 +392,7 @@
       "apiVersion": "2022-09-01",
       "name": "existingvnetTemplate",
       "resourceGroup": "[parameters('BootNodeVnetResourceGroup')]",
-      "subscriptionid": "[variables('seller_subscription_id')]",
+      "subscriptionid": "[parameters('subscriptionId')]",
       "properties": {
         "mode": "Incremental",
         "template": {
@@ -399,7 +433,7 @@
                 "[resourceId(parameters('BootNodeVnetResourceGroup'),'Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName2'))]"
               ],
               "properties": {
-                "addressPrefix": "[variables('vNetSubnetAddressPrefix')]",
+                "addressPrefix": "[parameters('vNetSubnetBootnodeCidrRange')]",
                 "networkSecurityGroup": {
                   "id": "[resourceId(parameters('BootNodeVnetResourceGroup'),'Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName2'))]"
                 }
@@ -567,7 +601,7 @@
             "typeHandlerVersion": "2.0",
             "autoUpgradeMinorVersion": true,
             "protectedSettings": {
-              "commandToExecute": "[concat('sleep 120;', 'cd /root/ansible-devops/multicloud-bootstrap;', './init-async.sh azure ''', parameters('offeringType'), ''' ''', parameters('location'), ''' null ''', parameters('clusterSize'), ''' ''', variables('projectName'), ''' ''', parameters('hostedDomain'), ''' null ''', parameters('sshPublicKey'), ''' null ''', parameters('entitledRegistryKey'), ''' ''', parameters('openShiftPullSecret'), ''' ''', parameters('masLicenseUrl'), ''' ''', parameters('slsEndpointUrl'), ''' ''', parameters('slsRegistrationKey'), ''' ''', parameters('slsPublicCertificateUrl'), ''' ''', parameters('udsEndpointUrl'), ''' ''', parameters('udsAPIKey'), ''' ''', parameters('udsPublicCertificateUrl'), ''' ''', parameters('masManageDBUser'), ''' ''', parameters('masManageDBPassword'), ''' ''', parameters('masManageDBJdbcUrl'), ''' ''', parameters('masManageDBCertificateUrl'), ''' ''', parameters('importDemoData'), ''' ''', parameters('openShiftClusterApiUrl'), ''' ''', parameters('openShiftUser'), ''' ''', parameters('openShiftPwd'), ''' ''', variables('rgName'), ''' ''', parameters('emailNotification'), ''' ''', parameters('notificattionEmailAddress'), ''' ''', parameters('smtpHost'), ''' ''', parameters('smtpPort'), ''' ''', parameters('smtpUsername'), ''' ''', parameters('smtpPassword'), ''' ''', parameters('azureServicePrincipalClientId'), ''' ''', parameters('azureServicePrincipalClientSecret'), ''' ''', variables('seller_subscription_id'), ''' ''', parameters('azureServicePrincipalTenantId'), ''' null null null null ''',parameters('BootNodeVnetId'),''' '''' null null null null null null null ''', parameters('operationalMode'), ''' '''' '''' '''' '''' '''' '''' '''' '''' dev ''', ''' > mas-provisioning.log 2>&1;')]"              }
+              "commandToExecute": "[concat('sleep 120;', 'cd /root/ansible-devops/multicloud-bootstrap;', './init-async.sh azure ''', parameters('offeringType'), ''' ''', parameters('location'), ''' null ''', parameters('clusterSize'), ''' ''', variables('projectName'), ''' ''', parameters('hostedDomain'), ''' null ''', parameters('sshPublicKey'), ''' null ''', parameters('entitledRegistryKey'), ''' ''', parameters('openShiftPullSecret'), ''' ''', parameters('masLicenseUrl'), ''' ''', parameters('slsEndpointUrl'), ''' ''', parameters('slsRegistrationKey'), ''' ''', parameters('slsPublicCertificateUrl'), ''' ''', parameters('udsEndpointUrl'), ''' ''', parameters('udsAPIKey'), ''' ''', parameters('udsPublicCertificateUrl'), ''' ''', parameters('masManageDBUser'), ''' ''', parameters('masManageDBPassword'), ''' ''', parameters('masManageDBJdbcUrl'), ''' ''', parameters('masManageDBCertificateUrl'), ''' ''', parameters('importDemoData'), ''' ''', parameters('openShiftClusterApiUrl'), ''' ''', parameters('openShiftUser'), ''' ''', parameters('openShiftPwd'), ''' ''', variables('rgName'), ''' ''', parameters('emailNotification'), ''' ''', parameters('notificattionEmailAddress'), ''' ''', parameters('smtpHost'), ''' ''', parameters('smtpPort'), ''' ''', parameters('smtpUsername'), ''' ''', parameters('smtpPassword'), ''' ''', parameters('azureServicePrincipalClientId'), ''' ''', parameters('azureServicePrincipalClientSecret'), ''' ''', parameters('subscriptionId'), ''' ''', parameters('azureServicePrincipalTenantId'), ''' null null null null ''',parameters('BootNodeVnetId'),''' '''' null null null null null null null ''', parameters('operationalMode'), ''' '''' '''' '''' '''' '''' '''' '''' '''' dev ''', ''' > mas-provisioning.log 2>&1;')]"              }
           }
         }
       ]

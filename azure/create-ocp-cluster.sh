@@ -29,6 +29,10 @@ virtual-network-name    = "$EXISTING_NETWORK"
 new-or-existing         = "$new_or_existing_vpc_subnet"
 existing-vnet-resource-group = "$EXISTING_NETWORK_RG"
 private-or-public-cluster = "$private_or_public_cluster"
+virtual-network-cidr    =  "$virtual_network_cidr"
+master-subnet-cidr      =  "$master_subnet_cidr"
+worker-subnet-cidr      =  "$worker_subnet_cidr"
+bastion_cidr            =  "$bastion_cidr"
 EOT
 if [[ -f terraform.tfvars ]]; then
     chmod 600 terraform.tfvars

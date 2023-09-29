@@ -218,7 +218,7 @@ export CPD_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
 export CPD_VERSION=cpd40
 export CPD_PRODUCT_VERSION=4.6.3
 export MAS_CHANNEL=8.10.x
-export MAS_CATALOG_VERSION=v8-230518-amd64
+export MAS_CATALOG_VERSION=v8-230725-amd64
 if [[ $CLUSTER_TYPE == "aws" ]]; then
   export CPD_PRIMARY_STORAGE_CLASS="ocs-storagecluster-cephfs"
 elif [[ $CLUSTER_TYPE == "azure" ]]; then
@@ -273,6 +273,7 @@ if [[ -z "$EXISTING_NETWORK" && $CLUSTER_TYPE == "azure" ]]; then
   export INSTALLATION_MODE="IPI"
   # Setting the name of the v-net
   export EXISTING_NETWORK=${RANDOM_STR}-vnet
+  export ExocpProvisionedVPCId=$EXISTING_NETWORK
 else
   export INSTALLATION_MODE="UPI"
 fi
@@ -312,7 +313,6 @@ esac
 log "Below are common deployment parameters,"
 log " OPERATIONAL_MODE: $OPERATIONAL_MODE"
 log " AWS_MSK_PROVIDER: $AWS_MSK_PROVIDER"
-log " DBProvisionedVPCId: $DBProvisionedVPCId"
 log " CLUSTER_TYPE: $CLUSTER_TYPE"
 log " OFFERING_TYPE: $OFFERING_TYPE"
 log " DEPLOY_REGION: $DEPLOY_REGION"
@@ -358,6 +358,8 @@ log " GOOGLE_APPLICATION_CREDENTIALS_FILE=$GOOGLE_APPLICATION_CREDENTIALS_FILE"
 log " EMAIL_NOTIFICATION: $EMAIL_NOTIFICATION"
 log " EXISTING_NETWORK=$EXISTING_NETWORK"
 log " EXISTING_NETWORK_RG=$EXISTING_NETWORK_RG"
+log " DBProvisionedVPCId=$DBProvisionedVPCId"
+log " ExocpProvisionedVPCId=$ExocpProvisionedVPCId"
 log " ENV_TYPE=$ENV_TYPE"
 log " MONGO_USE_EXISTING_INSTANCE=${MONGO_USE_EXISTING_INSTANCE}"
 log " MONGO_FLAVOR=${MONGO_FLAVOR}"
@@ -408,44 +410,6 @@ export DEPLOY_MANAGE=$(echo $DEPLOY_MANAGE | cut -d '=' -f 2)
 log " DEPLOY_CP4D: $DEPLOY_CP4D"
 log " DEPLOY_MANAGE: $DEPLOY_MANAGE"
 
-if [[ $CLUSTER_TYPE == "azure" ]]; then
-  # Perform az login
-  az login --service-principal -u ${AZURE_SP_CLIENT_ID} -p ${AZURE_SP_CLIENT_PWD} --tenant ${TENANT_ID}
-  az resource list -n masocp-${RANDOM_STR}-bootnode-vm
-  # Get subscription ID
-  export AZURE_SUBSC_ID=`az account list | jq -r '.[].id'`
-  log " AZURE_SUBSC_ID: $AZURE_SUBSC_ID"
-  # Get Base domain RG name
-  DNS_ZONE=$BASE_DOMAIN
-  export BASE_DOMAIN_RG_NAME=`az network dns zone list | jq --arg DNS_ZONE $DNS_ZONE '.[] | select(.name==$DNS_ZONE).resourceGroup' | tr -d '"'`
-  log " BASE_DOMAIN_RG_NAME: $BASE_DOMAIN_RG_NAME"
-  # Get VNet RG name for UPI based installation
-  if [[ $INSTALLATION_MODE == "UPI" ]]; then
-    # Domain name with private dns - only available for UPI
-    if [[ $PRIVATE_CLUSTER == "true" ]]; then
-        export private_or_public_cluster="private"
-        export BASE_DOMAIN_RG_NAME=`az network private-dns zone list | jq --arg DNS_ZONE $DNS_ZONE '.[] | select(.name==$DNS_ZONE).resourceGroup' | tr -d '"'`
-         log " UPI PRIVATE CLUSTER - BASE_DOMAIN_RG_NAME: $BASE_DOMAIN_RG_NAME"
-      else
-         export private_or_public_cluster="public"
-         export BASE_DOMAIN_RG_NAME=`az network dns zone list | jq --arg DNS_ZONE $DNS_ZONE '.[] | select(.name==$DNS_ZONE).resourceGroup' | tr -d '"'`
-         log " UPI PUBLIC CLUSTER - BASE_DOMAIN_RG_NAME: $BASE_DOMAIN_RG_NAME"
-      fi
-
-       VNET_NAME=$EXISTING_NETWORK
-       export EXISTING_NETWORK_RG=`az network vnet list | jq --arg VNET_NAME $VNET_NAME '.[] | select(.name==$VNET_NAME).resourceGroup' | tr -d '"'`
-        #Assign the nsg name
-      # export nsg_name=`az network vnet subnet list --resource-group $EXISTING_NETWORK_RG --vnet-name  $VNET_NAME|jq '.[0] | select(.name).networkSecurityGroup.id'|awk -F'/' '{print $9}'|tr -d '"'`
-        #Assign the network subnet
-       export  master_subnet_name=`az network vnet subnet list --resource-group $EXISTING_NETWORK_RG --vnet-name $VNET_NAME|jq '.[] | select(.name).name'|grep master|tr -d '"'`
-       export  worker_subnet_name=`az network vnet subnet list --resource-group $EXISTING_NETWORK_RG --vnet-name $VNET_NAME|jq '.[] | select(.name).name'|grep worker|tr -d '"'`
-       log " MASTER SUBNET NAME: $master_subnet_name "
-       log " WORKER SUBNET NAME: $worker_subnet_name"
-     #  log " NSG NAME: $nsg_name"
-       log " EXISTING_NETWORK_RG: $EXISTING_NETWORK_RG"
-  fi
-fi
-
 cd $GIT_REPO_HOME
 # Perform prevalidation checks
 log "===== PRE-VALIDATION STARTED ====="
@@ -462,6 +426,7 @@ else
 fi
 log "===== PRE-VALIDATION COMPLETED ($PRE_VALIDATION) ====="
 
+
 # Perform the MAS deployment only if pre-validation checks are passed
 if [[ $PRE_VALIDATION == "pass" ]]; then
   ## If user provided input of Openshift API url along with creds, then use the provided details for deployment of other components like CP4D, MAS etc.
@@ -470,7 +435,7 @@ if [[ $PRE_VALIDATION == "pass" ]]; then
     log "Openshift cluster details provided"
     # https://api.masocp-cluster.mas4aws.com/
     # https://api.ftmpsl-ocp-dev3.cp.fyre.ibm.com:6443/
-
+      export INSTALLATION_MODE="EXOCP"
     log "Debug: before: CLUSTER_NAME: $CLUSTER_NAME  BASE_DOMAIN: $BASE_DOMAIN"
     split_ocp_api_url $EXS_OCP_URL
     log "Debug: after: CLUSTER_NAME: $CLUSTER_NAME  BASE_DOMAIN: $BASE_DOMAIN"
@@ -552,7 +517,8 @@ if [[ $PRE_VALIDATION == "pass" ]]; then
     export MAS_URL_ADMIN="https:\/\/admin.${RANDOM_STR}.apps.${CLUSTER_NAME}.${BASE_DOMAIN}"
     export MAS_URL_WORKSPACE="https:\/\/$MAS_WORKSPACE_ID.home.${RANDOM_STR}.apps.${CLUSTER_NAME}.${BASE_DOMAIN}"
     cd ../
-    if [[ $DEPLOY_CP4D == "true" &&  ($retcode -eq 0)]]; then
+
+    if [[ $DEPLOY_CP4D == "true" &&  ($retcode -eq 0)  ]]; then
       log "==== CP4D db2 warehouse service enablement starts ===="
      ./cpd_vars.sh
      log "==== CP4D db2 warehouse service enablement completes ===="
