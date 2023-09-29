@@ -67,7 +67,7 @@ export MONGO_CA_PEM_FILE=${58}
 export DOCUMENTDB_VPC_ID=${59}
 export AWS_MSK_PROVIDER=${60}
 export DBProvisionedVPCId=${61}
-export ENV_TYPE=${62}
+export ENV_TYPE=${65}
 export GIT_REPO_HOME=$(pwd)
 # Load helper functions
 . helper.sh
