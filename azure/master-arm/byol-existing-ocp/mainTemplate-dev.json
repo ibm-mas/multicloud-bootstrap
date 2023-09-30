@@ -62,9 +62,9 @@
     },
     "vNetSubnetBootnodeCidrRange": {
       "type": "string",
-      "defaultValue": "10.0.4.0/24",
+      "defaultValue": "17.0.4.0/24",
       "metadata": {
-        "description": "Provide the CIDR range for the subnet of the bootnode. For example, if the Vnet CIDR range is 10.0.0.0/16 then the bootnode's subnet can be 10.0.4.0/24.Ensure that the CIDR range is within by the Vnet CIDR range."
+        "description": "Provide the CIDR range for the subnet of the bootnode. For example, if the Vnet CIDR range is 17.0.0.0/16 then the bootnode's subnet can be 17.0.4.0/24.Ensure that the CIDR range is within by the Vnet CIDR range."
       }
     },
     "clusterSize": {

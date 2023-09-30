@@ -181,7 +181,7 @@ Parameters:
     Description: >-
       Enter the VPC ID where existing Amazon DocumentDB was provisioned.
       Leave this field blank, if MongoDBProvider was selected as "MongoDB".
-      Make sure this VPC ID resides in the current deployment region and does not have matching or overlapping IPv4 CIDR blocks 10.0.0.0/16.
+      Make sure this VPC ID resides in the current deployment region and does not have matching or overlapping IPv4 CIDR blocks 17.0.0.0/16.
     Type: String
 
   AWSMSKProvider:

@@ -94,7 +94,7 @@ if [[ $CLUSTER_TYPE == "azure" ]]; then
        export  master_subnet_cidr=`az network vnet subnet show --resource-group $EXISTING_NETWORK_RG --vnet-name $VNET_NAME -n master-subnet|jq  -r '.addressPrefix'`
        export  worker_subnet_cidr=`az network vnet subnet show --resource-group $EXISTING_NETWORK_RG --vnet-name $VNET_NAME -n worker-subnet|jq  -r '.addressPrefix'`
        Ip_range=$worker_subnet_cidr
-       #10.0.3.224/27
+       #17.0.3.224/27
        export bastion_cidr=`echo $Ip_range|cut -d "." -f 1`.`echo $Ip_range|cut -d "." -f 2`.3.224/27
        export ACCEPTER_VPC_ID=${DBProvisionedVPCId}
        export REQUESTER_VPC_ID=$EXISTING_NETWORK
@@ -102,10 +102,10 @@ if [[ $CLUSTER_TYPE == "azure" ]]; then
     # Setting the cidr ranges for IPI mode
       export  master_subnet_name="master-subnet"
       export  worker_subnet_name="worker-subnet"
-      export  virtual_network_cidr="10.0.0.0/16"
-      export  master_subnet_cidr="10.0.1.0/24"
-      export  worker_subnet_cidr="10.0.2.0/24"
-      export bastion_cidr="10.0.3.224/27"
+      export  virtual_network_cidr="17.0.0.0/16"
+      export  master_subnet_cidr="17.0.1.0/24"
+      export  worker_subnet_cidr="17.0.2.0/24"
+      export bastion_cidr="17.0.3.224/27"
       export ACCEPTER_VPC_ID=${DBProvisionedVPCId}
       export REQUESTER_VPC_ID=$EXISTING_NETWORK
    elif [[  (-n $ExocpProvisionedVPCId) ]]; then

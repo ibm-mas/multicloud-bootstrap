@@ -57,7 +57,7 @@ variable "virtual-network-name" {
 }
 
 variable "virtual-network-cidr" {
-  default = "10.0.0.0/16"
+  default = "17.0.0.0/16"
 }
 
 variable "master-subnet-name" {
@@ -65,7 +65,7 @@ variable "master-subnet-name" {
 }
 
 variable "master-subnet-cidr" {
-  default = "10.0.1.0/24"
+  default = "17.0.1.0/24"
 }
 
 variable "worker-subnet-name" {
@@ -73,7 +73,7 @@ variable "worker-subnet-name" {
 }
 
 variable "worker-subnet-cidr" {
-  default = "10.0.2.0/24"
+  default = "17.0.2.0/24"
 }
 
 variable "master-nsg-name" {
@@ -90,7 +90,7 @@ variable "worker-nsg-name" {
 
 #Bastion host variable
 variable "bastion_cidr" {
-  default = "10.0.3.224/27"
+  default = "17.0.3.224/27"
 }
 
 # Deploy OCP into single or multi-zone

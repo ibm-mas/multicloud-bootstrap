@@ -7,13 +7,13 @@
 | `secret_access_key` | Requires input | AWS account secret access key for the current user account. |
 | NETWORK |
 | `new_or_existing_vpc_subnet` | new | For existing VPC and SUBNETS use `exist` otherwise use `new` to create a new VPC and SUBNETS, default is `new`. |
-| `vpc_cidr` | 10.0.0.0/16 | The CIDR block for the VPC to be created. |
-| `master_subnet_cidr1` | 10.0.0.0/20 | The CIDR block for the master subnet located in Availability Zone 1. |
-| `master_subnet_cidr2` | 10.0.16.0/20 | The CIDR block for the master subnet located in Availability Zone 2. |
-| `master_subnet_cidr2` | 10.0.32.0/20 | The CIDR block for the master subnet located in Availability Zone 3. |
-| `worker_subnet_cidr1` | 10.0.128.0/20 | The CIDR block for the worker subnet located in Availability Zone 1. |
-| `worker_subnet_cidr1` | 10.0.144.0/20 | The CIDR block for the worker subnet located in Availability Zone 2. |
-| `worker_subnet_cidr1` | 10.0.160.0/20 | The CIDR block for the worker subnet located in Availability Zone 3. |
+| `vpc_cidr` | 17.0.0.0/16 | The CIDR block for the VPC to be created. |
+| `master_subnet_cidr1` | 17.0.0.0/20 | The CIDR block for the master subnet located in Availability Zone 1. |
+| `master_subnet_cidr2` | 17.0.16.0/20 | The CIDR block for the master subnet located in Availability Zone 2. |
+| `master_subnet_cidr2` | 17.0.32.0/20 | The CIDR block for the master subnet located in Availability Zone 3. |
+| `worker_subnet_cidr1` | 17.0.128.0/20 | The CIDR block for the worker subnet located in Availability Zone 1. |
+| `worker_subnet_cidr1` | 17.0.144.0/20 | The CIDR block for the worker subnet located in Availability Zone 2. |
+| `worker_subnet_cidr1` | 17.0.160.0/20 | The CIDR block for the worker subnet located in Availability Zone 3. |
 | `vpc_id` | "" | If existing VPC is to be used and selected `exist` as input parameter for `new_or_existing_vpc_subnet` variable, then provide a VPC id otherwise keep it blank as `“”`. NOTE: Enable DNS hostnames in existing VPC |
 | `master_subnet1_id` | "" | In case of existing VPC and SUBNETS, Subnet Id for master subnet in zone 1. |
 | `master_subnet2_id` | "" | In case of existing VPC and SUBNETS, Subnet Id for master subnet in zone 2. |

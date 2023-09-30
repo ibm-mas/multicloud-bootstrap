@@ -399,17 +399,17 @@ else
 
     if [[ -z "$SUBNET_ID1" ]]; then
       SCRIPT_STATUS=41
-      log "Subnet ID associated with CIDR Block 10.0.128.0/20 not found"
+      log "Subnet ID associated with CIDR Block 17.0.128.0/20 not found"
       exit $SCRIPT_STATUS
     fi
     if [[ -z "$SUBNET_ID2" ]]; then
       SCRIPT_STATUS=41
-      log "Subnet ID associated with CIDR Block 10.0.144.0/20 not found"
+      log "Subnet ID associated with CIDR Block 17.0.144.0/20 not found"
       exit $SCRIPT_STATUS
     fi
     if [[ -z "$SUBNET_ID3" ]]; then
       SCRIPT_STATUS=41
-      log "Subnet ID associated with CIDR Block 10.0.160.0/20 not found"
+      log "Subnet ID associated with CIDR Block 17.0.160.0/20 not found"
       exit $SCRIPT_STATUS
     fi
 

@@ -140,7 +140,7 @@ mark_provisioning_failed() {
   elif [[ $retcode -eq 36 ]]; then
     export STATUS_MSG="Failure in creating IAM policy."
   elif [[ $retcode -eq 37 ]]; then
-    export STATUS_MSG="Failure in creating Create Route. Please make sure there is no other VPCs which has matching or overlapping IPv4 CIDR blocks 10.0.0.0/16 "
+    export STATUS_MSG="Failure in creating Create Route. Please make sure there is no other VPCs which has matching or overlapping IPv4 CIDR blocks 17.0.0.0/16 "
   elif [[ $retcode -eq 38 ]]; then
     export STATUS_MSG="Failure in connecting to existing Mongo DB instance."
   elif [[ $retcode -eq 39 ]]; then
