@@ -31,7 +31,6 @@ spec:
   name: odf-operator
   source: redhat-operators
   sourceNamespace: openshift-marketplace
-  startingCSV: "odf-operator.v4.12.8-rhodf"
 ---
 apiVersion: odf.openshift.io/v1alpha1
 kind: StorageSystem
