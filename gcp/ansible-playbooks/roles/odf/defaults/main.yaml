@@ -1,7 +1,7 @@
-odf_channel: "{{ lookup('env', 'ODF_CHANNEL') | default('stable-4.10', true) }}"
+odf_channel: "{{ lookup('env', 'ODF_CHANNEL') | default('stable-4.12', true) }}"
 odf_namespace: "{{ lookup('env', 'ODF_NAMESPACE') | default('openshift-storage', true) }}"
 odf_operator: "{{ lookup('env', 'ODF_OPERATOR') | default('odf-operator', true) }}"
-odf_startingcsv: "{{ lookup('env', 'ODF_STARTINGCSV') | default('odf-operator.v4.10.7', true) }}"
+odf_startingcsv: "{{ lookup('env', 'ODF_STARTINGCSV') | default('odf-operator.v4.12', true) }}"
 
 # Cloud Platform variable
 ipi_platform: "{{ lookup('env', 'IPI_PLATFORM') | default('gcp', true) }}"
