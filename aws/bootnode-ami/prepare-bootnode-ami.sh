@@ -61,7 +61,9 @@ terraform version
 rm -rf terraform_${TERRAFORM_VER}_linux_amd64.zip
 
 ## Install Ansible
-pip3 install ansible==4.9.0
+# https://forum.ansible.com/t/unable-to-install-collection-from-new-galaxy/1238 
+# This will install ansible-core version 2.14.10 
+pip3 install ansible==7.7.0
 pip3 install openshift
 ansible-galaxy collection install community.kubernetes
 
