@@ -510,6 +510,9 @@ if [[ $PRE_VALIDATION == "pass" ]]; then
     else
       log "MAS_DEVOPS_COLLECTION_VERSION=$MAS_DEVOPS_COLLECTION_VERSION"
       log "==== Installing Ansible Collection ===="
+       # workaround fix - to upgrade ansible-core version above 2.13.9 starts
+      pip3 install ansible==7.7.0
+      # workaround fix - to upgrade ansible-core version above 2.13.9 ends
       ansible-galaxy collection install ibm.mas_devops:==${MAS_DEVOPS_COLLECTION_VERSION}
       log "==== Installed Ansible Collection Successfully ===="
     fi
