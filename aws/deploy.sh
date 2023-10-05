@@ -561,11 +561,34 @@ if [[ $DEPLOY_MANAGE == "true" && (-z $MAS_JDBC_USER) && (-z $MAS_JDBC_PASSWORD)
 fi
 
 if [[ $DEPLOY_MANAGE == "true" && (-n $MAS_JDBC_USER) && (-n $MAS_JDBC_PASSWORD) && (-n $MAS_JDBC_URL) ]]; then
-  export SSL_ENABLED=false
-  if [ -n "$MAS_JDBC_CERT_URL" ]; then
-    log "MAS_JDBC_CERT_URL is not empty, setting SSL_ENABLED as true"
-    export SSL_ENABLED=true
-  fi
+      export SSL_ENABLED=false
+      #Setting the DB values
+      if [[ -n $MANAGE_TABLESPACE ]]; then
+        log " $MANAGE_TABLESPACE: $$MANAGE_TABLESPACE"
+        export MAS_APP_SETTINGS_DB2_SCHEMA=$(echo $MANAGE_TABLESPACE | cut -d ':' -f 1)
+        export MAS_APP_SETTINGS_TABLESPACE=$(echo $MANAGE_TABLESPACE | cut -d ':' -f 2)
+        export MAS_APP_SETTINGS_INDEXSPACE=$(echo $MANAGE_TABLESPACE | cut -d ':' -f 3)
+      else
+         if [[ ${MAS_JDBC_URL,, } =~ ^jdbc:db2? ]]; then
+                       log "Setting to DB2 Values"
+                        export MAS_APP_SETTINGS_DB2_SCHEMA="maximo"
+                        export MAS_APP_SETTINGS_TABLESPACE="maxdata"
+                        export MAS_APP_SETTINGS_INDEXSPACE="maxindex"
+        elif [[ ${MAS_JDBC_URL,, } =~ ^jdbc:sql? ]]; then
+                         log "Setting to MSSQL Values"
+                          export MAS_APP_SETTINGS_DB2_SCHEMA="dto"
+                          export MAS_APP_SETTINGS_TABLESPACE="PRIMARY"
+                          export MAS_APP_SETTINGS_INDEXSPACE="PRIMARY"
+        elif [[ ${MAS_JDBC_URL,, } =~ ^jdbc:oracle? ]]; then
+                          log "Setting to ORACLE Values"
+                          export MAS_APP_SETTINGS_DB2_SCHEMA="maximo"
+                          export MAS_APP_SETTINGS_TABLESPACE="maxdata"
+                          export MAS_APP_SETTINGS_INDEXSPACE="maxindex"
+        fi
+      fi
+      log " MAS_APP_SETTINGS_DB2_SCHEMA: $MAS_APP_SETTINGS_DB2_SCHEMA"
+      log " DEPLOY_MANAGEMAS_APP_SETTINGS_TABLESPACE: $MAS_APP_SETTINGS_TABLESPACE"
+      log " MAS_APP_SETTINGS_INDEXSPACE: $MAS_APP_SETTINGS_INDEXSPACE"
   log "==== Configure JDBC started for external DB2 ==== SSL_ENABLED = $SSL_ENABLED"
   export ROLE_NAME=gencfg_jdbc && ansible-playbook ibm.mas_devops.run_role
   log "==== Configure JDBC completed for external DB2 ===="
