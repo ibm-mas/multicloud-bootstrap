@@ -29,7 +29,7 @@ echo "BOOTSTRAP_AUTOMATION_TAG_OR_BRANCH=$BOOTSTRAP_AUTOMATION_TAG_OR_BRANCH"
 dnf -y remove polkit
 
 # Enable and disable repos to update certs
-echo "Enable and disable repos to update certs"
+#echo "Enable and disable repos to update certs"
 #dnf update -y --disablerepo=* --enablerepo='*microsoft*' rhui-azure-rhel8-eus
 
 # Update all packages to latest
