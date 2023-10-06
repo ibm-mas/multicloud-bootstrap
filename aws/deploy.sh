@@ -62,27 +62,6 @@ fi
 if [[ -f sls.crt ]]; then
   chmod 600 sls.crt
 fi
-# Download UDS certificate
-cd $GIT_REPO_HOME
-if [[ ${UDS_PUB_CERT_URL,,} =~ ^https? ]]; then
-  log "Downloading UDS certificate from HTTP URL"
-  wget "$UDS_PUB_CERT_URL" -O uds.crt
-elif [[ ${UDS_PUB_CERT_URL,,} =~ ^s3 ]]; then
-  log "Downloading UDS certificate from S3 URL"
-  aws s3 cp "$UDS_PUB_CERT_URL" uds.crt --region $DEPLOY_REGION
-  ret=$?
-        if [ $ret -ne 0 ]; then
-        aws s3 cp "$UDS_PUB_CERT_URL" uds.crt --region us-east-1
-        ret=$?
-        if [ $ret -ne 0 ]; then
-            log "Invalid UDS License URL"
-        fi
-        fi
-fi
-if [[ -f uds.crt ]]; then
-  chmod 600 uds.crt
-fi
-
 ### Read License File & Retrive SLS hostname and host id
 if [[ -n "$MAS_LICENSE_URL" ]]; then
   line=$(head -n 1 entitlement.lic)
