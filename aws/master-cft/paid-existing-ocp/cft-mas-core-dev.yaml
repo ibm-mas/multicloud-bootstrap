@@ -258,14 +258,6 @@ Metadata:
           - SLSRegistrationKey
           - SLSPublicCertificateUrl
       - Label:
-          default: >-
-            Existing User Data Services connection details (leave this section
-            empty to create a new UDS instance)
-        Parameters:
-          - UDSEndpointUrl
-          - UDSAPIKey
-          - UDSPublicCertificateUrl
-      - Label:
           default: Email notification
         Parameters:
           - EmailNotification
@@ -660,13 +652,7 @@ Resources:
             - !Ref SLSRegistrationKey
             - ''' '''
             - !Ref SLSPublicCertificateUrl
-            - ''' '''
-            - !Ref UDSEndpointUrl
-            - ''' '''
-            - !Ref UDSAPIKey
-            - ''' '''
-            - !Ref UDSPublicCertificateUrl
-            - ''' '''
+            - ''' '''' '''' '''' '''
             - !Ref MASManageDBUser
             - ''' '''
             - !Ref MASManageDBPassword
@@ -757,4 +743,3 @@ Outputs:
     Description: >-
       Status description of the deployment.
     Value: !Select [1, !Split ["#", !GetAtt DeployWaitCondition.Data]]
-
