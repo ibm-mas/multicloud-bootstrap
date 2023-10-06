@@ -520,6 +520,7 @@ fi
 if [[ (-z $UDS_API_KEY) || (-z $UDS_ENDPOINT_URL) || (-z $UDS_PUB_CERT_URL) ]]; then
   # Deploy UDS
   log "==== UDS deployment started ===="
+  export OCP_FIPS_ENABLED=true
   export ROLE_NAME=uds && ansible-playbook ibm.mas_devops.run_role
   log "==== UDS deployment completed ===="
 
