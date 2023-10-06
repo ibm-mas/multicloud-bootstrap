@@ -323,6 +323,7 @@ if [[ $CLUSTER_TYPE == "azure" ]]; then
 fi
 
 if [[ $CLUSTER_TYPE == "azure" ]]; then
+   if [[ $DEPLOY_MANAGE == "true" && (-n $MAS_JDBC_USER) && (-n $MAS_JDBC_PASSWORD) && (-n $MAS_JDBC_URL) && (-n $MAS_JDBC_CERT_URL) ]]; then
    az login --service-principal -u ${AZURE_SP_CLIENT_ID} -p ${AZURE_SP_CLIENT_PWD} --tenant ${TENANT_ID}
   export ValidateDBProvisionedVPCId=`az network vnet list --query "[?name=='$DBProvisionedVPCId'].{Name:name}" -o tsv`
   log "ValidateDBProvisionedVPCId -- $ValidateDBProvisionedVPCId"
@@ -332,6 +333,7 @@ if [[ $CLUSTER_TYPE == "azure" ]]; then
   else
     log "ERROR: Database cluster /Node Vnet is invalid"
     SCRIPT_STATUS=45
+    fi
   fi
 fi
 
