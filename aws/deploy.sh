@@ -560,7 +560,7 @@ if [[ $DEPLOY_MANAGE == "true" && (-z $MAS_JDBC_USER) && (-z $MAS_JDBC_PASSWORD)
   log "==== Configure internal db2 for manage started ===="
 fi
 
-if [[ $DEPLOY_MANAGE == "true" && (-n $MAS_JDBC_USER) && (-n $MAS_JDBC_PASSWORD) && (-n $MAS_JDBC_URL) ]]; then
+if [[ $DEPLOY_MANAGE == "true" && (-n $MAS_JDBC_USER) && (-n $MAS_JDBC_PASSWORD) && (-z $MAS_JDBC_CERT_URL) && (-n $MAS_JDBC_URL) ]]; then
       export SSL_ENABLED=false
       #Setting the DB values
       if [[ -n $MANAGE_TABLESPACE ]]; then
