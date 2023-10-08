@@ -559,7 +559,7 @@ if [[ $DEPLOY_MANAGE == "true" && (-z $MAS_JDBC_USER) && (-z $MAS_JDBC_PASSWORD)
   export ROLE_NAME=suite_db2_setup_for_manage && ansible-playbook ibm.mas_devops.run_role
   log "==== Configure internal db2 for manage started ===="
 fi
-
+export SSL_ENABLED=true
 if [[ $DEPLOY_MANAGE == "true" && (-n $MAS_JDBC_USER) && (-n $MAS_JDBC_PASSWORD) && (-z $MAS_JDBC_CERT_URL) && (-n $MAS_JDBC_URL) ]]; then
       export SSL_ENABLED=false
       #Setting the DB values
