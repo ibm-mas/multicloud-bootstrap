@@ -559,8 +559,7 @@ if [[ $DEPLOY_MANAGE == "true" && (-z $MAS_JDBC_USER) && (-z $MAS_JDBC_PASSWORD)
   export ROLE_NAME=suite_db2_setup_for_manage && ansible-playbook ibm.mas_devops.run_role
   log "==== Configure internal db2 for manage started ===="
 fi
-export SSL_ENABLED=true
-if [[ $DEPLOY_MANAGE == "true" && (-n $MAS_JDBC_USER) && (-n $MAS_JDBC_PASSWORD) && (-z $MAS_JDBC_CERT_URL) && (-n $MAS_JDBC_URL) ]]; then
+if [[ $DEPLOY_MANAGE == "true" && (-n $MAS_JDBC_USER) && (-n $MAS_JDBC_PASSWORD) && (-n $MAS_JDBC_URL) ]]; then
       export SSL_ENABLED=false
       #Setting the DB values
       if [[ -n $MANAGE_TABLESPACE ]]; then
@@ -589,6 +588,12 @@ if [[ $DEPLOY_MANAGE == "true" && (-n $MAS_JDBC_USER) && (-n $MAS_JDBC_PASSWORD)
       log " MAS_APP_SETTINGS_DB2_SCHEMA: $MAS_APP_SETTINGS_DB2_SCHEMA"
       log " DEPLOY_MANAGEMAS_APP_SETTINGS_TABLESPACE: $MAS_APP_SETTINGS_TABLESPACE"
       log " MAS_APP_SETTINGS_INDEXSPACE: $MAS_APP_SETTINGS_INDEXSPACE"
+      
+      if [ -n "$MAS_JDBC_CERT_URL" ]; then
+    log "MAS_JDBC_CERT_URL is not empty, setting SSL_ENABLED as true"
+    export SSL_ENABLED=true
+     fi
+  
   log "==== Configure JDBC started for external DB2 ==== SSL_ENABLED = $SSL_ENABLED"
   export ROLE_NAME=gencfg_jdbc && ansible-playbook ibm.mas_devops.run_role
   log "==== Configure JDBC completed for external DB2 ===="
