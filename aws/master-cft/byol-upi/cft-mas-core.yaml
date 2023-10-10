@@ -211,18 +211,8 @@ Parameters:
       Leave this field blank, if MongoDBProvider was selected as "MongoDB".
       Make sure this VPC ID resides in the current deployment region and does not have matching or overlapping IPv4 CIDR blocks 10.0.0.0/16.
     Type: String
-  AWSMSKProvider:
-    Description: >-
-      Select Yes, to provision a AWS MSK cluster
-    Type: String
-    Default: "No"
-    MinLength: '1'
-    AllowedValues:
-      - "No"
-      - "Yes"
-
 Conditions:
-  MongoUseExistingInstanceCondition: !Equals [!Ref MongoDeploymentMode, "Use an existing mongo instance"]
+  MongoUseExistingInstanceCondition: !Equals [ !Ref MongoDeploymentMode, "Use an existing mongo instance" ]
 Metadata:
   'AWS::CloudFormation::Interface':
     ParameterGroups:
@@ -275,10 +265,6 @@ Metadata:
           - MongoHosts
           - MongoCAPemFile
           - DocumentDBProvisionedVPCId
-      - Label:
-          default: AWS MSK Provider
-        Parameters:
-          - AWSMSKProvider
       - Label:
           default: >-
             Existing Suite License Service connection details (leave this
@@ -710,9 +696,7 @@ Resources:
             - !If [MongoUseExistingInstanceCondition, !Ref MongoCAPemFile, ""]
             - ''' '''
             - !If [MongoUseExistingInstanceCondition, !Ref DocumentDBProvisionedVPCId, ""]
-            - ''' '''
-            - !Ref AWSMSKProvider
-            - ''' "prod" '
+            - ''' '''' "prod" '
             - '2>&1 | tee mas-provisioning.log; '
       Tags:
         - Key: Name
