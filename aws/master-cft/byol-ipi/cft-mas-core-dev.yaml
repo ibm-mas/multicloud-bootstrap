@@ -305,7 +305,7 @@ Mappings:
     eu-west-3:
       HVM64: ami-xxxxxxxxxxxxxxxxx
     eu-central-1:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
+      HVM64: ami-0263c75330542ced8
     ap-northeast-1:
       HVM64: ami-xxxxxxxxxxxxxxxxx
     ap-northeast-2:

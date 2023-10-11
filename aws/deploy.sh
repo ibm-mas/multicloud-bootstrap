@@ -563,8 +563,8 @@ if [[ $DEPLOY_MANAGE == "true" && (-n $MAS_JDBC_USER) && (-n $MAS_JDBC_PASSWORD)
       export SSL_ENABLED=false
       #Setting the DB values
       if [[ -n $MANAGE_TABLESPACE ]]; then
-        log " $MANAGE_TABLESPACE: $$MANAGE_TABLESPACE"
-     #   export MAS_APP_SETTINGS_DB2_SCHEMA=$(echo $MANAGE_TABLESPACE | cut -d ':' -f 1)
+        log " MANAGE_TABLESPACE: $MANAGE_TABLESPACE"
+        export MAS_APP_SETTINGS_DB2_SCHEMA=$(echo $MANAGE_TABLESPACE | cut -d ':' -f 1)
         export MAS_APP_SETTINGS_TABLESPACE=$(echo $MANAGE_TABLESPACE | cut -d ':' -f 1)
         export MAS_APP_SETTINGS_INDEXSPACE=$(echo $MANAGE_TABLESPACE | cut -d ':' -f 2)
       else
@@ -575,7 +575,7 @@ if [[ $DEPLOY_MANAGE == "true" && (-n $MAS_JDBC_USER) && (-n $MAS_JDBC_PASSWORD)
                         export MAS_APP_SETTINGS_INDEXSPACE="maxindex"
         elif [[ ${MAS_JDBC_URL,, } =~ ^jdbc:sql? ]]; then
                          log "Setting to MSSQL Values"
-                         # export MAS_APP_SETTINGS_DB2_SCHEMA="dto"
+                          export MAS_APP_SETTINGS_DB2_SCHEMA="dto"
                           export MAS_APP_SETTINGS_TABLESPACE="PRIMARY"
                           export MAS_APP_SETTINGS_INDEXSPACE="PRIMARY"
         elif [[ ${MAS_JDBC_URL,, } =~ ^jdbc:oracle? ]]; then
