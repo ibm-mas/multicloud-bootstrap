@@ -63,6 +63,11 @@ Parameters:
       connects to, for example:
       jdbc:db2://1.2.3.4:50051/FTMDB:sslConnection=true;
     Type: String
+  TablespaceSchemaName:
+    Description: >-
+      Enter the tablespace, indexspace, & schema names here if you are not using the default names (maximo,maxdata,maxindex,maximo).
+      Each name separated by a delimeter colon (:). For example in this format: <schema_name>:<tablespace_name>:<indexspace_name>
+    Type: String
   MASManageDBCertificateUrl:
     Description: >-
       Enter the HTTP or S3 location of the database's public certificate, for
@@ -70,7 +75,7 @@ Parameters:
     Type: String
   DBProvisionedVPCId:
     Description: >-
-      Enter the VPC ID where your existing database (DB2 or Oracle or MSSQL) was provisioned on a private subnet to establish 
+      Enter the VPC ID where your existing database (DB2 or Oracle or MSSQL) was provisioned on a private subnet to establish
       VPC Peering from this VPC & the VPC created during current stack deployment in order to establish database connection.
     Type: String
   ImportDemoData:
@@ -148,7 +153,7 @@ Parameters:
       - "Use an existing mongo instance"
   MongoDBProvider:
     Description: >-
-      Select the desired MongoDB provider. 
+      Select the desired MongoDB provider.
       Note: When selecting MongoDBProvider as MongoDB and MongoDeploymentMode as 'Provision a new mongo instance', a new "MongoDB Community Edition" instance will be provisioned
     Type: String
     Default: "MongoDB"
@@ -190,7 +195,7 @@ Parameters:
       - "Yes"
 Conditions:
   MongoUseExistingInstanceCondition: !Equals [!Ref MongoDeploymentMode, "Use an existing mongo instance"]
-      
+
 Metadata:
   'AWS::CloudFormation::Interface':
     ParameterGroups:
@@ -220,13 +225,14 @@ Metadata:
       - Label:
           default: >-
             Maximo Manage database configuration (complete this section only if
-            you chose the 'MAS + Manage' offering type. 
-            In case if this section is left empty and you chose 'MAS + Manage' offering type, 
+            you chose the 'MAS + Manage' offering type.
+            In case if this section is left empty and you chose 'MAS + Manage' offering type,
             then We will provision an internal DB2 instance for Manage)
         Parameters:
           - MASManageDBUser
           - MASManageDBPassword
           - MASManageDBJdbcUrl
+          - TablespaceSchemaName
           - MASManageDBCertificateUrl
           - DBProvisionedVPCId
           - ImportDemoData
@@ -237,7 +243,7 @@ Metadata:
           - MongoDBProvider
       - Label:
           default: >-
-            Existing MongoDB / DocumentDB configuration details 
+            Existing MongoDB / DocumentDB configuration details
             (complete this section only if MongoDeploymentMode was selected as 'Use an existing mongo instance')
         Parameters:
           - MongoAdminUsername
@@ -682,7 +688,7 @@ Resources:
             - ''' '''
             - !Ref OperationalMode
             - ''' '''
-            - !If [MongoUseExistingInstanceCondition, "true", "false"] 
+            - !If [MongoUseExistingInstanceCondition, "true", "false"]
             - ''' '''
             - !Ref MongoDBProvider
             - ''' '''
@@ -699,6 +705,11 @@ Resources:
             - !Ref AWSMSKProvider
             - ''' '''
             - !Ref DBProvisionedVPCId
+            - ''' '''' '''
+            - !Ref EBSVolumeType
+            - ''' '''
+            - !Ref TablespaceSchemaName
+            - ''' '''
             - ''' "prod" '
             - '2>&1 | tee mas-provisioning.log; '
       Tags:

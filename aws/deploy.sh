@@ -158,6 +158,7 @@ master_instance_type            = "$MASTER_INSTANCE_TYPE"
 worker_instance_type            = "$WORKER_INSTANCE_TYPE"
 master_replica_count            = "$MASTER_NODE_COUNT"
 worker_replica_count            = "$WORKER_NODE_COUNT"
+worker_instance_volume_type		= "$EBSVolumeType"
 accept_cpd_license              = "accept"
 new_or_existing_vpc_subnet      = "$new_or_existing_vpc_subnet"
 enable_permission_quota_check   = "$enable_permission_quota_check"
@@ -562,6 +563,35 @@ fi
 
 if [[ $DEPLOY_MANAGE == "true" && (-n $MAS_JDBC_USER) && (-n $MAS_JDBC_PASSWORD) && (-n $MAS_JDBC_URL) ]]; then
   export SSL_ENABLED=false
+
+  #Setting the DB values
+      if [[ -n $MANAGE_TABLESPACE ]]; then
+        log " $MANAGE_TABLESPACE: $$MANAGE_TABLESPACE"
+        export MAS_APP_SETTINGS_DB2_SCHEMA=$(echo $MANAGE_TABLESPACE | cut -d ':' -f 1)
+        export MAS_APP_SETTINGS_TABLESPACE=$(echo $MANAGE_TABLESPACE | cut -d ':' -f 1)
+        export MAS_APP_SETTINGS_INDEXSPACE=$(echo $MANAGE_TABLESPACE | cut -d ':' -f 2)
+      else
+         if [[ ${MAS_JDBC_URL,, } =~ ^jdbc:db2? ]]; then
+                          log "Setting to DB2 Values"
+                          export MAS_APP_SETTINGS_DB2_SCHEMA="maximo"
+                          export MAS_APP_SETTINGS_TABLESPACE="maxdata"
+                          export MAS_APP_SETTINGS_INDEXSPACE="maxindex"
+        elif [[ ${MAS_JDBC_URL,, } =~ ^jdbc:sql? ]]; then
+                          log "Setting to MSSQL Values"
+                          export MAS_APP_SETTINGS_DB2_SCHEMA="dto"
+                          export MAS_APP_SETTINGS_TABLESPACE="PRIMARY"
+                          export MAS_APP_SETTINGS_INDEXSPACE="PRIMARY"
+        elif [[ ${MAS_JDBC_URL,, } =~ ^jdbc:oracle? ]]; then
+                          log "Setting to ORACLE Values"
+                          export MAS_APP_SETTINGS_DB2_SCHEMA="maximo"
+                          export MAS_APP_SETTINGS_TABLESPACE="maxdata"
+                          export MAS_APP_SETTINGS_INDEXSPACE="maxindex"
+        fi
+      fi
+      log " MAS_APP_SETTINGS_DB2_SCHEMA: $MAS_APP_SETTINGS_DB2_SCHEMA"
+      log " DEPLOY_MANAGEMAS_APP_SETTINGS_TABLESPACE: $MAS_APP_SETTINGS_TABLESPACE"
+      log " MAS_APP_SETTINGS_INDEXSPACE: $MAS_APP_SETTINGS_INDEXSPACE"
+
   if [ -n "$MAS_JDBC_CERT_URL" ]; then
     log "MAS_JDBC_CERT_URL is not empty, setting SSL_ENABLED as true"
     export SSL_ENABLED=true

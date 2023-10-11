@@ -69,7 +69,7 @@ variable "master_instance_volume_iops" {
 
 variable "master_instance_volume_size" {
   type    = number
-  default = 350
+  default = 300
 }
 
 variable "master_instance_volume_type" {
