@@ -313,8 +313,11 @@ cd $GIT_REPO_HOME
 log "==== aws/deploy.sh : Invoke db-create-vpc-peer.sh starts ===="
     log "Existing instance of db @ VPC_ID=$DBProvisionedVPCId"
     export ACCEPTER_VPC_ID=${DBProvisionedVPCId}
+    if [[ -n $ExocpProvisionedVPCId ]]; then
+    export REQUESTER_VPC_ID=${ExocpProvisionedVPCId}
+    else
     export REQUESTER_VPC_ID=${VPC_ID}
-
+    fi    
     sh $GIT_REPO_HOME/aws/db/db-create-vpc-peer.sh
     log "==== aws/deploy.sh : Invoke db-create-vpc-peer.sh ends ===="
 fi
