@@ -95,7 +95,7 @@ log "==== This VPC peering is done to pre-validate database connection ==="
     export ACCEPTER_VPC_ID=${DBProvisionedVPCId}
     export REQUESTER_VPC_ID=${BOOTNODE_VPC_ID}
 
-    sh $GIT_REPO_HOME/aws/db/db-create-vnet-peer.sh
+    sh $GIT_REPO_HOME/aws/db/db-create-vpc-peer.sh
     log "==== Invoke db-create-vpc-peer.sh ends ===="
 fi
 # JDBC CFT inputs validation and connection test
