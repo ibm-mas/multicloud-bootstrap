@@ -303,7 +303,7 @@ if [[ $DEPLOY_MANAGE == "true" && (-n $MAS_JDBC_USER) && (-n $MAS_JDBC_PASSWORD)
       export SSL_ENABLED=false
       #Setting the DB values
       if [[ -n $MANAGE_TABLESPACE ]]; then
-        log " $MANAGE_TABLESPACE: $$MANAGE_TABLESPACE"
+        log " MANAGE_TABLESPACE: $MANAGE_TABLESPACE"
         export MAS_APP_SETTINGS_DB2_SCHEMA=$(echo $MANAGE_TABLESPACE | cut -d ':' -f 1)
         export MAS_APP_SETTINGS_TABLESPACE=$(echo $MANAGE_TABLESPACE | cut -d ':' -f 2)
         export MAS_APP_SETTINGS_INDEXSPACE=$(echo $MANAGE_TABLESPACE | cut -d ':' -f 3)

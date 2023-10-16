@@ -87,18 +87,6 @@ fi
 #    SCRIPT_STATUS=25
 #fi
 
-
-if [[ ($CLUSTER_TYPE == "aws") && (-n $DBProvisionedVPCId) ]]; then
-cd $GIT_REPO_HOME
-log "==== Invoke db-create-vpc-peer.sh to create VPC Peering between bootnode VPC & database provisioned VPC ID starts ===="
-log "==== This VPC peering is done to pre-validate database connection ==="
-    log "Existing instance of db @ VPC_ID=$DBProvisionedVPCId"
-    export ACCEPTER_VPC_ID=${DBProvisionedVPCId}
-    export REQUESTER_VPC_ID=${BOOTNODE_VPC_ID}
-
-    sh $GIT_REPO_HOME/aws/db/db-create-vpc-peer.sh
-    log "==== Invoke db-create-vpc-peer.sh ends ===="
-fi
 # JDBC CFT inputs validation and connection test
 if [[ $DEPLOY_MANAGE == "true" ]]; then
     if [[ (-z $MAS_JDBC_USER) && (-z $MAS_JDBC_PASSWORD) && (-z $MAS_JDBC_URL) && (-z $MAS_JDBC_CERT_URL) ]]; then
