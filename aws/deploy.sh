@@ -12,8 +12,7 @@ MASTER_INSTANCE_TYPE="m5.2xlarge"
 WORKER_INSTANCE_TYPE="m5.4xlarge"
 # Mongo variables
 export MONGODB_STORAGE_CLASS=gp2
-# Amqstreams variables
-export KAFKA_STORAGE_CLASS=gp2
+
 # IAM variables
 IAM_POLICY_NAME="masocp-policy-${RANDOM_STR}"
 IAM_USER_NAME="masocp-user-${RANDOM_STR}"
@@ -34,7 +33,6 @@ log " AWS_DEFAULT_REGION: $AWS_DEFAULT_REGION"
 log " MASTER_INSTANCE_TYPE: $MASTER_INSTANCE_TYPE"
 log " WORKER_INSTANCE_TYPE: $WORKER_INSTANCE_TYPE"
 log " MONGODB_STORAGE_CLASS: $MONGODB_STORAGE_CLASS"
-log " KAFKA_STORAGE_CLASS: $KAFKA_STORAGE_CLASS"
 log " IAM_POLICY_NAME: $IAM_POLICY_NAME"
 log " IAM_USER_NAME: $IAM_USER_NAME"
 log " SLS_STORAGE_CLASS: $SLS_STORAGE_CLASS"
@@ -402,52 +400,12 @@ else
   ## Deploy MongoDB completed
 fi
 
-if [[ -z $VPC_ID && $AWS_MSK_PROVIDER == "Yes" ]]; then
-  log "Failed to get the vpc id required to deploy AWS MSK"
-  exit 42
-fi
-log "==== AWS_MSK_PROVIDER=$AWS_MSK_PROVIDER VPC_ID=$VPC_ID ===="
-if [[ $AWS_MSK_PROVIDER == "Yes" ]]; then
-  log "==== AWS MSK deployment started ===="
-  export KAFKA_CLUSTER_NAME="msk-${RANDOM_STR}"
-  export KAFKA_NAMESPACE="msk-${RANDOM_STR}"
-  export AWS_KAFKA_USER_NAME="mskuser-${RANDOM_STR}"
-  export AWS_REGION="${DEPLOY_REGION}"
-  export KAFKA_VERSION="2.8.1"
-  export KAFKA_PROVIDER="aws"
-  export KAFKA_ACTION="install"
-  export AWS_MSK_INSTANCE_TYPE="kafka.m5.large"
-  export AWS_MSK_VOLUME_SIZE="100"
-  export AWS_MSK_INSTANCE_NUMBER=3
 
-  log "==== Invoke fetch-cidr-block.sh ===="
-  source $GIT_REPO_HOME/aws/utils/fetch-cidr-block.sh
-  if [ $? -ne 0 ]; then
-    SCRIPT_STATUS=44
-    exit $SCRIPT_STATUS
-  fi
-  # IPv4 CIDR of private or default subnet
-  export AWS_MSK_CIDR_AZ1="${CIDR_BLOCKS_0}"
-  export AWS_MSK_CIDR_AZ2="${CIDR_BLOCKS_1}"
-  export AWS_MSK_CIDR_AZ3="${CIDR_BLOCKS_2}"
-  export AWS_MSK_INGRESS_CIDR="${VPC_CIDR_BLOCK}"
-  export AWS_MSK_EGRESS_CIDR="${VPC_CIDR_BLOCK}"
-  log "AWS_MSK_CIDR_AZ1=${AWS_MSK_CIDR_AZ1}  AWS_MSK_CIDR_AZ2=${AWS_MSK_CIDR_AZ2} AWS_MSK_CIDR_AZ3=${AWS_MSK_CIDR_AZ3} VPC_CIDR_BLOCK=$VPC_CIDR_BLOCK"
-
-  export ROLE_NAME=kafka && ansible-playbook ibm.mas_devops.run_role
-  log "==== AWS MSK deployment completed ===="
-fi
 ## Copying the entitlement.lic to MAS_CONFIG_DIR
 if [[ -n "$MAS_LICENSE_URL" ]]; then
   cp $GIT_REPO_HOME/entitlement.lic $MAS_CONFIG_DIR
 fi
 
-if [[ $DEPLOY_MANAGE == "true" && $DEPLOY_CP4D == "true" ]]; then
-  ## Deploy Amqstreams
-  log "==== Amq streams deployment started ===="
-  export ROLE_NAME=kafka && ansible-playbook ibm.mas_devops.run_role
-  log "==== Amq streams deployment completed ===="
-fi
 
 ## Deploy SLS
 if [[ (-z $SLS_URL) || (-z $SLS_REGISTRATION_KEY) || (-z $SLS_PUB_CERT_URL) ]]; then

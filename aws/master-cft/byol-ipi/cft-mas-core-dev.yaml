@@ -172,19 +172,8 @@ Parameters:
       Leave this field blank, if MongoDBProvider was selected as "MongoDB".
       Make sure this VPC ID resides in the current deployment region and does not have matching or overlapping IPv4 CIDR blocks 10.0.0.0/16.
     Type: String
-
-  AWSMSKProvider:
-    Description: >-
-      Select Yes, to provision a AWS MSK cluster
-    Type: String
-    Default: "No"
-    MinLength: '1'
-    AllowedValues:
-      - "No"
-      - "Yes"
 Conditions:
-  MongoUseExistingInstanceCondition: !Equals [!Ref MongoDeploymentMode, "Use an existing mongo instance"]
-
+  MongoUseExistingInstanceCondition: !Equals [ !Ref MongoDeploymentMode, "Use an existing mongo instance" ]
 Metadata:
   'AWS::CloudFormation::Interface':
     ParameterGroups:
@@ -235,10 +224,6 @@ Metadata:
           - MongoHosts
           - MongoCAPemFile
           - DocumentDBProvisionedVPCId
-      - Label:
-          default: AWS MSK Provision
-        Parameters:
-          - AWSMSKProvider	         
       - Label:
           default: >-
             Existing Suite License Service connection details (leave this
@@ -623,7 +608,7 @@ Resources:
             - 'git clone https://github.com/ibm-mas/ansible-devops.git;'
             - cd ansible-devops;
             - rm -rf multicloud-bootstrap 1>/dev/null 2>&1;
-            - 'git clone -b SUDS_install https://github.com/ibm-mas/multicloud-bootstrap.git;'
+            - 'git clone -b remove_kafkaMSK https://github.com/ibm-mas/multicloud-bootstrap.git;'
             - cd multicloud-bootstrap;
             - 'find . -type f -name "*.sh" -exec chmod +x {} \;;'
             - ./init.sh "aws" "
@@ -693,9 +678,7 @@ Resources:
             - !If [MongoUseExistingInstanceCondition, !Ref MongoCAPemFile, ""]
             - ''' '''
             - !If [MongoUseExistingInstanceCondition, !Ref DocumentDBProvisionedVPCId, ""]
-            - ''' '''
-            - !Ref AWSMSKProvider	    
-            - ''' "dev" '
+            - ''' '''' "dev" '
             - '2>&1 | tee mas-provisioning.log; '
       Tags:
         - Key: Name
