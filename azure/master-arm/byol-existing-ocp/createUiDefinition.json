@@ -139,7 +139,7 @@
                         "type": "Microsoft.Common.DropDown",
                         "label": "Offering type",
                         "defaultValue": "MAS Core + Cloud Pak for Data",
-                        "toolTip": "Select your preferred Suite offering type.",
+                        "toolTip": "Select your preferred Suite offering type. For MAS Core+Manage: if DB2 values are not provided, DB2 will be deployed internally.",
                         "constraints": {
                             "allowedValues": [
                                 {
@@ -397,7 +397,7 @@
                         "type": "Microsoft.Common.TextBox",
                         "label": "MAS Manage Database values",
                         "defaultValue": "",
-                        "toolTip": "Manage Database setting : DB_SCHEMA ,TABLESPACE,INDEXSPACE values with ':' in between the values. Ex : For DB2 - maximo:maxdata:maxindex , Oracle -maximo:maxdata:maxindex , Mssql - dto:PRIMARY:PRIMARY",
+                        "toolTip": "Manage database settings by specifying values for DB_SCHEMA, TABLESPACE, and INDEXSPACE with colons in between the values. For example, maximo:maxdata:maxindex for DB2; maximo:maxdata:maxindex for Oracle and dto:PRIMARY:PRIMARY for MSSQL.",
                         "constraints": {
                             "required": "[or(not(empty(steps('DatabaseSettings').masManageDBUser)), not(empty(steps('DatabaseSettings').masManageDBPassword)), not(empty(steps('DatabaseSettings').masManageDBJdbcUrl)))]",
                             "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
@@ -410,7 +410,7 @@
                         "type": "Microsoft.Common.TextBox",
                         "label": "VNetId of Database",
                         "defaultValue": "",
-                        "toolTip": "Enter the Vnet ID where your existing database (DB2 or Oracle or MSSQL) was provisioned to establish \n  Vnet Peering from this Vnet & the Existing OCP cluster's Vnet in order to establish database connection.",
+                        "toolTip": "Enter the Vnet ID where the existing database (DB2, Oracle, or MSSQL) was provisioned. This Vnet ID is required to establish Vnet Peering between the specified Vnet and the Vnet of the OCP cluster, which is essential for enabling a connection to the database.",
                         "constraints": {
                             "required": "[or(not(empty(steps('DatabaseSettings').masManageDBUser)), not(empty(steps('DatabaseSettings').masManageDBPassword)), not(empty(steps('DatabaseSettings').masManageDBJdbcUrl)))]",
                             "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
@@ -423,7 +423,7 @@
                         "type": "Microsoft.Common.TextBox",
                         "label": "VnetId of existing OCP cluster",
                         "defaultValue": "",
-                        "toolTip": "Enter the  Existing OCP cluster's Vnet ID to establish \\n  Vnet Peering from this Vnet &  Vnet where your existing database VM is created, in order to establish database connection.\"",
+                        "toolTip": "Enter the Vnet ID of the existing OCP cluster to establish Vnet Peering between this Vnet and the VNetId of Database.",
                         "constraints": {
                             "required": "[or(not(empty(steps('DatabaseSettings').masManageDBUser)), not(empty(steps('DatabaseSettings').masManageDBPassword)), not(empty(steps('DatabaseSettings').masManageDBJdbcUrl)))]",
                             "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",

@@ -113,7 +113,7 @@
                         "type": "Microsoft.Common.DropDown",
                         "label": "Offering type",
                         "defaultValue": "MAS Core + Cloud Pak for Data",
-                        "toolTip": "Select your preferred Suite offering type.For MAS Core + Manage: If db2 values are not provided,db2 will be internally deployed",
+                        "toolTip": "Select your preferred Suite offering type. For MAS Core+Manage: if DB2 values are not provided, DB2 will be deployed internally.",
                         "constraints": {
                             "allowedValues": [
                                 {
@@ -384,7 +384,7 @@
                         "type": "Microsoft.Common.TextBox",
                         "label": "VNetId of Database",
                         "defaultValue": "",
-                        "toolTip": "Enter the Vnet ID where your existing database (DB2 or Oracle or MSSQL) was provisioned to establish \n  Vnet Peering from this Vnet & the Existing OCP cluster's Vnet in order to establish database connection.",
+                        "toolTip": "Enter the Vnet ID where the existing database (DB2, Oracle, or MSSQL) was provisioned. This Vnet ID is required to establish Vnet Peering between the specified Vnet and the Vnet of the OCP cluster, which is essential for enabling a connection to the database.",
                         "constraints": {
                             "required": "[or(not(empty(steps('DatabaseSettings').masManageDBUser)), not(empty(steps('DatabaseSettings').masManageDBPassword)), not(empty(steps('DatabaseSettings').masManageDBJdbcUrl)))]",
                             "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
