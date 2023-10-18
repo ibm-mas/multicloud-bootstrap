@@ -397,9 +397,8 @@
                         "type": "Microsoft.Common.TextBox",
                         "label": "MAS Manage Database values",
                         "defaultValue": "",
-                        "toolTip": "Manage database settings by specifying values for DB_SCHEMA, TABLESPACE, and INDEXSPACE with colons in between the values. For example, maximo:maxdata:maxindex for DB2; maximo:maxdata:maxindex for Oracle and dto:PRIMARY:PRIMARY for MSSQL.",
+                        "toolTip": "Enter the tablespace & indexspace names here if you are not using the default names.\n  Each name separated by a delimeter colon (:) For example: schema_name:tablespace_name:indexspace_name.",
                         "constraints": {
-                            "required": "[or(not(empty(steps('DatabaseSettings').masManageDBUser)), not(empty(steps('DatabaseSettings').masManageDBPassword)), not(empty(steps('DatabaseSettings').masManageDBJdbcUrl)))]",
                             "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
                             "validationMessage": "Contain letters, numbers and special characters only."
                         },
@@ -408,11 +407,10 @@
                     {
                         "name": "DBProvisionedVPCId",
                         "type": "Microsoft.Common.TextBox",
-                        "label": "VNetId of Database",
+                        "label": "VNetId of external database provisioned.",
                         "defaultValue": "",
-                        "toolTip": "Enter the Vnet ID where the existing database (DB2, Oracle, or MSSQL) was provisioned. This Vnet ID is required to establish Vnet Peering between the specified Vnet and the Vnet of the OCP cluster, which is essential for enabling a connection to the database.",
+                        "toolTip": "Enter the Vnet ID where your existing database (DB2 or Oracle or MSSQL) was provisioned to establish \n  Vnet Peering from this Vnet & the Existing OCP cluster's Vnet in order to establish database connection.",
                         "constraints": {
-                            "required": "[or(not(empty(steps('DatabaseSettings').masManageDBUser)), not(empty(steps('DatabaseSettings').masManageDBPassword)), not(empty(steps('DatabaseSettings').masManageDBJdbcUrl)))]",
                             "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
                             "validationMessage": "Contain letters, numbers and special characters only."
                         },
@@ -423,9 +421,8 @@
                         "type": "Microsoft.Common.TextBox",
                         "label": "VnetId of existing OCP cluster",
                         "defaultValue": "",
-                        "toolTip": "Enter the Vnet ID of the existing OCP cluster to establish Vnet Peering between this Vnet and the VNetId of Database.",
+                        "toolTip": "Enter the  Existing OCP cluster's Vnet ID to establish \\n  Vnet Peering from this Vnet &  Vnet where your existing database VM is created, in order to establish database connection.\"",
                         "constraints": {
-                            "required": "[or(not(empty(steps('DatabaseSettings').masManageDBUser)), not(empty(steps('DatabaseSettings').masManageDBPassword)), not(empty(steps('DatabaseSettings').masManageDBJdbcUrl)))]",
                             "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
                             "validationMessage": "Contain letters, numbers and special characters only."
                         },
@@ -578,16 +575,19 @@
             "masManageDBPassword": "[steps('DatabaseSettings').masManageDBPassword]",
             "masManageDBJdbcUrl": "[steps('DatabaseSettings').masManageDBJdbcUrl]",
             "masManageDBCertificateUrl": "[steps('DatabaseSettings').masManageDBCertificateUrl]",
+            "masManageTablespace": "[steps('DatabaseSettings').masManageTablespace]",
+            "DBProvisionedVPCId":"[steps('DatabaseSettings').DBProvisionedVPCId]",
+            "ExocpProvisionedVPCId": "[steps('DatabaseSettings').ExocpProvisionedVPCId]",
             "importDemoData": "[steps('DatabaseSettings').importDemoData]",
-            
-            
+
+
             "emailNotification": "[steps('EmailSettings').emailNotification]",
             "smtpHost": "[steps('EmailSettings').smtpHost]",
             "smtpPort": "[steps('EmailSettings').smtpPort]",
             "smtpUsername": "[steps('EmailSettings').smtpUsername]",
             "smtpPassword": "[steps('EmailSettings').smtpPassword]",
             "notificattionEmailAddress": "[steps('EmailSettings').notificattionEmailAddress]"
-            
+
         }
     }
 }

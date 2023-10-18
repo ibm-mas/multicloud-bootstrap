@@ -4,8 +4,7 @@
   "parameters": {
     "subscriptionId": {
       "type": "string",
-      "metadata": {
-        "description": "Azure subscription id where bootnode and OpenShift cluster resources to be deployed:"
+      "metadata": {"description": "Confirm your Azure subscription id  again,where all resources needs to be deployed:"
       },
       "defaultValue": "[subscription().subscriptionId]"
     },
@@ -39,7 +38,7 @@
     "offeringType": {
       "type": "string",
       "metadata": {
-        "description": "Select your preferred Suite offering type. For MAS Core+Manage: if DB2 values are not provided, DB2 will be deployed internally."
+        "description": "Select your preferred Suite offering type.For MAS Core + Manage: If db2 values are not provided,db2 will be internally deployed."
       },
       "defaultValue": "MAS Core + Cloud Pak for Data",
       "allowedValues": [
@@ -136,14 +135,14 @@
     "masManageTablespace": {
       "type": "string",
       "metadata": {
-        "description": "Enter the DB_SCHEMA ,TABLESPACE,INDEXSPACE values with ':' in between the values. Ex : For DB2 - maximo:maxdata:maxindex , Oracle -maximo:maxdata:maxindex , Mssql - dto:PRIMARY:PRIMARY"
+        "description": "Enter the tablespace & indexspace names here if you are not using the default names.\n  Each name separated by a delimeter colon (:). For example in this format: <schema_name>:<tablespace_name>:<indexspace_name>."
       },
       "defaultValue": ""
     },
     "DBProvisionedVPCId": {
       "type": "string",
       "metadata": {
-        "description": "Enter the Vnet ID where the existing database (DB2, Oracle, or MSSQL) was provisioned. This Vnet ID is required to establish Vnet Peering between the specified Vnet and the Vnet of the OCP cluster, which is essential for enabling a connection to the database."
+        "description": "Enter the Vnet ID where your existing database (DB2 or Oracle or MSSQL) was provisioned on a private subnet to establish\n      Vnet Peering from this Vnet & the Vnet created during current stack deployment in order to establish database connection."
       },
       "defaultValue": ""
     },
@@ -160,7 +159,7 @@
     },
     "sshPublicKey": {
       "type": "string",
-      "defaultValue": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCZsnnoLyMnmObhjDLHNh9ksowEb1dV1eb8Ssw7vdzLFoWVf+Upm1xtH2vOybaDfE/rES+aQIsjrKhwlGM+o2ViM9skQJIX/34/gzt3r+SUG4bzRvAtmPofAoQTrvRKWwL47K8nNPVcqHoV1TMEL9R+F8UTwQGbhz5FuxEt0eReOBCxNQnuLPLChawaml7LSNNaRka6tBQ/QeA/oJdo82sn/tpNZFNivOn8+fo+HNQPvirFJKLmsiER2HFuhH6p3wHYA1IMqzzOcWv52cRRIONyowyPbuCCVzbdXSHWt2JtcyvkwAqc2a5DuhxTeioYP+xAij9r/Xkc/x94sXAsAJtz imported-openssh-key",
+      "defaultValue": "",
       "metadata": {
         "description": "Provide the public SSH key that you want to add to the bootnode, bastion host and cluster nodes."
       }
@@ -209,7 +208,7 @@
     },
     "azureServicePrincipalClientId": {
       "type": "string",
-      "defaultValue": "3fd721c5-fe3c-4a10-b39d-afa313353005",
+      "defaultValue": "",
       "metadata": {
         "description": "Enter Azure service principal client Id."
       }
