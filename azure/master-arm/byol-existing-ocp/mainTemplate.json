@@ -38,7 +38,7 @@
     "offeringType": {
       "type": "string",
       "metadata": {
-        "description": "Select your preferred Suite offering type.For MAS Core + Manage: If db2 values are not provided,db2 will be internally deployed."
+        "description": "Select your preferred Suite offering type. For MAS Core+Manage: if DB2 values are not provided, DB2 will be deployed internally."
       },
       "defaultValue": "MAS Core + Cloud Pak for Data",
       "allowedValues": [
@@ -177,7 +177,7 @@
     "ExocpProvisionedVPCId": {
       "type": "string",
       "metadata": {
-        "description": "Enter the  Existing OCP cluster's Vnet ID to establish \\n  Vnet Peering from this Vnet &  Vnet where your existing database VM is created, in order to establish database connection.\""
+        "description": "Enter the Vnet ID of the existing OCP cluster to establish Vnet Peering between this Vnet and the VNetId of Database."
       },
       "defaultValue": ""
     },

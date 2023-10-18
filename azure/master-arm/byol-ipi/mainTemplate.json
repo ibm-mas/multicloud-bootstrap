@@ -39,7 +39,7 @@
     "offeringType": {
       "type": "string",
       "metadata": {
-        "description": "Select your preferred Suite offering type.For MAS Core + Manage: If db2 values are not provided,db2 will be internally deployed"
+        "description": "Select your preferred Suite offering type. For MAS Core+Manage: if DB2 values are not provided, DB2 will be deployed internally."
       },
       "defaultValue": "MAS Core + Cloud Pak for Data",
       "allowedValues": [
