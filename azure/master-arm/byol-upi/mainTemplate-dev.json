@@ -143,14 +143,14 @@
     "masManageTablespace": {
       "type": "string",
       "metadata": {
-        "description": "Enter the DB_SCHEMA ,TABLESPACE,INDEXSPACE values with ':' in between the values. Ex : For DB2 - maximo:maxdata:maxindex , Oracle -maximo:maxdata:maxindex , Mssql - dto:PRIMARY:PRIMARY"
+        "description": "Enter the tablespace & indexspace names here if you are not using the default names.\n  Each name separated by a delimeter colon (:). For example in this format: <schema_name>:<tablespace_name>:<indexspace_name>."
       },
       "defaultValue": ""
     },
     "DBProvisionedVPCId": {
       "type": "string",
       "metadata": {
-        "description": "Enter the Vnet ID where your existing database (DB2 or Oracle or MSSQL) was provisioned to establish \n  Vnet Peering from this Vnet & the Existing OCP cluster's Vnet in order to establish database connection."
+        "description": "Enter the Vnet ID where your existing database (DB2 or Oracle or MSSQL) was provisioned on a private subnet to establish\n      Vnet Peering from this Vnet & the Vnet created during current stack deployment in order to establish database connection."
       },
       "defaultValue": ""
     },
@@ -254,7 +254,7 @@
       }
     },
     "vnetIdResourceGroup": {
-      "defaultValue": "kxr601-vnet-rg",
+      "defaultValue": "",
       "type": "string",
       "metadata": {
         "description": "Enter resource group of openShiftClustervnetId :  (required for UPI mode deployment)."
