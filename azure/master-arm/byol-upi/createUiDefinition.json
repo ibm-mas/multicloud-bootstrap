@@ -435,7 +435,7 @@
                     {
                         "name": "masManageTablespace",
                         "type": "Microsoft.Common.TextBox",
-                        "label": "MAS Manage Database values",
+                        "label": "MAS Manage DB values",
                         "defaultValue": "",
                         "toolTip": "Enter the tablespace & indexspace names here if you are not using the default names.\n  Each name separated by a delimeter colon (:). \n For example in this format:schema_name:tablespace_name:indexspace_name.",
                         "constraints": {
@@ -447,10 +447,11 @@
                     {
                         "name": "DBProvisionedVPCId",
                         "type": "Microsoft.Common.TextBox",
-                        "label": "VNetId of external database provisioned.",
+                        "label": "VNetId of DB provisioned.",
                         "defaultValue": "",
                         "toolTip": "Enter the Vnet ID where your existing database (DB2 or Oracle or MSSQL) was provisioned on a private subnet to establish\n      Vnet Peering from this Vnet & the Vnet created during current stack deployment in order to establish database connection.",
                         "constraints": {
+                            "required": "[or(not(empty(steps('DatabaseSettings').masManageDBUser)), not(empty(steps('DatabaseSettings').masManageDBPassword)), not(empty(steps('DatabaseSettings').masManageDBCertificateUrl)))]",
                             "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
                             "validationMessage": "Contain letters, numbers and special characters only."
                         },
