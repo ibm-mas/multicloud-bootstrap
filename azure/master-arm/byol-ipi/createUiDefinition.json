@@ -385,7 +385,6 @@
                         "defaultValue": "",
                         "toolTip": "Enter the Vnet ID where your existing database (DB2 or Oracle or MSSQL) was provisioned on a private subnet to establish\n      Vnet Peering from this Vnet & the Vnet created during current stack deployment in order to establish database connection.",
                         "constraints": {
-                            "required": "[or(not(empty(steps('DatabaseSettings').masManageDBUser)), not(empty(steps('DatabaseSettings').masManageDBPassword)), not(empty(steps('DatabaseSettings').masManageDBCertificateUrl)))]",
                             "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
                             "validationMessage": "Contain letters, numbers and special characters only."
                         },
