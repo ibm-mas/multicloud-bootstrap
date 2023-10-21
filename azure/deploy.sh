@@ -226,13 +226,13 @@ if [[ $? -ne 0 ]]; then
 fi
 log "==== OCP cluster configuration (Cert Manager) completed ===="
 
-if [[ -n $DBProvisionedVPCId ]]; then
-   log "==== Vnet peering between  cluster and Database starts  ===="
+#if [[ -n $DBProvisionedVPCId ]]; then
+ #  log "==== Vnet peering between  cluster and Database starts  ===="
 
-   cd $GIT_REPO_HOME
-   sh $GIT_REPO_HOME/azure/db/db-create-vnet-peer.sh
-   log "==== Vnet peering between  cluster and Database ends  ===="
-fi
+  # cd $GIT_REPO_HOME
+  # sh $GIT_REPO_HOME/azure/db/db-create-vnet-peer.sh
+  # log "==== Vnet peering between  cluster and Database ends  ===="
+#fi
 set -e
 ## Deploy MongoDB
 log "==== MongoDB deployment started ===="
