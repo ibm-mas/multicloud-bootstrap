@@ -395,7 +395,7 @@
                     {
                         "name": "masManageTablespace",
                         "type": "Microsoft.Common.TextBox",
-                        "label": "MAS Manage Database values",
+                        "label": "MAS Manage DB values",
                         "defaultValue": "",
                         "toolTip": "Enter the tablespace & indexspace names here if you are not using the default names.\n  Each name separated by a delimeter colon (:) For example: schema_name:tablespace_name:indexspace_name.",
                         "constraints": {
@@ -407,7 +407,7 @@
                     {
                         "name": "DBProvisionedVPCId",
                         "type": "Microsoft.Common.TextBox",
-                        "label": "VNetId of external database provisioned.",
+                        "label": "VNetId of DB provisioned.",
                         "defaultValue": "",
                         "toolTip": "Enter the Vnet ID where your existing database (DB2 or Oracle or MSSQL) was provisioned to establish \n  Vnet Peering from this Vnet & the Existing OCP cluster's Vnet in order to establish database connection.",
                         "constraints": {
