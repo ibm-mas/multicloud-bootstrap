@@ -583,7 +583,7 @@ if [[ $DEPLOY_MANAGE == "true" && (-n $MAS_JDBC_USER) && (-n $MAS_JDBC_PASSWORD)
                           export MAS_APP_SETTINGS_INDEXSPACE="maxindex"
         elif [[ ${MAS_JDBC_URL,, } =~ ^jdbc:sql? ]]; then
                           log "Setting to MSSQL Values"
-                          export MAS_APP_SETTINGS_DB2_SCHEMA="dto"
+                          export MAS_APP_SETTINGS_DB2_SCHEMA="dbo"
                           export MAS_APP_SETTINGS_TABLESPACE="PRIMARY"
                           export MAS_APP_SETTINGS_INDEXSPACE="PRIMARY"
         elif [[ ${MAS_JDBC_URL,, } =~ ^jdbc:oracle? ]]; then
