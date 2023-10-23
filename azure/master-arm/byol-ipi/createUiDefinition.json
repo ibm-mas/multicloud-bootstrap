@@ -376,7 +376,7 @@
                             "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
                             "validationMessage": "Contain letters, numbers and special characters only."
                         },
-                        "visible": true
+                        "visible": false
                     },
                     {
                         "name": "DBProvisionedVPCId",
