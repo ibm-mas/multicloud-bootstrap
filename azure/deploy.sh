@@ -301,13 +301,7 @@ log "==== MAS Workspace generation completed ===="
 if [[ $DEPLOY_MANAGE == "true" && (-n $MAS_JDBC_USER) && (-n $MAS_JDBC_PASSWORD) && (-n $MAS_JDBC_URL) ]]; then
       export SSL_ENABLED=false
       #Setting the DB values
-      if [[ -n $MANAGE_TABLESPACE ]]; then
-        log " MANAGE_TABLESPACE: $MANAGE_TABLESPACE"
-        export MAS_APP_SETTINGS_DB2_SCHEMA=$(echo $MANAGE_TABLESPACE | cut -d ':' -f 1)
-        export MAS_APP_SETTINGS_TABLESPACE=$(echo $MANAGE_TABLESPACE | cut -d ':' -f 2)
-        export MAS_APP_SETTINGS_INDEXSPACE=$(echo $MANAGE_TABLESPACE | cut -d ':' -f 3)
-      else
-         if [[ ${MAS_JDBC_URL,, } =~ ^jdbc:db2? ]]; then
+      if [[ ${MAS_JDBC_URL,, } =~ ^jdbc:db2? ]]; then
                        log "Setting to DB2 Values"
                         export MAS_APP_SETTINGS_DB2_SCHEMA="maximo"
                         export MAS_APP_SETTINGS_TABLESPACE="maxdata"
@@ -323,7 +317,7 @@ if [[ $DEPLOY_MANAGE == "true" && (-n $MAS_JDBC_USER) && (-n $MAS_JDBC_PASSWORD)
                           export MAS_APP_SETTINGS_TABLESPACE="maxdata"
                           export MAS_APP_SETTINGS_INDEXSPACE="maxindex"
         fi
-      fi
+
       log " MAS_APP_SETTINGS_DB2_SCHEMA: $MAS_APP_SETTINGS_DB2_SCHEMA"
       log " DEPLOY_MANAGEMAS_APP_SETTINGS_TABLESPACE: $MAS_APP_SETTINGS_TABLESPACE"
       log " MAS_APP_SETTINGS_INDEXSPACE: $MAS_APP_SETTINGS_INDEXSPACE"
