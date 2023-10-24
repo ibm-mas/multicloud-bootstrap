@@ -70,7 +70,7 @@ export DBProvisionedVPCId=${61}
 export ExocpProvisionedVPCId=${62}
 export EBSVolumeType=${63}
 export MANAGE_TABLESPACE=${64}
-export ENV_TYPE=${65}
+export ENV_TYPE="prod"
 export GIT_REPO_HOME=$(pwd)
 # Load helper functions
 . helper.sh
