@@ -199,7 +199,7 @@ spec:
               kmsKey:
                 arn: "${aws_kms_key.ocs_key.arn}"
               volumeSize: 300
-              volumeType: gp3
+              volumeType: io1
           credentialsSecret:
             name: aws-cloud-credentials
           deviceIndex: 0
@@ -269,7 +269,7 @@ spec:
               kmsKey:
                 arn: "${aws_kms_key.ocs_key.arn}"
               volumeSize: 300
-              volumeType: gp3
+              volumeType: io1
           credentialsSecret:
             name: aws-cloud-credentials
           deviceIndex: 0
@@ -339,7 +339,7 @@ spec:
               kmsKey:
                 arn: "${aws_kms_key.ocs_key.arn}"
               volumeSize: 300
-              volumeType: gp3
+              volumeType: io1
           credentialsSecret:
             name: aws-cloud-credentials
           deviceIndex: 0
