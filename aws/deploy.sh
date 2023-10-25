@@ -572,28 +572,20 @@ if [[ $DEPLOY_MANAGE == "true" && (-n $MAS_JDBC_USER) && (-n $MAS_JDBC_PASSWORD)
 
   #Setting the DB values
       if [[ -n $MANAGE_TABLESPACE ]]; then
-        export MAS_APP_SETTINGS_DB2_SCHEMA=$(echo $MANAGE_TABLESPACE | cut -d ':' -f 1)
         export MAS_APP_SETTINGS_TABLESPACE=$(echo $MANAGE_TABLESPACE | cut -d ':' -f 1)
         export MAS_APP_SETTINGS_INDEXSPACE=$(echo $MANAGE_TABLESPACE | cut -d ':' -f 2)
       else
          if [[ ${MAS_JDBC_URL,, } =~ ^jdbc:db2? ]]; then
                           log "Setting to DB2 Values"
-                          export MAS_APP_SETTINGS_DB2_SCHEMA="maximo"
                           export MAS_APP_SETTINGS_TABLESPACE="maxdata"
                           export MAS_APP_SETTINGS_INDEXSPACE="maxindex"
-        elif [[ ${MAS_JDBC_URL,, } =~ ^jdbc:sql? ]]; then
-                          log "Setting to MSSQL Values"
-                          export MAS_APP_SETTINGS_DB2_SCHEMA="dbo"
-                          export MAS_APP_SETTINGS_TABLESPACE="PRIMARY"
-                          export MAS_APP_SETTINGS_INDEXSPACE="PRIMARY"
         elif [[ ${MAS_JDBC_URL,, } =~ ^jdbc:oracle? ]]; then
                           log "Setting to ORACLE Values"
-                          export MAS_APP_SETTINGS_DB2_SCHEMA="maximo"
                           export MAS_APP_SETTINGS_TABLESPACE="maxdata"
                           export MAS_APP_SETTINGS_INDEXSPACE="maxindex"
         fi
       fi
-      log " MAS_APP_SETTINGS_DB2_SCHEMA: $MAS_APP_SETTINGS_DB2_SCHEMA"
+
       log " MAS_APP_SETTINGS_TABLESPACE: $MAS_APP_SETTINGS_TABLESPACE"
       log " MAS_APP_SETTINGS_INDEXSPACE: $MAS_APP_SETTINGS_INDEXSPACE"
 
