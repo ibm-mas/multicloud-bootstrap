@@ -59,7 +59,7 @@ variable "worker_replica_count" {
 
 variable "master_instance_type" {
   type = string
-  default = "m5.2xlarge"
+  default = "m5.4xlarge"
 }
 
 variable "master_instance_volume_iops" {

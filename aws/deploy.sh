@@ -8,7 +8,7 @@ validate_prouduct_type
 
 ## Variables
 export AWS_DEFAULT_REGION=$DEPLOY_REGION
-MASTER_INSTANCE_TYPE="m5.2xlarge"
+MASTER_INSTANCE_TYPE="m5.4xlarge"
 WORKER_INSTANCE_TYPE="m5.4xlarge"
 # Mongo variables
 export MONGODB_STORAGE_CLASS=gp2
