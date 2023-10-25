@@ -32,7 +32,7 @@ Parameters:
     Description: >-
       Enter the VPC ID where your existing OCP cluster is provisioned. This is required to establish
       VPC Peering from this VPC to the VPC of database in order to establish database connection.
-    Type: 'AWS::EC2::VPC::Id'
+    Type: String
   OpenShiftClusterApiUrl:
     Description: >-
       Enter the cluster's URL in the format
@@ -77,7 +77,8 @@ Parameters:
   TablespaceNames:
     Description: >-
       Enter the tablespace & indexspace names here if you are not using the default names.
-      Each name separated by a delimeter colon (:). For example in this format: <schema_name>:<tablespace_name>:<indexspace_name>
+      Each name separated by a delimeter colon (:). For example in this format: <tablespace_name>:<indexspace_name>
+      Note: This is not applicable in case of MSSQL database.
     Type: String
   MASManageDBCertificateUrl:
     Description: >-
@@ -88,7 +89,7 @@ Parameters:
     Description: >-
       Enter the VPC ID where your existing database (DB2 or Oracle or MSSQL) was provisioned on a private subnet to establish
       VPC Peering from this VPC & the VPC created during current stack deployment in order to establish database connection.
-    Type: 'AWS::EC2::VPC::Id'
+    Type: String
   ImportDemoData:
     Description: >-
       Indicate whether you want to import demo data into the database. This
@@ -303,9 +304,9 @@ Mappings:
     ca-central-1:
       HVM64: ami-xxxxxxxxxxxxxxxxx
     eu-north-1:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
+      HVM64: ami-0fc7ab563232d6769
     eu-west-1:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
+      HVM64: ami-0fc349d82c682cae4
     eu-west-2:
       HVM64: ami-xxxxxxxxxxxxxxxxx
     eu-west-3:
@@ -329,7 +330,7 @@ Mappings:
     af-south-1:
       HVM64: ami-xxxxxxxxxxxxxxxxx
     ap-east-1:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
+      HVM64: ami-0a8ba8a0fde410499
     ap-southeast-3:
       HVM64: ami-xxxxxxxxxxxxxxxxx
     eu-south-1:
@@ -652,7 +653,7 @@ Resources:
             - 'git clone https://github.com/ibm-mas/ansible-devops.git;'
             - cd ansible-devops;
             - rm -rf multicloud-bootstrap 1>/dev/null 2>&1;
-            - 'git clone -b mas810-alpha https://github.com/ibm-mas/multicloud-bootstrap.git;'
+            - 'git clone https://github.com/ibm-mas/multicloud-bootstrap.git;'
             - cd multicloud-bootstrap;
             - 'find . -type f -name "*.sh" -exec chmod +x {} \;;'
             - ./init.sh "aws" "
@@ -736,7 +737,6 @@ Resources:
             - !Ref ExocpProvisionedVPCId
             - ''' '''' '''
             - !Ref TablespaceNames
-            - ''' '''
             - ''' "prod" '
             - '2>&1 | tee mas-provisioning.log; '
       Tags:
