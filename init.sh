@@ -70,7 +70,7 @@ export DBProvisionedVPCId=${61}
 export ExocpProvisionedVPCId=${62}
 export EBSVolumeType=${63}
 export MANAGE_TABLESPACE=${64}
-export ENV_TYPE=dev
+export ENV_TYPE=${65}
 export GIT_REPO_HOME=$(pwd)
 # Load helper functions
 . helper.sh
@@ -360,6 +360,7 @@ log " VPC/VNET NETWORK(EXISTING_NETWORK)=$EXISTING_NETWORK"
 log " VPC/VNET NETWORK RG(EXISTING_NETWORK_RG)=$EXISTING_NETWORK_RG"
 log " DBProvisionedVPCId=$DBProvisionedVPCId"
 log " OCPVPCId(ExocpProvisionedVPCId)=$ExocpProvisionedVPCId"
+log " EBSVolumeType=$EBSVolumeType"
 log " ENV_TYPE=$ENV_TYPE"
 log " MONGO_USE_EXISTING_INSTANCE=${MONGO_USE_EXISTING_INSTANCE}"
 log " MONGO_FLAVOR=${MONGO_FLAVOR}"
