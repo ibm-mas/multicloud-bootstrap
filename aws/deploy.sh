@@ -564,6 +564,9 @@ if [[ $DEPLOY_MANAGE == "true" && (-z $MAS_JDBC_USER) && (-z $MAS_JDBC_PASSWORD)
   log "==== Configure internal db2 for manage started ===="
   export ROLE_NAME=db2 && ansible-playbook ibm.mas_devops.run_role
   export ROLE_NAME=suite_db2_setup_for_manage && ansible-playbook ibm.mas_devops.run_role
+  export ROLE_NAME=suite_config && ansible-playbook ibm.mas_devops.run_role
+  export ROLE_NAME=suite_app_install && ansible-playbook ibm.mas_devops.run_role
+  export ROLE_NAME=suite_app_config && ansible-playbook ibm.mas_devops.run_role
   log "==== Configure internal db2 for manage started ===="
 fi
 
