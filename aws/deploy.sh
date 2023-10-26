@@ -580,7 +580,7 @@ if [[ $DEPLOY_MANAGE == "true" && (-n $MAS_JDBC_USER) && (-n $MAS_JDBC_PASSWORD)
 			export MAS_APP_SETTINGS_TABLESPACE="maxdata"
 			export MAS_APP_SETTINGS_INDEXSPACE="maxindex"
 	   elif [[ ${MAS_JDBC_URL,, } =~ ^jdbc:oracle? ]]; then
-			log "Setting to ORACLE Values"
+			log "Setting to ORACLE DB Values"
 			export MAS_APP_SETTINGS_TABLESPACE="maxdata"
 			export MAS_APP_SETTINGS_INDEXSPACE="maxindex"
 	fi
