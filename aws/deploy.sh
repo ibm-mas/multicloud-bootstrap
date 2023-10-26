@@ -559,6 +559,13 @@ log "==== MAS Workspace generation started ===="
 export ROLE_NAME=gencfg_workspace && ansible-playbook ibm.mas_devops.run_role
 log "==== MAS Workspace generation completed ===="
 
+## Deploy MAS
+log "==== MAS deployment started ===="
+export ROLE_NAME=suite_install && ansible-playbook ibm.mas_devops.run_role
+export ROLE_NAME=suite_config && ansible-playbook ibm.mas_devops.run_role
+export ROLE_NAME=suite_verify && ansible-playbook ibm.mas_devops.run_role
+log "==== MAS deployment completed ===="
+
 ## Deploy Manage
 if [[ $DEPLOY_MANAGE == "true" && (-z $MAS_JDBC_USER) && (-z $MAS_JDBC_PASSWORD) && (-z $MAS_JDBC_URL) && (-z $MAS_JDBC_CERT_URL) ]]; then
   log "==== Configure internal db2 for manage started ===="
@@ -607,12 +614,7 @@ if [[ $DEPLOY_MANAGE == "true" && (-n $MAS_JDBC_USER) && (-n $MAS_JDBC_PASSWORD)
   log "==== Configure JDBC completed for external DB2 ===="
 fi
 
-## Deploy MAS
-log "==== MAS deployment started ===="
-export ROLE_NAME=suite_install && ansible-playbook ibm.mas_devops.run_role
-export ROLE_NAME=suite_config && ansible-playbook ibm.mas_devops.run_role
-export ROLE_NAME=suite_verify && ansible-playbook ibm.mas_devops.run_role
-log "==== MAS deployment completed ===="
+
 
 ## Deploy Manage
 if [[ $DEPLOY_MANAGE == "true" ]]; then
