@@ -481,7 +481,7 @@ if [[ -n "$MAS_LICENSE_URL" ]]; then
   cp $GIT_REPO_HOME/entitlement.lic $MAS_CONFIG_DIR
 fi
 
-if [[ $DEPLOY_MANAGE == "true" && $DEPLOY_CP4D == "true" ]]; then
+if [[ $DEPLOY_MANAGE == "truee" && $DEPLOY_CP4D == "true" ]]; then
   ## Deploy Amqstreams
   log "==== Amq streams deployment started ===="
   export ROLE_NAME=kafka && ansible-playbook ibm.mas_devops.run_role
@@ -560,14 +560,14 @@ export ROLE_NAME=gencfg_workspace && ansible-playbook ibm.mas_devops.run_role
 log "==== MAS Workspace generation completed ===="
 
 ## Deploy Manage
-if [[ $DEPLOY_MANAGE == "true" && (-z $MAS_JDBC_USER) && (-z $MAS_JDBC_PASSWORD) && (-z $MAS_JDBC_URL) && (-z $MAS_JDBC_CERT_URL) ]]; then
+if [[ $DEPLOY_MANAGE == "truee" && (-z $MAS_JDBC_USER) && (-z $MAS_JDBC_PASSWORD) && (-z $MAS_JDBC_URL) && (-z $MAS_JDBC_CERT_URL) ]]; then
   log "==== Configure internal db2 for manage started ===="
   export ROLE_NAME=db2 && ansible-playbook ibm.mas_devops.run_role
   export ROLE_NAME=suite_db2_setup_for_manage && ansible-playbook ibm.mas_devops.run_role
   log "==== Configure internal db2 for manage started ===="
 fi
 
-if [[ $DEPLOY_MANAGE == "true" && (-n $MAS_JDBC_USER) && (-n $MAS_JDBC_PASSWORD) && (-n $MAS_JDBC_URL) ]]; then
+if [[ $DEPLOY_MANAGE == "truee" && (-n $MAS_JDBC_USER) && (-n $MAS_JDBC_PASSWORD) && (-n $MAS_JDBC_URL) ]]; then
   export SSL_ENABLED=false
 
   #Setting the DB values
@@ -612,7 +612,7 @@ export ROLE_NAME=suite_verify && ansible-playbook ibm.mas_devops.run_role
 log "==== MAS deployment completed ===="
 
 ## Deploy Manage
-if [[ $DEPLOY_MANAGE == "true" ]]; then
+if [[ $DEPLOY_MANAGE == "truee" ]]; then
   # Deploy Manage
   log "==== MAS Manage deployment started ===="
   export ROLE_NAME=suite_app_install && ansible-playbook ibm.mas_devops.run_role
