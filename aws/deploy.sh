@@ -156,7 +156,6 @@ openshift_password              = "$OCP_PASSWORD"
 cpd_api_key                     = "$CPD_API_KEY"
 master_instance_type            = "$MASTER_INSTANCE_TYPE"
 worker_instance_type            = "$WORKER_INSTANCE_TYPE"
-worker_instance_volume_type		= "$EBSVolumeType"
 master_replica_count            = "$MASTER_NODE_COUNT"
 worker_replica_count            = "$WORKER_NODE_COUNT"
 accept_cpd_license              = "accept"
@@ -301,30 +300,13 @@ if [[ -n $EXISTING_NETWORK ]]; then
   export VPC_ID="${EXISTING_NETWORK}" #upi
 fi
 if [[ -z $AWS_VPC_ID && -z $EXISTING_NETWORK  && -n $BOOTNODE_VPC_ID ]]; then
-  export VPC_ID="${BOOTNODE_VPC_ID}" #existing ocp #new VPCID
+  export VPC_ID="${BOOTNODE_VPC_ID}" #existing ocp
 fi
 if [[ -z $VPC_ID && $MONGO_FLAVOR == "Amazon DocumentDB" ]]; then
   log "Failed to get the vpc id required to deploy documentdb"
   exit 32
 fi
 export AWS_REGION=$DEPLOY_REGION
-
-if [[ -n $DBProvisionedVPCId ]]; then
-cd $GIT_REPO_HOME
-log "==== aws/deploy.sh : Invoke db-create-vpc-peer.sh starts ===="
-    log "Existing instance of db @ VPC_ID=$DBProvisionedVPCId"
-    export ACCEPTER_VPC_ID=${DBProvisionedVPCId}
-
-    #If VPC ID of existing OCP cluster is inputted then assign REQUESTER_VPC_ID to it.
-    if [[ -n $ExocpProvisionedVPCId ]]; then
-    export REQUESTER_VPC_ID=${ExocpProvisionedVPCId}
-    else
-    export REQUESTER_VPC_ID=${VPC_ID}
-    fi
-    sh $GIT_REPO_HOME/aws/db/db-create-vpc-peer.sh
-    log "==== aws/deploy.sh : Invoke db-create-vpc-peer.sh ends ===="
-fi
-
 
 log "==== MONGO_USE_EXISTING_INSTANCE = ${MONGO_USE_EXISTING_INSTANCE}"
 if [[ $MONGO_USE_EXISTING_INSTANCE == "true" ]]; then
@@ -551,6 +533,7 @@ fi
 if [[ $DEPLOY_CP4D == "true" ]]; then
   log "==== CP4D deployment started ===="
   export ROLE_NAME=cp4d && ansible-playbook ibm.mas_devops.run_role
+  export ROLE_NAME=db2 && ansible-playbook ibm.mas_devops.run_role
   log "==== CP4D deployment completed ===="
 fi
 
@@ -569,34 +552,6 @@ fi
 
 if [[ $DEPLOY_MANAGE == "true" && (-n $MAS_JDBC_USER) && (-n $MAS_JDBC_PASSWORD) && (-n $MAS_JDBC_URL) ]]; then
   export SSL_ENABLED=false
-
-  #Setting the DB values
-      if [[ -n $MANAGE_TABLESPACE ]]; then
-        export MAS_APP_SETTINGS_DB2_SCHEMA=$(echo $MANAGE_TABLESPACE | cut -d ':' -f 1)
-        export MAS_APP_SETTINGS_TABLESPACE=$(echo $MANAGE_TABLESPACE | cut -d ':' -f 1)
-        export MAS_APP_SETTINGS_INDEXSPACE=$(echo $MANAGE_TABLESPACE | cut -d ':' -f 2)
-      else
-         if [[ ${MAS_JDBC_URL,, } =~ ^jdbc:db2? ]]; then
-                          log "Setting to DB2 Values"
-                          export MAS_APP_SETTINGS_DB2_SCHEMA="maximo"
-                          export MAS_APP_SETTINGS_TABLESPACE="maxdata"
-                          export MAS_APP_SETTINGS_INDEXSPACE="maxindex"
-        elif [[ ${MAS_JDBC_URL,, } =~ ^jdbc:sql? ]]; then
-                          log "Setting to MSSQL Values"
-                          export MAS_APP_SETTINGS_DB2_SCHEMA="dbo"
-                          export MAS_APP_SETTINGS_TABLESPACE="PRIMARY"
-                          export MAS_APP_SETTINGS_INDEXSPACE="PRIMARY"
-        elif [[ ${MAS_JDBC_URL,, } =~ ^jdbc:oracle? ]]; then
-                          log "Setting to ORACLE Values"
-                          export MAS_APP_SETTINGS_DB2_SCHEMA="maximo"
-                          export MAS_APP_SETTINGS_TABLESPACE="maxdata"
-                          export MAS_APP_SETTINGS_INDEXSPACE="maxindex"
-        fi
-      fi
-      log " MAS_APP_SETTINGS_DB2_SCHEMA: $MAS_APP_SETTINGS_DB2_SCHEMA"
-      log " MAS_APP_SETTINGS_TABLESPACE: $MAS_APP_SETTINGS_TABLESPACE"
-      log " MAS_APP_SETTINGS_INDEXSPACE: $MAS_APP_SETTINGS_INDEXSPACE"
-
   if [ -n "$MAS_JDBC_CERT_URL" ]; then
     log "MAS_JDBC_CERT_URL is not empty, setting SSL_ENABLED as true"
     export SSL_ENABLED=true

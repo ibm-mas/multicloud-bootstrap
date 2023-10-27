@@ -29,7 +29,7 @@ echo "BOOTSTRAP_AUTOMATION_TAG_OR_BRANCH=$BOOTSTRAP_AUTOMATION_TAG_OR_BRANCH"
 dnf -y remove polkit
 
 # Enable and disable repos to update certs
-#echo "Enable and disable repos to update certs"
+echo "Enable and disable repos to update certs"
 #dnf update -y --disablerepo=* --enablerepo='*microsoft*' rhui-azure-rhel8-eus
 
 # Update all packages to latest
@@ -63,9 +63,7 @@ rm -rf openshift-install-linux.tar.gz
 # Install Azure cli for rhel9
 rpm --import https://packages.microsoft.com/keys/microsoft.asc
 dnf install -y https://packages.microsoft.com/config/rhel/9.0/packages-microsoft-prod.rpm
-#dnf install azure-cli -y
-#https://github.com/Azure/azure-cli/issues/26814
-dnf install azure-cli-2.49.0-1.el9 -y
+dnf install azure-cli -y
 
 # Install AzureCopy cli
 wget -q https://aka.ms/downloadazcopy-v10-linux -O azcopy_linux_amd64.tar.gz
@@ -136,16 +134,6 @@ cd multicloud-bootstrap
 echo "removing folders"
 rm -rf aws azure/bootnode-image azure/master-arm gcp mongo lib/ojdbc8.jar
 find . -type f -name "*.sh" -exec chmod +x {} \;
-
-
-#Installig cpd-cli for db2wh
-
-wget https://github.com/IBM/cpd-cli/releases/download/v12.0.3/cpd-cli-linux-SE-12.0.3.tgz
-tar -zvxf cpd-cli-linux-SE-12.0.3.tgz
-rm -rf cpd-cli-linux-SE-12.0.3.tgz
-cd cpd-cli-linux-SE-12.0.3-43
-chmod +x cpd-cli
-mv * /usr/local/bin/
 
 # Clear bash history
 echo "" > /home/azureuser/.bash_history

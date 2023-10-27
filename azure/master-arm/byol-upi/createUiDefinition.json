@@ -9,19 +9,6 @@
         },
         "basics": [
             {
-                "name": "subscriptionId",
-                "type": "Microsoft.Common.TextBox",
-                "label": "Subscription Id",
-                "defaultValue": "",
-                "toolTip": "Confirm the Azure subscription id again where all resources needs to be deployed:",
-                "constraints": {
-                    "required": true,
-                    "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
-                    "validationMessage": "Contain letters, numbers and special characters only."
-                },
-                "visible": true
-            },
-            {
                 "name": "sshPublicKey",
                 "type": "Microsoft.Common.TextBox",
                 "label": "SSH public key",
@@ -38,7 +25,7 @@
                 "name": "bootnodeSGIngressCidrIp",
                 "type": "Microsoft.Common.TextBox",
                 "label": "Bootnode NSG Ingress CIDR IP range",
-                "defaultValue": "0.0.0.0/0",
+                "defaultValue": "",
                 "toolTip": "Use CIDR notation to enter the IP addresses that can access the bootnode. For example, 192.12.33.3/32. To allow access from all IP addresses, enter 0.0.0.0/0.",
                 "constraints": {
                     "required": true,
@@ -47,20 +34,6 @@
                 },
                 "visible": true
             },
-            {
-                "name": "vNetSubnetBootnodeCidrRange",
-                "type": "Microsoft.Common.TextBox",
-                "label": "Bootnode Subnet CIDR IP range",
-                "defaultValue": "10.0.4.0/24",
-                "toolTip": "Provide the CIDR range for the subnet of the bootnode. For example, if the Vnet CIDR range is 10.0.0.0/16 then the bootnode's subnet can be 10.0.4.0/24.Ensure that the CIDR range is within by the Vnet CIDR range.",
-                "constraints": {
-                    "required": true,
-                    "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
-                    "validationMessage": "Contain letters, numbers and special characters only."
-                },
-                "visible": true
-            },
-
             {
                 "name": "azureServicePrincipalTenantId",
                 "type": "Microsoft.Common.TextBox",
@@ -127,7 +100,7 @@
                         "type": "Microsoft.Common.DropDown",
                         "label": "Offering type",
                         "defaultValue": "MAS Core + Cloud Pak for Data",
-                        "toolTip": "Select your preferred Suite offering type. For MAS Core + Manage: if DB2 values are not provided, DB2 will be deployed internally.",
+                        "toolTip": "Select your preferred Suite offering type.For MAS Core + Manage: If db2 values are not provided,db2 will be internally deployed",
                         "constraints": {
                             "allowedValues": [
                                 {
@@ -433,31 +406,6 @@
                         "visible": true
                     },
                     {
-                        "name": "masManageTablespace",
-                        "type": "Microsoft.Common.TextBox",
-                        "label": "MAS Manage DB values",
-                        "defaultValue": "",
-                        "toolTip": "Enter the tablespace & indexspace names here if you are not using the default names.\n  Each name separated by a delimeter colon (:). \n For example in this format:schema_name:tablespace_name:indexspace_name.",
-                        "constraints": {
-                            "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
-                            "validationMessage": "Contain letters, numbers and special characters only."
-                        },
-                        "visible": false
-                    },
-                    {
-                        "name": "DBProvisionedVPCId",
-                        "type": "Microsoft.Common.TextBox",
-                        "label": "VNetId of DB provisioned.",
-                        "defaultValue": "",
-                        "toolTip": "Enter the Vnet ID where your existing database (DB2 or Oracle or MSSQL) was provisioned on a private subnet to establish\n      Vnet Peering from this Vnet & the Vnet created during current stack deployment in order to establish database connection.",
-                        "constraints": {
-                            "required": "[or(not(empty(steps('DatabaseSettings').masManageDBUser)), not(empty(steps('DatabaseSettings').masManageDBPassword)), not(empty(steps('DatabaseSettings').masManageDBCertificateUrl)))]",
-                            "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
-                            "validationMessage": "Contain letters, numbers and special characters only."
-                        },
-                        "visible": true
-                    },
-                    {
                         "name": "importDemoData",
                         "type": "Microsoft.Common.DropDown",
                         "label": "Import demo data",
@@ -576,13 +524,12 @@
         ],
         "outputs": {
             "location": "[location()]",
-            "subscriptionId":  "[basics('subscriptionId')]",
             "sshPublicKey": "[basics('sshPublicKey')]",
-            "vNetSubnetBootnodeCidrRange": "[basics('vNetSubnetBootnodeCidrRange')]",
             "bootnodeSGIngressCidrIp": "[basics('bootnodeSGIngressCidrIp')]",
             "azureServicePrincipalTenantId": "[basics('azureServicePrincipalTenantId')]",
             "azureServicePrincipalClientId": "[basics('azureServicePrincipalClientId')]",
             "azureServicePrincipalClientSecret": "[basics('azureServicePrincipalClientSecret')]",
+
             "HostedDomain": "[steps('ApplicationSettings').HostedDomain]",
             "offeringType": "[steps('ApplicationSettings').offeringType]",
             "clusterSize": "[steps('ApplicationSettings').clusterSize]",
@@ -605,8 +552,6 @@
             "masManageDBPassword": "[steps('DatabaseSettings').masManageDBPassword]",
             "masManageDBJdbcUrl": "[steps('DatabaseSettings').masManageDBJdbcUrl]",
             "masManageDBCertificateUrl": "[steps('DatabaseSettings').masManageDBCertificateUrl]",
-            "masManageTablespace": "[steps('DatabaseSettings').masManageTablespace]",
-            "DBProvisionedVPCId":"[steps('DatabaseSettings').DBProvisionedVPCId]",
             "importDemoData": "[steps('DatabaseSettings').importDemoData]",
             
             

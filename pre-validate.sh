@@ -6,7 +6,6 @@ if [[ $CLUSTER_TYPE == "aws" ]]; then
     SUPPORTED_REGIONS="us-east-1;us-east-2;us-west-2;ca-central-1;eu-north-1;eu-west-1;eu-west-2;eu-west-3;eu-central-1;ap-northeast-1;ap-northeast-2;ap-northeast-3;ap-south-1;ap-southeast-1;ap-southeast-2;sa-east-1;ap-east-1;ap-southeast-3;eu-south-1;me-south-1;me-central-1;af-south-1"
 elif [[ $CLUSTER_TYPE == "azure" ]]; then
     # az account list-locations --query "[].{Name:name}" -o table|grep -Ev '^(Name|-)'|tr '\n' ';'
-       az login --service-principal -u ${AZURE_SP_CLIENT_ID} -p ${AZURE_SP_CLIENT_PWD} --tenant ${TENANT_ID}
     SUPPORTED_REGIONS="eastus;eastus2;southcentralus;westus2;westus3;australiaeast;southeastasia;northeurope;swedencentral;uksouth;westeurope;centralus;southafricanorth;centralindia;eastasia;japaneast;koreacentral;canadacentral;francecentral;germanywestcentral;norwayeast;brazilsouth"
 elif [[ $CLUSTER_TYPE == "gcp" ]]; then
     SUPPORTED_REGIONS="asia-east1;asia-east2;asia-northeast1;asia-northeast2;asia-northeast3;asia-south1;asia-south2;asia-southeast1;asia-southeast2;australia-southeast12;europe-central2;europe-north1;europe-southwest1;europe-west1;europe-west2;europe-west3;europe-west4;europe-west6;europe-west8;europe-west9;northamerica-northeast1;northamerica-northeast2;southamerica-east1;southamerica-west1;us-central1;us-east1;us-east4;us-east5;us-south1;us-west1;us-west2;us-west3;us-west4"
@@ -108,33 +107,53 @@ if [[ $DEPLOY_MANAGE == "true" ]]; then
                 if [[ ${MAS_JDBC_CERT_URL,,} =~ ^s3 ]]; then
                     aws s3 cp "$MAS_JDBC_CERT_URL" db.crt --region us-east-1
                     ret=$?
-        		        if [ $ret -ne 0 ]; then
-        		          	aws s3 cp "$MAS_JDBC_CERT_URL" db.crt --region $DEPLOY_REGION
-        			          ret=$?
-        		            if [ $ret -ne 0 ]; then
-            	          	log "Invalid DB certificate URL"
-            	    	      SCRIPT_STATUS=31
-        		            fi
-        		         fi
+        		if [ $ret -ne 0 ]; then
+        			aws s3 cp "$MAS_JDBC_CERT_URL" db.crt --region $DEPLOY_REGION
+        			ret=$?
+        		if [ $ret -ne 0 ]; then
+            		log "Invalid DB certificate URL"
+            		SCRIPT_STATUS=31
+        		fi
+        		fi
                 elif [[ ${MAS_JDBC_CERT_URL,,} =~ ^https? ]]; then
                     wget "$MAS_JDBC_CERT_URL" -O db.crt
                 fi
             elif [[ $CLUSTER_TYPE == "azure" ]]; then
                 # https://myaccount.blob.core.windows.net/mycontainer/myblob regex
-                 if [[ ${MAS_JDBC_CERT_URL,,} =~ ^https://.+blob\.core\.windows\.net.+ ]]; then
+                if [[ ${MAS_JDBC_CERT_URL,,} =~ ^https://.+blob\.core\.windows\.net.+ ]]; then
                     azcopy copy "$MAS_JDBC_CERT_URL" db.crt
-                 elif [[ ${MAS_JDBC_CERT_URL,,} =~ ^https? ]]; then
+                elif [[ ${MAS_JDBC_CERT_URL,,} =~ ^https? ]]; then
                     wget "$MAS_JDBC_CERT_URL" -O db.crt
                 fi
             elif [[ $CLUSTER_TYPE == "gcp" ]]; then
                 wget "$MAS_JDBC_CERT_URL" -O db.crt
             fi
-           #Removing the Validation check for now as DB are in private subnets in different Vnet/VPC , Validation requires peering of database with bootnode Vpc/Vnet.
+            export MAS_DB2_JAR_LOCAL_PATH=$GIT_REPO_HOME/lib/db2jcc4.jar
+            if [[ ${MAS_JDBC_URL,, } =~ ^jdbc:db2? ]]; then
+                log "Connecting to DB2 Database"
+                if python jdbc-prevalidateDB2.py; then
+                    log "Db2 JDBC URL Validation = PASS"
+                else
+                    log "ERROR: Db2 JDBC URL Validation = FAIL"
+                    SCRIPT_STATUS=14
+                fi
+            elif [[ ${MAS_JDBC_URL,, } =~ ^jdbc:oracle? ]]; then
+                export MAS_ORACLE_JAR_LOCAL_PATH=$GIT_REPO_HOME/lib/ojdbc8.jar
+                log "Connecting to Oracle Database"
+                if python jdbc-prevalidateOracle.py; then
+                    log "Oracle JDBC URL Validation = PASS"
+				else
+                    log "ERROR: Oracle JDBC URL Validation = FAIL"
+                    SCRIPT_STATUS=14
+                fi
+            else
+                log "Skipping JDBC URL validation, supported only for DB2 and Oracle".
+            fi
         fi
     fi
 fi
 
-#mongo pre-validation only for AWS currently.
+#mongo pre-validation only for AWS currently. 
 if [[ $CLUSTER_TYPE == "aws" ]]; then
     log "=== pre-validate-mongo.sh started ==="
     sh $GIT_REPO_HOME/mongo/pre-validate-mongo.sh
@@ -264,47 +283,6 @@ if [[ $CLUSTER_TYPE == "azure" ]]; then
             SCRIPT_STATUS=26
         fi
     fi
-fi
-#Validate the subscriptionId
-if [[ $CLUSTER_TYPE == "azure" ]]; then
-   az login --service-principal -u ${AZURE_SP_CLIENT_ID} -p ${AZURE_SP_CLIENT_PWD} --tenant ${TENANT_ID}
-  export AZURE_VALIDATE_SUBSC_ID=`az account list --query "[?id == '$SELLER_SUBSCRIPTION_ID'].{Id:id}" -o tsv`
-  if [[ -n $AZURE_VALIDATE_SUBSC_ID ]]; then
-    export AZURE_SUBSC_ID=$AZURE_VALIDATE_SUBSC_ID
-     log " AZURE_SUBSC_ID: $AZURE_SUBSC_ID"
-  else
-    log "ERROR: Subscription Id Invalid"
-    SCRIPT_STATUS=46
-  fi
-fi
-
-if [[ $CLUSTER_TYPE == "azure" ]]; then
-   if [[ $DEPLOY_MANAGE == "true" && (-n $MAS_JDBC_USER) && (-n $MAS_JDBC_PASSWORD) && (-n $MAS_JDBC_URL) && (-n $MAS_JDBC_CERT_URL) ]]; then
-   az login --service-principal -u ${AZURE_SP_CLIENT_ID} -p ${AZURE_SP_CLIENT_PWD} --tenant ${TENANT_ID}
-  export ValidateDBProvisionedVPCId=`az network vnet list --query "[?name=='$DBProvisionedVPCId'].{Name:name}" -o tsv`
-  log "ValidateDBProvisionedVPCId -- $ValidateDBProvisionedVPCId"
-  if [[ -n $ValidateDBProvisionedVPCId ]]; then
-    export DBProvisionedVPCId=$ValidateDBProvisionedVPCId
-     log " DBProvisionedVPCId: $DBProvisionedVPCId"
-  else
-    log "ERROR: Database cluster /Node Vnet is invalid"
-    SCRIPT_STATUS=45
-    fi
-  fi
-fi
-
-
-#Validate the subscriptionId
-if [[ $CLUSTER_TYPE == "azure" ]]; then
-   az login --service-principal -u ${AZURE_SP_CLIENT_ID} -p ${AZURE_SP_CLIENT_PWD} --tenant ${TENANT_ID}
-  export AZURE_VALIDATE_SUBSC_ID=`az account list --query "[?id == '$SELLER_SUBSCRIPTION_ID'].{Id:id}" -o tsv`
-  if [[ -n $AZURE_VALIDATE_SUBSC_ID ]]; then
-    export AZURE_SUBSC_ID=$AZURE_VALIDATE_SUBSC_ID
-     log " AZURE_SUBSC_ID: $AZURE_SUBSC_ID"
-  else
-    log "ERROR: Subscription Id Invalid"
-    SCRIPT_STATUS=46
-  fi
 fi
 
 # Check if all the subnet values are provided for existing VPC Id

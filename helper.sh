@@ -138,7 +138,7 @@ mark_provisioning_failed() {
   elif [[ $retcode -eq 35 ]]; then
     export STATUS_MSG="Failure in creating VPC peering."
   elif [[ $retcode -eq 36 ]]; then
-    export STATUS_MSG="Failure in creating IAM policy."
+    export STATUS_MSG="Failure in creating IAM policy." 
   elif [[ $retcode -eq 37 ]]; then
     export STATUS_MSG="Failure in creating Create Route. Please make sure there is no other VPCs which has matching or overlapping IPv4 CIDR blocks 10.0.0.0/16 "
   elif [[ $retcode -eq 38 ]]; then
@@ -155,10 +155,6 @@ mark_provisioning_failed() {
     export STATUS_MSG="Amazon DocumentDB is not supported in current deploy region $DEPLOY_REGION"
   elif [[ $retcode -eq 44 ]]; then
     export STATUS_MSG="Failure in fetching the CIDR block associated with Subnet"
-  elif [[ $retcode -eq 45 ]]; then
-    export STATUS_MSG="$DBProvisionedVPCId is not found in region $DEPLOY_REGION"
-  elif [[ $retcode -eq 46 ]]; then
-      export STATUS_MSG="Subscription Id invalid"
   fi
   export MESSAGE_TEXT=NA
   export OPENSHIFT_CLUSTER_CONSOLE_URL=NA
@@ -245,8 +241,8 @@ validate_prouduct_type() {
   log "hyperscaler in MAS_ANNOTATIONS: $MAS_ANNOTATIONS"
   if [[ $CLUSTER_TYPE == "azure" ]]; then
     export MAS_ANNOTATIONS="mas.ibm.com/hyperscalerProvider=azure,mas.ibm.com/hyperscalerChannel=azure"
-  fi
-  log "hyperscaler in MAS_ANNOTATIONS: $MAS_ANNOTATIONS"
+  fi   
+  log "hyperscaler in MAS_ANNOTATIONS: $MAS_ANNOTATIONS"  
   if [[ $OPERATIONAL_MODE == "Non-production"  ]]; then
     if [[ -n "$MAS_ANNOTATIONS" ]]; then
       export MAS_ANNOTATIONS="mas.ibm.com/operationalMode=nonproduction,${MAS_ANNOTATIONS}"

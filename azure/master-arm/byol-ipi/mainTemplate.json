@@ -2,13 +2,6 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "subscriptionId": {
-      "type": "string",
-      "metadata": {
-        "description": "Azure subscription id where bootnode and OpenShift cluster resources to be deployed:"
-      },
-      "defaultValue": "[subscription().subscriptionId]"
-    },
     "location": {
       "type": "string",
       "metadata": {
@@ -39,7 +32,7 @@
     "offeringType": {
       "type": "string",
       "metadata": {
-        "description": "Select your preferred Suite offering type. For MAS Core+Manage: if DB2 values are not provided, DB2 will be deployed internally."
+        "description": "Select your preferred Suite offering type.For MAS Core + Manage: If db2 values are not provided,db2 will be internally deployed"
       },
       "defaultValue": "MAS Core + Cloud Pak for Data",
       "allowedValues": [
@@ -133,20 +126,6 @@
       },
       "defaultValue": ""
     },
-    "masManageTablespace": {
-      "type": "string",
-      "metadata": {
-        "description": "Enter the tablespace & indexspace names here if you are not using the default names.\n  Each name separated by a delimeter colon (:). For example in this format: <schema_name>:<tablespace_name>:<indexspace_name>."
-      },
-      "defaultValue": ""
-    },
-    "DBProvisionedVPCId": {
-      "type": "string",
-      "metadata": {
-        "description": "Enter the Vnet ID where your existing database (DB2 or Oracle or MSSQL) was provisioned on a private subnet to establish\n      Vnet Peering from this Vnet & the Vnet created during current stack deployment in order to establish database connection."
-      },
-      "defaultValue": ""
-    },
     "importDemoData": {
       "type": "string",
       "metadata": {
@@ -160,7 +139,7 @@
     },
     "sshPublicKey": {
       "type": "string",
-      "defaultValue": "",
+      "defaultValue": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCZsnnoLyMnmObhjDLHNh9ksowEb1dV1eb8Ssw7vdzLFoWVf+Upm1xtH2vOybaDfE/rES+aQIsjrKhwlGM+o2ViM9skQJIX/34/gzt3r+SUG4bzRvAtmPofAoQTrvRKWwL47K8nNPVcqHoV1TMEL9R+F8UTwQGbhz5FuxEt0eReOBCxNQnuLPLChawaml7LSNNaRka6tBQ/QeA/oJdo82sn/tpNZFNivOn8+fo+HNQPvirFJKLmsiER2HFuhH6p3wHYA1IMqzzOcWv52cRRIONyowyPbuCCVzbdXSHWt2JtcyvkwAqc2a5DuhxTeioYP+xAij9r/Xkc/x94sXAsAJtz imported-openssh-key",
       "metadata": {
         "description": "Provide the public SSH key that you want to add to the bootnode, bastion host and cluster nodes."
       }
@@ -209,7 +188,7 @@
     },
     "azureServicePrincipalClientId": {
       "type": "string",
-      "defaultValue": "",
+      "defaultValue": "1bc717ac-ea87-4011-ac59-21e6942a2e2f",
       "metadata": {
         "description": "Enter Azure service principal client Id."
       }
@@ -276,6 +255,7 @@
     }
   },
   "variables": {
+    "seller_subscription_id": "b2ca5467-2502-4b05-b78e-744604c6531d",
     "projectName": "[concat('i',substring(uniqueString(resourceGroup().id, deployment().name), 0, 5))]",
     "rgName": "[resourceGroup().name]",
     "vNetName": "bootnode-vnet",
@@ -287,7 +267,7 @@
     "publicIPAddressName": "[concat(variables('projectName'), '-ip')]",
     "networkInterfaceName": "[concat(variables('projectName'), '-nic')]",
     "networkSecurityGroupName": "[concat(variables('projectName'), '-nsg')]",
-    "networkSecurityGroupName2": "[concat(variables('projectName'), '-bootnodeSubnet-nsg')]",
+    "networkSecurityGroupName2": "[concat(variables('vNetSubnetName'), '-nsg')]",
     "storageaccountName": "[concat('masocp', variables('projectName'),'stgaccount')]"
   },
   "resources": [
@@ -549,7 +529,7 @@
             "typeHandlerVersion": "2.0",
             "autoUpgradeMinorVersion": true,
             "protectedSettings": {
-              "commandToExecute": "[concat('sleep 120;', 'cd /root/ansible-devops/multicloud-bootstrap;', './init-async.sh azure ''', parameters('offeringType'), ''' ''', parameters('location'), ''' null ''', parameters('clusterSize'), ''' ''', variables('projectName'), ''' ''', parameters('publicDomain'), ''' null ''', parameters('sshPublicKey'), ''' null ''', parameters('entitledRegistryKey'), ''' ''', parameters('openShiftPullSecret'), ''' ''', parameters('masLicenseUrl'), ''' ''', parameters('slsEndpointUrl'), ''' ''', parameters('slsRegistrationKey'), ''' ''', parameters('slsPublicCertificateUrl'), ''' ''', parameters('udsEndpointUrl'), ''' ''', parameters('udsAPIKey'), ''' ''', parameters('udsPublicCertificateUrl'), ''' ''', parameters('masManageDBUser'), ''' ''', parameters('masManageDBPassword'), ''' ''', parameters('masManageDBJdbcUrl'), ''' ''', parameters('masManageDBCertificateUrl'), ''' ''', parameters('importDemoData'), ''' '''' '''' '''' ''', variables('rgName'), ''' ''', parameters('emailNotification'), ''' ''', parameters('notificattionEmailAddress'), ''' ''', parameters('smtpHost'), ''' ''', parameters('smtpPort'), ''' ''', parameters('smtpUsername'), ''' ''', parameters('smtpPassword'), ''' ''', parameters('azureServicePrincipalClientId'), ''' ''', parameters('azureServicePrincipalClientSecret'), ''' ''', parameters('subscriptionId'), ''' ''', parameters('azureServicePrincipalTenantId'), ''' null null null null '''' '''' null null null null null null null ''', parameters('operationalMode'), ''' '''' '''' '''' '''' '''' '''' '''' '''' ''',parameters('DBProvisionedVPCId'),''' '''' '''' ''',parameters('masManageTablespace'),''' prod ''', ''' > mas-provisioning.log 2>&1;')]"
+              "commandToExecute": "[concat('sleep 120;', 'cd /root/ansible-devops/multicloud-bootstrap;', './init-async.sh azure ''', parameters('offeringType'), ''' ''', parameters('location'), ''' null ''', parameters('clusterSize'), ''' ''', variables('projectName'), ''' ''', parameters('publicDomain'), ''' null ''', parameters('sshPublicKey'), ''' null ''', parameters('entitledRegistryKey'), ''' ''', parameters('openShiftPullSecret'), ''' ''', parameters('masLicenseUrl'), ''' ''', parameters('slsEndpointUrl'), ''' ''', parameters('slsRegistrationKey'), ''' ''', parameters('slsPublicCertificateUrl'), ''' ''', parameters('udsEndpointUrl'), ''' ''', parameters('udsAPIKey'), ''' ''', parameters('udsPublicCertificateUrl'), ''' ''', parameters('masManageDBUser'), ''' ''', parameters('masManageDBPassword'), ''' ''', parameters('masManageDBJdbcUrl'), ''' ''', parameters('masManageDBCertificateUrl'), ''' ''', parameters('importDemoData'), ''' '''' '''' '''' ''', variables('rgName'), ''' ''', parameters('emailNotification'), ''' ''', parameters('notificattionEmailAddress'), ''' ''', parameters('smtpHost'), ''' ''', parameters('smtpPort'), ''' ''', parameters('smtpUsername'), ''' ''', parameters('smtpPassword'), ''' ''', parameters('azureServicePrincipalClientId'), ''' ''', parameters('azureServicePrincipalClientSecret'), ''' ''', variables('seller_subscription_id'), ''' ''', parameters('azureServicePrincipalTenantId'), ''' null null null null '''' '''' null null null null null null null ''', parameters('operationalMode'), ''' '''' '''' '''' '''' '''' '''' '''' '''' prod ''', ''' > mas-provisioning.log 2>&1;')]"
             }
           }
         }

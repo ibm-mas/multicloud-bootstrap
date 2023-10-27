@@ -74,21 +74,11 @@ Parameters:
       connects to, for example:
       jdbc:db2://1.2.3.4:50051/FTMDB:sslConnection=true;
     Type: String
-  TablespaceNames:
-    Description: >-
-      Enter the tablespace & indexspace names here if you are not using the default names.
-      Each name separated by a delimeter colon (:). For example in this format: <schema_name>:<tablespace_name>:<indexspace_name>
-    Type: String
   MASManageDBCertificateUrl:
     Description: >-
       Enter the HTTP or S3 location of the database's public certificate, for
       example: s3://masocp-license/db-certificate.crt
     Type: String
-  DBProvisionedVPCId:
-    Description: >-
-      Enter the VPC ID where your existing database (DB2 or Oracle or MSSQL) was provisioned on a private subnet to establish
-      VPC Peering from this VPC & the VPC created during current stack deployment in order to establish database connection.
-    Type: 'AWS::EC2::VPC::Id'
   ImportDemoData:
     Description: >-
       Indicate whether you want to import demo data into the database. This
@@ -168,7 +158,7 @@ Parameters:
       - "Use an existing mongo instance"
   MongoDBProvider:
     Description: >-
-      Select the desired MongoDB provider.
+      Select the desired MongoDB provider. 
       Note: When selecting MongoDBProvider as MongoDB and MongoDeploymentMode as 'Provision a new mongo instance', a new "MongoDB Community Edition" instance will be provisioned
     Type: String
     Default: "MongoDB"
@@ -238,16 +228,14 @@ Metadata:
       - Label:
           default: >-
             Maximo Manage database configuration (complete this section only if
-            you chose the 'MAS + Manage' offering type.
-            In case if this section is left empty and you chose 'MAS + Manage' offering type,
+            you chose the 'MAS + Manage' offering type. 
+            In case if this section is left empty and you chose 'MAS + Manage' offering type, 
             then We will provision an internal DB2 instance for Manage)
         Parameters:
           - MASManageDBUser
           - MASManageDBPassword
           - MASManageDBJdbcUrl
-          - TablespaceNames
           - MASManageDBCertificateUrl
-          - DBProvisionedVPCId
           - ImportDemoData
       - Label:
           default: MongoDB Configuration
@@ -256,7 +244,7 @@ Metadata:
           - MongoDBProvider
       - Label:
           default: >-
-            Existing MongoDB / DocumentDB configuration details
+            Existing MongoDB / DocumentDB configuration details 
             (complete this section only if MongoDeploymentMode was selected as 'Use an existing mongo instance')
         Parameters:
           - MongoAdminUsername
@@ -267,7 +255,7 @@ Metadata:
       - Label:
           default: AWS MSK Provision
         Parameters:
-          - AWSMSKProvider
+          - AWSMSKProvider	         
       - Label:
           default: >-
             Existing Suite License Service connection details (leave this
@@ -295,49 +283,45 @@ Metadata:
 Mappings:
   RegionMap:
     us-east-1:
-      HVM64: ami-07809a17acfe15035
+      HVM64: ami-028c3019ed25237a4
     us-east-2:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
+      HVM64: ami-0da4f91ded4bac1bd
     us-west-2:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
-    ca-central-1:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
-    eu-north-1:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
-    eu-west-1:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
-    eu-west-2:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
-    eu-west-3:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
-    eu-central-1:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
-    ap-northeast-1:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
-    ap-northeast-2:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
-    ap-northeast-3:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
-    ap-south-1:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
-    ap-southeast-1:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
-    ap-southeast-2:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
-    sa-east-1:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
-    af-south-1:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
+      HVM64: ami-0d6ac2d0246b8f646
     ap-east-1:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
-    ap-southeast-3:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
+      HVM64: ami-05b4d16ec6412d429
+    ap-southeast-1:
+      HVM64: ami-0e084c2cc29ec1720
+    ap-southeast-2:
+      HVM64: ami-093254aff333dcfe3
+    ap-northeast-1:
+      HVM64: ami-0786a7bec0e143591
+    eu-central-1:
+      HVM64: ami-09fbeb232efd55c04
+    ap-south-1:
+      HVM64: ami-09ee06d85c3bf30f9
+    ap-northeast-2:
+      HVM64: ami-0b5a78be9ec85d01b
+    ap-northeast-3:
+      HVM64: ami-0d96abb825f3fc970
+    ca-central-1:
+      HVM64: ami-05de5e08f0f2ebd49
     eu-south-1:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
+      HVM64: ami-045e0d5842edd2162
+    eu-west-1:
+      HVM64: ami-0eead16d37ab73f41
+    eu-west-2:
+      HVM64: ami-0b91a33eb29e0b111
+    eu-west-3:
+      HVM64: ami-07701973de476bf5c
+    eu-north-1:
+      HVM64: ami-0a58f0bb290790019
+    af-south-1:
+      HVM64: ami-051f9c6d45b88f721
     me-south-1:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
-    me-central-1:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
+      HVM64: ami-0872ea1a62d5925b8
+    sa-east-1:
+      HVM64: ami-02db20519b43317bb
 Resources:
   DeployWaitConditionHandle:
     Type: 'AWS::CloudFormation::WaitConditionHandle'
@@ -741,14 +725,7 @@ Resources:
             - ''' '''
             - !If [MongoUseExistingInstanceCondition, !Ref DocumentDBProvisionedVPCId, ""]
             - ''' '''
-            - !Ref AWSMSKProvider
-            - ''' '''
-            - !Ref DBProvisionedVPCId
-            - ''' '''' '''
-            - !Ref EBSVolumeType
-            - ''' '''
-            - !Ref TablespaceNames
-            - ''' '''
+            - !Ref AWSMSKProvider	    
             - ''' "dev" '
             - '2>&1 | tee mas-provisioning.log; '
       Tags:

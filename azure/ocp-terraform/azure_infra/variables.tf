@@ -60,6 +60,7 @@ variable "virtual-network-cidr" {
   default = "10.0.0.0/16"
 }
 
+
 variable "master-subnet-name" {
   default = "master-subnet"
 }
@@ -79,15 +80,9 @@ variable "worker-subnet-cidr" {
 variable "master-nsg-name" {
   default = "master-nsg"
 }
-
-variable "cluster-network-cidr" {
-    default = "10.128.0.0/14"
-}
-
 variable "worker-nsg-name" {
-    default = "worker-nsg"
+  default = "worker-nsg"
 }
-
 #Bastion host variable
 variable "bastion_cidr" {
   default = "10.0.3.224/27"
