@@ -563,6 +563,8 @@ log "==== MAS Workspace generation completed ===="
 if [[ $DEPLOY_MANAGE == "true" && (-z $MAS_JDBC_USER) && (-z $MAS_JDBC_PASSWORD) && (-z $MAS_JDBC_URL) && (-z $MAS_JDBC_CERT_URL) ]]; then
   log "==== Configure internal db2 for manage started ===="
   export ROLE_NAME=db2 && ansible-playbook ibm.mas_devops.run_role
+  sleep 120
+  oc exec -n db2u c-db2wh-db01-db2u-0 -- su -lc '/tmp/setupdb.sh | tee /tmp/natsetupdb.log' db2inst1
   export ROLE_NAME=suite_db2_setup_for_manage && ansible-playbook ibm.mas_devops.run_role
   sleep 600
   oc exec -n db2u c-db2wh-db01-db2u-0 -- su -lc '/tmp/setupdb.sh | tee /tmp/natsetupdb.log' db2inst1
