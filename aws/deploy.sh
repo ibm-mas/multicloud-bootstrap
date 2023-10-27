@@ -564,7 +564,9 @@ if [[ $DEPLOY_MANAGE == "true" && (-z $MAS_JDBC_USER) && (-z $MAS_JDBC_PASSWORD)
   log "==== Configure internal db2 for manage started ===="
   export ROLE_NAME=db2 && ansible-playbook ibm.mas_devops.run_role
   export ROLE_NAME=suite_db2_setup_for_manage && ansible-playbook ibm.mas_devops.run_role
-  log "==== Configure internal db2 for manage started ===="
+  sleep 600
+  oc exec -n db2u c-db2wh-db01-db2u-0 -- su -lc '/tmp/setupdb.sh | tee /tmp/natsetupdb.log' db2inst1
+  log "==== Configure internal db2 for manage completed ===="
 fi
 
 if [[ $DEPLOY_MANAGE == "true" && (-n $MAS_JDBC_USER) && (-n $MAS_JDBC_PASSWORD) && (-n $MAS_JDBC_URL) ]]; then
