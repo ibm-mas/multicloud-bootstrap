@@ -71,6 +71,7 @@ export ExocpProvisionedVPCId=${62}
 export EBSVolumeType=${63}
 export MANAGE_TABLESPACE=${64}
 export ENV_TYPE=${65}
+export OCP_INGRESS_TLS_SECRET_NAME=${66}
 export GIT_REPO_HOME=$(pwd)
 # Load helper functions
 . helper.sh
