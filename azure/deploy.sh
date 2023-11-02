@@ -14,7 +14,7 @@ SP_NAME="http://${CLUSTER_NAME}-sp"
 export SLS_STORAGE_CLASS=managed-premium
 # UDS variables
 export UDS_STORAGE_CLASS=managed-premium
-export OCP_INGRESS_TLS_SECRET_NAME=$OCP_INGRESS_TLS_SECRET_NAME
+export OCP_INGRESS_TLS_SECRET_NAME=${OCP_INGRESS_TLS_SECRET_NAME}
 # CP4D variables
 export CPD_METADATA_STORAGE_CLASS=managed-premium
 export CPD_SERVICE_STORAGE_CLASS=azurefiles-premium
