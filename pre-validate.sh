@@ -4,12 +4,6 @@ SCRIPT_STATUS=0
 # Check if region is supported
 if [[ $CLUSTER_TYPE == "aws" ]]; then
     SUPPORTED_REGIONS="us-east-1;us-east-2;us-west-2;ca-central-1;eu-north-1;eu-west-1;eu-west-2;eu-west-3;eu-central-1;ap-northeast-1;ap-northeast-2;ap-northeast-3;ap-south-1;ap-southeast-1;ap-southeast-2;sa-east-1;ap-east-1;ap-southeast-3;eu-south-1;me-south-1;me-central-1;af-south-1"
-elif [[ $CLUSTER_TYPE == "azure" ]]; then
-    # az account list-locations --query "[].{Name:name}" -o table|grep -Ev '^(Name|-)'|tr '\n' ';'
-       az login --service-principal -u ${AZURE_SP_CLIENT_ID} -p ${AZURE_SP_CLIENT_PWD} --tenant ${TENANT_ID}
-    SUPPORTED_REGIONS="eastus;eastus2;southcentralus;westus2;westus3;australiaeast;southeastasia;northeurope;swedencentral;uksouth;westeurope;centralus;southafricanorth;centralindia;eastasia;japaneast;koreacentral;canadacentral;francecentral;germanywestcentral;norwayeast;brazilsouth"
-elif [[ $CLUSTER_TYPE == "gcp" ]]; then
-    SUPPORTED_REGIONS="asia-east1;asia-east2;asia-northeast1;asia-northeast2;asia-northeast3;asia-south1;asia-south2;asia-southeast1;asia-southeast2;australia-southeast12;europe-central2;europe-north1;europe-southwest1;europe-west1;europe-west2;europe-west3;europe-west4;europe-west6;europe-west8;europe-west9;northamerica-northeast1;northamerica-northeast2;southamerica-east1;southamerica-west1;us-central1;us-east1;us-east4;us-east5;us-south1;us-west1;us-west2;us-west3;us-west4"
 else
     SUPPORTED_REGIONS=$DEPLOY_REGION
 fi
@@ -53,17 +47,6 @@ if [[ ($CLUSTER_TYPE == "aws") && (-n $BASE_DOMAIN) ]]; then
 else
     true
 fi
-# Check if provided hosted zone is public /private for azure
-if [[ ($CLUSTER_TYPE == "azure") && (-n $BASE_DOMAIN) ]]; then
-    if [[ $PRIVATE_CLUSTER == "false" ]]; then
-       PUBLIC_DNS_VALIDATION=`az network dns zone list  |grep -w $BASE_DOMAIN| tr -d '"'`
-          [[ ! -z "$PUBLIC_DNS_VALIDATION" ]] && log "Valid PUBLIC DNS selection" || log "Invalid PUBLIC DNS SELECTION"
-        else
-         PRIVATE_DNS_VALIDATION=`az network private-dns zone list |grep -w $BASE_DOMAIN| tr -d '"'`
-           [[ ! -z "$PRIVATE_DNS_VALIDATION" ]] && log "Valid PRIVATE DNS selection" || log "Invalid PRIVATE DNS SELECTION"
-    fi
-fi
-
 if [ $? -eq 0 ]; then
     log "MAS public domain verification = PASS"
 else
@@ -119,18 +102,7 @@ if [[ $DEPLOY_MANAGE == "true" ]]; then
                 elif [[ ${MAS_JDBC_CERT_URL,,} =~ ^https? ]]; then
                     wget "$MAS_JDBC_CERT_URL" -O db.crt
                 fi
-            elif [[ $CLUSTER_TYPE == "azure" ]]; then
-                # https://myaccount.blob.core.windows.net/mycontainer/myblob regex
-                 if [[ ${MAS_JDBC_CERT_URL,,} =~ ^https://.+blob\.core\.windows\.net.+ ]]; then
-                    azcopy copy "$MAS_JDBC_CERT_URL" db.crt
-                 elif [[ ${MAS_JDBC_CERT_URL,,} =~ ^https? ]]; then
-                    wget "$MAS_JDBC_CERT_URL" -O db.crt
-                fi
-            elif [[ $CLUSTER_TYPE == "gcp" ]]; then
-                wget "$MAS_JDBC_CERT_URL" -O db.crt
-            fi
-           #Removing the Validation check for now as DB are in private subnets in different Vnet/VPC , Validation requires peering of database with bootnode Vpc/Vnet.
-        fi
+         fi
     fi
 fi
 
@@ -257,55 +229,6 @@ else
     fi
 fi
 
-if [[ $CLUSTER_TYPE == "azure" ]]; then
-    if [[ $EMAIL_NOTIFICATION == "true" ]]; then
-        if [[ (-z $SMTP_HOST) || (-z $SMTP_PORT) || (-z $SMTP_USERNAME) || (-z $SMTP_PASSWORD) || (-z $RECEPIENT) ]]; then
-            log "ERROR: Missing required parameters when email notification is set to true."
-            SCRIPT_STATUS=26
-        fi
-    fi
-fi
-#Validate the subscriptionId
-if [[ $CLUSTER_TYPE == "azure" ]]; then
-   az login --service-principal -u ${AZURE_SP_CLIENT_ID} -p ${AZURE_SP_CLIENT_PWD} --tenant ${TENANT_ID}
-  export AZURE_VALIDATE_SUBSC_ID=`az account list --query "[?id == '$SELLER_SUBSCRIPTION_ID'].{Id:id}" -o tsv`
-  if [[ -n $AZURE_VALIDATE_SUBSC_ID ]]; then
-    export AZURE_SUBSC_ID=$AZURE_VALIDATE_SUBSC_ID
-     log " AZURE_SUBSC_ID: $AZURE_SUBSC_ID"
-  else
-    log "ERROR: Subscription Id Invalid"
-    SCRIPT_STATUS=46
-  fi
-fi
-
-if [[ $CLUSTER_TYPE == "azure" ]]; then
-   if [[ $DEPLOY_MANAGE == "true" && (-n $MAS_JDBC_USER) && (-n $MAS_JDBC_PASSWORD) && (-n $MAS_JDBC_URL) && (-n $MAS_JDBC_CERT_URL) ]]; then
-   az login --service-principal -u ${AZURE_SP_CLIENT_ID} -p ${AZURE_SP_CLIENT_PWD} --tenant ${TENANT_ID}
-  export ValidateDBProvisionedVPCId=`az network vnet list --query "[?name=='$DBProvisionedVPCId'].{Name:name}" -o tsv`
-  log "ValidateDBProvisionedVPCId -- $ValidateDBProvisionedVPCId"
-  if [[ -n $ValidateDBProvisionedVPCId ]]; then
-    export DBProvisionedVPCId=$ValidateDBProvisionedVPCId
-     log " DBProvisionedVPCId: $DBProvisionedVPCId"
-  else
-    log "ERROR: Database cluster /Node Vnet is invalid"
-    SCRIPT_STATUS=45
-    fi
-  fi
-fi
-
-
-#Validate the subscriptionId
-if [[ $CLUSTER_TYPE == "azure" ]]; then
-   az login --service-principal -u ${AZURE_SP_CLIENT_ID} -p ${AZURE_SP_CLIENT_PWD} --tenant ${TENANT_ID}
-  export AZURE_VALIDATE_SUBSC_ID=`az account list --query "[?id == '$SELLER_SUBSCRIPTION_ID'].{Id:id}" -o tsv`
-  if [[ -n $AZURE_VALIDATE_SUBSC_ID ]]; then
-    export AZURE_SUBSC_ID=$AZURE_VALIDATE_SUBSC_ID
-     log " AZURE_SUBSC_ID: $AZURE_SUBSC_ID"
-  else
-    log "ERROR: Subscription Id Invalid"
-    SCRIPT_STATUS=46
-  fi
-fi
 
 # Check if all the subnet values are provided for existing VPC Id
 if [[ -n $ExistingVPCId ]]; then

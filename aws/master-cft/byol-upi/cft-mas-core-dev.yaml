@@ -161,23 +161,6 @@ Parameters:
       retrieved from the 'ca.crt' file in the 'mas-*-sls-cfg' secret in the MAS
       core namespace.
     Type: String
-  UDSEndpointUrl:
-    Description: >-
-      Enter the endpoint URL that you retrieved from the 'uds-endpoint'
-      OpenShift route in the ibm-common-services namespace. URL should not have
-      slash (/) at the end.
-    Type: String
-  UDSAPIKey:
-    Description: >-
-      Enter the service's API key that you retrieved from the 'uds-api-key'
-      secret in the ibm-common-services namespace.
-    Type: String
-  UDSPublicCertificateUrl:
-    Description: >-
-      Enter the HTTP or S3 location of the service's public certificate that you
-      retrieved from the 'ca-bundle.pem' file in the 'mas-*-uds-cfg' secret in
-      the MAS core namespace.
-    Type: String
   EmailNotification:
     Description: >-
       Indicate whether you want to receive emails that contain the connection
@@ -248,16 +231,6 @@ Parameters:
       Leave this field blank, if MongoDBProvider was selected as "MongoDB".
       Make sure this VPC ID resides in the current deployment region and does not have matching or overlapping IPv4 CIDR blocks 10.0.0.0/16.
     Type: String
-  AWSMSKProvider:
-    Description: >-
-      Select Yes, to provision a AWS MSK cluster
-    Type: String
-    Default: "No"
-    MinLength: '1'
-    AllowedValues:
-      - "No"
-      - "Yes"
-
 Conditions:
   MongoUseExistingInstanceCondition: !Equals [!Ref MongoDeploymentMode, "Use an existing mongo instance"]
 Metadata:
@@ -288,10 +261,8 @@ Metadata:
           - MASLicenseUrl
       - Label:
           default: >-
-            Maximo Manage database configuration (complete this section only if
-            you chose the 'MAS + Manage' offering type.
-            In case if this section is left empty and you chose 'MAS + Manage' offering type,
-            then We will provision an internal DB2 instance for Manage)
+            Maximo Manage (Oracle) database configuration (complete this section only if
+            you chose the 'MAS + Manage' offering type.)
         Parameters:
           - MASManageDBUser
           - MASManageDBPassword
@@ -316,10 +287,6 @@ Metadata:
           - MongoCAPemFile
           - DocumentDBProvisionedVPCId
       - Label:
-          default: AWS MSK Provider
-        Parameters:
-          - AWSMSKProvider
-      - Label:
           default: >-
             Existing Suite License Service connection details (leave this
             section empty to create a new SLS instance)
@@ -327,14 +294,6 @@ Metadata:
           - SLSEndpointUrl
           - SLSRegistrationKey
           - SLSPublicCertificateUrl
-      - Label:
-          default: >-
-            Existing User Data Services connection details (leave this section
-            empty to create a new UDS instance)
-        Parameters:
-          - UDSEndpointUrl
-          - UDSAPIKey
-          - UDSPublicCertificateUrl
       - Label:
           default: Email notification
         Parameters:
@@ -678,7 +637,7 @@ Resources:
             - 'git clone https://github.com/ibm-mas/ansible-devops.git;'
             - cd ansible-devops;
             - rm -rf multicloud-bootstrap 1>/dev/null 2>&1;
-            - 'git clone https://github.com/ibm-mas/multicloud-bootstrap.git;'
+            - 'git clone Govcloud https://github.com/ibm-mas/multicloud-bootstrap.git;'
             - cd multicloud-bootstrap;
             - 'find . -type f -name "*.sh" -exec chmod +x {} \;;'
             - ./init.sh "aws" "
@@ -714,13 +673,7 @@ Resources:
             - !Ref SLSRegistrationKey
             - ''' '''
             - !Ref SLSPublicCertificateUrl
-            - ''' '''
-            - !Ref UDSEndpointUrl
-            - ''' '''
-            - !Ref UDSAPIKey
-            - ''' '''
-            - !Ref UDSPublicCertificateUrl
-            - ''' '''
+            - ''' '''' '''' '''' '''
             - !Ref MASManageDBUser
             - ''' '''
             - !Ref MASManageDBPassword
@@ -764,9 +717,7 @@ Resources:
             - !If [MongoUseExistingInstanceCondition, !Ref MongoCAPemFile, ""]
             - ''' '''
             - !If [MongoUseExistingInstanceCondition, !Ref DocumentDBProvisionedVPCId, ""]
-            - ''' '''
-            - !Ref AWSMSKProvider
-            - ''' '''
+            - ''' '''' '''
             - !Ref DBProvisionedVPCId
             - ''' '''' '''
             - !Ref EBSVolumeType

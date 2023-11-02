@@ -41,12 +41,6 @@ if [[ $DEPLOY_CP4D == "true" ]]; then
 	if [[ $retcode -eq 29 ]]; then
 	return $retcode
 	fi
-#commenting this as we dont use db2u cluster ,instead we are using cp4d db2wh
-	#getVersion Db2uCluster
-	#retcode=$?
-	#if [[ $retcode -eq 29 ]]; then
-	#return $retcode
-	#fi
 fi
 
 

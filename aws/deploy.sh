@@ -62,27 +62,6 @@ fi
 if [[ -f sls.crt ]]; then
   chmod 600 sls.crt
 fi
-# Download UDS certificate
-cd $GIT_REPO_HOME
-if [[ ${UDS_PUB_CERT_URL,,} =~ ^https? ]]; then
-  log "Downloading UDS certificate from HTTP URL"
-  wget "$UDS_PUB_CERT_URL" -O uds.crt
-elif [[ ${UDS_PUB_CERT_URL,,} =~ ^s3 ]]; then
-  log "Downloading UDS certificate from S3 URL"
-  aws s3 cp "$UDS_PUB_CERT_URL" uds.crt --region $DEPLOY_REGION
-  ret=$?
-        if [ $ret -ne 0 ]; then
-        aws s3 cp "$UDS_PUB_CERT_URL" uds.crt --region us-east-1
-        ret=$?
-        if [ $ret -ne 0 ]; then
-            log "Invalid UDS License URL"
-        fi
-        fi
-fi
-if [[ -f uds.crt ]]; then
-  chmod 600 uds.crt
-fi
-
 ### Read License File & Retrive SLS hostname and host id
 if [[ -n "$MAS_LICENSE_URL" ]]; then
   line=$(head -n 1 entitlement.lic)
@@ -441,52 +420,12 @@ else
   ## Deploy MongoDB completed
 fi
 
-if [[ -z $VPC_ID && $AWS_MSK_PROVIDER == "Yes" ]]; then
-  log "Failed to get the vpc id required to deploy AWS MSK"
-  exit 42
-fi
-log "==== AWS_MSK_PROVIDER=$AWS_MSK_PROVIDER VPC_ID=$VPC_ID ===="
-if [[ $AWS_MSK_PROVIDER == "Yes" ]]; then
-  log "==== AWS MSK deployment started ===="
-  export KAFKA_CLUSTER_NAME="msk-${RANDOM_STR}"
-  export KAFKA_NAMESPACE="msk-${RANDOM_STR}"
-  export AWS_KAFKA_USER_NAME="mskuser-${RANDOM_STR}"
-  export AWS_REGION="${DEPLOY_REGION}"
-  export KAFKA_VERSION="2.8.1"
-  export KAFKA_PROVIDER="aws"
-  export KAFKA_ACTION="install"
-  export AWS_MSK_INSTANCE_TYPE="kafka.m5.large"
-  export AWS_MSK_VOLUME_SIZE="100"
-  export AWS_MSK_INSTANCE_NUMBER=3
 
-  log "==== Invoke fetch-cidr-block.sh ===="
-  source $GIT_REPO_HOME/aws/utils/fetch-cidr-block.sh
-  if [ $? -ne 0 ]; then
-    SCRIPT_STATUS=44
-    exit $SCRIPT_STATUS
-  fi
-  # IPv4 CIDR of private or default subnet
-  export AWS_MSK_CIDR_AZ1="${CIDR_BLOCKS_0}"
-  export AWS_MSK_CIDR_AZ2="${CIDR_BLOCKS_1}"
-  export AWS_MSK_CIDR_AZ3="${CIDR_BLOCKS_2}"
-  export AWS_MSK_INGRESS_CIDR="${VPC_CIDR_BLOCK}"
-  export AWS_MSK_EGRESS_CIDR="${VPC_CIDR_BLOCK}"
-  log "AWS_MSK_CIDR_AZ1=${AWS_MSK_CIDR_AZ1}  AWS_MSK_CIDR_AZ2=${AWS_MSK_CIDR_AZ2} AWS_MSK_CIDR_AZ3=${AWS_MSK_CIDR_AZ3} VPC_CIDR_BLOCK=$VPC_CIDR_BLOCK"
-
-  export ROLE_NAME=kafka && ansible-playbook ibm.mas_devops.run_role
-  log "==== AWS MSK deployment completed ===="
-fi
 ## Copying the entitlement.lic to MAS_CONFIG_DIR
 if [[ -n "$MAS_LICENSE_URL" ]]; then
   cp $GIT_REPO_HOME/entitlement.lic $MAS_CONFIG_DIR
 fi
 
-if [[ $DEPLOY_MANAGE == "true" && $DEPLOY_CP4D == "true" ]]; then
-  ## Deploy Amqstreams
-  log "==== Amq streams deployment started ===="
-  export ROLE_NAME=kafka && ansible-playbook ibm.mas_devops.run_role
-  log "==== Amq streams deployment completed ===="
-fi
 
 ## Deploy SLS
 if [[ (-z $SLS_URL) || (-z $SLS_REGISTRATION_KEY) || (-z $SLS_PUB_CERT_URL) ]]; then
@@ -538,11 +477,13 @@ fi
 if [[ (-z $UDS_API_KEY) || (-z $UDS_ENDPOINT_URL) || (-z $UDS_PUB_CERT_URL) ]]; then
   # Deploy UDS
   log "==== UDS deployment started ===="
+  export OCP_FIPS_ENABLED=true
   export ROLE_NAME=uds && ansible-playbook ibm.mas_devops.run_role
   log "==== UDS deployment completed ===="
 
 else
   log "=== Using Existing UDS Deployment ==="
+  export OCP_FIPS_ENABLED=true
   export ROLE_NAME=uds && ansible-playbook ibm.mas_devops.run_role
   log "=== Generated UDS Config YAML ==="
 fi
@@ -559,15 +500,6 @@ log "==== MAS Workspace generation started ===="
 export ROLE_NAME=gencfg_workspace && ansible-playbook ibm.mas_devops.run_role
 log "==== MAS Workspace generation completed ===="
 
-## Deploy Manage
-if [[ $DEPLOY_MANAGE == "true" && (-z $MAS_JDBC_USER) && (-z $MAS_JDBC_PASSWORD) && (-z $MAS_JDBC_URL) && (-z $MAS_JDBC_CERT_URL) ]]; then
-  log "==== Configure internal db2 for manage started ===="
-  export ROLE_NAME=db2 && ansible-playbook ibm.mas_devops.run_role
-  export ROLE_NAME=suite_db2_setup_for_manage && ansible-playbook ibm.mas_devops.run_role
-  #Running setupdb.sh script again such that it creates required tablespaces if it's missed creating it while invoked by ansible role.
-  oc exec -n db2u c-db2wh-db01-db2u-0 -- su -lc '/tmp/setupdb.sh | tee /tmp/setupdb2.log' db2inst1
-  log "==== Configure internal db2 for manage completed ===="
-fi
 
 if [[ $DEPLOY_MANAGE == "true" && (-n $MAS_JDBC_USER) && (-n $MAS_JDBC_PASSWORD) && (-n $MAS_JDBC_URL) ]]; then
   export SSL_ENABLED=false
@@ -577,21 +509,11 @@ if [[ $DEPLOY_MANAGE == "true" && (-n $MAS_JDBC_USER) && (-n $MAS_JDBC_PASSWORD)
 	   export MAS_APP_SETTINGS_TABLESPACE=$(echo $MANAGE_TABLESPACE | cut -d ':' -f 1)
 	   export MAS_APP_SETTINGS_INDEXSPACE=$(echo $MANAGE_TABLESPACE | cut -d ':' -f 2)
 	else
-	   if [[ ${MAS_JDBC_URL,, } =~ ^jdbc:db2? ]]; then
-			log "Setting to DB2 Values"
-			export MAS_APP_SETTINGS_TABLESPACE="maxdata"
-			export MAS_APP_SETTINGS_INDEXSPACE="maxindex"
-	   elif [[ ${MAS_JDBC_URL,, } =~ ^jdbc:oracle? ]]; then
+	   if [[ ${MAS_JDBC_URL,, } =~ ^jdbc:oracle? ]]; then
 			log "Setting to ORACLE Values"
 			export MAS_APP_SETTINGS_TABLESPACE="maxdata"
 			export MAS_APP_SETTINGS_INDEXSPACE="maxindex"
 	fi
-	fi
-	if [[ ${MAS_JDBC_URL,, } =~ ^jdbc:sql? ]]; then
-			log "Setting to MSSQL Values"
-			export MAS_APP_SETTINGS_DB2_SCHEMA="dbo"
-			export MAS_APP_SETTINGS_TABLESPACE="PRIMARY"
-			export MAS_APP_SETTINGS_INDEXSPACE="PRIMARY"
 	fi
 			log " MAS_APP_SETTINGS_DB2_SCHEMA: $MAS_APP_SETTINGS_DB2_SCHEMA"
 			log " MAS_APP_SETTINGS_TABLESPACE: $MAS_APP_SETTINGS_TABLESPACE"
