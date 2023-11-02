@@ -186,7 +186,6 @@ echo
 echoBlue "====  CP4D deployment started    ===="
 echo
 export ROLE_NAME=cp4d && ansible-playbook ibm.mas_devops.run_role
-export ROLE_NAME=db2 && ansible-playbook ibm.mas_devops.run_role
 echo
 echoBlue "====  CP4D deployment completed  ===="
 echo

@@ -72,7 +72,7 @@ Parameters:
     Description: >-
       Enter the URL location of the database that the Maximo Manage application
       connects to, for example:
-      jdbc:db2://1.2.3.4:50051/FTMDB:sslConnection=true;
+      jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS=(PROTOCOL=tcps)(HOST=63.246.112.120)(PORT=2484))(CONNECT_DATA=(SERVICE_NAME=maxdb)))
     Type: String
   TablespaceNames:
     Description: >-
@@ -87,7 +87,7 @@ Parameters:
     Type: String
   DBProvisionedVPCId:
     Description: >-
-      Enter the VPC ID where your existing database (DB2 or Oracle or MSSQL) was provisioned on a private subnet to establish
+      Enter the VPC ID where your existing database (Oracle) was provisioned on a private subnet to establish
       VPC Peering from this VPC & the VPC created during current stack deployment in order to establish database connection.
     Type: String
   ImportDemoData:

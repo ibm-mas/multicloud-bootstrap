@@ -12,8 +12,6 @@ MASTER_INSTANCE_TYPE="m5.2xlarge"
 WORKER_INSTANCE_TYPE="m5.4xlarge"
 # Mongo variables
 export MONGODB_STORAGE_CLASS=gp2
-# Amqstreams variables
-export KAFKA_STORAGE_CLASS=gp2
 # IAM variables
 IAM_POLICY_NAME="masocp-policy-${RANDOM_STR}"
 IAM_USER_NAME="masocp-user-${RANDOM_STR}"
@@ -34,7 +32,6 @@ log " AWS_DEFAULT_REGION: $AWS_DEFAULT_REGION"
 log " MASTER_INSTANCE_TYPE: $MASTER_INSTANCE_TYPE"
 log " WORKER_INSTANCE_TYPE: $WORKER_INSTANCE_TYPE"
 log " MONGODB_STORAGE_CLASS: $MONGODB_STORAGE_CLASS"
-log " KAFKA_STORAGE_CLASS: $KAFKA_STORAGE_CLASS"
 log " IAM_POLICY_NAME: $IAM_POLICY_NAME"
 log " IAM_USER_NAME: $IAM_USER_NAME"
 log " SLS_STORAGE_CLASS: $SLS_STORAGE_CLASS"
@@ -515,7 +512,7 @@ if [[ $DEPLOY_MANAGE == "true" && (-n $MAS_JDBC_USER) && (-n $MAS_JDBC_PASSWORD)
 			export MAS_APP_SETTINGS_INDEXSPACE="maxindex"
 	fi
 	fi
-			log " MAS_APP_SETTINGS_DB2_SCHEMA: $MAS_APP_SETTINGS_DB2_SCHEMA"
+			log " MAS_APP_SETTINGS_DB_SCHEMA: $MAS_APP_SETTINGS_DB2_SCHEMA"
 			log " MAS_APP_SETTINGS_TABLESPACE: $MAS_APP_SETTINGS_TABLESPACE"
 			log " MAS_APP_SETTINGS_INDEXSPACE: $MAS_APP_SETTINGS_INDEXSPACE"
 
@@ -523,9 +520,9 @@ if [[ $DEPLOY_MANAGE == "true" && (-n $MAS_JDBC_USER) && (-n $MAS_JDBC_PASSWORD)
     log "MAS_JDBC_CERT_URL is not empty, setting SSL_ENABLED as true"
     export SSL_ENABLED=true
   fi
-  log "==== Configure JDBC started for external DB2 ==== SSL_ENABLED = $SSL_ENABLED"
+  log "==== Configure JDBC started for external Oracle ==== SSL_ENABLED = $SSL_ENABLED"
   export ROLE_NAME=gencfg_jdbc && ansible-playbook ibm.mas_devops.run_role
-  log "==== Configure JDBC completed for external DB2 ===="
+  log "==== Configure JDBC completed for external Oracle ===="
 fi
 
 ## Deploy MAS

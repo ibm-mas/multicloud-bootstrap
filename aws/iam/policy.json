@@ -110,18 +110,7 @@
                 "sts:GetCallerIdentity",
                 "tag:GetResources",
                 "tag:TagResources",
-                "tag:UntagResources",
-                "kafka:Batch*",
-                "kafka:Create*",
-                "kafka:Delete*",
-                "kafka:Describe*",
-                "kafka:GetBootstrapBrokers",
-                "kafka:GetCompatibleKafkaVersions",
-                "kafka:List*",
-                "kafka:RebootBroker",
-                "kafka:TagResource",
-                "kafka:UntagResource",
-                "kafka:Update*"
+                "tag:UntagResources"
             ],
             "Resource": [
                 "*"

@@ -119,9 +119,7 @@ mark_provisioning_failed() {
     export STATUS_MSG="CNAME or A records already exist."
   elif [[ $retcode -eq 26 ]]; then
     export STATUS_MSG="Missing required parameters when email notification is set to true."
-  elif [[ $retcode -eq 27 ]]; then
-    export STATUS_MSG="Failure in creating azurefiles storage class."
-  elif [[ $retcode -eq 28 ]]; then
+   elif [[ $retcode -eq 28 ]]; then
     export STATUS_MSG="Missing or Invalid Product Code."
   elif [[ $retcode -eq 29 ]]; then
     export STATUS_MSG="User provided existing OpenShift cluster did not pass the pre-requisites check. The deployment failed due to $2. Please select option to create a new cluster in a new deployment. (Check provisioning logs for more details)"
@@ -149,8 +147,6 @@ mark_provisioning_failed() {
     export STATUS_MSG="Failure in finding VPC in region $DEPLOY_REGION"
   elif [[ $retcode -eq 41 ]]; then
     export STATUS_MSG="Subnet ID associated with CIDR Block is not found"
-  elif [[ $retcode -eq 42 ]]; then
-    export STATUS_MSG="Failure in fetching the VPC id required to deploy AWS MSK.."
   elif [[ $retcode -eq 43 ]]; then
     export STATUS_MSG="Amazon DocumentDB is not supported in current deploy region $DEPLOY_REGION"
   elif [[ $retcode -eq 44 ]]; then
@@ -242,10 +238,6 @@ validate_prouduct_type() {
   fi
   log "CLUSTER_TYPE: $CLUSTER_TYPE"
   log "OPERATIONAL_MODE: $OPERATIONAL_MODE"
-  log "hyperscaler in MAS_ANNOTATIONS: $MAS_ANNOTATIONS"
-  if [[ $CLUSTER_TYPE == "azure" ]]; then
-    export MAS_ANNOTATIONS="mas.ibm.com/hyperscalerProvider=azure,mas.ibm.com/hyperscalerChannel=azure"
-  fi
   log "hyperscaler in MAS_ANNOTATIONS: $MAS_ANNOTATIONS"
   if [[ $OPERATIONAL_MODE == "Non-production"  ]]; then
     if [[ -n "$MAS_ANNOTATIONS" ]]; then
