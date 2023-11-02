@@ -14,6 +14,7 @@ SP_NAME="http://${CLUSTER_NAME}-sp"
 export SLS_STORAGE_CLASS=managed-premium
 # UDS variables
 export UDS_STORAGE_CLASS=managed-premium
+export OCP_INGRESS_TLS_SECRET_NAME=$OCP_INGRESS_TLS_SECRET_NAME
 # CP4D variables
 export CPD_METADATA_STORAGE_CLASS=managed-premium
 export CPD_SERVICE_STORAGE_CLASS=azurefiles-premium
@@ -24,6 +25,7 @@ log " KAFKA_STORAGE_CLASS: $KAFKA_STORAGE_CLASS"
 log " SP_NAME: $SP_NAME"
 log " SLS_STORAGE_CLASS: $SLS_STORAGE_CLASS"
 log " UDS_STORAGE_CLASS: $UDS_STORAGE_CLASS"
+log " OCP_INGRESS_TLS_SECRET_NAME=$OCP_INGRESS_TLS_SECRET_NAME"
 log " SSH_PUB_KEY: $SSH_PUB_KEY"
 ## Download files from S3 bucket
 # Download MAS license
@@ -267,12 +269,14 @@ if [[ (-z $UDS_API_KEY) || (-z $UDS_ENDPOINT_URL) || (-z $UDS_PUB_CERT_URL) ]]; 
   # Deploy UDS
   log "==== UDS deployment started ===="
   # uds and gencfg_uds are combined in common uds role
+  export OCP_INGRESS_TLS_SECRET_NAME=$OCP_INGRESS_TLS_SECRET_NAME
   export ROLE_NAME=uds && ansible-playbook ibm.mas_devops.run_role
   log "==== UDS deployment completed ===="
 
 else
   log "=== Using Existing UDS Deployment ==="
   # works when UDS_ENDPOINT_URL is set, handled in same uds role
+  export OCP_INGRESS_TLS_SECRET_NAME=$OCP_INGRESS_TLS_SECRET_NAME
   export ROLE_NAME=uds && ansible-playbook ibm.mas_devops.run_role
   log "=== Generated UDS Config YAML ==="
 fi
