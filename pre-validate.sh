@@ -89,7 +89,7 @@ if [[ $DEPLOY_MANAGE == "true" ]]; then
          fi
     fi
 fi
-
+fi
 #mongo pre-validation only for AWS currently.
 if [[ $CLUSTER_TYPE == "aws" ]]; then
     log "=== pre-validate-mongo.sh started ==="
