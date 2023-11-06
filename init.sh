@@ -416,7 +416,7 @@ if [[ $PRE_VALIDATION == "pass" ]]; then
   chmod 600 $OPENSHIFT_PULL_SECRET_FILE_PATH
 
   ## Installing the collection depending on ENV_TYPE
-  if [[ ($CLUSTER_TYPE == "aws") ]; then
+  if [[ ($CLUSTER_TYPE == "aws") ]]; then
     if [[ $ENV_TYPE == "dev" ]]; then
       log "=== Building and Installing Ansible Collection Locally ==="
       cd $GIT_REPO_HOME/../ibm/mas_devops

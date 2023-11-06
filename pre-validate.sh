@@ -56,7 +56,8 @@ fi
 # JDBC CFT inputs validation and connection test
 if [[ $DEPLOY_MANAGE == "true" ]]; then
     if [[ (-z $MAS_JDBC_USER) && (-z $MAS_JDBC_PASSWORD) && (-z $MAS_JDBC_URL) && (-z $MAS_JDBC_CERT_URL) ]]; then
-
+     log "=== ERROR :DB values are not entered  ==="
+      SCRIPT_STATUS=14
     else
         if [ -z "$MAS_JDBC_USER" ]; then
             log "ERROR: Database username is not specified"

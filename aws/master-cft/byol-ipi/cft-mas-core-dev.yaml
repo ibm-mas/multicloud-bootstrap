@@ -279,7 +279,7 @@ Mappings:
     eu-west-3:
       HVM64: ami-xxxxxxxxxxxxxxxxx
     eu-central-1:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
+      HVM64: ami-0263c75330542ced8
     ap-northeast-1:
       HVM64: ami-xxxxxxxxxxxxxxxxx
     ap-northeast-2:
@@ -632,7 +632,7 @@ Resources:
             - 'git clone https://github.com/ibm-mas/ansible-devops.git;'
             - cd ansible-devops;
             - rm -rf multicloud-bootstrap 1>/dev/null 2>&1;
-            - 'git clone Govcloud https://github.com/ibm-mas/multicloud-bootstrap.git;'
+            - 'git clone -b Govcloud https://github.com/ibm-mas/multicloud-bootstrap.git;'
             - cd multicloud-bootstrap;
             - 'find . -type f -name "*.sh" -exec chmod +x {} \;;'
             - ./init.sh "aws" "
