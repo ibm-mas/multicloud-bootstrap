@@ -223,5 +223,4 @@ if [[ -n $ExistingVPCId ]]; then
         SCRIPT_STATUS=27
     fi
 fi
-
 exit $SCRIPT_STATUS
