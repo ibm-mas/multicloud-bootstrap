@@ -139,20 +139,20 @@ Parameters:
       - Non-production
   MongoDeploymentMode:
     Description: >-
-      A new mongo instance will be created on selection of 'Provision a new mongo instance'.
-      To use an existing mongo instance, select 'Use an existing mongo instance' option
+      A new Amazon DocumentDB instance will be created on selection of 'Provision a new Amazon DocumentDB instance'.
+      To use an existing mongoDB / Amazon DocumentDB instance, select 'Use an existing Amazon DocumentDB /mongoDB instance' option
     Type: String
-    Default: "Provision a new mongo instance"
+    Default: "Provision a new Amazon DocumentDB instance"
     MinLength: '1'
     AllowedValues:
-      - "Provision a new mongo instance"
-      - "Use an existing mongo instance"
+      - "Provision a new Amazon DocumentDB instance"
+      - "Use an existing mongoDB instance"
   MongoDBProvider:
     Description: >-
       Select the desired MongoDB provider.
-      Note: When selecting MongoDBProvider as MongoDB and MongoDeploymentMode as 'Provision a new mongo instance', a new "MongoDB Community Edition" instance will be provisioned
+      Note: Use mongoDB as MongoDBProvider only if existing mongoDB instance exists
     Type: String
-    Default: "MongoDB"
+    Default: "Amazon DocumentDB"
     MinLength: '1'
     AllowedValues:
       - "MongoDB"
