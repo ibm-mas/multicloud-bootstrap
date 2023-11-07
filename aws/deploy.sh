@@ -401,10 +401,9 @@ else
     aws ec2 create-tags --resources $SUBNET_ID2  --tags Key=Name,Value=docdb-${RANDOM_STR}
     aws ec2 create-tags --resources $SUBNET_ID3  --tags Key=Name,Value=docdb-${RANDOM_STR}
     log "==== DocumentDB deployment started ==== @VPC_ID=${VPC_ID} ==== DOCDB_CLUSTER_NAME = ${DOCDB_CLUSTER_NAME}"
-     # Create only for DocumentDB
-    export ROLE_NAME=mongodb && ansible-playbook ibm.mas_devops.run_role
-      fi
 
+      fi
+    export ROLE_NAME=mongodb && ansible-playbook ibm.mas_devops.run_role
   if [[ $MONGO_FLAVOR == "Amazon DocumentDB" && $MONGO_USE_EXISTING_INSTANCE == "false" ]]; then
     #Renaming subnet name tag to its original value, required in the create instance flow
     if [[ (-n $SUBNET_ID1) && (-n $SUBNET_ID2) && (-n $SUBNET_ID3) && (-n $TAG_NAME1) && (-n $TAG_NAME2) && (-n $TAG_NAME3) ]]; then
