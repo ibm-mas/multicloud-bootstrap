@@ -275,7 +275,7 @@ if [[ -n $EXISTING_NETWORK ]]; then
   export VPC_ID="${EXISTING_NETWORK}" #upi
 fi
 if [[ -z $AWS_VPC_ID && -z $EXISTING_NETWORK  && -n $BOOTNODE_VPC_ID ]]; then
-  export VPC_ID="${BOOTNODE_VPC_ID}" #existing ocp #new VPCID
+  export VPC_ID="${BOOTNODE_VPC_ID}" #existing ocp
 fi
 if [[ -z $VPC_ID && $MONGO_FLAVOR == "Amazon DocumentDB" ]]; then
   log "Failed to get the vpc id required to deploy documentdb"
@@ -283,26 +283,8 @@ if [[ -z $VPC_ID && $MONGO_FLAVOR == "Amazon DocumentDB" ]]; then
 fi
 export AWS_REGION=$DEPLOY_REGION
 
-if [[ -n $DBProvisionedVPCId ]]; then
-cd $GIT_REPO_HOME
-log "==== aws/deploy.sh : Invoke db-create-vpc-peer.sh starts ===="
-    log "Existing instance of db @ VPC_ID=$DBProvisionedVPCId"
-    export ACCEPTER_VPC_ID=${DBProvisionedVPCId}
-
-    #If VPC ID of existing OCP cluster is inputted then assign REQUESTER_VPC_ID to it.
-    if [[ -n $ExocpProvisionedVPCId ]]; then
-    export REQUESTER_VPC_ID=${ExocpProvisionedVPCId}
-    else
-    export REQUESTER_VPC_ID=${VPC_ID}
-    fi
-    sh $GIT_REPO_HOME/aws/db/db-create-vpc-peer.sh
-    log "==== aws/deploy.sh : Invoke db-create-vpc-peer.sh ends ===="
-fi
-
-
 log "==== MONGO_USE_EXISTING_INSTANCE = ${MONGO_USE_EXISTING_INSTANCE}"
 if [[ $MONGO_USE_EXISTING_INSTANCE == "true" ]]; then
-  //required
   if [[ $MONGO_FLAVOR == "Amazon DocumentDB" ]]; then
     export MONGODB_PROVIDER="aws"
     # setting to false, used be sls role
@@ -315,8 +297,6 @@ if [[ $MONGO_USE_EXISTING_INSTANCE == "true" ]]; then
     sh $GIT_REPO_HOME/mongo/docdb/docdb-create-vpc-peer.sh
     log "==== aws/deploy.sh : Invoke docdb-create-vpc-peer.sh ends ===="
   fi
-  //end required
-  //required - existing mongo
   export MONGODB_ADMIN_USERNAME="${MONGO_ADMIN_USERNAME}"
   export MONGODB_ADMIN_PASSWORD="${MONGO_ADMIN_PASSWORD}"
   export MONGODB_HOSTS="${MONGO_HOSTS}"
@@ -327,7 +307,7 @@ if [[ $MONGO_USE_EXISTING_INSTANCE == "true" ]]; then
   export ROLE_NAME=gencfg_mongo && ansible-playbook ibm.mas_devops.run_role
   log "==== Existing MongoDB gencfg_mongo completed ===="
 else
-  ## Deploy MongoDB started - New
+  ## Deploy MongoDB started
   log "==== MongoDB deployment started ==== MONGO_FLAVOR=$MONGO_FLAVOR"
   if [[ $MONGO_FLAVOR == "Amazon DocumentDB" ]]; then
     log "Provision new instance of Amazon Document DB @ VPC_ID=$VPC_ID"
@@ -352,6 +332,7 @@ else
     export DOCDB_INGRESS_CIDR="${VPC_CIDR_BLOCK}"
     export DOCDB_EGRESS_CIDR="${VPC_CIDR_BLOCK}"
     log "DOCDB_CIDR_AZ1=${DOCDB_CIDR_AZ1}  DOCDB_CIDR_AZ2=${DOCDB_CIDR_AZ2} DOCDB_CIDR_AZ3=${DOCDB_CIDR_AZ3} VPC_CIDR_BLOCK=$VPC_CIDR_BLOCK"
+
 
     SUBNET_1=`aws ec2 describe-subnets --filters \
 	  "Name=cidr,Values=$DOCDB_CIDR_AZ1" \
@@ -401,9 +382,8 @@ else
     aws ec2 create-tags --resources $SUBNET_ID2  --tags Key=Name,Value=docdb-${RANDOM_STR}
     aws ec2 create-tags --resources $SUBNET_ID3  --tags Key=Name,Value=docdb-${RANDOM_STR}
     log "==== DocumentDB deployment started ==== @VPC_ID=${VPC_ID} ==== DOCDB_CLUSTER_NAME = ${DOCDB_CLUSTER_NAME}"
-
-      fi
-    export ROLE_NAME=mongodb && ansible-playbook ibm.mas_devops.run_role
+  fi
+  export ROLE_NAME=mongodb && ansible-playbook ibm.mas_devops.run_role
   if [[ $MONGO_FLAVOR == "Amazon DocumentDB" && $MONGO_USE_EXISTING_INSTANCE == "false" ]]; then
     #Renaming subnet name tag to its original value, required in the create instance flow
     if [[ (-n $SUBNET_ID1) && (-n $SUBNET_ID2) && (-n $SUBNET_ID3) && (-n $TAG_NAME1) && (-n $TAG_NAME2) && (-n $TAG_NAME3) ]]; then
