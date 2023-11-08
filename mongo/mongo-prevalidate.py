@@ -14,7 +14,7 @@ print(f'CONNECTION_STRING {CONNECTION_STRING}')
 client = pymongo.MongoClient(CONNECTION_STRING)
 
 if client :
-    print("Connection to mongodb success !")
+    print("Connection to mongodb success ... connect!")
 else:
     print("Connection to mongodb failed !")    
     os._exit(38)
