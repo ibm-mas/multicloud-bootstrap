@@ -144,7 +144,7 @@ variable "public_ssh_key" {
 
 variable "enable_fips" {
   type    = bool
-  default = false
+  default = true
 }
 
 variable "openshift_username" {
