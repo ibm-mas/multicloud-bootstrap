@@ -221,7 +221,6 @@ Parameters:
       - "Yes"
 Conditions:
   MongoUseExistingInstanceCondition: !Equals [!Ref MongoDeploymentMode, "Use an existing mongo instance"]
-
 Metadata:
   'AWS::CloudFormation::Interface':
     ParameterGroups:
