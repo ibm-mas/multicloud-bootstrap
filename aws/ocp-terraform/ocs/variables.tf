@@ -95,6 +95,9 @@ variable "aws_amis" {
     },
     "ap-southeast-3": {
         "hvm": "ami-0ced3df877f5a3530"
+    },
+    "us-gov-west-1": {
+        "hvm": "ami-0b48cc1fb917c23e6"
     }
   }
 }
