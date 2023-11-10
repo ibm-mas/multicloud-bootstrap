@@ -103,7 +103,7 @@ if [[ $CLUSTER_TYPE == "aws" ]]; then
 
     if [[ $MONGO_FLAVOR == "Amazon DocumentDB" && $MONGO_USE_EXISTING_INSTANCE == "false" ]]; then
         # check if the deploy region supports Amazon DocumentDB
-        DOCDB_SUPPORTED_REGIONS="ap-northeast-1;ap-northeast-2;ap-south-1;ap-southeast-1;ap-southeast-2;ca-central-1;eu-central-1;eu-south-1;eu-west-1;eu-west-2;eu-west-3;sa-east-1;us-east-1;us-east-2;us-gov-west-1;us-west-2"
+        DOCDB_SUPPORTED_REGIONS="ap-northeast-1;ap-northeast-2;ap-east-1;ap-south-1;ap-southeast-1;ap-southeast-2;ca-central-1;eu-central-1;eu-south-1;eu-west-1;eu-west-2;eu-west-3;sa-east-1;us-east-1;us-east-2;us-gov-west-1;us-west-2"
         if [[ ${DOCDB_SUPPORTED_REGIONS} =~ $DEPLOY_REGION ]]; then
             log "Amazon DocumentDB is supported in current deploy region $DEPLOY_REGION "
         else
