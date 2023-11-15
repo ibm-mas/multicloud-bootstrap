@@ -25,7 +25,6 @@ else
 fi
 
 # Check if ER key is valid
-log "ER key verification = $SLS_ENTITLEMENT_KEY"
 skopeo inspect --creds "cp:$SLS_ENTITLEMENT_KEY" docker://$MAS_IMAGE_TEST_DOWNLOAD >/dev/null
 if [ $? -eq 0 ]; then
     log "ER key verification = PASS"
