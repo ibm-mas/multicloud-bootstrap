@@ -16,3 +16,36 @@ resource "azurerm_storage_account" "allnodes" {
     azurerm_resource_group.cpdrg,
   ]
 }
+
+resource "azurerm_template_deployment" "pid" {
+  name                = "atrribute_tracking"
+  resource_group_name = var.resource-group
+  depends_on = [
+    azurerm_resource_group.cpdrg,
+  ]
+  template_body   = <<DEPLOY
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {},
+    "variables": {},
+    "resources": [
+        {
+            "apiVersion": "2019-05-01",
+            "name": "pid-5a1e8d63-79c9-418d-b3af-b2a21a557aac",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "resources": [
+                    ]
+                }
+            }
+        }
+    ]
+}
+DEPLOY
+  deployment_mode = "Incremental"
+}
