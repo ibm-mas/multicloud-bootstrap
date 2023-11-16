@@ -16,6 +16,11 @@ Parameters:
       Select the public hosted zone that you created in the AWS Route 53
       service, for example: mas4aws.myorg.com
     Type: 'AWS::Route53::HostedZone::Id'
+  BootNodeVPCId:
+    Description: >-
+      Select the public hosted zone that you created in the AWS Route 53
+      service, for example: mas4aws.myorg.com
+    Type: 'AWS::Route53::HostedZone::Id'
   BootnodeSGIngressCidrIp:
     Description: >-
       Use CIDR notation to enter the IP addresses that can access the bootnode.
@@ -148,48 +153,29 @@ Parameters:
     AllowedValues:
       - Production
       - Non-production
-  MongoDeploymentMode:
-    Description: >-
-          Bring your own MongoDB instance
-    Type: String
-    Default: "Use an existing mongoDB instance"
-    MinLength: '1'
-    AllowedValues:
-      - "Use an existing mongoDB instance"
-  MongoDBProvider:
-    Description: >-
-      Select the desired MongoDB provider.
-      Note: Use mongoDB as MongoDBProvider only if existing mongoDB instance exists
-    Type: String
-    Default: "MongoDB"
-    MinLength: '1'
-    AllowedValues:
-      - "MongoDB"
   MongoAdminUsername:
     Description: >-
       Enter the Mongo Admin Username.
     Type: String
+    MinLength: '1'
   MongoAdminPassword:
     Description: >-
       Enter the Mongo Admin Password.
     Type: String
+    MinLength: '1'
     NoEcho: true
   MongoHosts:
     Description: >-
       Enter the Mongo Hosts. eg., docdb-nonwqp-1.abc.ca-central-1.docdb.amazonaws.com:27017,docdb-nonwqp-2.def.ca-central-1.docdb.amazonaws.com:27017
     Type: String
+    MinLength: '1'
   MongoCAPemFile:
     Description: >-
       Enter the S3 bucket URL where MongoCAPemFile was uploaded.
-    Type: String
-  DocumentDBProvisionedVPCId:
-    Description: >-
-      Enter the VPC ID where existing Amazon DocumentDB was provisioned.
-      Leave this field blank, if MongoDBProvider was selected as "MongoDB".
-      Make sure this VPC ID resides in the current deployment region and does not have matching or overlapping IPv4 CIDR blocks 10.0.0.0/16.
+    MinLength: '1'
     Type: String
 Conditions:
-  MongoUseExistingInstanceCondition: !Equals [!Ref MongoDeploymentMode, "Use an existing mongoDB instance"]
+  MongoUseExistingInstanceCondition: "true"
 Metadata:
   'AWS::CloudFormation::Interface':
     ParameterGroups:
@@ -227,20 +213,13 @@ Metadata:
           - DBProvisionedVPCId
           - ImportDemoData
       - Label:
-          default: MongoDB Configuration
-        Parameters:
-          - MongoDeploymentMode
-          - MongoDBProvider
-      - Label:
           default: >-
-            Existing MongoDB / DocumentDB configuration details
-            (complete this section only if MongoDeploymentMode was selected as 'Use an existing mongo instance')
+            Bring your own Existing MongoDB configuration
         Parameters:
           - MongoAdminUsername
           - MongoAdminPassword
           - MongoHosts
           - MongoCAPemFile
-          - DocumentDBProvisionedVPCId
       - Label:
           default: >-
             Existing Suite License Service connection details (leave this
@@ -303,6 +282,10 @@ Mappings:
       HVM64: ami-xxxxxxxxxxxxxxxxx
     me-central-1:
       HVM64: ami-xxxxxxxxxxxxxxxxx
+    us-gov-west-1:
+      HVM64: ami-05201cd6d66dbe356
+    us-gov-east-1:
+        HVM64: ami-06673962ba8da6901
 Resources:
   DeployWaitConditionHandle:
     Type: 'AWS::CloudFormation::WaitConditionHandle'
@@ -629,7 +612,7 @@ Resources:
             - 'git clone https://github.com/ibm-mas/ansible-devops.git;'
             - cd ansible-devops;
             - rm -rf multicloud-bootstrap 1>/dev/null 2>&1;
-            - 'git clone -b Govcloud https://github.com/ibm-mas/multicloud-bootstrap.git;'
+            - 'git clone -b govcloud-existingmongo https://github.com/ibm-mas/multicloud-bootstrap.git;'
             - cd multicloud-bootstrap;
             - 'find . -type f -name "*.sh" -exec chmod +x {} \;;'
             - ./init.sh "aws" "
@@ -688,7 +671,7 @@ Resources:
             - ''' '''
             - !If [MongoUseExistingInstanceCondition, "true", "false"]
             - ''' '''
-            - !Ref MongoDBProvider
+            - '"MongoDB"'
             - ''' '''
             - !If [MongoUseExistingInstanceCondition, !Ref MongoAdminUsername, ""]
             - ''' '''
@@ -698,7 +681,7 @@ Resources:
             - ''' '''
             - !If [MongoUseExistingInstanceCondition, !Ref MongoCAPemFile, ""]
             - ''' '''
-            - !If [MongoUseExistingInstanceCondition, !Ref DocumentDBProvisionedVPCId, ""]
+            - '" "'
             - ''' '''' '''
             - !Ref DBProvisionedVPCId
             - ''' '''' '''

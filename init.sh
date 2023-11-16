@@ -128,7 +128,7 @@ if [[ (-z $CLUSTER_TYPE) || (-z $DEPLOY_REGION) || (-z $RANDOM_STR) || (-z $CLUS
 fi
 
 if [[ $OFFERING_TYPE == "MAS Core + Cloud Pak for Data" ]]; then
-  export DEPLOY_CP4D="true"
+  export DEPLOY_CP4D="false"
   export DEPLOY_MANAGE="false"
 elif [[ $OFFERING_TYPE == "MAS Core + Manage (no Cloud Pak for Data)" ]]; then
   export DEPLOY_CP4D="false"
