@@ -127,7 +127,7 @@ if [[ (-z $CLUSTER_TYPE) || (-z $DEPLOY_REGION) || (-z $RANDOM_STR) || (-z $CLUS
   PRE_VALIDATION=fail
 fi
 
-if [[ $OFFERING_TYPE == "MAS Core + Cloud Pak for Data" ]]; then
+if [[ $OFFERING_TYPE == "MAS Core Only" ]]; then
   export DEPLOY_CP4D="false"
   export DEPLOY_MANAGE="false"
 elif [[ $OFFERING_TYPE == "MAS Core + Manage (no Cloud Pak for Data)" ]]; then
@@ -195,8 +195,10 @@ export CPD_VERSION=cpd40
 export CPD_PRODUCT_VERSION=4.6.3
 export MAS_CHANNEL=8.11.x
 export MAS_CATALOG_VERSION=v8-231004-amd64
+export MONGO_FLAVOR="MongoDB"
 if [[ $CLUSTER_TYPE == "aws" ]]; then
   export CPD_PRIMARY_STORAGE_CLASS="ocs-storagecluster-cephfs"
+
 fi
 # DB2WH variables
 export CPD_OPERATORS_NAMESPACE="ibm-cpd-operators-${RANDOM_STR}"
