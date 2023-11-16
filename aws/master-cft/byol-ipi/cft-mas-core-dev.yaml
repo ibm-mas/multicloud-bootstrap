@@ -150,24 +150,21 @@ Parameters:
       - Non-production
   MongoDeploymentMode:
     Description: >-
-      A new Amazon DocumentDB instance will be created on selection of 'Provision a new Amazon DocumentDB instance'.
-      To use an existing mongoDB / Amazon DocumentDB instance, select 'Use an existing Amazon DocumentDB /mongoDB instance' option
+          Bring your own MongoDB instance
     Type: String
-    Default: "Provision a new Amazon DocumentDB instance"
+    Default: "Use an existing mongoDB instance"
     MinLength: '1'
     AllowedValues:
-      - "Provision a new Amazon DocumentDB instance"
       - "Use an existing mongoDB instance"
   MongoDBProvider:
     Description: >-
       Select the desired MongoDB provider.
       Note: Use mongoDB as MongoDBProvider only if existing mongoDB instance exists
     Type: String
-    Default: "Amazon DocumentDB"
+    Default: "MongoDB"
     MinLength: '1'
     AllowedValues:
       - "MongoDB"
-      - "Amazon DocumentDB"
   MongoAdminUsername:
     Description: >-
       Enter the Mongo Admin Username.
@@ -192,7 +189,7 @@ Parameters:
       Make sure this VPC ID resides in the current deployment region and does not have matching or overlapping IPv4 CIDR blocks 10.0.0.0/16.
     Type: String
 Conditions:
-  MongoUseExistingInstanceCondition: !Equals [!Ref MongoDeploymentMode, "Use an existing mongo instance"]
+  MongoUseExistingInstanceCondition: !Equals [!Ref MongoDeploymentMode, "Use an existing mongoDB instance"]
 Metadata:
   'AWS::CloudFormation::Interface':
     ParameterGroups:
@@ -287,7 +284,7 @@ Mappings:
     ap-northeast-3:
       HVM64: ami-xxxxxxxxxxxxxxxxx
     ap-south-1:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
+      HVM64: ami-0d377f44a2aaea172
     ap-southeast-1:
       HVM64: ami-xxxxxxxxxxxxxxxxx
     ap-southeast-2:

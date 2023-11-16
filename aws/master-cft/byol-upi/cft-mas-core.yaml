@@ -190,24 +190,21 @@ Parameters:
       - Non-production
   MongoDeploymentMode:
     Description: >-
-      A new Amazon DocumentDB instance will be created on selection of 'Provision a new Amazon DocumentDB instance'.
-      To use an existing mongoDB / Amazon DocumentDB instance, select 'Use an existing Amazon DocumentDB /mongoDB instance' option
+          Bring your own MongoDB instance
     Type: String
-    Default: "Provision a new Amazon DocumentDB instance"
+    Default: "Use an existing mongoDB instance"
     MinLength: '1'
     AllowedValues:
-      - "Provision a new Amazon DocumentDB instance"
       - "Use an existing mongoDB instance"
   MongoDBProvider:
     Description: >-
       Select the desired MongoDB provider.
       Note: Use mongoDB as MongoDBProvider only if existing mongoDB instance exists
     Type: String
-    Default: "Amazon DocumentDB"
+    Default: "MongoDB"
     MinLength: '1'
     AllowedValues:
       - "MongoDB"
-      - "Amazon DocumentDB"
   MongoAdminUsername:
     Description: >-
       Enter the Mongo Admin Username.
