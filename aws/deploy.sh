@@ -84,7 +84,7 @@ else
   accessdetails=$(aws iam create-access-key --user-name ${IAM_USER_NAME})
   export AWS_ACCESS_KEY_ID=$(echo $accessdetails | jq '.AccessKey.AccessKeyId' | tr -d "\"")
   export AWS_SECRET_ACCESS_KEY=$(echo $accessdetails | jq '.AccessKey.SecretAccessKey' | tr -d "\"")
-  log " AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID"
+  #log " AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID"
   # on successful user and policy creation, create a file /tmp/iam-user-created
   echo "COMPLETE" > /tmp/iam-user-created
   chmod a+rw /tmp/iam-user-created
@@ -432,7 +432,7 @@ if [[ (-z $SLS_URL) || (-z $SLS_REGISTRATION_KEY) || (-z $SLS_PUB_CERT_URL) ]]; 
       accessdetails=$(aws iam create-access-key --user-name ${IAM_USER_NAME_ROSA})
       AWS_ACCESS_KEY_ID_ROSA=$(echo $accessdetails | jq '.AccessKey.AccessKeyId' | tr -d "\"")
       AWS_SECRET_ACCESS_KEY_ROSA=$(echo $accessdetails | jq '.AccessKey.SecretAccessKey' | tr -d "\"")
-      log " AWS_ACCESS_KEY_ID_ROSA: $AWS_ACCESS_KEY_ID_ROSA"
+      #log " AWS_ACCESS_KEY_ID_ROSA: $AWS_ACCESS_KEY_ID_ROSA"
       # Put some delay for IAM permissions to be applied in the backend
       sleep 60
       oc create secret generic "$SLS_INSTANCE_NAME"-aws-access --from-literal=aws_access_key_id="$AWS_ACCESS_KEY_ID_ROSA" --from-literal=aws_secret_access_key="$AWS_SECRET_ACCESS_KEY_ROSA" -n "$SLS_NAMESPACE"

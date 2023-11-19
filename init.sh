@@ -504,6 +504,16 @@ fi
 # Delete temporary password files
 rm -rf /tmp/*password*
 
+cd $GIT_REPO_HOME
+sed -i -e "/"kubeadmin"/d" mas-provisioning.log
+sed -i -e "/pullSecret:/d" mas-provisioning.log
+sed -i -e "/sshKey:/d" mas-provisioning.log
+
+
+
+
+
+
 # Upload log file to object store
 if [[ $CLUSTER_TYPE == "aws" ]]; then
   # Upload the log file to s3
