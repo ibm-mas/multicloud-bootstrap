@@ -29,7 +29,7 @@ else
     if [ $? -ne 0 ]; then
         SCRIPT_STATUS=36
     fi
-    log "mongo/docdb/docdb-create-iam-user.sh: .......... AWS_ACCESS_KEY_ID:DEPLOY_REGION $AWS_ACCESS_KEY_ID : $DEPLOY_REGION"
+    log "mongo/docdb/docdb-create-iam-user.sh: .......... AWS_ACCESS_KEY_ID:DEPLOY_REGION : $DEPLOY_REGION"
     # on successful completion of docdb-create-iam-user.sh, create a file 
     echo "COMPLETE" > /tmp/iam-user-created
     chmod a+rw /tmp/iam-user-created
