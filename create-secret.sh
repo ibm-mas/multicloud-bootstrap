@@ -55,6 +55,15 @@ masworkspaceurl=$MAS_URL_WORKSPACE_NEW
 masusername=$MAS_USER
 maspassword=$MAS_PASSWORD
 EOT
+elif [[ $SECRET_TYPE == "kubeadmin" ]]; then
+  get_mas_creds $RANDOM_STR
+  cat <<EOT >> $SECRETFILE
+uniquestring=$RANDOM_STR
+ocpclusterurl=$OPENSHIFT_CLUSTER_CONSOLE_URL_NEW
+ocpapiurl=$OPENSHIFT_CLUSTER_API_URL_NEW
+ocpusername="kubeadmin"
+ocppassword=$KUBEADMIN_PASSWORD
+EOT
 else
   log "Unsupported parameter passed"
   exit 1

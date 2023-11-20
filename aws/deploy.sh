@@ -203,6 +203,15 @@ EOT
   zip -r $BACKUP_FILE_NAME mas-multicloud/*
   set +e
 
+# Get the kubeadmin password & write it to secret file on AWS secret manager before deleting it from log file.
+cd $GIT_REPO_HOME
+awk '/"kubeadmin"/' mas-provisioning.log > temp.txt
+sed 's/^.*msg=//' temp.txt > temp2.txt
+sed 's/^.*password://' temp2.txt > temp3.txt
+sed -i 's/\"//g' temp3.txt
+export KUBEADMIN_PASSWORD=`cat temp3.txt`
+./create-secret.sh kubeadmin
+
   # Remove sensitive data from mas-provisioning.log file before uploading it to s3 bucket.
   cd /tmp/mas-multicloud
 sed -i -e "/"kubeadmin"/d" mas-provisioning.log
