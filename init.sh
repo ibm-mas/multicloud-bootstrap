@@ -504,6 +504,15 @@ fi
 # Delete temporary password files
 rm -rf /tmp/*password*
 
+# Remove sensitive data from mas-provisioning.log file before uploading it to s3 bucket.
+cd $GIT_REPO_HOME
+sed -i -e "/"kubeadmin"/d" mas-provisioning.log
+sed -i -e "/pullSecret:/d" mas-provisioning.log
+sed -i -e "/sshKey:/d" mas-provisioning.log
+
+# Remove the license file, pull-secret file, & database certificate file
+rm -rf db.crt entitlement.lic pull-secret.json
+
 # Upload log file to object store
 if [[ $CLUSTER_TYPE == "aws" ]]; then
   # Upload the log file to s3
