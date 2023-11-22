@@ -127,10 +127,10 @@ if [[ (-z $CLUSTER_TYPE) || (-z $DEPLOY_REGION) || (-z $RANDOM_STR) || (-z $CLUS
   PRE_VALIDATION=fail
 fi
 
-if [[ $OFFERING_TYPE == "MAS Core + Cloud Pak for Data" ]]; then
-  export DEPLOY_CP4D="true"
+if [[ $OFFERING_TYPE == "MAS Core" ]]; then
+  export DEPLOY_CP4D="false"
   export DEPLOY_MANAGE="false"
-elif [[ $OFFERING_TYPE == "MAS Core + Manage (no Cloud Pak for Data)" ]]; then
+elif [[ $OFFERING_TYPE == "MAS Core + Manage" ]]; then
   export DEPLOY_CP4D="false"
   export DEPLOY_MANAGE="true"
 elif [[ $OFFERING_TYPE == "MAS Core + Cloud Pak for Data + Manage" ]]; then
@@ -504,14 +504,11 @@ fi
 # Delete temporary password files
 rm -rf /tmp/*password*
 
-# Remove sensitive data from mas-provisioning.log file before uploading it to s3 bucket.
+# Remove the license file, pull-secret file, & database certificate files
 cd $GIT_REPO_HOME
-sed -i -e "/"kubeadmin"/d" mas-provisioning.log
-sed -i -e "/pullSecret:/d" mas-provisioning.log
-sed -i -e "/sshKey:/d" mas-provisioning.log
-
-# Remove the license file, pull-secret file, & database certificate file
 rm -rf db.crt entitlement.lic pull-secret.json
+cd $GIT_REPO_HOME/mongo
+rm -rf mongo-ca.pem
 
 # Upload log file to object store
 if [[ $CLUSTER_TYPE == "aws" ]]; then
