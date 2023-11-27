@@ -158,8 +158,6 @@ Parameters:
       Enter the S3 bucket URL where MongoCAPemFile was uploaded.
     MinLength: '1'
     Type: String
-Conditions:
-  MongoUseExistingInstanceCondition: !Equals ["Use an existing mongoDB instance", "Use an existing mongoDB instance"]
 Metadata:
   'AWS::CloudFormation::Interface':
     ParameterGroups:
@@ -597,18 +595,14 @@ Resources:
             - ''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''
             - ''' '''
             - !Ref OperationalMode
+            - ''' '''' '''' '''
+            - !Ref MongoAdminUsername
             - ''' '''
-            - !If [MongoUseExistingInstanceCondition, "true", "false"]
+            - !Ref MongoAdminPassword
             - ''' '''
-            - '"MongoDB"'
+            - !Ref MongoHosts
             - ''' '''
-            - !If [MongoUseExistingInstanceCondition, !Ref MongoAdminUsername, ""]
-            - ''' '''
-            - !If [MongoUseExistingInstanceCondition, !Ref MongoAdminPassword, ""]
-            - ''' '''
-            - !If [MongoUseExistingInstanceCondition, !Ref MongoHosts, ""]
-            - ''' '''
-            - !If [MongoUseExistingInstanceCondition, !Ref MongoCAPemFile, ""]
+            - !Ref MongoCAPemFile
             - ''' '''
             - '" "'
             - ''' '''' '''

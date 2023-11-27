@@ -158,8 +158,6 @@ Parameters:
       Enter the S3 bucket URL where MongoCAPemFile was uploaded.
     MinLength: '1'
     Type: String
-Conditions:
-  MongoUseExistingInstanceCondition: !Equals ["Use an existing mongoDB instance", "Use an existing mongoDB instance"]
 Metadata:
   'AWS::CloudFormation::Interface':
     ParameterGroups:
@@ -541,7 +539,7 @@ Resources:
             - 'git clone https://github.com/ibm-mas/ansible-devops.git;'
             - cd ansible-devops;
             - rm -rf multicloud-bootstrap 1>/dev/null 2>&1;
-            - 'git clone GovCloudNov24 https://github.com/ibm-mas/multicloud-bootstrap.git;'
+            - 'git clone -b GovCloudNov24 https://github.com/ibm-mas/multicloud-bootstrap.git;'
             - cd multicloud-bootstrap;
             - 'find . -type f -name "*.sh" -exec chmod +x {} \;;'
             - ./init.sh "aws" "
@@ -597,18 +595,14 @@ Resources:
             - ''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''
             - ''' '''
             - !Ref OperationalMode
+            - ''' '''' '''' '''
+            - !Ref MongoAdminUsername
             - ''' '''
-            - !If [MongoUseExistingInstanceCondition, "true", "false"]
+            - !Ref MongoAdminPassword
             - ''' '''
-            - '"MongoDB"'
+            - !Ref MongoHosts
             - ''' '''
-            - !If [MongoUseExistingInstanceCondition, !Ref MongoAdminUsername, ""]
-            - ''' '''
-            - !If [MongoUseExistingInstanceCondition, !Ref MongoAdminPassword, ""]
-            - ''' '''
-            - !If [MongoUseExistingInstanceCondition, !Ref MongoHosts, ""]
-            - ''' '''
-            - !If [MongoUseExistingInstanceCondition, !Ref MongoCAPemFile, ""]
+            - !Ref MongoCAPemFile
             - ''' '''
             - '" "'
             - ''' '''' '''
