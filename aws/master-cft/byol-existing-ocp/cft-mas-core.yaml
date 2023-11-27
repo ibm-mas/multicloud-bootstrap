@@ -150,7 +150,7 @@ Parameters:
     NoEcho: true
   MongoHosts:
     Description: >-
-      Enter the Mongo Hosts. eg., docdb-nonwqp-1.abc.ca-central-1.docdb.amazonaws.com:27017,docdb-nonwqp-2.def.ca-central-1.docdb.amazonaws.com:27017
+      Enter the Mongo Hosts. eg., mongodb-nonwqp-1.abc.ca-central-1.mongodb.amazonaws.com:27017,mongodb-nonwqp-2.def.ca-central-1.mongodb.amazonaws.com:27017
     Type: String
     MinLength: '1'
   MongoCAPemFile:
@@ -468,7 +468,7 @@ Resources:
                   response = ec2_client.describe_vpcs()
                   for vpc_response in response['Vpcs']:
                     vpc_id = vpc_response['VpcId']
-                      default_vpc_id = vpc_id
+                    default_vpc_id = vpc_id
                   response = ec2_client.describe_subnets()
                   for subnet_response in response['Subnets']:
                     subnet_id = subnet_response['SubnetId']

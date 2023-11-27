@@ -171,13 +171,6 @@ Parameters:
     AllowedValues:
       - true
       - false
-  PrivateCluster:
-    Description: Select true to create a private OpenShift cluster
-    Default: false
-    Type: String
-    AllowedValues:
-      - true
-      - false
   OperationalMode:
     Description: >-
       Non-production installations can be used for internal development and
@@ -272,7 +265,6 @@ Metadata:
       - Label:
           default: 'Choose the OCP cluster type  & existing VPC Details '
         Parameters:
-          - PrivateCluster
           - ExistingVPCId
           - ExistingPrivateSubnet1Id
           - ExistingPrivateSubnet2Id
@@ -631,7 +623,7 @@ Resources:
             - ''' '''
             - !Ref ExistingPublicSubnet3Id
             - ''' '''
-            - !Ref PrivateCluster
+            - 'true'
             - ''' '''
             - !Ref OperationalMode
             - ''' '''' '''' '''
