@@ -137,31 +137,16 @@ Parameters:
     AllowedValues:
       - Production
       - Non-production
-  MongoDeploymentMode:
-    Description: >-
-      Existing MongoDB configuration details (Make sure your MongoDB instance is FIPS compliant)
-    Type: String
-    Default: "Use an existing mongoDB instance"
-    MinLength: '1'
-    AllowedValues:
-      - "Use an existing mongoDB instance"
-  MongoDBProvider:
-    Description: >-
-      Select the desired MongoDB provider.
-      Note: Use mongoDB as MongoDBProvider only if existing mongoDB instance exists
-    Type: String
-    Default: "MongoDB"
-    MinLength: '1'
-    AllowedValues:
-      - "MongoDB"
   MongoAdminUsername:
     Description: >-
       Enter the Mongo Admin Username.
     Type: String
+    MinLength: '1'
   MongoAdminPassword:
     Description: >-
       Enter the Mongo Admin Password.
     Type: String
+    MinLength: '1'
     NoEcho: true
   MongoHosts:
     Description: >-
@@ -217,8 +202,7 @@ Metadata:
           - ImportDemoData
       - Label:
           default: >-
-            Existing MongoDB / DocumentDB configuration details
-            (complete this section only if MongoDeploymentMode was selected as 'Use an existing mongo instance')
+            Existing MongoDB configuration details (Make sure your MongoDB instance is FIPS compliant)
         Parameters:
           - MongoAdminUsername
           - MongoAdminPassword
@@ -486,10 +470,7 @@ Resources:
                   response = ec2_client.describe_vpcs()
                   for vpc_response in response['Vpcs']:
                     vpc_id = vpc_response['VpcId']
-                    is_default = vpc_response['IsDefault']
-                    if is_default == True:
                       default_vpc_id = vpc_id
-                      break
                   response = ec2_client.describe_subnets()
                   for subnet_response in response['Subnets']:
                     subnet_id = subnet_response['SubnetId']
@@ -636,7 +617,7 @@ Resources:
             - !Ref ExocpProvisionedVPCId
             - ''' '''' '''
             - !Ref TablespaceNames
-            - ''' "dev" '
+            - ''' "prod" '
             - '2>&1 | tee mas-provisioning.log; '
       Tags:
         - Key: Name

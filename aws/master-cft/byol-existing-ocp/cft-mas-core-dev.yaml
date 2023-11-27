@@ -229,7 +229,7 @@ Mappings:
     us-gov-west-1:
         HVM64: ami-0b48cc1fb917c23e6
     us-gov-east-1:
-          HVM64: ami-09a1308a8540174f6
+        HVM64: ami-09a1308a8540174f6
 Resources:
   DeployWaitConditionHandle:
     Type: 'AWS::CloudFormation::WaitConditionHandle'
@@ -470,10 +470,7 @@ Resources:
                   response = ec2_client.describe_vpcs()
                   for vpc_response in response['Vpcs']:
                     vpc_id = vpc_response['VpcId']
-                    is_default = vpc_response['IsDefault']
-                    if is_default == True:
-                      default_vpc_id = vpc_id
-                      break
+                    default_vpc_id = vpc_id
                   response = ec2_client.describe_subnets()
                   for subnet_response in response['Subnets']:
                     subnet_id = subnet_response['SubnetId']
