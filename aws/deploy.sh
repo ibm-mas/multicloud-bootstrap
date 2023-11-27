@@ -201,6 +201,7 @@ EOT
   sed 's/^.*msg=//' temp.txt > temp2.txt
   sed 's/^.*password://' temp2.txt > temp3.txt
   sed 's/^[[:space:]]*//g' temp3.txt > temp4.txt
+  sed -i 's/\"//g' temp4.txt
 
   export KUBEADMIN_PASSWORD=`cat temp4.txt`
   ./create-secret.sh kubeadmin
