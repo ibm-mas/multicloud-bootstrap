@@ -38,13 +38,16 @@ Parameters:
       Enter the cluster's URL in the format
       https://api.<cluster_name>.<domain_name>. Do not specify the port number.
       For example,https://api.masocp.joalae.mas4aws.com
+    MinLength: '1'
     Type: String
   OpenShiftUser:
     Description: Enter the username of the existing cluster account.
+    MinLength: '1'
     Type: String
   OpenShiftPassword:
     Description: Enter the password of the existing cluster account.
     Type: String
+    MinLength: '1'
     NoEcho: true
   EntitledRegistryKey:
     Description: Enter the registry key that you downloaded from the IBM Container Library.
@@ -167,8 +170,7 @@ Metadata:
           - OfferingType
       - Label:
           default: >-
-            Existing OpenShift cluster connection details (you must complete
-            this section)
+            Existing OpenShift cluster connection details - cluster has to be FIPS enabled (you must complete this section)
         Parameters:
           - OpenShiftClusterApiUrl
           - OpenShiftUser
