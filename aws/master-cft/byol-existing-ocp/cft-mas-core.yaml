@@ -170,7 +170,7 @@ Metadata:
           - OfferingType
       - Label:
           default: >-
-            Existing OpenShift cluster connection details - cluster has to be FIPS enabled (you must complete this section)
+            Existing OpenShift cluster(FIPS enabled) (you must complete this section)
         Parameters:
           - OpenShiftClusterApiUrl
           - OpenShiftUser
