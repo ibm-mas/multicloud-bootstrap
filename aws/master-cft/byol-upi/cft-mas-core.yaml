@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Template to create Bootnode used for deploying MAS(BYoL) on existing OpenShift
+Description: Template to create Bootnode used for deploying MAS on OpenShift
 Parameters:
   OfferingType:
     Description: Select your preferred Suite offering type.
@@ -9,14 +9,45 @@ Parameters:
     AllowedValues:
       - MAS Core
       - MAS Core + Manage
-  BootNodeVPCId:
+  HostedZone:
     Description: >-
-      Enter the VPC Id to create the bootnode into. Default VPC created by AWS
-      will be used if not specified. If existing OpenShift cluster is specified,
-      make sure it is reachable from this VPC
+      Select the private hosted zone that you created in the AWS Route 53
+      service, for example: mas4aws.myorg.com
+    Type: 'AWS::Route53::HostedZone::Id'
+  ExistingVPCId:
+    Description: >-
+      Enter the existing VPC ID to create the OpenShift cluster resources into
+      (required for UPI mode deployment).
     Type: 'AWS::EC2::VPC::Id'
-  BootNodeSubnetId:
-    Description: Enter the subnet ID from the bootnode VPC to be used for the bootnode.
+  ExistingPrivateSubnet1Id:
+    Description: >-
+      Enter the private subnet1 ID from the existing VPC (required for UPI mode
+      deployment).
+    Type: 'AWS::EC2::Subnet::Id'
+  ExistingPrivateSubnet2Id:
+    Description: >-
+      Enter the private subnet2 ID from the existing VPC (required for UPI mode
+      deployment).
+    Type: 'AWS::EC2::Subnet::Id'
+  ExistingPrivateSubnet3Id:
+    Description: >-
+      Enter the private subnet3 ID from the existing VPC (required for UPI mode
+      deployment).
+    Type: 'AWS::EC2::Subnet::Id'
+  ExistingPublicSubnet1Id:
+    Description: >-
+      Enter the public subnet1 ID from the existing VPC (required for UPI mode
+      deployment).
+    Type: 'AWS::EC2::Subnet::Id'
+  ExistingPublicSubnet2Id:
+    Description: >-
+      Enter the public subnet2 ID from the existing VPC (required for UPI mode
+      deployment).
+    Type: 'AWS::EC2::Subnet::Id'
+  ExistingPublicSubnet3Id:
+    Description: >-
+      Enter the public subnet3 ID from the existing VPC (required for UPI mode
+      deployment).)
     Type: 'AWS::EC2::Subnet::Id'
   BootnodeSGIngressCidrIp:
     Description: >-
@@ -28,26 +59,37 @@ Parameters:
     MaxLength: '18'
     AllowedPattern: '(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})/(\d{1,2})'
     ConstraintDescription: must be a valid IP CIDR range of the form w.x.y.z/a.
-  ExocpProvisionedVPCId:
+  ClusterSize:
     Description: >-
-      Enter the VPC ID where your existing OCP cluster is provisioned. This is required to establish
-      VPC Peering from this VPC to the VPC of database in order to establish database connection.
+      Select your preferred cluster size. All master nodes (M) are m5.2xlarge
+      Amazon EC2 instances. All worker nodes (W) are m5.4xlarge instances.
+      Choose from: small (3M, 3W, total memory: 288GB), medium (3M, 5W, total
+      memory: 416GB), or large (5M, 7W, total memory: 608GB).
     Type: String
-  OpenShiftClusterApiUrl:
-    Description: >-
-      Enter the cluster's URL in the format
-      https://api.<cluster_name>.<domain_name>. Do not specify the port number.
-      For example,https://api.masocp.joalae.mas4aws.com
+    Default: small
+    MinLength: '1'
+    AllowedValues:
+      - small
+      - medium
+      - large
+  EBSVolumeType:
+    Description: Select your preferred EBS Volume type for worker nodes based on your performance requirements & cost of the volume types.
+      For more information on volume types, refer --> https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-volume-types.html
     Type: String
-  OpenShiftUser:
-    Description: Enter the username of the existing cluster account.
-    Type: String
-  OpenShiftPassword:
-    Description: Enter the password of the existing cluster account.
-    Type: String
-    NoEcho: true
+    Default: gp3
+    MinLength: '1'
+    AllowedValues:
+      - io1
+      - gp3
   EntitledRegistryKey:
     Description: Enter the registry key that you downloaded from the IBM Container Library.
+    Type: String
+    NoEcho: true
+    MinLength: '1'
+  OpenShiftPullSecret:
+    Description: >-
+      Enter the JSON text from the pull secret file that you downloaded from the
+      Red Hat Hybrid Cloud Console.
     Type: String
     NoEcho: true
     MinLength: '1'
@@ -77,7 +119,7 @@ Parameters:
   TablespaceNames:
     Description: >-
       Enter the tablespace & indexspace names here if you are not using the default names.
-      Each name separated by a delimeter colon (:). For example in this format: <tablespace_name>:<indexspace_name>
+      Each name separated by a delimeter colon (:). For example in this format: <tablespace_name>:<indexspace_name>.
       Note: This is not applicable in case of MSSQL database.
     Type: String
   MASManageDBCertificateUrl:
@@ -105,7 +147,8 @@ Parameters:
   SLSEndpointUrl:
     Description: >-
       Enter the endpoint URL that you retrieved from the 'sls-*' OpenShift route
-      in the cluster namespace where SLS is installed. URL should not have slash (/) at the end.
+      in the cluster namespace where SLS is installed. URL should not have slash
+      (/) at the end.
     Type: String
   SLSRegistrationKey:
     Description: >-
@@ -130,7 +173,8 @@ Parameters:
       - false
   OperationalMode:
     Description: >-
-      Non-production installations can be used for internal development and testing activities only.
+      Non-production installations can be used for internal development and
+      testing activities only.
     Type: String
     Default: Production
     MinLength: '1'
@@ -141,18 +185,22 @@ Parameters:
     Description: >-
       Enter the Mongo Admin Username.
     Type: String
+    MinLength: '1'
   MongoAdminPassword:
     Description: >-
       Enter the Mongo Admin Password.
     Type: String
+    MinLength: '1'
     NoEcho: true
   MongoHosts:
     Description: >-
       Enter the Mongo Hosts. eg., mongodb-nonwqp-1.abc.ca-central-1.mongodb.amazonaws.com:27017,mongodb-nonwqp-2.def.ca-central-1.mongodb.amazonaws.com:27017
     Type: String
+    MinLength: '1'
   MongoCAPemFile:
     Description: >-
       Enter the S3 bucket URL where MongoCAPemFile was uploaded.
+    MinLength: '1'
     Type: String
 Metadata:
   'AWS::CloudFormation::Interface':
@@ -163,24 +211,22 @@ Metadata:
           - OfferingType
       - Label:
           default: >-
-            Existing OpenShift cluster connection details (you must complete
-            this section)
+            New OpenShift cluster configuration details (complete this section
+            only if you want to create a new cluster)
         Parameters:
-          - OpenShiftClusterApiUrl
-          - OpenShiftUser
-          - OpenShiftPassword
+          - HostedZone
+          - ClusterSize
+          - EBSVolumeType
       - Label:
           default: Cluster and bootnode access (you must complete this section)
         Parameters:
           - SSHKey
           - BootnodeSGIngressCidrIp
-          - BootNodeVPCId
-          - BootNodeSubnetId
-          - ExocpProvisionedVPCId
       - Label:
           default: Keys and licenses (you must complete this section)
         Parameters:
           - EntitledRegistryKey
+          - OpenShiftPullSecret
           - MASLicenseUrl
       - Label:
           default: >-
@@ -214,6 +260,16 @@ Metadata:
           default: Email notification
         Parameters:
           - EmailNotification
+      - Label:
+          default: 'Choose the OCP cluster type  & existing VPC Details '
+        Parameters:
+          - ExistingVPCId
+          - ExistingPrivateSubnet1Id
+          - ExistingPrivateSubnet2Id
+          - ExistingPrivateSubnet3Id
+          - ExistingPublicSubnet1Id
+          - ExistingPublicSubnet2Id
+          - ExistingPublicSubnet3Id
       - Label:
           default: Operational Mode
         Parameters:
@@ -265,7 +321,7 @@ Resources:
                   - !Join
                     - ':'
                     - - arn
-                      - aws
+                      - aws-us-gov
                       - iam
                       - ''
                       - !Ref 'AWS::AccountId'
@@ -273,7 +329,7 @@ Resources:
                   - !Join
                     - ':'
                     - - arn
-                      - aws
+                      - aws-us-gov
                       - iam
                       - ''
                       - !Ref 'AWS::AccountId'
@@ -281,7 +337,7 @@ Resources:
                   - !Join
                     - ':'
                     - - arn
-                      - aws
+                      - aws-us-gov
                       - s3
                       - ''
                       - ''
@@ -292,7 +348,7 @@ Resources:
                   - !Join
                     - ':'
                     - - arn
-                      - aws
+                      - aws-us-gov
                       - ses
                       - '*'
                       - !Ref 'AWS::AccountId'
@@ -300,7 +356,7 @@ Resources:
                   - !Join
                     - ':'
                     - - arn
-                      - aws
+                      - aws-us-gov
                       - ses
                       - '*'
                       - !Ref 'AWS::AccountId'
@@ -428,6 +484,14 @@ Resources:
               except Exception as e:
                   print("Exception Error : " + str(e))
                   cfnresponse.send(event, context, cfnresponse.FAILED, responseData, "CustomResourcePhysicalID")
+  CallLambdaGetHostedZoneName:
+    Type: 'Custom::CallLambdaGetHostedZoneName'
+    Properties:
+      ServiceToken: !GetAtt
+        - LambdaFunctionGetHostedZoneName
+        - Arn
+      ZoneId: !Ref HostedZone
+      Region: !Ref 'AWS::Region'
   DeploymentConfigBucket:
     Type: 'AWS::S3::Bucket'
     Properties:
@@ -444,50 +508,6 @@ Resources:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: AES256
-  LambdaFunctionGetSubnetForBootnode:
-    Type: 'AWS::Lambda::Function'
-    Properties:
-      Handler: index.lambda_handler
-      Role: !GetAtt
-        - LambdaRole
-        - Arn
-      Runtime: python3.9
-      Code:
-        ZipFile: |
-          import boto3
-          import string
-          import cfnresponse
-          def lambda_handler(event, context):
-              responseData = {}
-              try:
-                  ec2_client = boto3.client('ec2', region_name=event["ResourceProperties"]["Region"])
-                  response = ec2_client.describe_vpcs()
-                  for vpc_response in response['Vpcs']:
-                    vpc_id = vpc_response['VpcId']
-                    is_default = vpc_response['IsDefault']
-                    if is_default == True:
-                      default_vpc_id = vpc_id
-                      break
-                  response = ec2_client.describe_subnets()
-                  for subnet_response in response['Subnets']:
-                    subnet_id = subnet_response['SubnetId']
-                    subnet_vpc_id = subnet_response['VpcId']
-                    az_id = subnet_response['AvailabilityZoneId']
-                    if subnet_vpc_id == default_vpc_id:
-                      if "az1" in az_id:
-                        responseData['DefaultVPCId'] = subnet_vpc_id
-                        responseData['DefaultVPCAz1SubnetId'] = subnet_id
-                  cfnresponse.send(event, context, cfnresponse.SUCCESS, responseData, "CustomResourcePhysicalID")
-              except Exception as e:
-                  print("Exception Error : " + str(e))
-                  cfnresponse.send(event, context, cfnresponse.FAILED, responseData, "CustomResourcePhysicalID")
-  CallLambdaFunctionGetSubnetForBootnode:
-    Type: 'Custom::CallLambdaFunctionGetSubnetForBootnode'
-    Properties:
-      ServiceToken: !GetAtt
-        - LambdaFunctionGetSubnetForBootnode
-        - Arn
-      Region: !Ref 'AWS::Region'
   BootnodeSecurityGroup:
     Type: 'AWS::EC2::SecurityGroup'
     Properties:
@@ -504,7 +524,7 @@ Resources:
       SecurityGroupEgress:
         - IpProtocol: '-1'
           CidrIp: 0.0.0.0/0
-      VpcId: !Ref BootNodeVPCId
+      VpcId: !Ref ExistingVPCId
       Tags:
         - Key: Name
           Value: !Join
@@ -516,7 +536,7 @@ Resources:
   Bootnode:
     Type: 'AWS::EC2::Instance'
     Properties:
-      SubnetId: !Ref BootNodeSubnetId
+      SubnetId: !Ref ExistingPublicSubnet1Id
       ImageId: !FindInMap
         - RegionMap
         - !Ref 'AWS::Region'
@@ -538,7 +558,7 @@ Resources:
             - 'git clone https://github.com/ibm-mas/ansible-devops.git;'
             - cd ansible-devops;
             - rm -rf multicloud-bootstrap 1>/dev/null 2>&1;
-            - 'git clone nat-nov21st https://github.com/ibm-mas/multicloud-bootstrap.git;'
+            - 'git clone -b Govcloud https://github.com/ibm-mas/multicloud-bootstrap.git;'
             - cd multicloud-bootstrap;
             - 'find . -type f -name "*.sh" -exec chmod +x {} \;;'
             - ./init.sh "aws" "
@@ -548,13 +568,16 @@ Resources:
             - '" "'
             - !Ref 'AWS::AccountId'
             - '" "'
+            - !Ref ClusterSize
             - '" "'
             - !GetAtt
               - CallLambdaRandomizer
               - Lower_RandomString
             - '" "'
-            - '" "'
-            - '" "'
+            - !GetAtt
+              - CallLambdaGetHostedZoneName
+              - ZoneName
+            - '" "" "'
             - !Ref SSHKey
             - '" "'
             - !Ref DeployWaitConditionHandle
@@ -562,6 +585,7 @@ Resources:
             - !Ref EntitledRegistryKey
             - '" '
             - ''''
+            - !Ref OpenShiftPullSecret
             - ''' '''
             - !Ref MASLicenseUrl
             - ''' '''
@@ -580,18 +604,24 @@ Resources:
             - !Ref MASManageDBCertificateUrl
             - ''' '''
             - !Ref ImportDemoData
-            - ''' '''
-            - !Ref OpenShiftClusterApiUrl
-            - ''' '''
-            - !Ref OpenShiftUser
-            - ''' '''
-            - !Ref OpenShiftPassword
-            - ''' '''' '''
+            - ''' '''' '''' '''' '''' '''
             - !Ref EmailNotification
-            - ''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''
+            - ''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''
+            - !Ref ExistingVPCId
+            - ''' '''' '''
+            - !Ref ExistingPrivateSubnet1Id
             - ''' '''
-            - !Ref BootNodeVPCId
-            - ''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''
+            - !Ref ExistingPrivateSubnet2Id
+            - ''' '''
+            - !Ref ExistingPrivateSubnet3Id
+            - ''' '''
+            - !Ref ExistingPublicSubnet1Id
+            - ''' '''
+            - !Ref ExistingPublicSubnet2Id
+            - ''' '''
+            - !Ref ExistingPublicSubnet3Id
+            - ''' '''
+            - 'true'
             - ''' '''
             - !Ref OperationalMode
             - ''' '''' '''' '''
@@ -604,9 +634,9 @@ Resources:
             - !Ref MongoCAPemFile
             - ''' '''' '''' '''
             - !Ref DBProvisionedVPCId
-            - ''' '''
-            - !Ref ExocpProvisionedVPCId
             - ''' '''' '''
+            - !Ref EBSVolumeType
+            - ''' '''
             - !Ref TablespaceNames
             - ''' "prod" '
             - '2>&1 | tee mas-provisioning.log; '
@@ -634,27 +664,88 @@ Outputs:
     Value: !GetAtt
       - CallLambdaRandomizer
       - Lower_RandomString
-  MASInitialSetupUrlLogin:
+  OpenShiftConsoleUrl:
+    Description: Url to login to OpenShift console
+    Value: !Select
+      - 2
+      - !Split
+        - '#'
+        - !GetAtt
+          - DeployWaitCondition
+          - Data
+  OpenShiftApiUrl:
+    Description: Url to login to OpenShift Api
+    Value: !Select
+      - 3
+      - !Split
+        - '#'
+        - !GetAtt
+          - DeployWaitCondition
+          - Data
+  MASInitialSetupUrl:
     Description: >-
       Url to perform MAS initial setup, make sure you have imported the MAS
       public certificate into the browser
-    Value: !Select [4, !Split ["#", !GetAtt DeployWaitCondition.Data]]
+    Value: !Select
+      - 4
+      - !Split
+        - '#'
+        - !GetAtt
+          - DeployWaitCondition
+          - Data
   MASAdminUrl:
     Description: >-
       Url to login to MAS Admin UI, make sure you have imported the MAS public
       certificate into the browser
-    Value: !Select [5, !Split ["#", !GetAtt DeployWaitCondition.Data]]
+    Value: !Select
+      - 5
+      - !Split
+        - '#'
+        - !GetAtt
+          - DeployWaitCondition
+          - Data
   MASWorkspaceUrl:
     Description: >-
       Url to login to MAS Workspace, make sure you have imported the MAS public
       certificate into the browser
-    Value: !Select [0, !Split ["\"",!Select [0, !Split ["}",!Select [6, !Split ["#", !GetAtt DeployWaitCondition.Data]]]]]]
+    Value: !Select
+      - 0
+      - !Split
+        - '"'
+        - !Select
+          - 0
+          - !Split
+            - '}'
+            - !Select
+              - 6
+              - !Split
+                - '#'
+                - !GetAtt
+                  - DeployWaitCondition
+                  - Data
   DeploymentStatus:
-    Description: >-
-      Status of the deployment.
-    Value:  !Select [1, !Split ["\"", !Select [1, !Split [":", !Select [0, !Split ["#", !GetAtt DeployWaitCondition.Data]]]]]]
+    Description: Status of the deployment.
+    Value: !Select
+      - 1
+      - !Split
+        - '"'
+        - !Select
+          - 1
+          - !Split
+            - ':'
+            - !Select
+              - 0
+              - !Split
+                - '#'
+                - !GetAtt
+                  - DeployWaitCondition
+                  - Data
   DeploymentDescription:
-    Description: >-
-      Status description of the deployment.
-    Value: !Select [1, !Split ["#", !GetAtt DeployWaitCondition.Data]]
-
+    Description: Status description of the deployment.
+    Value: !Select
+      - 1
+      - !Split
+        - '#'
+        - !GetAtt
+          - DeployWaitCondition
+          - Data

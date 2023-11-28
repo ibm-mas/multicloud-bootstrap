@@ -38,13 +38,16 @@ Parameters:
       Enter the cluster's URL in the format
       https://api.<cluster_name>.<domain_name>. Do not specify the port number.
       For example,https://api.masocp.joalae.mas4aws.com
+    MinLength: '1'
     Type: String
   OpenShiftUser:
     Description: Enter the username of the existing cluster account.
+    MinLength: '1'
     Type: String
   OpenShiftPassword:
     Description: Enter the password of the existing cluster account.
     Type: String
+    MinLength: '1'
     NoEcho: true
   EntitledRegistryKey:
     Description: Enter the registry key that you downloaded from the IBM Container Library.
@@ -137,51 +140,27 @@ Parameters:
     AllowedValues:
       - Production
       - Non-production
-  MongoDeploymentMode:
-    Description: >-
-      A new Amazon DocumentDB instance will be created on selection of 'Provision a new Amazon DocumentDB instance'.
-      To use an existing mongoDB / Amazon DocumentDB instance, select 'Use an existing Amazon DocumentDB /mongoDB instance' option
-    Type: String
-    Default: "Provision a new Amazon DocumentDB instance"
-    MinLength: '1'
-    AllowedValues:
-      - "Provision a new Amazon DocumentDB instance"
-      - "Use an existing mongoDB instance"
-  MongoDBProvider:
-    Description: >-
-      Select the desired MongoDB provider.
-      Note: Use mongoDB as MongoDBProvider only if existing mongoDB instance exists
-    Type: String
-    Default: "Amazon DocumentDB"
-    MinLength: '1'
-    AllowedValues:
-      - "MongoDB"
-      - "Amazon DocumentDB"
   MongoAdminUsername:
     Description: >-
       Enter the Mongo Admin Username.
     Type: String
+    MinLength: '1'
   MongoAdminPassword:
     Description: >-
       Enter the Mongo Admin Password.
     Type: String
+    MinLength: '1'
     NoEcho: true
   MongoHosts:
     Description: >-
-      Enter the Mongo Hosts. eg., docdb-nonwqp-1.abc.ca-central-1.docdb.amazonaws.com:27017,docdb-nonwqp-2.def.ca-central-1.docdb.amazonaws.com:27017
+      Enter the Mongo Hosts. eg., mongodb-nonwqp-1.abc.ca-central-1.mongodb.amazonaws.com:27017,mongodb-nonwqp-2.def.ca-central-1.mongodb.amazonaws.com:27017
     Type: String
+    MinLength: '1'
   MongoCAPemFile:
     Description: >-
       Enter the S3 bucket URL where MongoCAPemFile was uploaded.
+    MinLength: '1'
     Type: String
-  DocumentDBProvisionedVPCId:
-    Description: >-
-      Enter the VPC ID where existing Amazon DocumentDB was provisioned.
-      Leave this field blank, if MongoDBProvider was selected as "MongoDB".
-      Make sure this VPC ID resides in the current deployment region and does not have matching or overlapping IPv4 CIDR blocks 10.0.0.0/16.
-    Type: String
-Conditions:
-  MongoUseExistingInstanceCondition: !Equals [!Ref MongoDeploymentMode, "Use an existing mongo instance"]
 Metadata:
   'AWS::CloudFormation::Interface':
     ParameterGroups:
@@ -191,8 +170,7 @@ Metadata:
           - OfferingType
       - Label:
           default: >-
-            Existing OpenShift cluster connection details (you must complete
-            this section)
+            Existing OpenShift cluster(FIPS enabled) (you must complete this section)
         Parameters:
           - OpenShiftClusterApiUrl
           - OpenShiftUser
@@ -223,20 +201,13 @@ Metadata:
           - DBProvisionedVPCId
           - ImportDemoData
       - Label:
-          default: MongoDB Configuration
-        Parameters:
-          - MongoDeploymentMode
-          - MongoDBProvider
-      - Label:
           default: >-
-            Existing MongoDB / DocumentDB configuration details
-            (complete this section only if MongoDeploymentMode was selected as 'Use an existing mongo instance')
+            Existing MongoDB configuration details (Make sure your MongoDB instance is FIPS compliant)
         Parameters:
           - MongoAdminUsername
           - MongoAdminPassword
           - MongoHosts
           - MongoCAPemFile
-          - DocumentDBProvisionedVPCId
       - Label:
           default: >-
             Existing Suite License Service connection details (leave this
@@ -255,50 +226,10 @@ Metadata:
           - OperationalMode
 Mappings:
   RegionMap:
-    us-east-1:
-      HVM64: ami-0ef2a204a69167b2e
-    us-east-2:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
-    us-west-2:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
-    ca-central-1:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
-    eu-north-1:
-      HVM64: ami-0fc7ab563232d6769
-    eu-west-1:
-      HVM64: ami-0fc349d82c682cae4
-    eu-west-2:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
-    eu-west-3:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
-    eu-central-1:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
-    ap-northeast-1:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
-    ap-northeast-2:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
-    ap-northeast-3:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
-    ap-south-1:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
-    ap-southeast-1:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
-    ap-southeast-2:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
-    sa-east-1:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
-    af-south-1:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
-    ap-east-1:
-      HVM64: ami-0a8ba8a0fde410499
-    ap-southeast-3:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
-    eu-south-1:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
-    me-south-1:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
-    me-central-1:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
+    us-gov-west-1:
+        HVM64: ami-0b48cc1fb917c23e6
+    us-gov-east-1:
+        HVM64: ami-09a1308a8540174f6
 Resources:
   DeployWaitConditionHandle:
     Type: 'AWS::CloudFormation::WaitConditionHandle'
@@ -340,7 +271,7 @@ Resources:
                   - !Join
                     - ':'
                     - - arn
-                      - aws
+                      - aws-us-gov
                       - iam
                       - ''
                       - !Ref 'AWS::AccountId'
@@ -348,7 +279,7 @@ Resources:
                   - !Join
                     - ':'
                     - - arn
-                      - aws
+                      - aws-us-gov
                       - iam
                       - ''
                       - !Ref 'AWS::AccountId'
@@ -356,7 +287,7 @@ Resources:
                   - !Join
                     - ':'
                     - - arn
-                      - aws
+                      - aws-us-gov
                       - s3
                       - ''
                       - ''
@@ -367,7 +298,7 @@ Resources:
                   - !Join
                     - ':'
                     - - arn
-                      - aws
+                      - aws-us-gov
                       - ses
                       - '*'
                       - !Ref 'AWS::AccountId'
@@ -375,7 +306,7 @@ Resources:
                   - !Join
                     - ':'
                     - - arn
-                      - aws
+                      - aws-us-gov
                       - ses
                       - '*'
                       - !Ref 'AWS::AccountId'
@@ -539,10 +470,7 @@ Resources:
                   response = ec2_client.describe_vpcs()
                   for vpc_response in response['Vpcs']:
                     vpc_id = vpc_response['VpcId']
-                    is_default = vpc_response['IsDefault']
-                    if is_default == True:
-                      default_vpc_id = vpc_id
-                      break
+                    default_vpc_id = vpc_id
                   response = ec2_client.describe_subnets()
                   for subnet_response in response['Subnets']:
                     subnet_id = subnet_response['SubnetId']
@@ -613,7 +541,7 @@ Resources:
             - 'git clone https://github.com/ibm-mas/ansible-devops.git;'
             - cd ansible-devops;
             - rm -rf multicloud-bootstrap 1>/dev/null 2>&1;
-            - 'git clone Govcloud https://github.com/ibm-mas/multicloud-bootstrap.git;'
+            - 'git clone -b Govcloud https://github.com/ibm-mas/multicloud-bootstrap.git;'
             - cd multicloud-bootstrap;
             - 'find . -type f -name "*.sh" -exec chmod +x {} \;;'
             - ./init.sh "aws" "
@@ -669,20 +597,16 @@ Resources:
             - ''' '''' '''' '''' '''' '''' '''' '''' '''' '''' '''
             - ''' '''
             - !Ref OperationalMode
+            - ''' '''' '''' '''
+            - !Ref MongoAdminUsername
             - ''' '''
-            - !If [MongoUseExistingInstanceCondition, "true", "false"]
+            - !Ref MongoAdminPassword
             - ''' '''
-            - !Ref MongoDBProvider
+            - !Ref MongoHosts
             - ''' '''
-            - !If [MongoUseExistingInstanceCondition, !Ref MongoAdminUsername, ""]
+            - !Ref MongoCAPemFile
             - ''' '''
-            - !If [MongoUseExistingInstanceCondition, !Ref MongoAdminPassword, ""]
-            - ''' '''
-            - !If [MongoUseExistingInstanceCondition, !Ref MongoHosts, ""]
-            - ''' '''
-            - !If [MongoUseExistingInstanceCondition, !Ref MongoCAPemFile, ""]
-            - ''' '''
-            - !If [MongoUseExistingInstanceCondition, !Ref DocumentDBProvisionedVPCId, ""]
+            - '" "'
             - ''' '''' '''
             - !Ref DBProvisionedVPCId
             - ''' '''
