@@ -97,10 +97,10 @@ variable "aws_amis" {
         "hvm": "ami-0ced3df877f5a3530"
     },
 	"us-gov-east-1": {
-        "hvm": "ami-09a1308a8540174f6"
+        "hvm": "ami-06c66dc527ec78588"
     },
     "us-gov-west-1": {
-        "hvm": "ami-0b48cc1fb917c23e6"
+        "hvm": "ami-006b4b58e4b6ea862"
     }
   }
 }
