@@ -4,11 +4,11 @@ Parameters:
   OfferingType:
     Description: Select your preferred Suite offering type.
     Type: String
-    Default: MAS Core + Cloud Pak for Data
+    Default: MAS Core
     MinLength: '1'
     AllowedValues:
-      - MAS Core + Cloud Pak for Data
-      - MAS Core + Manage (no Cloud Pak for Data)
+      - MAS Core
+      - MAS Core + Manage
   BootNodeVPCId:
     Description: >-
       Enter the VPC Id to create the bootnode into. Default VPC created by AWS
