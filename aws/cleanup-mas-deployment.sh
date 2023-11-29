@@ -400,10 +400,10 @@ echo "S3BUCKETS = $S3BUCKETS"
 if [[ -n $S3BUCKETS ]]; then
   echo "Found S3 buckets for this AWS stack"
   for inst in $S3BUCKETS; do
-    if [[ -n $inst ]]; then  
+    if [[ -n $inst ]]; then
       inst=$(echo $inst | tr -d '\r\n')
       aws s3 rb s3://$inst --force --region $REGION
-      echo "Deleted bucket $inst"    
+      echo "Deleted bucket $inst"
     fi
 
   done
@@ -563,7 +563,7 @@ echo "---------------------------------------------"
 
 ## Delete secret in Secrets Manager
 echo "Checking for secret"
-for secret in maximo-ocp-secret-$UNIQ_STR maximo-mas-secret-$UNIQ_STR; do
+for secret in maximo-ocp-secret-$UNIQ_STR maximo-kubeadmin-secret-$UNIQ_STR maximo-mas-secret-$UNIQ_STR; do
   SECRET=$(aws secretsmanager describe-secret --secret-id $secret --region $REGION | jq ".Name" | tr -d '"')
   echo "SECRET = $SECRET"
   if [[ -n $SECRET ]]; then

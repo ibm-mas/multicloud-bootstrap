@@ -194,28 +194,32 @@ EOT
 
   set -e
 
- # Get the kubeadmin password & write it to secret file on AWS secret manager before deleting it from log file.
+  # Get the kubeadmin password & write it to secret file on AWS secret manager before deleting it from log file.
   cd $GIT_REPO_HOME
+  set +e
   awk '/"kubeadmin"/' mas-provisioning.log > temp.txt
   sed 's/^.*msg=//' temp.txt > temp2.txt
   sed 's/^.*password://' temp2.txt > temp3.txt
-  sed -i 's/\"//g' temp3.txt
-  export KUBEADMIN_PASSWORD=`cat temp3.txt`
-  ./create-secret.sh kubeadmin
-  rm -rf temp.txt temp2.txt temp3.txt
+  sed 's/^[[:space:]]*//g' temp3.txt > temp4.txt
+  sed -i 's/\"//g' temp4.txt
 
-  # Remove sensitive data from mas-provisioning.log file before uploading it to s3 bucket.
-  sed -i -e "/"kubeadmin"/d" mas-provisioning.log
-  sed -i -e "/pullSecret:/d" mas-provisioning.log
-  sed -i -e "/sshKey:/d" mas-provisioning.log
+  export KUBEADMIN_PASSWORD=`cat temp4.txt`
+  ./create-secret.sh kubeadmin
+  rm -rf temp.txt temp2.txt temp3.txt temp4.txt
+  set -e
 
   # Backup deployment context
   rm -rf /tmp/mas-multicloud
   mkdir /tmp/mas-multicloud
   cp -r * /tmp/mas-multicloud
 
-  # Remove the license file, pull-secret file, & database certificate files
+  # Remove sensitive data from mas-provisioning.log file before uploading it to s3 bucket.
   cd /tmp/mas-multicloud
+  sed -i -e "/"kubeadmin"/d" mas-provisioning.log
+  sed -i -e "/pullSecret:/d" mas-provisioning.log
+  sed -i -e "/sshKey:/d" mas-provisioning.log
+
+  # Remove the license file, pull-secret file, & database certificate files
   rm -rf db.crt entitlement.lic pull-secret.json
   cd /tmp/mas-multicloud/mongo
   rm -rf mongo-ca.pem

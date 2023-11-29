@@ -506,8 +506,12 @@ fi
 # Delete temporary password files
 rm -rf /tmp/*password*
 
-# Remove the license file, pull-secret file, & database certificate files
 cd $GIT_REPO_HOME
+# Remove sensitive data from mas-provisioning.log file before uploading it to s3 bucket.
+  sed -i -e "/"kubeadmin"/d" mas-provisioning.log
+  sed -i -e "/pullSecret:/d" mas-provisioning.log
+  sed -i -e "/sshKey:/d" mas-provisioning.log
+# Remove the license file, pull-secret file, & database certificate files
 rm -rf db.crt entitlement.lic pull-secret.json
 cd $GIT_REPO_HOME/mongo
 rm -rf mongo-ca.pem
