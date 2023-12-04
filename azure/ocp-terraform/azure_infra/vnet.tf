@@ -38,7 +38,7 @@ resource "azurerm_subnet" "masternode" {
   name                 = var.master-subnet-name
   resource_group_name  = var.resource-group
   virtual_network_name = var.virtual-network-name
-  address_prefixes      = var.master-subnet-cidr
+  address_prefixes      = [ var.master-subnet-cidr ]
   depends_on = [
     azurerm_resource_group.cpdrg,
     azurerm_virtual_network.cpdvirtualnetwork
@@ -50,7 +50,7 @@ resource "azurerm_subnet" "workernode" {
   name                 = var.worker-subnet-name
   resource_group_name  = var.resource-group
   virtual_network_name = var.virtual-network-name
-  address_prefixes      = var.worker-subnet-cidr
+  address_prefixes      = [ var.worker-subnet-cidr ]
   depends_on = [
     azurerm_resource_group.cpdrg,
     azurerm_virtual_network.cpdvirtualnetwork
@@ -187,7 +187,7 @@ resource "azurerm_subnet_network_security_group_association" "worker" {
   name                 = "AzureBastionSubnet"
   resource_group_name  = var.resource-group
   virtual_network_name = var.virtual-network-name
-  address_prefixes    =  var.bastion_cidr
+  address_prefixes    = [ var.bastion_cidr ]
   depends_on = [
   azurerm_resource_group.cpdrg,
   azurerm_virtual_network.cpdvirtualnetwork
