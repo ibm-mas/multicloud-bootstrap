@@ -1,5 +1,5 @@
 provider "azurerm" {
-  version         = "= 2.6.0"
+  version         = "=3.21.0"
   subscription_id = var.azure-subscription-id
   client_id       = var.azure-client-id
   client_secret   = var.azure-client-secret
