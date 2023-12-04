@@ -89,8 +89,8 @@ resource "azurerm_network_security_group" "master" {
     protocol                   = "Tcp"
     source_port_range          = "*"
     destination_port_range     = "6443"
-    source_address_prefixes     = "*"
-    destination_address_prefixes= "*"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
   }
   depends_on = [
     azurerm_resource_group.cpdrg,
@@ -119,8 +119,8 @@ resource "azurerm_network_security_rule" "nfsin" {
   protocol                    = "*"
   source_port_range           = "*"
   destination_port_range      = "2049"
-  source_address_prefixes      = "*"
-  destination_address_prefixes = "*"
+  source_address_prefix       = "*"
+  destination_address_prefix  = "*"
   resource_group_name         = var.resource-group
   network_security_group_name = azurerm_network_security_group.worker[count.index].name
 }
@@ -134,8 +134,8 @@ resource "azurerm_network_security_rule" "worker-https" {
   protocol                    = "Tcp"
   source_port_range           = "*"
   destination_port_range      = "443"
-  source_address_prefixes      = "*"
-  destination_address_prefixes = "*"
+  source_address_prefix       = "*"
+  destination_address_prefix  = "*"
   resource_group_name         = var.resource-group
   network_security_group_name = azurerm_network_security_group.worker[count.index].name
 }
@@ -149,8 +149,8 @@ resource "azurerm_network_security_rule" "worker-http" {
   protocol                    = "Tcp"
   source_port_range           = "*"
   destination_port_range      = "80"
-  source_address_prefixes      = "*"
-  destination_address_prefixes = "*"
+  source_address_prefix       = "*"
+  destination_address_prefix  = "*"
   resource_group_name         = var.resource-group
   network_security_group_name = azurerm_network_security_group.worker[count.index].name
 }
