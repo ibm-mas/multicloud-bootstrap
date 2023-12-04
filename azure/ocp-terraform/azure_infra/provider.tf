@@ -1,3 +1,4 @@
+terraform {
 provider "azurerm" {
   version         = "=3.21.0"
   subscription_id = var.azure-subscription-id
@@ -11,5 +12,6 @@ provider "azurerm" {
   azurerm = {
   source  = "hashicorp/azurerm"
   version = "3.21.0"
-  }
-  }
+    }
+   }
+}
