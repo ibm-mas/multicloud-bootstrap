@@ -38,7 +38,7 @@ resource "azurerm_subnet" "masternode" {
   name                 = var.master-subnet-name
   resource_group_name  = var.resource-group
   virtual_network_name = var.virtual-network-name
-  address_prefix       = var.master-subnet-cidr
+  address_prefixes      = var.master-subnet-cidr
   depends_on = [
     azurerm_resource_group.cpdrg,
     azurerm_virtual_network.cpdvirtualnetwork
@@ -50,7 +50,7 @@ resource "azurerm_subnet" "workernode" {
   name                 = var.worker-subnet-name
   resource_group_name  = var.resource-group
   virtual_network_name = var.virtual-network-name
-  address_prefix       = var.worker-subnet-cidr
+  address_prefixes      = var.worker-subnet-cidr
   depends_on = [
     azurerm_resource_group.cpdrg,
     azurerm_virtual_network.cpdvirtualnetwork
@@ -89,8 +89,8 @@ resource "azurerm_network_security_group" "master" {
     protocol                   = "Tcp"
     source_port_range          = "*"
     destination_port_range     = "6443"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
+    source_address_prefixes     = "*"
+    destination_address_prefixes= "*"
   }
   depends_on = [
     azurerm_resource_group.cpdrg,
@@ -119,8 +119,8 @@ resource "azurerm_network_security_rule" "nfsin" {
   protocol                    = "*"
   source_port_range           = "*"
   destination_port_range      = "2049"
-  source_address_prefix       = "*"
-  destination_address_prefix  = "*"
+  source_address_prefixes      = "*"
+  destination_address_prefixes = "*"
   resource_group_name         = var.resource-group
   network_security_group_name = azurerm_network_security_group.worker[count.index].name
 }
@@ -134,8 +134,8 @@ resource "azurerm_network_security_rule" "worker-https" {
   protocol                    = "Tcp"
   source_port_range           = "*"
   destination_port_range      = "443"
-  source_address_prefix       = "*"
-  destination_address_prefix  = "*"
+  source_address_prefixes      = "*"
+  destination_address_prefixes = "*"
   resource_group_name         = var.resource-group
   network_security_group_name = azurerm_network_security_group.worker[count.index].name
 }
@@ -149,8 +149,8 @@ resource "azurerm_network_security_rule" "worker-http" {
   protocol                    = "Tcp"
   source_port_range           = "*"
   destination_port_range      = "80"
-  source_address_prefix       = "*"
-  destination_address_prefix  = "*"
+  source_address_prefixes      = "*"
+  destination_address_prefixes = "*"
   resource_group_name         = var.resource-group
   network_security_group_name = azurerm_network_security_group.worker[count.index].name
 }
@@ -187,7 +187,7 @@ resource "azurerm_subnet_network_security_group_association" "worker" {
   name                 = "AzureBastionSubnet"
   resource_group_name  = var.resource-group
   virtual_network_name = var.virtual-network-name
-  address_prefix     =  var.bastion_cidr
+  address_prefixes    =  var.bastion_cidr
   depends_on = [
   azurerm_resource_group.cpdrg,
   azurerm_virtual_network.cpdvirtualnetwork
