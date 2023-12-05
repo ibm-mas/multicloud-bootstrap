@@ -131,9 +131,7 @@ fi
 # Deploy OCP cluster and bastion host
 if [[ $OPENSHIFT_USER_PROVIDE == "false" ]]; then
   cd $GIT_REPO_HOME
-
   ## Create OCP cluster
     cd $GIT_REPO_HOME/azure
     set +e
     ./create-ocp-cluster.sh
-    retcode=$?
