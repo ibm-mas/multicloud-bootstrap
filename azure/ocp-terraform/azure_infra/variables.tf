@@ -104,20 +104,20 @@ variable "zone" {
 }
 
 variable "master-node-count" {
-  default = 1
+  default = 3
 }
 
 variable "worker-node-count" {
-  default = 1
+  default = 3
 }
 
 
 variable "master-instance-type" {
-  default = "Standard_B1s"
+  default = "Standard_D8s_v3"
 }
 
 variable "worker-instance-type" {
-  default = "Standard_B1s"
+  default = "Standard_D16s_v3"
 }
 
 variable "pull-secret-file-path" {
