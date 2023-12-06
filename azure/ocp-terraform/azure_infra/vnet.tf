@@ -22,7 +22,7 @@ resource "azurerm_resource_group" "cpdrg" {
 }
 
 resource "azurerm_virtual_network" "cpdvirtualnetwork" {
-  count               = var.new-or-existing == "new" ? 1 : 0
+  count              =  var.new-or-existing == "new" ? 1 : 0
   name                = var.virtual-network-name
   address_space       = [var.virtual-network-cidr]
   location            = var.region
@@ -34,11 +34,11 @@ resource "azurerm_virtual_network" "cpdvirtualnetwork" {
 
 
 resource "azurerm_subnet" "masternode" {
-  count                = var.new-or-existing == "new" ? 1 : 0
+  count                =  var.new-or-existing == "new" ? 1 : 0
   name                 = var.master-subnet-name
   resource_group_name  = var.resource-group
   virtual_network_name = var.virtual-network-name
-  address_prefixes      = [ var.master-subnet-cidr ]
+  address_prefixes      = [var.master-subnet-cidr]
   depends_on = [
     azurerm_resource_group.cpdrg,
     azurerm_virtual_network.cpdvirtualnetwork
@@ -50,7 +50,7 @@ resource "azurerm_subnet" "workernode" {
   name                 = var.worker-subnet-name
   resource_group_name  = var.resource-group
   virtual_network_name = var.virtual-network-name
-  address_prefixes      = [ var.worker-subnet-cidr ]
+  address_prefixes      = [var.worker-subnet-cidr]
   depends_on = [
     azurerm_resource_group.cpdrg,
     azurerm_virtual_network.cpdvirtualnetwork
@@ -75,7 +75,7 @@ resource "azurerm_network_interface" "nfs" {
 }
 
 resource "azurerm_network_security_group" "master" {
-  count               = var.new-or-existing == "new" ? 1 : 0
+  count                =   var.new-or-existing == "new" ? 1 : 0
   name                = var.master-nsg-name
   location            = var.region
   resource_group_name = var.resource-group
@@ -99,7 +99,7 @@ resource "azurerm_network_security_group" "master" {
 }
 
 resource "azurerm_network_security_group" "worker" {
-  count               = var.new-or-existing == "new" ? 1 : 0
+  count               =  var.new-or-existing == "new" ? 1 : 0
   name                = var.worker-nsg-name
   location            = var.region
   resource_group_name = var.resource-group
@@ -126,7 +126,7 @@ resource "azurerm_network_security_rule" "nfsin" {
 }
 
 resource "azurerm_network_security_rule" "worker-https" {
-  count                       = var.new-or-existing == "new" ? 1 : 0
+  count                       =  var.new-or-existing == "new" ? 1 : 0
   name                        = "https"
   priority                    = 500
   direction                   = "Inbound"
@@ -141,7 +141,7 @@ resource "azurerm_network_security_rule" "worker-https" {
 }
 
 resource "azurerm_network_security_rule" "worker-http" {
-  count                       = var.new-or-existing == "new" ? 1 : 0
+  count                       =   var.new-or-existing == "new" ? 1 : 0
   name                        = "http"
   priority                    = 501
   direction                   = "Inbound"
@@ -156,7 +156,7 @@ resource "azurerm_network_security_rule" "worker-http" {
 }
 
 resource "azurerm_subnet_network_security_group_association" "master" {
-  count                     = var.new-or-existing == "new" ? 1 : 0
+  count                     =    var.new-or-existing == "new" ? 1 : 0
   subnet_id                 = "/subscriptions/${var.azure-subscription-id}/resourceGroups/${var.resource-group}/providers/Microsoft.Network/virtualNetworks/${var.virtual-network-name}/subnets/${var.master-subnet-name}"
   network_security_group_id = "/subscriptions/${var.azure-subscription-id}/resourceGroups/${var.resource-group}/providers/Microsoft.Network/networkSecurityGroups/${azurerm_network_security_group.master[count.index].name}"
   depends_on = [
@@ -167,7 +167,7 @@ resource "azurerm_subnet_network_security_group_association" "master" {
 }
 
 resource "azurerm_subnet_network_security_group_association" "worker" {
-  count                     = var.new-or-existing == "new" ? 1 : 0
+  count                     =   var.new-or-existing == "new" ? 1 : 0
   subnet_id                 = "/subscriptions/${var.azure-subscription-id}/resourceGroups/${var.resource-group}/providers/Microsoft.Network/virtualNetworks/${var.virtual-network-name}/subnets/${var.worker-subnet-name}"
   network_security_group_id = "/subscriptions/${var.azure-subscription-id}/resourceGroups/${var.resource-group}/providers/Microsoft.Network/networkSecurityGroups/${azurerm_network_security_group.worker[count.index].name}"
   depends_on = [
@@ -183,11 +183,11 @@ resource "azurerm_subnet_network_security_group_association" "worker" {
 # Create bastion subnet in the vnet
 
   resource "azurerm_subnet" "bastion_subnet" {
-  count               = var.new-or-existing == "new" ? 1 : 0
+  count               =   var.new-or-existing == "new" ? 1 : 0
   name                 = "AzureBastionSubnet"
   resource_group_name  = var.resource-group
   virtual_network_name = var.virtual-network-name
-  address_prefixes    = [ var.bastion_cidr ]
+  address_prefixes    = [var.bastion_cidr]
   depends_on = [
   azurerm_resource_group.cpdrg,
   azurerm_virtual_network.cpdvirtualnetwork
@@ -196,7 +196,7 @@ resource "azurerm_subnet_network_security_group_association" "worker" {
 
 #Create public IP
   resource "azurerm_public_ip" "bastion_ip" {
-  count              = var.new-or-existing == "new" ? 1 : 0
+  count              =   var.new-or-existing == "new" ? 1 : 0
   name                = "bastion-ip"
   location            = var.region
   resource_group_name = var.resource-group
@@ -210,7 +210,7 @@ resource "azurerm_subnet_network_security_group_association" "worker" {
 
 #Create bastion host
   resource "azurerm_bastion_host" "bastion_host" {
-  count                     = var.new-or-existing == "new" ? 1 : 0
+    count               = var.new-or-existing == "new" ? 1 : 0
     name                = "azure-bastion-host"
     location            = var.region
     resource_group_name = var.resource-group
