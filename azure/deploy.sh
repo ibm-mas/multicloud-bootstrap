@@ -127,7 +127,6 @@ if [[ $CLUSTER_TYPE == "azure" ]]; then
      log " Vnet Id of Cluster: $REQUESTER_VPC_ID"
 fi
 #====================
-
 # Deploy OCP cluster and bastion host
 if [[ $OPENSHIFT_USER_PROVIDE == "false" ]]; then
   cd $GIT_REPO_HOME
@@ -135,3 +134,4 @@ if [[ $OPENSHIFT_USER_PROVIDE == "false" ]]; then
     cd $GIT_REPO_HOME/azure
     set +e
     ./create-ocp-cluster.sh
+fi
