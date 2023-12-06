@@ -218,6 +218,8 @@ EOT
   sed -i -e "/"kubeadmin"/d" mas-provisioning.log
   sed -i -e "/pullSecret:/d" mas-provisioning.log
   sed -i -e "/sshKey:/d" mas-provisioning.log
+  sed -i -e "/"Username"/d" mas-provisioning.log
+  sed -i -e "/"Password"/d" mas-provisioning.log
 
   # Remove the license file, pull-secret file, & database certificate files
   rm -rf db.crt entitlement.lic pull-secret.json
