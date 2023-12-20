@@ -8,10 +8,8 @@ declare -A op_versions
 op_versions['MongoDBCommunity']=4.1.9
 op_versions['Db2uCluster']=11.4
 op_versions['kafkas.kafka.strimzi.io']=2.4.9
-op_versions['ocpVersion410']='^4\.([1][0])?(\.[0-9][0-9]+.*)*$'
-op_versions['ocpVersion411']='^4\.([1][1])?(\.[0-9][0-9]+.*)*$'
 op_versions['ocpVersion412']='^4\.([1][2])?(\.[0-9][0-9]+.*)*$'
-op_versions['rosaVersion']='^4\.([1][0])?(\.[0-9]+.*)*$'
+op_versions['rosaVersion']='^4\.([1][2])?(\.[0-9]+.*)*$'
 op_versions['cpd-platform-operator']=2.0.7
 op_versions['user-data-services-operator']=2.0.6
 op_versions['ibm-cert-manager-operator']=3.19.9
@@ -41,8 +39,8 @@ checkROSA(){
 		if [[ $currentOpenshiftVersion =~ ${op_versions[rosaVersion]} ]]; then
     		log " ROSA Cluster Supported Version"
   		else
-    		log " Unsupported ROSA version $currentOpenshiftVersion. Supported ROSA version is 4.10.x"
-			export SERVICE_NAME=" Unsupported ROSA version $currentOpenshiftVersion. Supported ROSA version is 4.10.x"
+    		log " Unsupported ROSA version $currentOpenshiftVersion. Supported ROSA version is 4.12.x"
+			export SERVICE_NAME=" Unsupported ROSA version $currentOpenshiftVersion. Supported ROSA version is 4.12.x"
 			SCRIPT_STATUS=29
 			return $SCRIPT_STATUS
  		fi
@@ -62,9 +60,7 @@ function version_gt() {
 function getOCPVersion() {
 	currentOpenshiftVersion=$(oc get clusterversion | awk  'NR==2 {print $2 }')
 	log " OCP version is $currentOpenshiftVersion"
-	if [[ ${currentOpenshiftVersion} =~ ${op_versions[ocpVersion410]} ]]; then
-    	log " OCP Supported Version"
-    elif [[ ${currentOpenshiftVersion} =~ ${op_versions[ocpVersion412]} ]]; then
+    if [[ ${currentOpenshiftVersion} =~ ${op_versions[ocpVersion412]} ]]; then
     	log " OCP Supported Version"
 	elif [[ ${currentOpenshiftVersion} =~ ${op_versions[ocpVersion411]} ]]; then
 		log " OCP Version Not Supported"
@@ -76,8 +72,8 @@ function getOCPVersion() {
 		#fi
 
   	else
-    	log " Unsupported Openshift version $currentOpenshiftVersion. Supported OpenShift versions are 4.10.x and 4.12.x"
-		export SERVICE_NAME=" Unsupported Openshift version $currentOpenshiftVersion. Supported OpenShift versions are 4.10.x and 4.12.x"
+    	log " Unsupported Openshift version $currentOpenshiftVersion. Supported OpenShift version is 4.12.x"
+		export SERVICE_NAME=" Unsupported Openshift version $currentOpenshiftVersion. Supported OpenShift versions is 4.12.x"
 		SCRIPT_STATUS=29
 		return $SCRIPT_STATUS
  	fi

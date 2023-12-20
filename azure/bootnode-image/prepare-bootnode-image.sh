@@ -43,17 +43,17 @@ ln -s --force /usr/bin/pip3.9 /usr/bin/pip
 ln -s --force /usr/bin/python3.9 /usr/bin/python3
 ln -s --force /usr/bin/pip3.9 /usr/bin/pip3
 
-#Install openshift-install 4.12.18
-wget https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/4.12.18/openshift-client-linux-4.12.18.tar.gz
-tar -xvf openshift-client-linux-4.12.18.tar.gz
+#Install openshift-install 4.12.44
+wget https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/4.12.44/openshift-client-linux-4.12.44.tar.gz
+tar -xvf openshift-client-linux-4.12.44.tar.gz
 chmod u+x oc kubectl
 mv -f oc /usr/local/bin
 mv -f kubectl /usr/local/bin
 oc version
-rm -rf openshift-client-linux-4.12.18.tar.gz
+rm -rf openshift-client-linux-4.12.44.tar.gz
 
 ## Download the  Openshift CLI and move to /usr/local/bin
-wget "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.12.18/openshift-install-linux.tar.gz"
+wget "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.12.44/openshift-install-linux.tar.gz"
 tar -xvf openshift-install-linux.tar.gz
 chmod u+x openshift-install
 mv -f openshift-install /usr/local/bin
