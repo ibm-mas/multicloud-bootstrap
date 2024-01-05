@@ -148,14 +148,10 @@ function getazurefile() {
 	sc_name=$(oc get sc | grep azurefiles-premium | awk -F' ' '{print $1}')
 	log " azurefiles-premium StorageClass : $sc_name"
 	if [[ $sc_name = ""  ]]; then
-     if [[ $EXISTING_CLUSTER = "ARO"  ]]; then
-       	log " azurefiles-premium StorageClass will be installed ..."
-     else
 		  log " azurefiles-premium StorageClass is not available"
 		  SCRIPT_STATUS=29
 		  export SERVICE_NAME=" azurefiles-premium Storage is not available"
 		  return $SCRIPT_STATUS
-		fi
 	else
 		log " azurefiles-premium StorageClass is available"
   fi

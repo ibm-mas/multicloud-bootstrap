@@ -162,7 +162,9 @@ if [[ (! -z $EXS_OCP_URL) && (! -z $EXS_OCP_USER) && (! -z $EXS_OCP_PWD) ]]; the
     export OCP_USERNAME=${EXS_OCP_USER}
     export OCP_PASSWORD=${EXS_OCP_PWD}
     if [[ ${$EXS_OCP_URL} = *'aroapp'* ]]; then
+      log "EXISTING_CLUSTER is ARO"
       export EXISTING_CLUSTER="ARO"
+      log "EXISTING_CLUSTER -  $EXISTING_CLUSTER"
     fi
 fi
 export OPENSHIFT_PULL_SECRET_FILE_PATH=${GIT_REPO_HOME}/pull-secret.json
