@@ -80,7 +80,7 @@ az vm generalize --resource-group masocp-bootnode-vm-rg-${UNIQSTR} --name bootno
 az image create --resource-group masocp-bootnode-vm-rg-${UNIQSTR} --name masocp-bootnode-img-${UNIQSTR} --source bootnode-prep --hyper-v-generation V2
 az group create --name masocp-bootnode-image-rg-${UNIQSTR} --location eastus2
 az sig create --resource-group masocp-bootnode-image-rg-${UNIQSTR} --location eastus2 --gallery-name masbyolimagegallery${UNIQSTR}
-az sig image-definition create --resource-group masocp-bootnode-image-rg-${UNIQSTR} --gallery-name masbyolimagegallery${UNIQSTR} --gallery-image-definition masocp-image-def-${UNIQSTR} --os-type Linux --publisher ibm-software --hyper-v-generation V2 --offer ibm-maximo-vm-offer --sku ibm-maximo-vm-offer-byol
+az sig image-definition create --resource-group masocp-bootnode-image-rg-${UNIQSTR} --gallery-name masbyolimagegallery${UNIQSTR} --gallery-image-definition masocp-image-def-${UNIQSTR} --os-type Linux --publisher ibm-software --hyper-v-generation V2 --offer ibm-maximo-vm-offer --sku ibm-maximo-vm-offer-byol --features SecurityType=Standard
 az sig image-version create --resource-group masocp-bootnode-image-rg-${UNIQSTR} --location eastus2 --gallery-name masbyolimagegallery${UNIQSTR} --gallery-image-definition masocp-image-def-${UNIQSTR} --gallery-image-version 1.0.0 --target-regions eastus2=1=standard_lrs --managed-image /subscriptions/${SUBID}/resourceGroups/masocp-bootnode-vm-rg-${UNIQSTR}/providers/Microsoft.Compute/images/masocp-bootnode-img-${UNIQSTR}
 
 # Replicate image to all supported regions
