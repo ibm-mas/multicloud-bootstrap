@@ -161,7 +161,7 @@ export OCP_PASSWORD="mas${RANDOM_STR:3:3}`date +%H%M%S`${RANDOM_STR:0:3}"
 if [[ (! -z $EXS_OCP_URL) && (! -z $EXS_OCP_USER) && (! -z $EXS_OCP_PWD) ]]; then
     export OCP_USERNAME=${EXS_OCP_USER}
     export OCP_PASSWORD=${EXS_OCP_PWD}
-    if [[ ${$EXS_OCP_URL} = *'aroapp'* ]]; then
+    if [[ ${EXS_OCP_URL} = *'aroapp'* ]]; then
       log "EXISTING_CLUSTER is ARO"
       export EXISTING_CLUSTER="ARO"
       log "EXISTING_CLUSTER -  $EXISTING_CLUSTER"
