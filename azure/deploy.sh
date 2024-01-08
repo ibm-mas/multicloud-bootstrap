@@ -186,8 +186,8 @@ export encodedEntitlementKey=$(echo cp:$SLS_ENTITLEMENT_KEY | tr -d '\n' | base6
 export OCP_INGRESS_TLS_SECRET_NAME=$(oc get secret  --no-headers -o custom-columns=":metadata.name" -n openshift-ingress |grep ingress)
 export emailAddress=$(cat .dockerconfigjson | jq -r '.auths["cloud.openshift.com"].email')
 jq '.auths |= . + {"cp.icr.io": { "auth" : "$encodedEntitlementKey", "email" : "$emailAddress"}}' .dockerconfigjson >/tmp/dockerconfig.json
-
-envsubst </tmp/dockerconfig.json >/tmp/.dockerconfigjson
+log " OCP_INGRESS_TLS_SECRET_NAME $OCP_INGRESS_TLS_SECRET_NAME"
+envsubst </tmp/dockerconfig.json >/tmp/.dockerconfigjsonexport OCP_INGRESS_TLS_SECRET_NAME
 oc set data secret/pull-secret -n openshift-config --from-file=/tmp/.dockerconfigjson
 
 # Run ansible playbook to create azurefiles storage class
