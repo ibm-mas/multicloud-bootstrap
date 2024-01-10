@@ -20,6 +20,10 @@ oc adm policy add-scc-to-user privileged system:serviceaccount:kube-system:csi-a
 #Install CSI Driver
 oc create configmap azure-cred-file --from-literal=path="/etc/kubernetes/cloud.conf" -n kube-system
 
+#ARO Cluster permission
+oc create clusterrole azure-secret-reader --verb=create,get --resource=secrets
+oc adm policy add-cluster-role-to-user azure-secret-reader system:serviceaccount:kube-system:persistent-volume-binder
+
 export driver_version=v1.12.0
 echo "Driver version " $driver_version
 ./install-driver.sh $driver_version
