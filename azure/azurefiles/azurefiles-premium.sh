@@ -13,7 +13,7 @@ export resourceGroupName=${RG_NAME}
 $SUB_ID
 #Configure Azure Files Premium
 
-export AZURE_STORAGE_ACCOUNT_NAME=aroazurefilessa
+export AZURE_STORAGE_ACCOUNT_NAME=storage-$resourceGroupName
 az storage account create --name $AZURE_STORAGE_ACCOUNT_NAME --resource-group $resourceGroupName --kind StorageV2 --sku Standard_LRS
 ARO_SERVICE_PRINCIPAL_ID=$(az aro show -g $resourceGroupName -n $cluster --query servicePrincipalProfile.clientId -o tsv)
 az role assignment create --role Contributor --scope /subscriptions/$subscriptionId/resourceGroups/$resourceGroupName --assignee $ARO_SERVICE_PRINCIPAL_ID
