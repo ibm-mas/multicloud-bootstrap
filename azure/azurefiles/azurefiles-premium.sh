@@ -8,19 +8,22 @@ export tenantId=${TENANT_ID}
 export subscriptionId=${AZURE_SUBSC_ID}
 export clientId=${AZURE_SP_CLIENT_ID}
 export clientSecret=${AZURE_SP_CLIENT_PWD}
-export cluster=${CLUSTER_NAME}
-export resourceGroupName=${RG_NAME}
+export cluster=NewClusterARO
+export resourceGroupName=NewClusterARO
 $SUB_ID
 #Configure Azure Files Premium
 
-export AZURE_STORAGE_ACCOUNT_NAME=storage-$resourceGroupName
+export AZURE_STORAGE_ACCOUNT_NAME=storage-${resourceGroupName,,}
+echo $AZURE_STORAGE_ACCOUNT_NAME
 az storage account create --name $AZURE_STORAGE_ACCOUNT_NAME --resource-group $resourceGroupName --kind StorageV2 --sku Standard_LRS
 ARO_SERVICE_PRINCIPAL_ID=$(az aro show -g $resourceGroupName -n $cluster --query servicePrincipalProfile.clientId -o tsv)
+echo "ARO_SERVICE_PRINCIPAL_ID1" $ARO_SERVICE_PRINCIPAL_ID
 az role assignment create --role Contributor --scope /subscriptions/$subscriptionId/resourceGroups/$resourceGroupName --assignee $ARO_SERVICE_PRINCIPAL_ID
-echo $ARO_SERVICE_PRINCIPAL_ID
+echo "ARO_SERVICE_PRINCIPAL_ID2" $ARO_SERVICE_PRINCIPAL_ID
 az role assignment list --all --assignee $ARO_SERVICE_PRINCIPAL_ID --output json | jq '.[] | {"principalName":.principalName, "roleDefinitionName":.roleDefinitionName, "scope":.scope}'
 
 ARO_API_SERVER=$(az aro list --query "[?contains(name,'$cluster')].[apiserverProfile.url]" -o tsv)
+echo $ARO_API_SERVER
 SECRET_NAME=secret-$AZURE_STORAGE_ACCOUNT_NAME
 
 ## login to the ARO Cluster
