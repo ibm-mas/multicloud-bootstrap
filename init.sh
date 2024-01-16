@@ -227,7 +227,7 @@ export MAS_CATALOG_VERSION=v8-231228-amd64
 if [[ $CLUSTER_TYPE == "aws" ]]; then
   export CPD_PRIMARY_STORAGE_CLASS="ocs-storagecluster-cephfs"
 elif [[ $CLUSTER_TYPE == "azure" ]]; then
-  export CPD_PRIMARY_STORAGE_CLASS="azurefiles-premium"
+  export CPD_PRIMARY_STORAGE_CLASS="azurefile-csi"
 fi
 # DB2WH variables
 export CPD_OPERATORS_NAMESPACE="ibm-cpd-operators-${RANDOM_STR}"
