@@ -206,6 +206,9 @@ if [[ ($PRODUCT_TYPE == "privatepublic") && ($CLUSTER_TYPE == "aws") ]];then
 else
   export SLS_LICENSE_FILE="${MAS_CONFIG_DIR}/entitlement.lic"
 fi
+
+#  "msg": "WARNING: SLS_LICENSE_FILE and SLS_LICENSE_ID have been deprecated since SLS 3.7.0. Use only SLS_ENTITLEMENT_FILE instead."
+
 export SLS_TLS_CERT_LOCAL_FILE_PATH="${GIT_REPO_HOME}/sls.crt"
 export SLS_INSTANCE_NAME="masocp-${RANDOM_STR}"
 # UDS variables
@@ -227,7 +230,8 @@ export MAS_CATALOG_VERSION=v8-231228-amd64
 if [[ $CLUSTER_TYPE == "aws" ]]; then
   export CPD_PRIMARY_STORAGE_CLASS="ocs-storagecluster-cephfs"
 elif [[ $CLUSTER_TYPE == "azure" ]]; then
-  export CPD_PRIMARY_STORAGE_CLASS="azurefile-premium-new"
+  #export CPD_PRIMARY_STORAGE_CLASS="azurefile-premium-new"
+  export CPD_PRIMARY_STORAGE_CLASS="azurefiles-premium"
 fi
 # DB2WH variables
 export CPD_OPERATORS_NAMESPACE="ibm-cpd-operators-${RANDOM_STR}"
@@ -236,6 +240,7 @@ export CPD_INSTANCE_NAMESPACE="ibm-cpd-${RANDOM_STR}"
 export CPD_SERVICES_NAMESPACE="cpd-services-${RANDOM_STR}"
 export DB2WH_INSTANCE_NAME="db2wh-cpd-${RANDOM_STR}"
 export DB2WH_VERSION="11.5.8.0-CN2"
+export DB2WH_VERSION="11.5.7.0-cn2"
 export DB2_META_STORAGE_CLASS=$CPD_PRIMARY_STORAGE_CLASS
 export DB2_DATA_STORAGE_CLASS=$CPD_PRIMARY_STORAGE_CLASS
 export DB2_BACKUP_STORAGE_CLASS=$CPD_PRIMARY_STORAGE_CLASS

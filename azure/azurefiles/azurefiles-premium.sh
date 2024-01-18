@@ -26,8 +26,8 @@ echo "Driver version " $driver_version
 ./install-driver.sh $driver_version
 oc patch storageclass managed-csi -p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "false"}}}'
 #Deploy premium Storage Class
-envsubst < azurefiles-premium.yaml | tee azurefiles-premium.yaml
-oc apply -f azurefiles-premium.yaml
+#envsubst < azurefiles-premium.yaml | tee azurefiles-premium.yaml
+#oc apply -f azurefiles-premium.yaml
 envsubst < managed-premium.yaml | tee managed-premium.yaml
 oc apply -f managed-premium.yaml
 oc apply -f persistent-volume-binder.yaml
