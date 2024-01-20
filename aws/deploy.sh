@@ -195,7 +195,7 @@ EOT
   export AWS_VPC_ID="$(terraform output -raw vpcid)"
   log "AWS_VPC_ID ===> ${AWS_VPC_ID}"
 
-  oc login -u $OCP_USERNAME -p $OCP_PASSWORD --server=https://api.${CLUSTER_NAME}.${BASE_DOMAIN}:6443
+  oc login --token=sha256~8l_QYyQZ54cX8-FScZSqsXbyhu3hBFC_wCQ7f3P0Mwg --server=https://api.natrosaclust.4c38.p1.openshiftapps.com:6443
   log "==== Adding PID limits to worker nodes ===="
   oc create -f $GIT_REPO_HOME/templates/container-runtime-config.yml
   log "==== Creating storage classes namely, gp2, ocs-storagecluster-ceph-rbd, ocs-storagecluster-cephfs, & openshift-storage.noobaa.io ===="
@@ -252,7 +252,7 @@ log "==== Adding ER key details to OCP default pull-secret ===="
 cd /tmp
 # Login to OCP cluster
 export OCP_SERVER="$(echo https://api.${CLUSTER_NAME}.${BASE_DOMAIN}:6443)"
-oc login -u $OCP_USERNAME -p $OCP_PASSWORD --server=$OCP_SERVER --insecure-skip-tls-verify=true
+oc login --token=sha256~8l_QYyQZ54cX8-FScZSqsXbyhu3hBFC_wCQ7f3P0Mwg --server=https://api.natrosaclust.4c38.p1.openshiftapps.com:6443 --insecure-skip-tls-verify=true
 export OCP_TOKEN="$(oc whoami --show-token)"
 oc extract secret/pull-secret -n openshift-config --keys=.dockerconfigjson --to=. --confirm
 export encodedEntitlementKey=$(echo cp:$SLS_ENTITLEMENT_KEY | tr -d '\n' | base64 -w0)
@@ -267,6 +267,9 @@ log "==== OCP cluster configuration (Cert Manager) started ===="
 cd $GIT_REPO_HOME/../ibm/mas_devops/playbooks
 set +e
 
+log "==== Running OCP EFS role ===="
+export CLUSTER_NAME=natrosaclust
+export ROLE_NAME=ocp_efs && ansible-playbook ibm.mas_devops.run_role
 export ROLE_NAME=ibm_catalogs && ansible-playbook ibm.mas_devops.run_role
 export ROLE_NAME=common_services && ansible-playbook ibm.mas_devops.run_role
 export ROLE_NAME=cert_manager && ansible-playbook ibm.mas_devops.run_role
