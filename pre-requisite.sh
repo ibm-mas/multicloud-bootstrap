@@ -23,18 +23,7 @@ if [[ $retcode -eq 29 ]]; then
 	return $retcode
 fi
 
-if [[ $DEPLOY_CP4D == "true" ]]; then
 
-	if [[ $CLUSTER_TYPE == "aws" ]]; then
-		getOCS ocs-operator
-	elif [[ $CLUSTER_TYPE == "azure" ]]; then
-		getazurefile
-	fi
-
-	retcode=$?
-	if [[ $retcode -eq 29 ]]; then
-		return $retcode
-	fi
 
 	getOPNamespace cpd-platform-operator
 	retcode=$?
