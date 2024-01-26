@@ -36,8 +36,6 @@ fi
 	#if [[ $retcode -eq 29 ]]; then
 	#return $retcode
 	#fi
-fi
-
 
 getVersion MongoDBCommunity
 retcode=$?
