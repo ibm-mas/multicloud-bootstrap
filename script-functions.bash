@@ -124,6 +124,17 @@ function getOCS() {
 	check_for_csv_success=$(oc get csv  --all-namespaces | awk -v pattern="$1" '$2 ~ pattern  { print }'  | awk -F' ' '{print $NF}')
 	sc_name=$(oc get sc | grep ocs-storagecluster-cephfs | awk -F' ' '{print $1}')
 	log " OCS StorageClass : $sc_name"
+
+	export CLUSTER_NAME=$(echo $EXS_OCP_URL | cut -d '.' -f 2)
+	export CPD_PRIMARY_STORAGE_CLASS="efs$CLUSTER_NAME"
+	#export CPD_PRIMARY_STORAGE_CLASS="efsnatrosaclust"
+
+	export AWS_DEFAULT_REGION=$DEPLOY_REGION
+
+	log " Running OCP EFS ansible role"
+	ansible-galaxy collection install ibm.mas_devops
+	export ROLE_NAME=ocp_efs && ansible-playbook ibm.mas_devops.run_role
+
 	if [[ $check_for_csv_success != "Succeeded" && $sc_name = ""  ]]; then
 		log " OCS StorageClass is not available"
 
@@ -140,6 +151,7 @@ function getOCS() {
   oc patch storageclass gp3-csi -p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "false"}}}'
   oc patch storageclass gp2 -p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "false"}}}'
   oc patch storageclass efsnatrosaclust -p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "true"}}}'
+
 	else
 		log " OCS StorageClass is available"
     fi
