@@ -126,6 +126,7 @@ function getOCS() {
 	log " OCS StorageClass : $sc_name"
 	if [[ $check_for_csv_success != "Succeeded" && $sc_name = ""  ]]; then
 		log " OCS StorageClass is not available"
+
 		oc login -u $OCP_USERNAME -p $OCP_PASSWORD --server=$EXS_OCP_URL:6443
   log "==== Adding PID limits to worker nodes in script-functions.bash ===="
   export GIT_REPO_HOME=/root/ansible-devops/multicloud-bootstrap
@@ -135,8 +136,10 @@ function getOCS() {
   oc apply -f $GIT_REPO_HOME/aws/ocp-terraform/ocs/ocs-storagecluster-cephfs.yaml
   oc apply -f $GIT_REPO_HOME/aws/ocp-terraform/ocs/ocs-storagecluster-ceph-rbd.yaml
   oc apply -f $GIT_REPO_HOME/aws/ocp-terraform/ocs/openshift-storage.noobaa.io.yaml
-  # Ensure only gp2 is set as default storage class
+  # In script-functions.bash - Ensure only gp2 is set as default storage class
   oc patch storageclass gp3-csi -p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "false"}}}'
+  oc patch storageclass gp2 -p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "false"}}}'
+  oc patch storageclass efsnatrosaclust -p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "true"}}}'
 	else
 		log " OCS StorageClass is available"
     fi
