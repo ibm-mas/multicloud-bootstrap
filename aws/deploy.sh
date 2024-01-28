@@ -325,13 +325,8 @@ log "==== aws/deploy.sh : Invoke db-create-vpc-peer.sh starts ===="
     log "==== aws/deploy.sh : Invoke db-create-vpc-peer.sh ends ===="
 fi
 
-export AWS_DEFAULT_REGION=$DEPLOY_REGION
-
-	log " Running OCP EFS ansible role"
-	ansible-galaxy collection install ibm.mas_devops
-	export ROLE_NAME=ocp_efs && ansible-playbook ibm.mas_devops.run_role
+	log " Patch EFS storage class as default storage class"
 	oc patch storageclass $CPD_PRIMARY_STORAGE_CLASS -p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "true"}}}'
-	log " Completed Running OCP EFS ansible role"
 
 log "==== MONGO_USE_EXISTING_INSTANCE = ${MONGO_USE_EXISTING_INSTANCE}"
 if [[ $MONGO_USE_EXISTING_INSTANCE == "true" ]]; then
