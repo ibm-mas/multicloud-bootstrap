@@ -129,11 +129,7 @@ function getOCS() {
 	export CPD_PRIMARY_STORAGE_CLASS="efs$CLUSTER_NAME"
 	#export CPD_PRIMARY_STORAGE_CLASS="efsnatrosaclust"
 
-	export AWS_DEFAULT_REGION=$DEPLOY_REGION
-
-	log " Running OCP EFS ansible role"
-	ansible-galaxy collection install ibm.mas_devops
-	export ROLE_NAME=ocp_efs && ansible-playbook ibm.mas_devops.run_role
+	
 
 	if [[ $check_for_csv_success != "Succeeded" && $sc_name = ""  ]]; then
 		log " OCS StorageClass is not available"
@@ -150,7 +146,7 @@ function getOCS() {
   # In script-functions.bash - Ensure only gp2 is set as default storage class
   oc patch storageclass gp3-csi -p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "false"}}}'
   oc patch storageclass gp2 -p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "false"}}}'
-  oc patch storageclass efsnatrosaclust -p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "true"}}}'
+  
 
 	else
 		log " OCS StorageClass is available"
