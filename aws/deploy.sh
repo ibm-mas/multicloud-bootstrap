@@ -325,8 +325,8 @@ log "==== aws/deploy.sh : Invoke db-create-vpc-peer.sh starts ===="
     log "==== aws/deploy.sh : Invoke db-create-vpc-peer.sh ends ===="
 fi
 
-	log " Patch EFS storage class as default storage class"
-	oc patch storageclass $CPD_PRIMARY_STORAGE_CLASS -p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "true"}}}'
+	#log " Patch EFS storage class as default storage class"
+	#oc patch storageclass $CPD_PRIMARY_STORAGE_CLASS -p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "true"}}}'
 
 log "==== MONGO_USE_EXISTING_INSTANCE = ${MONGO_USE_EXISTING_INSTANCE}"
 if [[ $MONGO_USE_EXISTING_INSTANCE == "true" ]]; then
