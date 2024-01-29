@@ -3,7 +3,6 @@
 
 #set variables for deployment
 export deployRegion=${DEPLOY_REGION}
-#export resourceGroupName="$(oc get machineset -n openshift-machine-api -o json | jq -r '.items[0].spec.template.spec.providerSpec.value.resourceGroup')"
 export resourceGroupName="$(oc get machineset -n openshift-machine-api -o json | jq -r '.items[0].spec.template.spec.providerSpec.value.resourceGroup')"
 export tenantId=${TENANT_ID}
 export subscriptionId=${AZURE_SUBSC_ID}
@@ -26,8 +25,13 @@ echo "Driver version " $driver_version
 ./install-driver.sh $driver_version
 oc patch storageclass managed-csi -p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "false"}}}'
 #Deploy premium Storage Class
-#envsubst < azurefiles-premium.yaml | tee azurefiles-premium.yaml
-#oc apply -f azurefiles-premium.yaml
+envsubst < azurefiles-premium.yaml | tee azurefiles-premium.yaml
+oc apply -f azurefiles-premium.yaml
 envsubst < managed-premium.yaml | tee managed-premium.yaml
 oc apply -f managed-premium.yaml
 oc apply -f persistent-volume-binder.yaml
+echo $EXISTING_CLUSTER
+if [[ $EXISTING_CLUSTER == "ARO" ]]; then
+  chmod 755 azurefiles-premium_aro.sh
+ ./azurefiles-premium_aro.sh
+fi
