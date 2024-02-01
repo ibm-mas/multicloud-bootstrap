@@ -224,7 +224,7 @@ export UDS_TLS_CERT_LOCAL_FILE_PATH="${GIT_REPO_HOME}/uds.crt"
 # CP4D variables
 export CPD_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
 export CPD_VERSION=cpd40
-export CPD_PRODUCT_VERSION=4.6.4
+export CPD_PRODUCT_VERSION=4.6.6
 export MAS_CHANNEL=8.11.x
 export MAS_CATALOG_VERSION=v8-231228-amd64
 if [[ $CLUSTER_TYPE == "aws" ]]; then
@@ -530,11 +530,11 @@ if [[ $PRE_VALIDATION == "pass" ]]; then
     export MAS_URL_WORKSPACE="https:\/\/$MAS_WORKSPACE_ID.home.${RANDOM_STR}.apps.${CLUSTER_NAME}.${BASE_DOMAIN}"
     cd ../
 
-    if [[ $DEPLOY_CP4D == "true" &&  ($retcode -eq 0)  ]]; then
-      log "==== CP4D db2 warehouse service enablement starts ===="
-     ./cpd_vars.sh
-     log "==== CP4D db2 warehouse service enablement completes ===="
-    fi
+    #if [[ $DEPLOY_CP4D == "true" &&  ($retcode -eq 0)  ]]; then
+     # log "==== CP4D db2 warehouse service enablement starts ===="
+     #./cpd_vars.sh
+     #log "==== CP4D db2 warehouse service enablement completes ===="
+    #fi
     ./get-product-versions.sh  #Execute the script to get the versions of various products
     # Create a secret in the Cloud to keep MAS access credentials
     cd $GIT_REPO_HOME
