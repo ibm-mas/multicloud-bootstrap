@@ -12,15 +12,11 @@ MASTER_INSTANCE_TYPE="m5.2xlarge"
 WORKER_INSTANCE_TYPE="m5.4xlarge"
 # Mongo variables
 export MONGODB_STORAGE_CLASS=gp2
-# Amqstreams variables
-export KAFKA_STORAGE_CLASS=gp2
 # IAM variables
 IAM_POLICY_NAME="masocp-policy-${RANDOM_STR}"
 IAM_USER_NAME="masocp-user-${RANDOM_STR}"
 # SLS variables
 export SLS_STORAGE_CLASS=gp2
-# UDS variables
-export UDS_STORAGE_CLASS=gp2
 # CP4D variables
 export CPD_METADATA_STORAGE_CLASS=gp2
 export CPD_SERVICE_STORAGE_CLASS="ocs-storagecluster-cephfs"
@@ -34,7 +30,6 @@ log " AWS_DEFAULT_REGION: $AWS_DEFAULT_REGION"
 log " MASTER_INSTANCE_TYPE: $MASTER_INSTANCE_TYPE"
 log " WORKER_INSTANCE_TYPE: $WORKER_INSTANCE_TYPE"
 log " MONGODB_STORAGE_CLASS: $MONGODB_STORAGE_CLASS"
-log " KAFKA_STORAGE_CLASS: $KAFKA_STORAGE_CLASS"
 log " IAM_POLICY_NAME: $IAM_POLICY_NAME"
 log " IAM_USER_NAME: $IAM_USER_NAME"
 log " SLS_STORAGE_CLASS: $SLS_STORAGE_CLASS"
@@ -62,27 +57,6 @@ fi
 if [[ -f sls.crt ]]; then
   chmod 600 sls.crt
 fi
-# Download UDS certificate
-cd $GIT_REPO_HOME
-if [[ ${UDS_PUB_CERT_URL,,} =~ ^https? ]]; then
-  log "Downloading UDS certificate from HTTP URL"
-  wget "$UDS_PUB_CERT_URL" -O uds.crt
-elif [[ ${UDS_PUB_CERT_URL,,} =~ ^s3 ]]; then
-  log "Downloading UDS certificate from S3 URL"
-  aws s3 cp "$UDS_PUB_CERT_URL" uds.crt --region $DEPLOY_REGION
-  ret=$?
-        if [ $ret -ne 0 ]; then
-        aws s3 cp "$UDS_PUB_CERT_URL" uds.crt --region us-east-1
-        ret=$?
-        if [ $ret -ne 0 ]; then
-            log "Invalid UDS License URL"
-        fi
-        fi
-fi
-if [[ -f uds.crt ]]; then
-  chmod 600 uds.crt
-fi
-
 ### Read License File & Retrive SLS hostname and host id
 if [[ -n "$MAS_LICENSE_URL" ]]; then
   line=$(head -n 1 entitlement.lic)
@@ -96,9 +70,9 @@ if [[ -n "$MAS_LICENSE_URL" ]]; then
 else
   log " MAS LICENSE URL file is not available."
 fi
-log "deploy.sh AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID"
+#log "deploy.sh AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID"
 if [[ -f "/tmp/iam-user-created" ]]; then
-  log "deploy.sh /tmp/iam-user-created exists; iam user creation skipped AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID..."
+  log "deploy.sh /tmp/iam-user-created exists; iam user creation skipped..."
 else
   ## IAM
   # Create IAM policy
@@ -110,7 +84,7 @@ else
   accessdetails=$(aws iam create-access-key --user-name ${IAM_USER_NAME})
   export AWS_ACCESS_KEY_ID=$(echo $accessdetails | jq '.AccessKey.AccessKeyId' | tr -d "\"")
   export AWS_SECRET_ACCESS_KEY=$(echo $accessdetails | jq '.AccessKey.SecretAccessKey' | tr -d "\"")
-  log " AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID"
+  #log " AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID"
   # on successful user and policy creation, create a file /tmp/iam-user-created
   echo "COMPLETE" > /tmp/iam-user-created
   chmod a+rw /tmp/iam-user-created
@@ -220,14 +194,45 @@ EOT
 
   set -e
 
-  # Backup deployment context
+  # Get the kubeadmin password & write it to secret file on AWS secret manager before deleting it from log file.
   cd $GIT_REPO_HOME
+  set +e
+  awk '/"kubeadmin"/' mas-provisioning.log > temp.txt
+  sed 's/^.*msg=//' temp.txt > temp2.txt
+  sed 's/^.*password://' temp2.txt > temp3.txt
+  sed 's/^[[:space:]]*//g' temp3.txt > temp4.txt
+  sed -i 's/\"//g' temp4.txt
+
+  export KUBEADMIN_PASSWORD=`cat temp4.txt`
+  ./create-secret.sh kubeadmin
+  rm -rf temp.txt temp2.txt temp3.txt temp4.txt
+  set -e
+
+  # Backup deployment context
   rm -rf /tmp/mas-multicloud
   mkdir /tmp/mas-multicloud
   cp -r * /tmp/mas-multicloud
+
+  # Remove sensitive data from mas-provisioning.log file before uploading it to s3 bucket.
+  cd /tmp/mas-multicloud
+  sed -i -e "/"kubeadmin"/d" mas-provisioning.log
+  sed -i -e "/pullSecret:/d" mas-provisioning.log
+  sed -i -e "/sshKey:/d" mas-provisioning.log
+  sed -i -e "/"Username"/d" mas-provisioning.log
+  sed -i -e "/"Password"/d" mas-provisioning.log
+
+  # Remove the license file, pull-secret file, & database certificate files
+  rm -rf db.crt entitlement.lic pull-secret.json
+  cd /tmp/mas-multicloud/mongo
+  rm -rf mongo-ca.pem
+
+  # Create the zip file of deployment context
   cd /tmp
   zip -r $BACKUP_FILE_NAME mas-multicloud/*
   set +e
+
+  # Upload the deployment context zip file to s3 bucket.
+
   aws s3 cp $BACKUP_FILE_NAME $DEPLOYMENT_CONTEXT_UPLOAD_PATH --region $DEPLOY_REGION
   retcode=$?
   if [[ $retcode -ne 0 ]]; then
@@ -301,7 +306,7 @@ if [[ -n $EXISTING_NETWORK ]]; then
   export VPC_ID="${EXISTING_NETWORK}" #upi
 fi
 if [[ -z $AWS_VPC_ID && -z $EXISTING_NETWORK  && -n $BOOTNODE_VPC_ID ]]; then
-  export VPC_ID="${BOOTNODE_VPC_ID}" #existing ocp #new VPCID
+  export VPC_ID="${BOOTNODE_VPC_ID}" #existing ocp
 fi
 if [[ -z $VPC_ID && $MONGO_FLAVOR == "Amazon DocumentDB" ]]; then
   log "Failed to get the vpc id required to deploy documentdb"
@@ -324,7 +329,6 @@ log "==== aws/deploy.sh : Invoke db-create-vpc-peer.sh starts ===="
     sh $GIT_REPO_HOME/aws/db/db-create-vpc-peer.sh
     log "==== aws/deploy.sh : Invoke db-create-vpc-peer.sh ends ===="
 fi
-
 
 log "==== MONGO_USE_EXISTING_INSTANCE = ${MONGO_USE_EXISTING_INSTANCE}"
 if [[ $MONGO_USE_EXISTING_INSTANCE == "true" ]]; then
@@ -436,57 +440,21 @@ else
       aws ec2 create-tags --resources $SUBNET_ID3  --tags Key=Name,Value=$TAG_NAME3
     fi
   fi
-
+  if [[ $MONGO_FLAVOR == "MongoDB" && $MONGO_USE_EXISTING_INSTANCE == "false" ]]; then
+         SCRIPT_STATUS=47
+          log "New MongoDB cannot be provisioned .."
+          exit $SCRIPT_STATUS
+  fi
   log "==== MongoDB deployment completed ===="
   ## Deploy MongoDB completed
 fi
 
-if [[ -z $VPC_ID && $AWS_MSK_PROVIDER == "Yes" ]]; then
-  log "Failed to get the vpc id required to deploy AWS MSK"
-  exit 42
-fi
-log "==== AWS_MSK_PROVIDER=$AWS_MSK_PROVIDER VPC_ID=$VPC_ID ===="
-if [[ $AWS_MSK_PROVIDER == "Yes" ]]; then
-  log "==== AWS MSK deployment started ===="
-  export KAFKA_CLUSTER_NAME="msk-${RANDOM_STR}"
-  export KAFKA_NAMESPACE="msk-${RANDOM_STR}"
-  export AWS_KAFKA_USER_NAME="mskuser-${RANDOM_STR}"
-  export AWS_REGION="${DEPLOY_REGION}"
-  export KAFKA_VERSION="2.8.1"
-  export KAFKA_PROVIDER="aws"
-  export KAFKA_ACTION="install"
-  export AWS_MSK_INSTANCE_TYPE="kafka.m5.large"
-  export AWS_MSK_VOLUME_SIZE="100"
-  export AWS_MSK_INSTANCE_NUMBER=3
 
-  log "==== Invoke fetch-cidr-block.sh ===="
-  source $GIT_REPO_HOME/aws/utils/fetch-cidr-block.sh
-  if [ $? -ne 0 ]; then
-    SCRIPT_STATUS=44
-    exit $SCRIPT_STATUS
-  fi
-  # IPv4 CIDR of private or default subnet
-  export AWS_MSK_CIDR_AZ1="${CIDR_BLOCKS_0}"
-  export AWS_MSK_CIDR_AZ2="${CIDR_BLOCKS_1}"
-  export AWS_MSK_CIDR_AZ3="${CIDR_BLOCKS_2}"
-  export AWS_MSK_INGRESS_CIDR="${VPC_CIDR_BLOCK}"
-  export AWS_MSK_EGRESS_CIDR="${VPC_CIDR_BLOCK}"
-  log "AWS_MSK_CIDR_AZ1=${AWS_MSK_CIDR_AZ1}  AWS_MSK_CIDR_AZ2=${AWS_MSK_CIDR_AZ2} AWS_MSK_CIDR_AZ3=${AWS_MSK_CIDR_AZ3} VPC_CIDR_BLOCK=$VPC_CIDR_BLOCK"
-
-  export ROLE_NAME=kafka && ansible-playbook ibm.mas_devops.run_role
-  log "==== AWS MSK deployment completed ===="
-fi
 ## Copying the entitlement.lic to MAS_CONFIG_DIR
 if [[ -n "$MAS_LICENSE_URL" ]]; then
   cp $GIT_REPO_HOME/entitlement.lic $MAS_CONFIG_DIR
 fi
 
-if [[ $DEPLOY_MANAGE == "true" && $DEPLOY_CP4D == "true" ]]; then
-  ## Deploy Amqstreams
-  log "==== Amq streams deployment started ===="
-  export ROLE_NAME=kafka && ansible-playbook ibm.mas_devops.run_role
-  log "==== Amq streams deployment completed ===="
-fi
 
 ## Deploy SLS
 if [[ (-z $SLS_URL) || (-z $SLS_REGISTRATION_KEY) || (-z $SLS_PUB_CERT_URL) ]]; then
@@ -511,7 +479,7 @@ if [[ (-z $SLS_URL) || (-z $SLS_REGISTRATION_KEY) || (-z $SLS_PUB_CERT_URL) ]]; 
       accessdetails=$(aws iam create-access-key --user-name ${IAM_USER_NAME_ROSA})
       AWS_ACCESS_KEY_ID_ROSA=$(echo $accessdetails | jq '.AccessKey.AccessKeyId' | tr -d "\"")
       AWS_SECRET_ACCESS_KEY_ROSA=$(echo $accessdetails | jq '.AccessKey.SecretAccessKey' | tr -d "\"")
-      log " AWS_ACCESS_KEY_ID_ROSA: $AWS_ACCESS_KEY_ID_ROSA"
+      #log " AWS_ACCESS_KEY_ID_ROSA: $AWS_ACCESS_KEY_ID_ROSA"
       # Put some delay for IAM permissions to be applied in the backend
       sleep 60
       oc create secret generic "$SLS_INSTANCE_NAME"-aws-access --from-literal=aws_access_key_id="$AWS_ACCESS_KEY_ID_ROSA" --from-literal=aws_secret_access_key="$AWS_SECRET_ACCESS_KEY_ROSA" -n "$SLS_NAMESPACE"
@@ -538,11 +506,13 @@ fi
 if [[ (-z $UDS_API_KEY) || (-z $UDS_ENDPOINT_URL) || (-z $UDS_PUB_CERT_URL) ]]; then
   # Deploy UDS
   log "==== UDS deployment started ===="
+  export OCP_FIPS_ENABLED=true
   export ROLE_NAME=uds && ansible-playbook ibm.mas_devops.run_role
   log "==== UDS deployment completed ===="
 
 else
   log "=== Using Existing UDS Deployment ==="
+  export OCP_FIPS_ENABLED=true
   export ROLE_NAME=uds && ansible-playbook ibm.mas_devops.run_role
   log "=== Generated UDS Config YAML ==="
 fi
@@ -559,15 +529,6 @@ log "==== MAS Workspace generation started ===="
 export ROLE_NAME=gencfg_workspace && ansible-playbook ibm.mas_devops.run_role
 log "==== MAS Workspace generation completed ===="
 
-## Deploy Manage
-if [[ $DEPLOY_MANAGE == "true" && (-z $MAS_JDBC_USER) && (-z $MAS_JDBC_PASSWORD) && (-z $MAS_JDBC_URL) && (-z $MAS_JDBC_CERT_URL) ]]; then
-  log "==== Configure internal db2 for manage started ===="
-  export ROLE_NAME=db2 && ansible-playbook ibm.mas_devops.run_role
-  export ROLE_NAME=suite_db2_setup_for_manage && ansible-playbook ibm.mas_devops.run_role
-  #Running setupdb.sh script again such that it creates required tablespaces if it's missed creating it while invoked by ansible role.
-  oc exec -n db2u c-db2wh-db01-db2u-0 -- su -lc '/tmp/setupdb.sh | tee /tmp/setupdb2.log' db2inst1
-  log "==== Configure internal db2 for manage completed ===="
-fi
 
 if [[ $DEPLOY_MANAGE == "true" && (-n $MAS_JDBC_USER) && (-n $MAS_JDBC_PASSWORD) && (-n $MAS_JDBC_URL) ]]; then
   export SSL_ENABLED=false
@@ -577,23 +538,13 @@ if [[ $DEPLOY_MANAGE == "true" && (-n $MAS_JDBC_USER) && (-n $MAS_JDBC_PASSWORD)
 	   export MAS_APP_SETTINGS_TABLESPACE=$(echo $MANAGE_TABLESPACE | cut -d ':' -f 1)
 	   export MAS_APP_SETTINGS_INDEXSPACE=$(echo $MANAGE_TABLESPACE | cut -d ':' -f 2)
 	else
-	   if [[ ${MAS_JDBC_URL,, } =~ ^jdbc:db2? ]]; then
-			log "Setting to DB2 Values"
-			export MAS_APP_SETTINGS_TABLESPACE="maxdata"
-			export MAS_APP_SETTINGS_INDEXSPACE="maxindex"
-	   elif [[ ${MAS_JDBC_URL,, } =~ ^jdbc:oracle? ]]; then
+	   if [[ ${MAS_JDBC_URL,, } =~ ^jdbc:oracle? ]]; then
 			log "Setting to ORACLE Values"
 			export MAS_APP_SETTINGS_TABLESPACE="maxdata"
 			export MAS_APP_SETTINGS_INDEXSPACE="maxindex"
 	fi
 	fi
-	if [[ ${MAS_JDBC_URL,, } =~ ^jdbc:sql? ]]; then
-			log "Setting to MSSQL Values"
-			export MAS_APP_SETTINGS_DB2_SCHEMA="dbo"
-			export MAS_APP_SETTINGS_TABLESPACE="PRIMARY"
-			export MAS_APP_SETTINGS_INDEXSPACE="PRIMARY"
-	fi
-			log " MAS_APP_SETTINGS_DB2_SCHEMA: $MAS_APP_SETTINGS_DB2_SCHEMA"
+			log " MAS_APP_SETTINGS_DB_SCHEMA: $MAS_APP_SETTINGS_DB2_SCHEMA"
 			log " MAS_APP_SETTINGS_TABLESPACE: $MAS_APP_SETTINGS_TABLESPACE"
 			log " MAS_APP_SETTINGS_INDEXSPACE: $MAS_APP_SETTINGS_INDEXSPACE"
 
@@ -601,9 +552,9 @@ if [[ $DEPLOY_MANAGE == "true" && (-n $MAS_JDBC_USER) && (-n $MAS_JDBC_PASSWORD)
     log "MAS_JDBC_CERT_URL is not empty, setting SSL_ENABLED as true"
     export SSL_ENABLED=true
   fi
-  log "==== Configure JDBC started for external DB2 ==== SSL_ENABLED = $SSL_ENABLED"
+  log "==== Configure JDBC started for external Oracle ==== SSL_ENABLED = $SSL_ENABLED"
   export ROLE_NAME=gencfg_jdbc && ansible-playbook ibm.mas_devops.run_role
-  log "==== Configure JDBC completed for external DB2 ===="
+  log "==== Configure JDBC completed for external Oracle ===="
 fi
 
 ## Deploy MAS

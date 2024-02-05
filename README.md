@@ -1,12 +1,10 @@
 # MultiCloud Bootstrap Process
 
 This folder contains the automation required for the bootstrap process.
-The scripts in this folder are not meant to be called manually unless needed for troubleshooting. These scripts are called in a specific order during the bootstrap process. The bootstrap process is called from the virtual server (aka the `bootnode`) automatically when the bootnode is created. The bootnode is a virtual server (_EC2 instance_ in AWS and _virtual machine_ in Azure and Google Cloud) that gets created in the buyer's account during the MAS instance deployment.
+The scripts in this folder are not meant to be called manually unless needed for troubleshooting. These scripts are called in a specific order during the bootstrap process. The bootstrap process is called from the virtual server (aka the `bootnode`) automatically when the bootnode is created. The bootnode is a virtual server (_EC2 instance_ in AWS ) that gets created in the buyer's account during the MAS instance deployment.
 
 For example,
 - In AWS, the Marketplace product has associated CloudFormation template, and the template creates the EC2 instance. The _UserData_ section in the EC2 instance has the commands to start the bootstrap process.
-- In Azure, the Marketplace product has associated ARM template, and the template creates the virtual machine. The virtual machine has the _CustomScript extension_ defined that has the commands to start the bootstrap process.
-
 Below are the steps that are invoked by Cloud provider automatically upon the creation of the bootnode.
 
 #### From the template associated with the Marketplace product

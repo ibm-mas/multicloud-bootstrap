@@ -4,14 +4,14 @@ Parameters:
   OfferingType:
     Description: Select your preferred Suite offering type.
     Type: String
-    Default: MAS Core + Cloud Pak for Data
+    Default: MAS Core
     MinLength: '1'
     AllowedValues:
-      - MAS Core + Cloud Pak for Data
-      - MAS Core + Manage (no Cloud Pak for Data)
+      - MAS Core
+      - MAS Core + Manage
   HostedZone:
     Description: >-
-      Select the public/private hosted zone that you created in the AWS Route 53
+      Select the private hosted zone that you created in the AWS Route 53
       service, for example: mas4aws.myorg.com
     Type: 'AWS::Route53::HostedZone::Id'
   ExistingVPCId:
@@ -114,7 +114,7 @@ Parameters:
     Description: >-
       Enter the URL location of the database that the Maximo Manage application
       connects to, for example:
-      jdbc:db2://1.2.3.4:50051/FTMDB:sslConnection=true;
+      jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS=(PROTOCOL=tcps)(HOST=63.246.112.120)(PORT=2484))(CONNECT_DATA=(SERVICE_NAME=maxdb)))
     Type: String
   TablespaceNames:
     Description: >-
@@ -129,7 +129,7 @@ Parameters:
     Type: String
   DBProvisionedVPCId:
     Description: >-
-      Enter the VPC ID where your existing database (DB2 or Oracle or MSSQL) was provisioned on a private subnet to establish
+      Enter the VPC ID where your existing database (Oracle) was provisioned on a private subnet to establish
       VPC Peering from this VPC & the VPC created during current stack deployment in order to establish database connection.
     Type: String
   ImportDemoData:
@@ -161,35 +161,11 @@ Parameters:
       retrieved from the 'ca.crt' file in the 'mas-*-sls-cfg' secret in the MAS
       core namespace.
     Type: String
-  UDSEndpointUrl:
-    Description: >-
-      Enter the endpoint URL that you retrieved from the 'uds-endpoint'
-      OpenShift route in the ibm-common-services namespace. URL should not have
-      slash (/) at the end.
-    Type: String
-  UDSAPIKey:
-    Description: >-
-      Enter the service's API key that you retrieved from the 'uds-api-key'
-      secret in the ibm-common-services namespace.
-    Type: String
-  UDSPublicCertificateUrl:
-    Description: >-
-      Enter the HTTP or S3 location of the service's public certificate that you
-      retrieved from the 'ca-bundle.pem' file in the 'mas-*-uds-cfg' secret in
-      the MAS core namespace.
-    Type: String
   EmailNotification:
     Description: >-
       Indicate whether you want to receive emails that contain the connection
       details and credentials for the Suite. These emails are sent only to the
       verified email addresses that you configured in the Amazon SES service.
-    Default: false
-    Type: String
-    AllowedValues:
-      - true
-      - false
-  PrivateCluster:
-    Description: Select true to create a private OpenShift cluster
     Default: false
     Type: String
     AllowedValues:
@@ -205,61 +181,27 @@ Parameters:
     AllowedValues:
       - Production
       - Non-production
-  MongoDeploymentMode:
-    Description: >-
-      A new mongo instance will be created on selection of 'Provision a new mongo instance'.
-      To use an existing mongo instance, select 'Use an existing mongo instance' option
-    Type: String
-    Default: "Provision a new mongo instance"
-    MinLength: '1'
-    AllowedValues:
-      - "Provision a new mongo instance"
-      - "Use an existing mongo instance"
-  MongoDBProvider:
-    Description: >-
-      Select the desired MongoDB provider.
-      Note: When selecting MongoDBProvider as MongoDB and MongoDeploymentMode as 'Provision a new mongo instance', a new "MongoDB Community Edition" instance will be provisioned
-    Type: String
-    Default: "MongoDB"
-    MinLength: '1'
-    AllowedValues:
-      - "MongoDB"
-      - "Amazon DocumentDB"
   MongoAdminUsername:
     Description: >-
       Enter the Mongo Admin Username.
     Type: String
+    MinLength: '1'
   MongoAdminPassword:
     Description: >-
       Enter the Mongo Admin Password.
     Type: String
+    MinLength: '1'
     NoEcho: true
   MongoHosts:
     Description: >-
-      Enter the Mongo Hosts. eg., docdb-nonwqp-1.abc.ca-central-1.docdb.amazonaws.com:27017,docdb-nonwqp-2.def.ca-central-1.docdb.amazonaws.com:27017
+      Enter the Mongo Hosts. eg., mongodb-nonwqp-1.abc.ca-central-1.mongodb.amazonaws.com:27017,mongodb-nonwqp-2.def.ca-central-1.mongodb.amazonaws.com:27017
     Type: String
+    MinLength: '1'
   MongoCAPemFile:
     Description: >-
       Enter the S3 bucket URL where MongoCAPemFile was uploaded.
-    Type: String
-  DocumentDBProvisionedVPCId:
-    Description: >-
-      Enter the VPC ID where existing Amazon DocumentDB was provisioned.
-      Leave this field blank, if MongoDBProvider was selected as "MongoDB".
-      Make sure this VPC ID resides in the current deployment region and does not have matching or overlapping IPv4 CIDR blocks 10.0.0.0/16.
-    Type: String
-  AWSMSKProvider:
-    Description: >-
-      Select Yes, to provision a AWS MSK cluster
-    Type: String
-    Default: "No"
     MinLength: '1'
-    AllowedValues:
-      - "No"
-      - "Yes"
-
-Conditions:
-  MongoUseExistingInstanceCondition: !Equals [!Ref MongoDeploymentMode, "Use an existing mongo instance"]
+    Type: String
 Metadata:
   'AWS::CloudFormation::Interface':
     ParameterGroups:
@@ -288,10 +230,8 @@ Metadata:
           - MASLicenseUrl
       - Label:
           default: >-
-            Maximo Manage database configuration (complete this section only if
-            you chose the 'MAS + Manage' offering type.
-            In case if this section is left empty and you chose 'MAS + Manage' offering type,
-            then We will provision an internal DB2 instance for Manage)
+            Maximo Manage (Oracle) database configuration (complete this section only if
+            you chose the 'MAS + Manage' offering type.)
         Parameters:
           - MASManageDBUser
           - MASManageDBPassword
@@ -301,24 +241,13 @@ Metadata:
           - DBProvisionedVPCId
           - ImportDemoData
       - Label:
-          default: MongoDB Configuration
-        Parameters:
-          - MongoDeploymentMode
-          - MongoDBProvider
-      - Label:
           default: >-
-            Existing MongoDB / DocumentDB configuration details
-            (complete this section only if MongoDeploymentMode was selected as 'Use an existing mongo instance')
+            Existing MongoDB configuration details (Make sure your MongoDB instance is FIPS compliant)
         Parameters:
           - MongoAdminUsername
           - MongoAdminPassword
           - MongoHosts
           - MongoCAPemFile
-          - DocumentDBProvisionedVPCId
-      - Label:
-          default: AWS MSK Provider
-        Parameters:
-          - AWSMSKProvider
       - Label:
           default: >-
             Existing Suite License Service connection details (leave this
@@ -328,21 +257,12 @@ Metadata:
           - SLSRegistrationKey
           - SLSPublicCertificateUrl
       - Label:
-          default: >-
-            Existing User Data Services connection details (leave this section
-            empty to create a new UDS instance)
-        Parameters:
-          - UDSEndpointUrl
-          - UDSAPIKey
-          - UDSPublicCertificateUrl
-      - Label:
           default: Email notification
         Parameters:
           - EmailNotification
       - Label:
           default: 'Choose the OCP cluster type  & existing VPC Details '
         Parameters:
-          - PrivateCluster
           - ExistingVPCId
           - ExistingPrivateSubnet1Id
           - ExistingPrivateSubnet2Id
@@ -356,50 +276,10 @@ Metadata:
           - OperationalMode
 Mappings:
   RegionMap:
-    us-east-1:
-      HVM64: ami-07809a17acfe15035
-    us-east-2:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
-    us-west-2:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
-    ca-central-1:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
-    eu-north-1:
-      HVM64: ami-0fc7ab563232d6769
-    eu-west-1:
-      HVM64: ami-0fc349d82c682cae4
-    eu-west-2:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
-    eu-west-3:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
-    eu-central-1:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
-    ap-northeast-1:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
-    ap-northeast-2:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
-    ap-northeast-3:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
-    ap-south-1:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
-    ap-southeast-1:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
-    ap-southeast-2:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
-    sa-east-1:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
-    af-south-1:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
-    ap-east-1:
-      HVM64: ami-0a8ba8a0fde410499
-    ap-southeast-3:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
-    eu-south-1:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
-    me-south-1:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
-    me-central-1:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
+    us-gov-west-1:
+      HVM64: ami-0b48cc1fb917c23e6
+    us-gov-east-1:
+      HVM64: ami-09a1308a8540174f6
 Resources:
   DeployWaitConditionHandle:
     Type: 'AWS::CloudFormation::WaitConditionHandle'
@@ -441,7 +321,7 @@ Resources:
                   - !Join
                     - ':'
                     - - arn
-                      - aws
+                      - aws-us-gov
                       - iam
                       - ''
                       - !Ref 'AWS::AccountId'
@@ -449,7 +329,7 @@ Resources:
                   - !Join
                     - ':'
                     - - arn
-                      - aws
+                      - aws-us-gov
                       - iam
                       - ''
                       - !Ref 'AWS::AccountId'
@@ -457,7 +337,7 @@ Resources:
                   - !Join
                     - ':'
                     - - arn
-                      - aws
+                      - aws-us-gov
                       - s3
                       - ''
                       - ''
@@ -468,7 +348,7 @@ Resources:
                   - !Join
                     - ':'
                     - - arn
-                      - aws
+                      - aws-us-gov
                       - ses
                       - '*'
                       - !Ref 'AWS::AccountId'
@@ -476,7 +356,7 @@ Resources:
                   - !Join
                     - ':'
                     - - arn
-                      - aws
+                      - aws-us-gov
                       - ses
                       - '*'
                       - !Ref 'AWS::AccountId'
@@ -678,7 +558,7 @@ Resources:
             - 'git clone https://github.com/ibm-mas/ansible-devops.git;'
             - cd ansible-devops;
             - rm -rf multicloud-bootstrap 1>/dev/null 2>&1;
-            - 'git clone https://github.com/ibm-mas/multicloud-bootstrap.git;'
+            - 'git clone -b Govcloud https://github.com/ibm-mas/multicloud-bootstrap.git;'
             - cd multicloud-bootstrap;
             - 'find . -type f -name "*.sh" -exec chmod +x {} \;;'
             - ./init.sh "aws" "
@@ -714,13 +594,7 @@ Resources:
             - !Ref SLSRegistrationKey
             - ''' '''
             - !Ref SLSPublicCertificateUrl
-            - ''' '''
-            - !Ref UDSEndpointUrl
-            - ''' '''
-            - !Ref UDSAPIKey
-            - ''' '''
-            - !Ref UDSPublicCertificateUrl
-            - ''' '''
+            - ''' '''' '''' '''' '''
             - !Ref MASManageDBUser
             - ''' '''
             - !Ref MASManageDBPassword
@@ -747,26 +621,18 @@ Resources:
             - ''' '''
             - !Ref ExistingPublicSubnet3Id
             - ''' '''
-            - !Ref PrivateCluster
+            - 'true'
             - ''' '''
             - !Ref OperationalMode
+            - ''' '''' '''' '''
+            - !Ref MongoAdminUsername
             - ''' '''
-            - !If [MongoUseExistingInstanceCondition, "true", "false"]
+            - !Ref MongoAdminPassword
             - ''' '''
-            - !Ref MongoDBProvider
+            - !Ref MongoHosts
             - ''' '''
-            - !If [MongoUseExistingInstanceCondition, !Ref MongoAdminUsername, ""]
-            - ''' '''
-            - !If [MongoUseExistingInstanceCondition, !Ref MongoAdminPassword, ""]
-            - ''' '''
-            - !If [MongoUseExistingInstanceCondition, !Ref MongoHosts, ""]
-            - ''' '''
-            - !If [MongoUseExistingInstanceCondition, !Ref MongoCAPemFile, ""]
-            - ''' '''
-            - !If [MongoUseExistingInstanceCondition, !Ref DocumentDBProvisionedVPCId, ""]
-            - ''' '''
-            - !Ref AWSMSKProvider
-            - ''' '''
+            - !Ref MongoCAPemFile
+            - ''' '''' '''' '''
             - !Ref DBProvisionedVPCId
             - ''' '''' '''
             - !Ref EBSVolumeType

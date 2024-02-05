@@ -27,8 +27,6 @@ if [[ $DEPLOY_CP4D == "true" ]]; then
 
 	if [[ $CLUSTER_TYPE == "aws" ]]; then
 		getOCS ocs-operator
-	elif [[ $CLUSTER_TYPE == "azure" ]]; then
-		getazurefile
 	fi
 
 	retcode=$?
@@ -41,12 +39,6 @@ if [[ $DEPLOY_CP4D == "true" ]]; then
 	if [[ $retcode -eq 29 ]]; then
 	return $retcode
 	fi
-#commenting this as we dont use db2u cluster ,instead we are using cp4d db2wh
-	#getVersion Db2uCluster
-	#retcode=$?
-	#if [[ $retcode -eq 29 ]]; then
-	#return $retcode
-	#fi
 fi
 
 
@@ -97,19 +89,7 @@ do
 	i=`expr $i + 1`
 done
 
-# # getSBOVersion
-# # retcode=$?
-# # if [[ $retcode -eq 29 ]]; then
-# # 	return $retcode
-# # fi
 
-getKafkaVersion
-retcode=$?
-if [[ $retcode -eq 29 ]]; then
-	return $retcode
-fi
-
-log " KAFKA_NAMESPACE: $KAFKA_NAMESPACE"
 log " CPD_OPERATORS_NAMESPACE: $CPD_OPERATORS_NAMESPACE"
 log " CPD_INSTANCE_NAMESPACE: $CPD_INSTANCE_NAMESPACE"
 log " SLS_NAMESPACE: $SLS_NAMESPACE"

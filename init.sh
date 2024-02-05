@@ -120,18 +120,6 @@ EOT
   sleep 60
   cd -
 fi
-
-## Configure Ops agent
-if [[ $CLUSTER_TYPE == "gcp" ]]; then
-  log "Configuring Ops agent"
-  # Update config file
-  sed -i "s/\[UNIQID\]/$RANDOM_STR/g" /etc/google-cloud-ops-agent/config.yaml
-  # Start Ops agent service
-  service google-cloud-ops-agent restart
-  sleep 5
-  cd -
-fi
-
 # Check for input parameters
 if [[ (-z $CLUSTER_TYPE) || (-z $DEPLOY_REGION) || (-z $RANDOM_STR) || (-z $CLUSTER_SIZE) || (-z $SLS_ENTITLEMENT_KEY) \
    || (-z $SSH_KEY_NAME) ]]; then
@@ -139,10 +127,10 @@ if [[ (-z $CLUSTER_TYPE) || (-z $DEPLOY_REGION) || (-z $RANDOM_STR) || (-z $CLUS
   PRE_VALIDATION=fail
 fi
 
-if [[ $OFFERING_TYPE == "MAS Core + Cloud Pak for Data" ]]; then
-  export DEPLOY_CP4D="true"
+if [[ $OFFERING_TYPE == "MAS Core" ]]; then
+  export DEPLOY_CP4D="false"
   export DEPLOY_MANAGE="false"
-elif [[ $OFFERING_TYPE == "MAS Core + Manage (no Cloud Pak for Data)" ]]; then
+elif [[ $OFFERING_TYPE == "MAS Core + Manage" ]]; then
   export DEPLOY_CP4D="false"
   export DEPLOY_MANAGE="true"
 elif [[ $OFFERING_TYPE == "MAS Core + Cloud Pak for Data + Manage" ]]; then
@@ -172,21 +160,11 @@ export MAS_IMAGE_TEST_DOWNLOAD="cp.icr.io/cp/mas/admin-dashboard:5.1.27"
 export BACKUP_FILE_NAME="deployment-backup-${CLUSTER_NAME}.zip"
 if [[ $CLUSTER_TYPE == "aws" ]]; then
   export DEPLOYMENT_CONTEXT_UPLOAD_PATH="s3://masocp-${RANDOM_STR}-bucket-${DEPLOY_REGION}/ocp-cluster-provisioning-deployment-context/"
-elif [[ $CLUSTER_TYPE == "azure" ]]; then
-  export DEPLOYMENT_CONTEXT_UPLOAD_PATH="ocp-cluster-provisioning-deployment-context/${BACKUP_FILE_NAME}"
-  export STORAGE_ACNT_NAME="masocp${RANDOM_STR}stgaccount"
-elif [[ $CLUSTER_TYPE == "gcp" ]]; then
-  export DEPLOYMENT_CONTEXT_UPLOAD_PATH="gs://masocp-${RANDOM_STR}-bucket/ocp-cluster-provisioning-deployment-context/"
 fi
 # Mongo variables
 export MAS_INSTANCE_ID="${RANDOM_STR}"
 export MAS_CONFIG_DIR=/var/tmp/masconfigdir
 export MONGODB_NAMESPACE="mongoce-${RANDOM_STR}"
-# Amqstreams variables
-export KAFKA_NAMESPACE="amq-streams-${RANDOM_STR}"
-export KAFKA_CLUSTER_NAME=maskafka
-export KAFKA_CLUSTER_SIZE=small
-export KAFKA_USER_NAME=masuser
 # SLS variables
 export SLS_NAMESPACE="ibm-sls-${RANDOM_STR}"
 export SLS_MONGODB_CFG_FILE="${MAS_CONFIG_DIR}/mongo-${MONGODB_NAMESPACE}.yml"
@@ -206,8 +184,6 @@ export SLS_INSTANCE_NAME="masocp-${RANDOM_STR}"
 # UDS variables
 if [[ $CLUSTER_TYPE == "aws" ]]; then
   export UDS_STORAGE_CLASS="gp2"
-elif [[ $CLUSTER_TYPE == "azure" ]]; then
-  export UDS_STORAGE_CLASS="managed-premium"
 fi
 export UDS_CONTACT_EMAIL="uds.support@ibm.com"
 export UDS_CONTACT_FIRSTNAME=Uds
@@ -219,31 +195,18 @@ export CPD_VERSION=cpd40
 export CPD_PRODUCT_VERSION=4.6.3
 export MAS_CHANNEL=8.11.x
 export MAS_CATALOG_VERSION=v8-231004-amd64
+export MONGO_FLAVOR=MongoDB
+
 if [[ $CLUSTER_TYPE == "aws" ]]; then
   export CPD_PRIMARY_STORAGE_CLASS="ocs-storagecluster-cephfs"
-elif [[ $CLUSTER_TYPE == "azure" ]]; then
-  export CPD_PRIMARY_STORAGE_CLASS="azurefiles-premium"
 fi
 # DB2WH variables
 export CPD_OPERATORS_NAMESPACE="ibm-cpd-operators-${RANDOM_STR}"
 export CPD_INSTANCE_NAMESPACE="ibm-cpd-${RANDOM_STR}"
 #CPD_SERVICES_NAMESPACE is used in roles - cp4d, cp4dv3_install, cp4dv3_install_services and suite_dns
 export CPD_SERVICES_NAMESPACE="cpd-services-${RANDOM_STR}"
-export DB2WH_INSTANCE_NAME="db2wh-cpd-${RANDOM_STR}"
-export DB2WH_VERSION="11.5.8.0-CN1"
-export DB2_META_STORAGE_CLASS=$CPD_PRIMARY_STORAGE_CLASS
-export DB2_DATA_STORAGE_CLASS=$CPD_PRIMARY_STORAGE_CLASS
-export DB2_BACKUP_STORAGE_CLASS=$CPD_PRIMARY_STORAGE_CLASS
-export DB2_LOGS_STORAGE_CLASS=$CPD_PRIMARY_STORAGE_CLASS
-export DB2_TEMP_STORAGE_CLASS=$CPD_PRIMARY_STORAGE_CLASS
-export CPD_SERVICE_NAME="db2wh"
-
-export DB2_INSTANCE_NAME=db2wh-db01
-export DB2_VERSION=11.5.7.0-cn2
 export ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
-# not reqd its hardcoded as db2_namespace: db2u
-export DB2WH_NAMESPACE="cpd-services-${RANDOM_STR}"
-export DB2WH_JDBC_USERNAME="db2inst1"
+
 # MAS variables
 export MAS_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
 export IBM_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
@@ -269,15 +232,6 @@ fi
 log " new_or_existing_vpc_subnet=$new_or_existing_vpc_subnet"
 log " enable_permission_quota_check=$enable_permission_quota_check"
 
-if [[ -z "$EXISTING_NETWORK" && $CLUSTER_TYPE == "azure" ]]; then
-  export INSTALLATION_MODE="IPI"
-  # Setting the name of the v-net
-  export EXISTING_NETWORK=${RANDOM_STR}-vnet
-  export ExocpProvisionedVPCId=$EXISTING_NETWORK
-else
-  export INSTALLATION_MODE="UPI"
-fi
-log "==== INSTALLATION MODE: ${INSTALLATION_MODE}"
 
 RESP_CODE=0
 
@@ -312,7 +266,6 @@ esac
 # Log the variable values
 log "Below are common deployment parameters,"
 log " OPERATIONAL_MODE: $OPERATIONAL_MODE"
-log " AWS_MSK_PROVIDER: $AWS_MSK_PROVIDER"
 log " CLUSTER_TYPE: $CLUSTER_TYPE"
 log " OFFERING_TYPE: $OFFERING_TYPE"
 log " DEPLOY_REGION: $DEPLOY_REGION"
@@ -350,11 +303,6 @@ log " SMTP_PORT=$SMTP_PORT"
 log " SMTP_USERNAME=$SMTP_USERNAME"
 # Do not log SMTP password, uncomment in case of debugging but comment it out once done
 #log " SMTP_PASSWORD=$SMTP_PASSWORD"
-log " AZURE_SP_CLIENT_ID=$AZURE_SP_CLIENT_ID"
-log " SELLER_SUBSCRIPTION_ID=$SELLER_SUBSCRIPTION_ID"
-log " TENANT_ID=$TENANT_ID"
-log " GOOGLE_PROJECTID=$GOOGLE_PROJECTID"
-log " GOOGLE_APPLICATION_CREDENTIALS_FILE=$GOOGLE_APPLICATION_CREDENTIALS_FILE"
 log " EMAIL_NOTIFICATION: $EMAIL_NOTIFICATION"
 log " VPC/VNET NETWORK(EXISTING_NETWORK)=$EXISTING_NETWORK"
 log " VPC/VNET NETWORK RG(EXISTING_NETWORK_RG)=$EXISTING_NETWORK_RG"
@@ -391,14 +339,6 @@ log " DEPLOYMENT_CONTEXT_UPLOAD_PATH: $DEPLOYMENT_CONTEXT_UPLOAD_PATH"
 log " STORAGE_ACNT_NAME: $STORAGE_ACNT_NAME"
 log " MAS_INSTANCE_ID: $MAS_INSTANCE_ID"
 log " MAS_CONFIG_DIR: $MAS_CONFIG_DIR"
-log " KAFKA_NAMESPACE: $KAFKA_NAMESPACE"
-log " KAFKA_CLUSTER_NAME: $KAFKA_CLUSTER_NAME"
-log " KAFKA_CLUSTER_SIZE: $KAFKA_CLUSTER_SIZE"
-log " KAFKA_USER_NAME: $KAFKA_USER_NAME"
-log " UDS_STORAGE_CLASS: $UDS_STORAGE_CLASS"
-log " UDS_CONTACT_EMAIL: $UDS_CONTACT_EMAIL"
-log " UDS_CONTACT_FIRSTNAME: $UDS_CONTACT_FIRSTNAME"
-log " UDS_CONTACT_LASTNAME: $UDS_CONTACT_LASTNAME"
 log " CPD_PRIMARY_STORAGE_CLASS: $CPD_PRIMARY_STORAGE_CLASS"
 log " CPD_PRODUCT_VERSION: $CPD_PRODUCT_VERSION"
 log " MAS_APP_ID: $MAS_APP_ID"
@@ -478,7 +418,7 @@ if [[ $PRE_VALIDATION == "pass" ]]; then
   chmod 600 $OPENSHIFT_PULL_SECRET_FILE_PATH
 
   ## Installing the collection depending on ENV_TYPE
-  if [[ ($CLUSTER_TYPE == "aws") || ($CLUSTER_TYPE == "gcp") ]]; then
+  if [[ ($CLUSTER_TYPE == "aws") ]]; then
     if [[ $ENV_TYPE == "dev" ]]; then
       log "=== Building and Installing Ansible Collection Locally ==="
       cd $GIT_REPO_HOME/../ibm/mas_devops
@@ -519,12 +459,6 @@ if [[ $PRE_VALIDATION == "pass" ]]; then
     export MAS_URL_ADMIN="https:\/\/admin.${RANDOM_STR}.apps.${CLUSTER_NAME}.${BASE_DOMAIN}"
     export MAS_URL_WORKSPACE="https:\/\/$MAS_WORKSPACE_ID.home.${RANDOM_STR}.apps.${CLUSTER_NAME}.${BASE_DOMAIN}"
     cd ../
-
-    if [[ $DEPLOY_CP4D == "true" &&  ($retcode -eq 0)  ]]; then
-      log "==== CP4D db2 warehouse service enablement starts ===="
-     ./cpd_vars.sh
-     log "==== CP4D db2 warehouse service enablement completes ===="
-    fi
     ./get-product-versions.sh  #Execute the script to get the versions of various products
     # Create a secret in the Cloud to keep MAS access credentials
     cd $GIT_REPO_HOME
@@ -572,17 +506,22 @@ fi
 # Delete temporary password files
 rm -rf /tmp/*password*
 
+cd $GIT_REPO_HOME
+# Remove sensitive data from mas-provisioning.log file before uploading it to s3 bucket.
+  sed -i -e "/"kubeadmin"/d" mas-provisioning.log
+  sed -i -e "/pullSecret:/d" mas-provisioning.log
+  sed -i -e "/sshKey:/d" mas-provisioning.log
+  sed -i -e "/"Username"/d" mas-provisioning.log
+  sed -i -e "/"Password"/d" mas-provisioning.log
+# Remove the license file, pull-secret file, & database certificate files
+rm -rf db.crt entitlement.lic pull-secret.json
+cd $GIT_REPO_HOME/mongo
+rm -rf mongo-ca.pem
+
 # Upload log file to object store
 if [[ $CLUSTER_TYPE == "aws" ]]; then
   # Upload the log file to s3
   aws s3 cp $GIT_REPO_HOME/mas-provisioning.log $DEPLOYMENT_CONTEXT_UPLOAD_PATH
-elif [[ $CLUSTER_TYPE == "azure" ]]; then
-  # Upload the log file to blob storage
-  az storage blob upload --account-name ${STORAGE_ACNT_NAME} --container-name masocpcontainer --name ocp-cluster-provisioning-deployment-context/mas-provisioning.log --file $GIT_REPO_HOME/mas-provisioning.log
-elif [[ $CLUSTER_TYPE == "gcp" ]]; then
-  # Upload the log files to cloud storage
-  gsutil cp $GIT_REPO_HOME/mas-provisioning.log gs://masocp-${RANDOM_STR}-bucket/ocp-cluster-provisioning-deployment-context/
-  gsutil cp /root/openshift-install/config/${CLUSTER_NAME}/.openshift_install.log gs://${RANDOM_STR}-bucket/ocp-cluster-provisioning-deployment-context/
 fi
 log "Shutting down VM in a minute"
 shutdown -P "+1"

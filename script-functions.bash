@@ -6,14 +6,11 @@ export -f log
 SCRIPT_STATUS=0
 declare -A op_versions
 op_versions['MongoDBCommunity']=4.1.9
-op_versions['Db2uCluster']=11.4
-op_versions['kafkas.kafka.strimzi.io']=2.4.9
 op_versions['ocpVersion410']='^4\.([1][0])?(\.[0-9][0-9]+.*)*$'
 op_versions['ocpVersion411']='^4\.([1][1])?(\.[0-9][0-9]+.*)*$'
 op_versions['ocpVersion412']='^4\.([1][2])?(\.[0-9][0-9]+.*)*$'
 op_versions['rosaVersion']='^4\.([1][0])?(\.[0-9]+.*)*$'
 op_versions['cpd-platform-operator']=2.0.7
-op_versions['user-data-services-operator']=2.0.6
 op_versions['ibm-cert-manager-operator']=3.19.9
 op_versions['ibm-sls']=3.3.9
 op_versions['service-binding-operator']=1.0.9
@@ -22,14 +19,12 @@ declare -A op_namespaces=~
 op_namespaces['cpd-platform-operator']='CPD_OPERATORS_NAMESPACE'
 op_namespaces['ibm-sls']='SLS_NAMESPACE'
 op_namespaces['MongoDBCommunity']='MONGODB_NAMESPACE'
-op_namespaces['kafkas.kafka.strimzi.io']='KAFKA_NAMESPACE'
+
 
 declare -A instance_names=~
 instance_names['cpd-platform-operator']='ibmcpd'
 instance_names['user-data-services-operator']='analyticsproxy'
 instance_names['MongoDBCommunity']='mas-mongo-ce'
-instance_names['kafkas.kafka.strimzi.io']='maskafka'
-instance_names['Db2uCluster']='db2wh-db01'
 instance_names['ibm-cert-manager-operator']='default'
 
 checkROSA(){
@@ -143,19 +138,6 @@ function getOCS() {
 
 }
 
-function getazurefile() {
-	sc_name=$(oc get sc | grep azurefiles-premium | awk -F' ' '{print $1}')
-	log " azurefiles-premium StorageClass : $sc_name"
-	if [[ $sc_name = ""  ]]; then
-		log " azurefiles-premium StorageClass is not available"
-		SCRIPT_STATUS=29
-		export SERVICE_NAME=" azurefiles-premium Storage is not available"
-		return $SCRIPT_STATUS
-	else
-		log " azurefiles-premium StorageClass is available"
-    fi
-
-}
 
 function getOPNamespace() {
 	check_for_csv_success=$(oc get csv  --all-namespaces | awk -v pattern="$1" '$2 ~ pattern  { print }'  | awk -F' ' '{print $NF}')
@@ -317,56 +299,7 @@ function getVersion() {
   	fi
 }
 
-function getKafkaVersion() {
-	instance=$(oc get kafkas.kafka.strimzi.io --all-namespaces  --output json | jq -j '.items | length')
-	if [[ $instance > 1 ]]; then
-		log " Multiple $1 Instances are available"
-		SCRIPT_STATUS=29
-		export SERVICE_NAME=" Multiple $1 Instances are available"
-		return $SCRIPT_STATUS
-	fi
 
-	namespace=$(oc get kafkas.kafka.strimzi.io  --all-namespaces | awk  'NR==2 {print $1 }')
-	if [[ $namespace = "" ]]; then
-		log " Kafka will be installed."
-		return
-	fi
-	currentVersion=$(oc get kafkas.kafka.strimzi.io -n ${namespace}  -o json | jq .items[0].spec.kafka.version -r)
-	log " Kafka version is $currentVersion"
-	if  version_gt $currentVersion ${op_versions[kafkas.kafka.strimzi.io]} ; then
-    	log " Kafka Supported Version"
-		instance_name=$(oc get kafkas.kafka.strimzi.io -n ${namespace}  -o json | jq .items[0].metadata.name -r)
-		log " $1 Instance Name : $instance_name"
-		if [[  ${instance_names[kafkas.kafka.strimzi.io]} && ${instance_names[kafkas.kafka.strimzi.io]} = "$instance_name" ]]; then
-			if [[  ${op_namespaces[kafkas.kafka.strimzi.io]} ]]; then
-				export ${op_namespaces[kafkas.kafka.strimzi.io]}=$namespace
-			fi
-		else
-			log " Instance Name for Kafka is not matching."
-			SCRIPT_STATUS=29
-			export SERVICE_NAME=" Instance Name for Kafka is not matching"
-			return $SCRIPT_STATUS
-		fi
-  	else
-    	log " Unsupported Kafka version $currentVersion."
-		SCRIPT_STATUS=29
-		export SERVICE_NAME=" Unsupported Kafka version $currentVersion"
-		return $SCRIPT_STATUS
-  fi
-}
-
-# function getSBOVersion() {
-# 	currentVersion=$(oc get csv -n default | grep service-binding-operator | awk -F' ' '{print $1}' |  grep --perl-regexp '(?:(\d+)\.)?(?:(\d+)\.)?(?:(\d+)\.\d+)' --only-matching)
-# 	log " service-binding-operator version is $currentVersion"
-# 	if [[ "$currentVersion" -ge ${op_versions[service-binding-operator]} ]]; then
-# 		log " SBO Supported Version"
-#   	else
-#     	log " Unsupported service-binding-operator version $currentVersion."
-# 		SCRIPT_STATUS=29
-#		export SERVICE_NAME=" Unsupported service-binding-operator version $currentVersion"
-# 		return $SCRIPT_STATUS
-#   	fi
-# }
 function getOPVersions() {
 	check_for_csv_success=$(oc get csv  --all-namespaces | awk -v pattern="$1" '$2 ~ pattern  { print }'  | awk -F' ' '{print $NF}')
 	if [[ $check_for_csv_success = "Succeeded" ]]; then
