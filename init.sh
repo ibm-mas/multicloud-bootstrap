@@ -161,6 +161,11 @@ export OCP_PASSWORD="mas${RANDOM_STR:3:3}`date +%H%M%S`${RANDOM_STR:0:3}"
 if [[ (! -z $EXS_OCP_URL) && (! -z $EXS_OCP_USER) && (! -z $EXS_OCP_PWD) ]]; then
     export OCP_USERNAME=${EXS_OCP_USER}
     export OCP_PASSWORD=${EXS_OCP_PWD}
+    if [[ ${EXS_OCP_URL} = *'aroapp'* ]]; then
+      log "EXISTING_CLUSTER is ARO"
+      export EXISTING_CLUSTER="ARO"
+      log "EXISTING_CLUSTER -  $EXISTING_CLUSTER"
+    fi
 fi
 export OPENSHIFT_PULL_SECRET_FILE_PATH=${GIT_REPO_HOME}/pull-secret.json
 export MASTER_NODE_COUNT="3"
@@ -201,6 +206,9 @@ if [[ ($PRODUCT_TYPE == "privatepublic") && ($CLUSTER_TYPE == "aws") ]];then
 else
   export SLS_LICENSE_FILE="${MAS_CONFIG_DIR}/entitlement.lic"
 fi
+
+#  "msg": "WARNING: SLS_LICENSE_FILE and SLS_LICENSE_ID have been deprecated since SLS 3.7.0. Use only SLS_ENTITLEMENT_FILE instead."
+
 export SLS_TLS_CERT_LOCAL_FILE_PATH="${GIT_REPO_HOME}/sls.crt"
 export SLS_INSTANCE_NAME="masocp-${RANDOM_STR}"
 # UDS variables
@@ -216,13 +224,15 @@ export UDS_TLS_CERT_LOCAL_FILE_PATH="${GIT_REPO_HOME}/uds.crt"
 # CP4D variables
 export CPD_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
 export CPD_VERSION=cpd40
-export CPD_PRODUCT_VERSION=4.6.3
+export CPD_PRODUCT_VERSION=4.6.4
 export MAS_CHANNEL=8.11.x
-export MAS_CATALOG_VERSION=v8-231004-amd64
+export MAS_CATALOG_VERSION=v8-231228-amd64
 if [[ $CLUSTER_TYPE == "aws" ]]; then
   export CPD_PRIMARY_STORAGE_CLASS="ocs-storagecluster-cephfs"
 elif [[ $CLUSTER_TYPE == "azure" ]]; then
+  #export CPD_PRIMARY_STORAGE_CLASS="azurefile-premium-new"
   export CPD_PRIMARY_STORAGE_CLASS="azurefiles-premium"
+  export CPD_METADATA_STORAGE_CLASS="managed-premium"
 fi
 # DB2WH variables
 export CPD_OPERATORS_NAMESPACE="ibm-cpd-operators-${RANDOM_STR}"

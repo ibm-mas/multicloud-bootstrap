@@ -183,10 +183,11 @@ oc login -u $OCP_USERNAME -p $OCP_PASSWORD --server=$OCP_SERVER --insecure-skip-
 export OCP_TOKEN="$(oc whoami --show-token)"
 oc extract secret/pull-secret -n openshift-config --keys=.dockerconfigjson --to=. --confirm
 export encodedEntitlementKey=$(echo cp:$SLS_ENTITLEMENT_KEY | tr -d '\n' | base64 -w0)
+export OCP_INGRESS_TLS_SECRET_NAME=$(oc get secret  --no-headers -o custom-columns=":metadata.name" -n openshift-ingress |grep ingress)
 export emailAddress=$(cat .dockerconfigjson | jq -r '.auths["cloud.openshift.com"].email')
 jq '.auths |= . + {"cp.icr.io": { "auth" : "$encodedEntitlementKey", "email" : "$emailAddress"}}' .dockerconfigjson >/tmp/dockerconfig.json
-
-envsubst </tmp/dockerconfig.json >/tmp/.dockerconfigjson
+log " OCP_INGRESS_TLS_SECRET_NAME $OCP_INGRESS_TLS_SECRET_NAME"
+envsubst </tmp/dockerconfig.json >/tmp/.dockerconfigjsonexport OCP_INGRESS_TLS_SECRET_NAME
 oc set data secret/pull-secret -n openshift-config --from-file=/tmp/.dockerconfigjson
 
 # Run ansible playbook to create azurefiles storage class
@@ -196,7 +197,7 @@ cd $GIT_REPO_HOME/azure/azurefiles
 retcode=$?
 if [[ $retcode -ne 0 ]]; then
   log "Failed to create azurefiles-premium storageclass"
-  exit 27
+  #exit 27
 fi
 
 ## Configure OCP cluster

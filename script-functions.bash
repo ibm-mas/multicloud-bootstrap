@@ -144,16 +144,17 @@ function getOCS() {
 }
 
 function getazurefile() {
+
 	sc_name=$(oc get sc | grep azurefiles-premium | awk -F' ' '{print $1}')
 	log " azurefiles-premium StorageClass : $sc_name"
 	if [[ $sc_name = ""  ]]; then
-		log " azurefiles-premium StorageClass is not available"
-		SCRIPT_STATUS=29
-		export SERVICE_NAME=" azurefiles-premium Storage is not available"
-		return $SCRIPT_STATUS
+		  log " azurefiles-premium StorageClass is not available"
+		  SCRIPT_STATUS=29
+		  export SERVICE_NAME=" azurefiles-premium Storage is not available"
+		  return $SCRIPT_STATUS
 	else
 		log " azurefiles-premium StorageClass is available"
-    fi
+  fi
 
 }
 

@@ -28,7 +28,10 @@ if [[ $DEPLOY_CP4D == "true" ]]; then
 	if [[ $CLUSTER_TYPE == "aws" ]]; then
 		getOCS ocs-operator
 	elif [[ $CLUSTER_TYPE == "azure" ]]; then
-		getazurefile
+	     log "In prereq - EXISTING_CLUSTER is $EXISTING_CLUSTER"
+	    if [[ $EXISTING_CLUSTER != "ARO"  ]]; then
+		    getazurefile
+		fi
 	fi
 
 	retcode=$?

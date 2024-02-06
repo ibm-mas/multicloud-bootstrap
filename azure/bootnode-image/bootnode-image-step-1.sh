@@ -67,24 +67,32 @@ UNIQSTR=$(date +%Y%m%d%H%M%S)
 echo "Unique string: $UNIQSTR"
 az group create --name masocp-bootnode-vm-rg-${UNIQSTR} --location eastus2
 
-output=$(az vm create --resource-group masocp-bootnode-vm-rg-${UNIQSTR} --name bootnode-prep --image RedHat:RHEL:92-gen2:latest --admin-username azureuser --ssh-key-values "$SSH_KEY" --size Standard_D2s_v3 --public-ip-sku Standard)
+output=$(az vm create --resource-group masocp-bootnode-vm-rg-${UNIQSTR} --name bootnode-prep --image RedHat:RHEL:92-gen2:latest --admin-username azureuser --ssh-key-values "$SSH_KEY" --size Standard_D2s_v3 --public-ip-sku Standard --security-type Standard)
 
 echo $output
 vmip=$(echo $output | jq '.publicIpAddress' | tr -d '"')
 echo "VM IP address: $vmip"
 
-ssh -i $6 -o StrictHostKeyChecking=no azureuser@$vmip "cd /tmp; curl -skSL 'https://raw.githubusercontent.com/ibm-mas/multicloud-bootstrap/main/azure/bootnode-image/prepare-bootnode-image.sh' -o prepare-bootnode-image.sh; chmod +x prepare-bootnode-image.sh; sudo su - root -c \"/tmp/prepare-bootnode-image.sh '$ANSIBLE_COLLECTION_VERSION' '$ANSIBLE_COLLECTION_BRANCH' '$BOOTSTRAP_AUTOMATION_TAG_OR_BRANCH'\""
+ssh -i $6 -o StrictHostKeyChecking=no azureuser@$vmip "cd /tmp; curl -skSL 'https://raw.githubusercontent.com/ibm-mas/multicloud-bootstrap/ARO/azure/bootnode-image/prepare-bootnode-image.sh' -o prepare-bootnode-image.sh; chmod +x prepare-bootnode-image.sh; sudo su - root -c \"/tmp/prepare-bootnode-image.sh '$ANSIBLE_COLLECTION_VERSION' '$ANSIBLE_COLLECTION_BRANCH' '$BOOTSTRAP_AUTOMATION_TAG_OR_BRANCH'\""
 
 az vm deallocate --resource-group masocp-bootnode-vm-rg-${UNIQSTR} --name bootnode-prep
+echo "az vm deallocate done"
 az vm generalize --resource-group masocp-bootnode-vm-rg-${UNIQSTR} --name bootnode-prep
-az image create --resource-group masocp-bootnode-vm-rg-${UNIQSTR} --name masocp-bootnode-img-${UNIQSTR} --source bootnode-prep --hyper-v-generation V2
-az group create --name masocp-bootnode-image-rg-${UNIQSTR} --location eastus2
-az sig create --resource-group masocp-bootnode-image-rg-${UNIQSTR} --location eastus2 --gallery-name masbyolimagegallery${UNIQSTR}
-az sig image-definition create --resource-group masocp-bootnode-image-rg-${UNIQSTR} --gallery-name masbyolimagegallery${UNIQSTR} --gallery-image-definition masocp-image-def-${UNIQSTR} --os-type Linux --publisher ibm-software --hyper-v-generation V2 --offer ibm-maximo-vm-offer --sku ibm-maximo-vm-offer-byol
-az sig image-version create --resource-group masocp-bootnode-image-rg-${UNIQSTR} --location eastus2 --gallery-name masbyolimagegallery${UNIQSTR} --gallery-image-definition masocp-image-def-${UNIQSTR} --gallery-image-version 1.0.0 --target-regions eastus2=1=standard_lrs --managed-image /subscriptions/${SUBID}/resourceGroups/masocp-bootnode-vm-rg-${UNIQSTR}/providers/Microsoft.Compute/images/masocp-bootnode-img-${UNIQSTR}
 
+echo "az vm generalize done"
+az image create --resource-group masocp-bootnode-vm-rg-${UNIQSTR} --name masocp-bootnode-img-${UNIQSTR} --source bootnode-prep --hyper-v-generation V2
+echo "az vm image create done"
+az group create --name masocp-bootnode-image-rg-${UNIQSTR} --location eastus2
+echo "az vm group create done"
+az sig create --resource-group masocp-bootnode-image-rg-${UNIQSTR} --location eastus2 --gallery-name masbyolimagegallery${UNIQSTR}
+echo "az sig create  done"
+az sig image-definition create --resource-group masocp-bootnode-image-rg-${UNIQSTR} --gallery-name masbyolimagegallery${UNIQSTR} --gallery-image-definition masocp-image-def-${UNIQSTR} --os-type Linux --publisher ibm-software --hyper-v-generation V2 --offer ibm-maximo-vm-offer --sku ibm-maximo-vm-offer-byol --features SecurityType=Standard
+echo "az sig image-definition  done"
+az sig image-version create --resource-group masocp-bootnode-image-rg-${UNIQSTR} --location eastus2 --gallery-name masbyolimagegallery${UNIQSTR} --gallery-image-definition masocp-image-def-${UNIQSTR} --gallery-image-version 1.0.0 --target-regions eastus2=1=standard_lrs --managed-image /subscriptions/${SUBID}/resourceGroups/masocp-bootnode-vm-rg-${UNIQSTR}/providers/Microsoft.Compute/images/masocp-bootnode-img-${UNIQSTR}
+echo "az sig image-version create  done"
 # Replicate image to all supported regions
 az sig image-version update --resource-group masocp-bootnode-image-rg-${UNIQSTR} --gallery-name masbyolimagegallery${UNIQSTR} --gallery-image-definition masocp-image-def-${UNIQSTR} --gallery-image-version 1.0.0 --target-regions eastus eastus2 southcentralus westus2 westus3 australiaeast southeastasia northeurope swedencentral uksouth westeurope centralus southafricanorth centralindia eastasia japaneast koreacentral canadacentral francecentral germanywestcentral norwayeast brazilsouth &
+echo "az sig image-version update  done"
 echo " Replicating the images to supported regions in the background, it may take around 30 minutes to complete. Please check the replication status from Azure portal."
 
 # Delete the VM resource group

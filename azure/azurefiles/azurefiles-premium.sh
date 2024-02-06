@@ -30,3 +30,8 @@ oc apply -f azurefiles-premium.yaml
 envsubst < managed-premium.yaml | tee managed-premium.yaml
 oc apply -f managed-premium.yaml
 oc apply -f persistent-volume-binder.yaml
+echo $EXISTING_CLUSTER
+if [[ $EXISTING_CLUSTER == "ARO" ]]; then
+  chmod 755 azurefiles-premium_aro.sh
+ ./azurefiles-premium_aro.sh
+fi
