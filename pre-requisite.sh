@@ -13,6 +13,16 @@ if [[ $ROSA = ""  ]]; then
 	retcode=$?
 	if [[ $retcode -eq 29 ]]; then
 	return $retcode
+	else
+	oc login -u $OCP_USERNAME -p $OCP_PASSWORD --server=$EXS_OCP_URL:6443
+  		log "==== Adding PID limits to worker nodes ===="
+  		export GIT_REPO_HOME=/root/ansible-devops/multicloud-bootstrap
+  		oc create -f $GIT_REPO_HOME/templates/container-runtime-config.yml
+  log "==== Creating storage classes namely gp2, ocs-storagecluster-ceph-rbd, ocs-storagecluster-cephfs, & openshift-storage.noobaa.io ===="
+  		oc apply -f $GIT_REPO_HOME/aws/ocp-terraform/ocs/gp2.yaml
+  		oc apply -f $GIT_REPO_HOME/aws/ocp-terraform/ocs/ocs-storagecluster-cephfs.yaml
+  		oc apply -f $GIT_REPO_HOME/aws/ocp-terraform/ocs/ocs-storagecluster-ceph-rbd.yaml
+  		oc apply -f $GIT_REPO_HOME/aws/ocp-terraform/ocs/openshift-storage.noobaa.io.yaml
 	fi
 fi
 
