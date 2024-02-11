@@ -126,15 +126,15 @@ function getWorkerNodeDetails(){
 function getEFS() {
 	check_for_csv_success=$(oc get csv  --all-namespaces | awk -v pattern="$1" '$2 ~ pattern  { print }'  | awk -F' ' '{print $NF}')
 	sc_name=$(oc get sc | grep efs | awk -F' ' '{print $1}')
-	log " OCS StorageClass : $sc_name"
+	log " EFS StorageClass : $sc_name"
 	if [[ $check_for_csv_success != "Succeeded" && $sc_name = ""  ]]; then
-		log " OCS StorageClass is not available"
+		log " EFS StorageClass is not available"
 		export SERVICE_NAME="EFS storage requirements not satisfied"
 			SCRIPT_STATUS=29
 			return $SCRIPT_STATUS
 
 	else
-		log " OCS StorageClass is available"
+		log " EFS StorageClass is available"
     fi
 
 }
