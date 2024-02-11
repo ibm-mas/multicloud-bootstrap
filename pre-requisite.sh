@@ -16,7 +16,7 @@ if [[ $ROSA = ""  ]]; then
 	fi
 fi
 
-if [[ $ROSA = ""  ]]; then
+if [[ $ROSA =="true" ]]; then
 	getEFS
 	retcode=$?
 	if [[ $retcode -eq 29 ]]; then
