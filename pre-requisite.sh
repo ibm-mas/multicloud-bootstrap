@@ -16,6 +16,14 @@ if [[ $ROSA = ""  ]]; then
 	fi
 fi
 
+if [[ $ROSA = ""  ]]; then
+	getEFS
+	retcode=$?
+	if [[ $retcode -eq 29 ]]; then
+	return $retcode
+	fi
+fi
+
 
 getWorkerNodeDetails
 retcode=$?
