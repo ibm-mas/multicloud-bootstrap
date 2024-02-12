@@ -155,18 +155,7 @@ fi
 
 ## Variables
 # OCP variables
-export CLUSTER_NAME="masocp-${RANDOM_STR}"
-export OCP_USERNAME="masocpuser"
-export OCP_PASSWORD="mas${RANDOM_STR:3:3}`date +%H%M%S`${RANDOM_STR:0:3}"
-if [[ (! -z $EXS_OCP_URL) && (! -z $EXS_OCP_USER) && (! -z $EXS_OCP_PWD) ]]; then
-    export OCP_USERNAME=${EXS_OCP_USER}
-    export OCP_PASSWORD=${EXS_OCP_PWD}
-    if [[ ${EXS_OCP_URL} = *'aroapp'* ]]; then
-      log "EXISTING_CLUSTER is ARO"
-      export EXISTING_CLUSTER="ARO"
-      log "EXISTING_CLUSTER -  $EXISTING_CLUSTER"
-    fi
-fi
+
 export OPENSHIFT_PULL_SECRET_FILE_PATH=${GIT_REPO_HOME}/pull-secret.json
 export MASTER_NODE_COUNT="3"
 export WORKER_NODE_COUNT="3"
@@ -421,6 +410,20 @@ export DEPLOY_CP4D=$(echo $DEPLOY_CP4D | cut -d '=' -f 2)
 export DEPLOY_MANAGE=$(echo $DEPLOY_MANAGE | cut -d '=' -f 2)
 log " DEPLOY_CP4D: $DEPLOY_CP4D"
 log " DEPLOY_MANAGE: $DEPLOY_MANAGE"
+
+export CLUSTER_NAME="masocp-${RANDOM_STR}"
+export OCP_USERNAME="masocpuser"
+export OCP_PASSWORD="mas${RANDOM_STR:3:3}`date +%H%M%S`${RANDOM_STR:0:3}"
+if [[ (! -z $EXS_OCP_URL) && (! -z $EXS_OCP_USER) && (! -z $EXS_OCP_PWD) ]]; then
+    export OCP_USERNAME=${EXS_OCP_USER}
+    export OCP_PASSWORD=${EXS_OCP_PWD}
+    if [[ ${EXS_OCP_URL} = *'aroapp'* ]]; then
+      log "EXISTING_CLUSTER is ARO"
+      export EXISTING_CLUSTER="ARO"
+      log "EXISTING_CLUSTER -  $EXISTING_CLUSTER"
+    fi
+fi
+
 
 cd $GIT_REPO_HOME
 # Perform prevalidation checks
