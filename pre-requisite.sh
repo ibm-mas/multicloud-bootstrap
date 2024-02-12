@@ -17,7 +17,7 @@ if [[ $ROSA = ""  ]]; then
 fi
 
 if [[ $ROSA == "true" ]]; then
-	log " Checking for EFS StorageClass"
+	log " Checking for EFS Storage"
 	getEFS
 	retcode=$?
 	if [[ $retcode -eq 29 ]]; then
