@@ -130,6 +130,7 @@ function getOCS() {
 	log " OCS StorageClass : $sc_name"
 	if [[ $check_for_csv_success != "Succeeded" && $sc_name = ""  ]]; then
 		log " OCS StorageClass is not available"
+		export SERVICE_NAME=" OCS Storage is not available"
 		SCRIPT_STATUS=29
 		return $SCRIPT_STATUS
 	else
