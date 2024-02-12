@@ -267,6 +267,14 @@ log "==== OCP cluster configuration (Cert Manager) started ===="
 cd $GIT_REPO_HOME/../ibm/mas_devops/playbooks
 set +e
 
+if [[ $ROSA == "true" ]]; then
+	log " Patch EFS storage class as default storage class"
+	oc patch storageclass gp3-csi -p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "false"}}}'
+  	oc patch storageclass gp2 -p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "false"}}}'
+  	oc patch storageclass gp3 -p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "false"}}}'
+  	oc patch storageclass $CPD_PRIMARY_STORAGE_CLASS -p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "true"}}}'
+fi
+
 export ROLE_NAME=ibm_catalogs && ansible-playbook ibm.mas_devops.run_role
 export ROLE_NAME=common_services && ansible-playbook ibm.mas_devops.run_role
 export ROLE_NAME=cert_manager && ansible-playbook ibm.mas_devops.run_role
@@ -562,11 +570,16 @@ log "==== MAS Workspace generation completed ===="
 ## Deploy Manage
 if [[ $DEPLOY_MANAGE == "true" && (-z $MAS_JDBC_USER) && (-z $MAS_JDBC_PASSWORD) && (-z $MAS_JDBC_URL) && (-z $MAS_JDBC_CERT_URL) ]]; then
   log "==== Configure internal db2 for manage started ===="
-  export ROLE_NAME=db2 && ansible-playbook ibm.mas_devops.run_role
-  export ROLE_NAME=suite_db2_setup_for_manage && ansible-playbook ibm.mas_devops.run_role
-  #Running setupdb.sh script again such that it creates required tablespaces if it's missed creating it while invoked by ansible role.
-  oc exec -n db2u c-db2wh-db01-db2u-0 -- su -lc '/tmp/setupdb.sh | tee /tmp/setupdb2.log' db2inst1
-  log "==== Configure internal db2 for manage completed ===="
+    if [[ $ROSA == "true" ]]; then
+       log "==== Currently internal db2 is not supported for ROSA  ===="
+    else
+      export ROLE_NAME=db2 && ansible-playbook ibm.mas_devops.run_role
+      export ROLE_NAME=suite_db2_setup_for_manage && ansible-playbook ibm.mas_devops.run_role
+      #Running setupdb.sh script again such that it creates required tablespaces if it's missed creating it while invoked by ansible role.
+      oc exec -n db2u c-db2wh-db01-db2u-0 -- su -lc '/tmp/setupdb.sh | tee /tmp/setupdb2.log' db2inst1
+      log "==== Configure internal db2 for manage completed ===="
+    fi
+
 fi
 
 if [[ $DEPLOY_MANAGE == "true" && (-n $MAS_JDBC_USER) && (-n $MAS_JDBC_PASSWORD) && (-n $MAS_JDBC_URL) ]]; then
