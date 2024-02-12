@@ -267,6 +267,18 @@ log "==== OCP cluster configuration (Cert Manager) started ===="
 cd $GIT_REPO_HOME/../ibm/mas_devops/playbooks
 set +e
 
+if [[ $ROSA == "true" ]]; then
+	export CLUSTER_NAME=$(echo $EXS_OCP_URL | cut -d '.' -f 2)
+	log "Set CPD_PRIMARY_STORAGE_CLASS parameter to EFS storage class created for ROSA"
+	export CPD_PRIMARY_STORAGE_CLASS="efs$CLUSTER_NAME"
+
+	log " Patch EFS storage class as default storage class"
+	oc patch storageclass gp3-csi -p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "false"}}}'
+  	oc patch storageclass gp2 -p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "false"}}}'
+  	oc patch storageclass gp3 -p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "false"}}}'
+  	oc patch storageclass $CPD_PRIMARY_STORAGE_CLASS -p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "true"}}}'
+fi
+
 export ROLE_NAME=ibm_catalogs && ansible-playbook ibm.mas_devops.run_role
 export ROLE_NAME=common_services && ansible-playbook ibm.mas_devops.run_role
 export ROLE_NAME=cert_manager && ansible-playbook ibm.mas_devops.run_role
