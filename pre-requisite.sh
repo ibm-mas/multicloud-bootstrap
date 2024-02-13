@@ -16,6 +16,14 @@ if [[ $ROSA = ""  ]]; then
 	fi
 fi
 
+if [[ $ROSA == "true" ]]; then
+	log " Checking for EFS Storage"
+	getEFS
+	retcode=$?
+	if [[ $retcode -eq 29 ]]; then
+	return $retcode
+	fi
+fi
 
 getWorkerNodeDetails
 retcode=$?
@@ -23,8 +31,7 @@ if [[ $retcode -eq 29 ]]; then
 	return $retcode
 fi
 
-if [[ $DEPLOY_CP4D == "true" ]]; then
-
+if [[ ($DEPLOY_CP4D == "true") && ($ROSA != "true") ]]; then
 	if [[ $CLUSTER_TYPE == "aws" ]]; then
 		getOCS ocs-operator
 	elif [[ $CLUSTER_TYPE == "azure" ]]; then
