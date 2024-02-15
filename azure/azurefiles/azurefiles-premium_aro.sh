@@ -13,7 +13,7 @@ echo  $deployRegion $resourceGroupName $tenantId $subscriptionId $clientId $clie
 export CLUSTER_NAME=$(az resource list --name  $resourceGroupName --query "[].{id:id}"|grep OpenShiftClusters|cut -d "/" -f 9|tr -d '"')
 echo "CLUSTER_NAME" $CLUSTER_NAME
 log "CLUSTER_NAME" $CLUSTER_NAME
-export AZURE_STORAGE_ACCOUNT_NAME=stg${resourceGroupName}
+export AZURE_STORAGE_ACCOUNT_NAME=stg${resourceGroupName,,}
 echo "AZURE_STORAGE_ACCOUNT_NAME" $AZURE_STORAGE_ACCOUNT_NAME
 export AZURE_FILES_RESOURCE_GROUP=$resourceGroupName
 echo "AZURE_FILES_RESOURCE_GROUP" $AZURE_FILES_RESOURCE_GROUP
