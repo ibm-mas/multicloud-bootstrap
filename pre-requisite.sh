@@ -16,15 +16,6 @@ if [[ $ROSA = ""  ]]; then
 	fi
 fi
 
-if [[ $ROSA == "true" ]]; then
-	log " Checking for EFS Storage"
-	getEFS
-	retcode=$?
-	if [[ $retcode -eq 29 ]]; then
-	return $retcode
-	fi
-fi
-
 getWorkerNodeDetails
 retcode=$?
 if [[ $retcode -eq 29 ]]; then

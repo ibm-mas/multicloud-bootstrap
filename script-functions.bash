@@ -130,9 +130,15 @@ function getOCS() {
 	log " OCS StorageClass : $sc_name"
 	if [[ $check_for_csv_success != "Succeeded" && $sc_name = ""  ]]; then
 		log " OCS StorageClass is not available"
-		export SERVICE_NAME=" OCS Storage is not available"
-		SCRIPT_STATUS=29
-		return $SCRIPT_STATUS
+		oc login -u $OCP_USERNAME -p $OCP_PASSWORD --server=$EXS_OCP_URL:6443
+  		log "==== Adding PID limits to worker nodes ===="
+  		export GIT_REPO_HOME=/root/ansible-devops/multicloud-bootstrap
+  		oc create -f $GIT_REPO_HOME/templates/container-runtime-config.yml
+  log "==== Creating storage classes namely gp2, ocs-storagecluster-ceph-rbd, ocs-storagecluster-cephfs, & openshift-storage.noobaa.io ===="
+  		oc apply -f $GIT_REPO_HOME/aws/ocp-terraform/ocs/gp2.yaml
+  		oc apply -f $GIT_REPO_HOME/aws/ocp-terraform/ocs/ocs-storagecluster-cephfs.yaml
+  		oc apply -f $GIT_REPO_HOME/aws/ocp-terraform/ocs/ocs-storagecluster-ceph-rbd.yaml
+  		oc apply -f $GIT_REPO_HOME/aws/ocp-terraform/ocs/openshift-storage.noobaa.io.yaml
 	else
 		log " OCS StorageClass is available"
     fi
