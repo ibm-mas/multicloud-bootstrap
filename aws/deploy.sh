@@ -570,13 +570,15 @@ log "==== MAS Workspace generation completed ===="
 ## Deploy Manage
 if [[ $DEPLOY_MANAGE == "true" && (-z $MAS_JDBC_USER) && (-z $MAS_JDBC_PASSWORD) && (-z $MAS_JDBC_URL) && (-z $MAS_JDBC_CERT_URL) ]]; then
   log "==== Configure internal db2 for manage started ===="
-
+    if [[ $ROSA == "true" ]]; then
+       log "==== Currently internal db2 is not supported for ROSA  ===="
+    else
       export ROLE_NAME=db2 && ansible-playbook ibm.mas_devops.run_role
       export ROLE_NAME=suite_db2_setup_for_manage && ansible-playbook ibm.mas_devops.run_role
       #Running setupdb.sh script again such that it creates required tablespaces if it's missed creating it while invoked by ansible role.
       oc exec -n db2u c-db2wh-db01-db2u-0 -- su -lc '/tmp/setupdb.sh | tee /tmp/setupdb2.log' db2inst1
       log "==== Configure internal db2 for manage completed ===="
-
+   fi
 
 fi
 
