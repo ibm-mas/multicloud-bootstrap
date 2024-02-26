@@ -268,13 +268,6 @@ cd $GIT_REPO_HOME/../ibm/mas_devops/playbooks
 set +e
 
 if [[ $ROSA == "true" ]]; then
-	log "==== Adding PID limits to worker nodes ===="
-  oc create -f $GIT_REPO_HOME/templates/container-runtime-config.yml
-  log "==== Creating storage classes namely, gp2, ocs-storagecluster-ceph-rbd, ocs-storagecluster-cephfs, & openshift-storage.noobaa.io ===="
-  oc apply -f $GIT_REPO_HOME/aws/ocp-terraform/ocs/gp2.yaml
-  oc apply -f $GIT_REPO_HOME/aws/ocp-terraform/ocs/ocs-storagecluster-cephfs.yaml
-  oc apply -f $GIT_REPO_HOME/aws/ocp-terraform/ocs/ocs-storagecluster-ceph-rbd.yaml
-  oc apply -f $GIT_REPO_HOME/aws/ocp-terraform/ocs/openshift-storage.noobaa.io.yaml
 	log " Patch EFS storage class as default storage class"
 	oc patch storageclass gp3-csi -p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "false"}}}'
   	oc patch storageclass gp2 -p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "false"}}}'
