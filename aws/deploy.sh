@@ -22,8 +22,10 @@ export SLS_STORAGE_CLASS=gp2
 # UDS variables
 export UDS_STORAGE_CLASS=gp2
 # CP4D variables
-export CPD_METADATA_STORAGE_CLASS="efsnsrosaclust"
-export CPD_SERVICE_STORAGE_CLASS="efsnsrosaclust"
+#export CPD_METADATA_STORAGE_CLASS="efsnsrosaclust"
+#export CPD_SERVICE_STORAGE_CLASS="efsnsrosaclust"
+export CPD_METADATA_STORAGE_CLASS="gp2"
+export CPD_SERVICE_STORAGE_CLASS="ocs-storagecluster-cephfs"
 export CPD_PRIMARY_STORAGE_CLASS="efsnsrosaclust"
 
 # Retrieve SSH public key
