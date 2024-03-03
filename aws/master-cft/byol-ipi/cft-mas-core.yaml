@@ -306,49 +306,45 @@ Metadata:
 Mappings:
   RegionMap:
     us-east-1:
-      HVM64: ami-07809a17acfe15035
+      HVM64: ami-008d76c84eb8e3200
     us-east-2:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
+      HVM64: ami-0a71da287df660937 
     us-west-2:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
+      HVM64: ami-0314c984473d391b1 
     ca-central-1:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
+      HVM64: ami-0fa6021b4916d1d40
     eu-north-1:
-      HVM64: ami-0fc7ab563232d6769
+      HVM64: ami-03c8c1aaddae0d9d5
     eu-west-1:
-      HVM64: ami-0fc349d82c682cae4
+      HVM64: ami-0dc9af42ea5d74974
     eu-west-2:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
+      HVM64: ami-0133211dd60650a83
     eu-west-3:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
+      HVM64: ami-0a2ad325e075b7ebd
     eu-central-1:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
+      HVM64: ami-0468aaadc1917bff3
     ap-northeast-1:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
+      HVM64: ami-034db12d1c81abe4f
     ap-northeast-2:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
+      HVM64: ami-027e08abfa3bfb575
     ap-northeast-3:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
+      HVM64: ami-0b951085b2cf36aa8
     ap-south-1:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
+      HVM64: ami-0d18e347d0f24dd56
     ap-southeast-1:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
+      HVM64: ami-0e2b96b03b2251251
     ap-southeast-2:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
+      HVM64: ami-00ddb2b588752aada
     sa-east-1:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
+      HVM64: ami-02fa7c0ee64a928f9
     af-south-1:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
+      HVM64: ami-000b4a9c77afc24b9
     ap-east-1:
-      HVM64: ami-0a8ba8a0fde410499
-    ap-southeast-3:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
+      HVM64: ami-0a438b1d3639b2ad0
     eu-south-1:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
+      HVM64: ami-062c2380077d12749
     me-south-1:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
-    me-central-1:
-      HVM64: ami-xxxxxxxxxxxxxxxxx
+      HVM64: ami-01f52d47a767c3c1e
 Resources:
   DeployWaitConditionHandle:
     Type: 'AWS::CloudFormation::WaitConditionHandle'
@@ -672,10 +668,10 @@ Resources:
               # Initiate the provisioning process
             - ssh-keyscan github.com >> ~/.ssh/known_hosts;
             - cd /root;
-            - 'git clone https://github.com/ibm-mas/ansible-devops.git;'
+            - 'git clone -b pk-gitops-issue-1223 https://github.com/ibm-mas/ansible-devops.git;'
             - cd ansible-devops;
             - rm -rf multicloud-bootstrap 1>/dev/null 2>&1;
-            - 'git clone https://github.com/ibm-mas/multicloud-bootstrap.git;'
+            - 'git clone -b pk_8.11 https://github.com/ibm-mas/multicloud-bootstrap.git;'
             - cd multicloud-bootstrap;
             - 'find . -type f -name "*.sh" -exec chmod +x {} \;;'
             - ./init.sh "aws" "
@@ -759,7 +755,7 @@ Resources:
             - !Ref EBSVolumeType
             - ''' '''
             - !Ref TablespaceNames
-            - ''' "prod" '
+            - ''' "dev" '
             - '2>&1 | tee mas-provisioning.log; '
       Tags:
         - Key: Name
