@@ -447,6 +447,7 @@ else
     # Read mongocfg and update certificate
     echo "latest..... SLS_MONGODB_CFG_FILE update logic"
     if [[ -f ${SLS_MONGODB_CFG_FILE} && -f $GIT_REPO_HOME/aws/certs/2048-ca/root-ca-rsa2048-${DEPLOY_REGION}.pem ]]; then
+      python -m pip install yq || exit 1
       echo "SLS_MONGODB_CFG_FILE..... before update"
       cat ${SLS_MONGODB_CFG_FILE}
 
