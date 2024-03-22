@@ -443,6 +443,24 @@ else
       aws ec2 create-tags --resources $SUBNET_ID2  --tags Key=Name,Value=$TAG_NAME2
       aws ec2 create-tags --resources $SUBNET_ID3  --tags Key=Name,Value=$TAG_NAME3
     fi
+
+    # Read mongocfg and update certificate
+    echo "latest..... SLS_MONGODB_CFG_FILE update logic"
+    if [[ -f ${SLS_MONGODB_CFG_FILE} && -f $GIT_REPO_HOME/aws/certs/2048-ca/root-ca-rsa2048-${DEPLOY_REGION}.pem ]]; then
+      echo "SLS_MONGODB_CFG_FILE..... before update"
+      cat ${SLS_MONGODB_CFG_FILE}
+
+      cp $SLS_MONGODB_CFG_FILE ${SLS_MONGODB_CFG_FILE}.bak
+
+      echo "SLS_MONGODB_CFG_FILE..... before update"
+      export CERTIFICATES=$(cat $GIT_REPO_HOME/aws/certs/2048-ca/root-ca-rsa2048-${DEPLOY_REGION}.pem | yq -r '.crt')
+      echo "CERTIFICATES=$CERTIFICATES"
+      yq -iY 'del(.spec.certificates[1])' ${SLS_MONGODB_CFG_FILE}
+
+      yq --arg crt "${CERTIFICATES}" -iY 'select(.spec.certificates[0] | has("crt") ).spec.certificates[0].crt = $crt' ${SLS_MONGODB_CFG_FILE}
+      echo "SLS_MONGODB_CFG_FILE..... after update"
+      cat ${SLS_MONGODB_CFG_FILE}
+    fi
   fi
 
   log "==== MongoDB deployment completed ===="
