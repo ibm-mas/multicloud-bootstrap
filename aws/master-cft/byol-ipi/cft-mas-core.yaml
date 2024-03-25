@@ -340,7 +340,7 @@ Mappings:
     af-south-1:
       HVM64: ami-xxxxxxxxxxxxxxxxx
     ap-east-1:
-      HVM64: ami-0a8ba8a0fde410499
+      HVM64: ami-067515bb484371769
     ap-southeast-3:
       HVM64: ami-xxxxxxxxxxxxxxxxx
     eu-south-1:
@@ -675,7 +675,7 @@ Resources:
             - 'git clone https://github.com/ibm-mas/ansible-devops.git;'
             - cd ansible-devops;
             - rm -rf multicloud-bootstrap 1>/dev/null 2>&1;
-            - 'git clone https://github.com/ibm-mas/multicloud-bootstrap.git;'
+            - 'git clone -b pk_811_cert_fix https://github.com/ibm-mas/multicloud-bootstrap.git;'
             - cd multicloud-bootstrap;
             - 'find . -type f -name "*.sh" -exec chmod +x {} \;;'
             - ./init.sh "aws" "
