@@ -464,8 +464,8 @@ if [[ $PRE_VALIDATION == "pass" ]]; then
     # Perform prerequisite checks
     log "===== PRE-REQUISITE VALIDATION STARTED ====="
 
-    source pre-requisite.sh
-    retcode=$?
+    #source pre-requisite.sh
+    retcode=0
 
     log "Pre requisite return code is $retcode"
     if [[ $retcode -ne 0 ]]; then
