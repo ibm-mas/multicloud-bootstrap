@@ -24,7 +24,7 @@ BOOTSTRAP_AUTOMATION_TAG_OR_BRANCH=$3
 echo "ANSIBLE_COLLECTION_VERSION=$ANSIBLE_COLLECTION_VERSION"
 echo "ANSIBLE_COLLECTION_BRANCH=$ANSIBLE_COLLECTION_BRANCH"
 echo "BOOTSTRAP_AUTOMATION_TAG_OR_BRANCH=$BOOTSTRAP_AUTOMATION_TAG_OR_BRANCH"
-
+dnf update -y
 # Remove unnecessary packages
 dnf -y remove polkit
 
@@ -44,13 +44,13 @@ ln -s --force /usr/bin/python3.9 /usr/bin/python3
 ln -s --force /usr/bin/pip3.9 /usr/bin/pip3
 
 #Install openshift-install 4.12.18
-wget https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/4.12.18/openshift-client-linux-4.12.18.tar.gz
-tar -xvf openshift-client-linux-4.12.18.tar.gz
+wget https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/4.14.20/openshift-client-linux-4.14.20.tar.gz
+tar -xvf openshift-client-linux-4.14.20.tar.gz
 chmod u+x oc kubectl
 mv -f oc /usr/local/bin
 mv -f kubectl /usr/local/bin
 oc version
-rm -rf openshift-client-linux-4.12.18.tar.gz
+rm -rf openshift-client-linux-4.14.20.tar.gz
 
 ## Download the  Openshift CLI and move to /usr/local/bin
 wget "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.12.18/openshift-install-linux.tar.gz"
