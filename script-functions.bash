@@ -33,27 +33,27 @@ instance_names['ibm-cert-manager-operator']='default'
 
 checkROSA(){
 	rosa_cm=$(oc get cm rosa-brand-logo -n openshift-config | awk  'NR==2 {print $2 }')
-	if [[ $rosa_cm -eq 1 ]]; then
-		log " ROSA Cluster "
-		currentOpenshiftVersion=$(oc get clusterversion | awk  'NR==2 {print $2 }')
-		log " OCP version is $currentOpenshiftVersion"
-		if [[ $currentOpenshiftVersion =~ ${op_versions[rosaVersion412]} ]]; then
-    		log " ROSA Cluster Supported Version"
-    	elif [[ $currentOpenshiftVersion =~ ${op_versions[rosaVersion414]} ]]; then
-    		log " ROSA Cluster Supported Version"
-  		else
-    		log " Unsupported ROSA version $currentOpenshiftVersion. Supported ROSA versions are 4.12.x and 4.14.x"
-			export SERVICE_NAME=" Unsupported ROSA version $currentOpenshiftVersion. Supported ROSA versions are 4.12.x and 4.14.x"
-			SCRIPT_STATUS=29
-			return $SCRIPT_STATUS
- 		fi
-		log " DEPLOY_CP4D: $DEPLOY_CP4D"
-		export ROSA="true"
-			#if [[ $DEPLOY_CP4D == "true" ]]; then
-			#SCRIPT_STATUS=30
-			#return $SCRIPT_STATUS
-			#fi
-	fi
+		if [[ $rosa_cm -eq 1 ]]; then
+			log " ROSA Cluster "
+			currentOpenshiftVersion=$(oc get clusterversion | awk  'NR==2 {print $2 }')
+			log " OCP version is $currentOpenshiftVersion"
+			if [[ $currentOpenshiftVersion =~ ${op_versions[rosaVersion412]} ]]; then
+	    		log " ROSA Cluster Supported Version"
+	    	elif [[ $currentOpenshiftVersion =~ ${op_versions[rosaVersion414]} ]]; then
+	    		log " ROSA Cluster Supported Version"
+	  		else
+	    		log " Unsupported ROSA version $currentOpenshiftVersion. Supported ROSA versions are 4.12.x and 4.14.x"
+				export SERVICE_NAME=" Unsupported ROSA version $currentOpenshiftVersion. Supported ROSA versions are 4.12.x and 4.14.x"
+				SCRIPT_STATUS=29
+				return $SCRIPT_STATUS
+	 		fi
+			log " DEPLOY_CP4D: $DEPLOY_CP4D"
+			export ROSA="true"
+				#if [[ $DEPLOY_CP4D == "true" ]]; then
+				#SCRIPT_STATUS=30
+				#return $SCRIPT_STATUS
+				#fi
+		fi
 
 }
 function version_gt() {
