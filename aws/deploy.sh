@@ -268,6 +268,19 @@ cd $GIT_REPO_HOME/../ibm/mas_devops/playbooks
 set +e
 
 if [[ $ROSA == "true" ]]; then
+    # Use the latest catalog version to support ROSA 4.14.x cluster
+    export MAS_DEVOPS_COLLECTION_VERSION=18.17.0
+    export MAS_CATALOG_VERSION=v8-240405-amd64
+    # Below environment variable settings are required to point to EFS storage to make internal DB2 & Manage offering to work on ROSA cluster
+    export CLUSTER_NAME=$(echo $EXS_OCP_URL | cut -d '.' -f 2)
+	export CPD_PRIMARY_STORAGE_CLASS="efs$CLUSTER_NAME"
+	export CPD_METADATA_STORAGE_CLASS="efs$CLUSTER_NAME"
+	export CPD_SERVICE_STORAGE_CLASS="efs$CLUSTER_NAME"
+	export DB2_META_STORAGE_CLASS=$CPD_PRIMARY_STORAGE_CLASS
+	export DB2_DATA_STORAGE_CLASS=$CPD_PRIMARY_STORAGE_CLASS
+	export DB2_BACKUP_STORAGE_CLASS=$CPD_PRIMARY_STORAGE_CLASS
+	export DB2_LOGS_STORAGE_CLASS=$CPD_PRIMARY_STORAGE_CLASS
+	export DB2_TEMP_STORAGE_CLASS=$CPD_PRIMARY_STORAGE_CLASS
 	log " Patch EFS storage class as default storage class"
 	oc patch storageclass gp3-csi -p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "false"}}}'
   	oc patch storageclass gp2 -p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "false"}}}'
@@ -570,16 +583,12 @@ log "==== MAS Workspace generation completed ===="
 ## Deploy Manage
 if [[ $DEPLOY_MANAGE == "true" && (-z $MAS_JDBC_USER) && (-z $MAS_JDBC_PASSWORD) && (-z $MAS_JDBC_URL) && (-z $MAS_JDBC_CERT_URL) ]]; then
   log "==== Configure internal db2 for manage started ===="
-    if [[ $ROSA == "true" ]]; then
-       log "==== Currently internal db2 is not supported for ROSA  ===="
-    else
       export ROLE_NAME=db2 && ansible-playbook ibm.mas_devops.run_role
       export ROLE_NAME=suite_db2_setup_for_manage && ansible-playbook ibm.mas_devops.run_role
+
       #Running setupdb.sh script again such that it creates required tablespaces if it's missed creating it while invoked by ansible role.
       oc exec -n db2u c-db2wh-db01-db2u-0 -- su -lc '/tmp/setupdb.sh | tee /tmp/setupdb2.log' db2inst1
       log "==== Configure internal db2 for manage completed ===="
-   fi
-
 fi
 
 if [[ $DEPLOY_MANAGE == "true" && (-n $MAS_JDBC_USER) && (-n $MAS_JDBC_PASSWORD) && (-n $MAS_JDBC_URL) ]]; then
