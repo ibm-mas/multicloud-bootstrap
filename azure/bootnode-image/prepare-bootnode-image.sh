@@ -146,11 +146,11 @@ find . -type f -name "*.sh" -exec chmod +x {} \;
 wget https://github.com/IBM/cpd-cli/releases/download/v13.1.5/cpd-cli-linux-SE-13.1.5.tgz
 
 tar -zvxf cpd-cli-linux-SE-13.1.5.tgz
-rm -rf cpd-cli-linux-SE-13.1.5.tgz
-cd cpd-cli-linux-SE-13.1.5*
-chmod +x cpd-clis
-mv * /usr/local/bin/
 
+cd cpd-cli-linux-SE-13.1.5*
+chmod +x cpd-cli
+mv * /usr/local/bin/
+rm -rf cpd-cli-linux-SE-13.1.5.tgz
 # Clear bash history
 echo "" > /home/azureuser/.bash_history
 history -c
