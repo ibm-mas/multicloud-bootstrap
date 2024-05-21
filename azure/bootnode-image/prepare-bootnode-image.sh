@@ -144,10 +144,8 @@ find . -type f -name "*.sh" -exec chmod +x {} \;
 #Installig cpd-cli for db2wh
 
 wget https://github.com/IBM/cpd-cli/releases/download/v13.1.5/cpd-cli-linux-SE-13.1.5.tgz
-
 tar -zvxf cpd-cli-linux-SE-13.1.5.tgz
-
-cd cpd-cli-linux-SE-13.1.5*
+cd cpd-cli-linux-SE-13.1.5-176
 chmod +x cpd-cli
 mv * /usr/local/bin/
 rm -rf cpd-cli-linux-SE-13.1.5.tgz
