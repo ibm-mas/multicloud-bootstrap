@@ -132,12 +132,22 @@ if [[ $CLUSTER_TYPE == "gcp" ]]; then
   cd -
 fi
 
+
+
 # Check for input parameters
 if [[ (-z $CLUSTER_TYPE) || (-z $DEPLOY_REGION) || (-z $RANDOM_STR) || (-z $CLUSTER_SIZE) || (-z $SLS_ENTITLEMENT_KEY) \
    || (-z $SSH_KEY_NAME) ]]; then
   log "ERROR: Required parameter not specified, please provide all the required inputs to the script."
   PRE_VALIDATION=fail
 fi
+#for dev release
+export MAS_ENTITLEMENT_USERNAME=`echo $SLS_ENTITLEMENT_KEY|cut -d "#" -f 2`
+export MAS_ENTITLEMENT_KEY=`echo $SLS_ENTITLEMENT_KEY|cut -d "#" -f 3`
+export SLS_ENTITLEMENT_KEY=`echo $SLS_ENTITLEMENT_KEY|cut -d "#" -f 1`
+echo $SLS_ENTITLEMENT_KEY
+echo $MAS_ENTITLEMENT_USERNAME
+echo $MAS_ENTITLEMENT_KEY
+
 
 if [[ $OFFERING_TYPE == "MAS Core + Cloud Pak for Data" ]]; then
   export DEPLOY_CP4D="true"
@@ -213,9 +223,9 @@ export UDS_TLS_CERT_LOCAL_FILE_PATH="${GIT_REPO_HOME}/uds.crt"
 # CP4D variables
 export CPD_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
 export CPD_VERSION=cpd40
-export CPD_PRODUCT_VERSION=4.6.4
-export MAS_CHANNEL=8.11.x
-export MAS_CATALOG_VERSION=v8-231228-amd64
+export CPD_PRODUCT_VERSION=4.8.0
+export MAS_CHANNEL=9.0.x-dev
+export MAS_CATALOG_VERSION=v8-master-amd64
 if [[ $CLUSTER_TYPE == "aws" ]]; then
   export CPD_PRIMARY_STORAGE_CLASS="ocs-storagecluster-cephfs"
 elif [[ $CLUSTER_TYPE == "azure" ]]; then
@@ -244,7 +254,7 @@ export ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
 export DB2WH_NAMESPACE="cpd-services-${RANDOM_STR}"
 export DB2WH_JDBC_USERNAME="db2inst1"
 # MAS variables
-export MAS_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
+#export MAS_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
 export IBM_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
 export MAS_WORKSPACE_ID="wsmasocp"
 export MAS_WORKSPACE_NAME="wsmasocp"
@@ -253,8 +263,8 @@ export MAS_APP_ID=manage
 export MAS_APPWS_JDBC_BINDING="workspace-application"
 export MAS_JDBC_CERT_LOCAL_FILE=$GIT_REPO_HOME/db.crt
 export MAS_CLOUD_AUTOMATION_VERSION=1.0
-export MAS_DEVOPS_COLLECTION_VERSION=18.3.4
-export MAS_APP_CHANNEL=8.7.x
+export MAS_DEVOPS_COLLECTION_VERSION=20.0.1
+export MAS_APP_CHANNEL=8.9.x
 if [ -z "$EXISTING_NETWORK" ]; then
   export new_or_existing_vpc_subnet="new"
   export enable_permission_quota_check=true
