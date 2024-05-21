@@ -32,8 +32,8 @@ dnf -y remove polkit
 #echo "Enable and disable repos to update certs"
 #dnf update -y --disablerepo=* --enablerepo='*microsoft*' rhui-azure-rhel8-eus
 rm /etc/dnf/vars/releasever
-dnf --disablerepo='*' remove 'rhui-azure-rhel9-eus'
-dnf --config='https://rhelimage.blob.core.windows.net/repositories/rhui-microsoft-azure-rhel9.config' install rhui-azure-rhel9
+dnf --disablerepo='*' -y remove 'rhui-azure-rhel9-eus'
+dnf --config='https://rhelimage.blob.core.windows.net/repositories/rhui-microsoft-azure-rhel9.config' install rhui-azure-rhel9 -y
 
 # Update all packages to latest
 dnf update -y
