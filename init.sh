@@ -141,6 +141,8 @@ if [[ (-z $CLUSTER_TYPE) || (-z $DEPLOY_REGION) || (-z $RANDOM_STR) || (-z $CLUS
   PRE_VALIDATION=fail
 fi
 #for dev release
+export MAS_ICR_CP=docker-na-public.artifactory.swg-devops.com/wiotp-docker-local
+export MAS_ICR_CPOPEN=docker-na-public.artifactory.swg-devops.com/wiotp-docker-local/cpopen
 export MAS_ENTITLEMENT_USERNAME=`echo $SLS_ENTITLEMENT_KEY|cut -d "#" -f 2`
 export MAS_ENTITLEMENT_KEY=`echo $SLS_ENTITLEMENT_KEY|cut -d "#" -f 3`
 export SLS_ENTITLEMENT_KEY=`echo $SLS_ENTITLEMENT_KEY|cut -d "#" -f 1`
