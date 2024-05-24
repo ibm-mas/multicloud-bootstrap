@@ -141,15 +141,15 @@ if [[ (-z $CLUSTER_TYPE) || (-z $DEPLOY_REGION) || (-z $RANDOM_STR) || (-z $CLUS
   PRE_VALIDATION=fail
 fi
 #for dev release
-export MAS_ICR_CP=docker-na-public.artifactory.swg-devops.com/wiotp-docker-local
-export MAS_ICR_CPOPEN=docker-na-public.artifactory.swg-devops.com/wiotp-docker-local/cpopen
-export MAS_ENTITLEMENT_USERNAME=`echo $SLS_ENTITLEMENT_KEY|cut -d "#" -f 2`
-export MAS_ENTITLEMENT_KEY=`echo $SLS_ENTITLEMENT_KEY|cut -d "#" -f 3`
-export SLS_ENTITLEMENT_KEY=`echo $SLS_ENTITLEMENT_KEY|cut -d "#" -f 1`
-export IBM_ENTITLEMENT_KEY=$MAS_ENTITLEMENT_KEY
-echo $SLS_ENTITLEMENT_KEY
-echo $MAS_ENTITLEMENT_USERNAME
-echo $MAS_ENTITLEMENT_KEY
+#export MAS_ICR_CP=docker-na-public.artifactory.swg-devops.com/wiotp-docker-local
+#export MAS_ICR_CPOPEN=docker-na-public.artifactory.swg-devops.com/wiotp-docker-local/cpopen
+#export MAS_ENTITLEMENT_USERNAME=`echo $SLS_ENTITLEMENT_KEY|cut -d "#" -f 2`
+#export MAS_ENTITLEMENT_KEY=`echo $SLS_ENTITLEMENT_KEY|cut -d "#" -f 3`
+#export SLS_ENTITLEMENT_KEY=`echo $SLS_ENTITLEMENT_KEY|cut -d "#" -f 1`
+#export IBM_ENTITLEMENT_KEY=$MAS_ENTITLEMENT_KEY
+#echo $SLS_ENTITLEMENT_KEY
+#echo $MAS_ENTITLEMENT_USERNAME
+#echo $MAS_ENTITLEMENT_KEY
 
 
 if [[ $OFFERING_TYPE == "MAS Core + Cloud Pak for Data" ]]; then
@@ -173,7 +173,7 @@ export OPENSHIFT_PULL_SECRET_FILE_PATH=${GIT_REPO_HOME}/pull-secret.json
 export MASTER_NODE_COUNT="3"
 export WORKER_NODE_COUNT="3"
 export AZ_MODE="multi_zone"
-export OCP_VERSION="4.12.18"
+export OCP_VERSION="4.14.26"
 
 export MAS_IMAGE_TEST_DOWNLOAD="cp.icr.io/cp/mas/admin-dashboard:5.1.27"
 export BACKUP_FILE_NAME="deployment-backup-${CLUSTER_NAME}.zip"
@@ -227,8 +227,8 @@ export UDS_TLS_CERT_LOCAL_FILE_PATH="${GIT_REPO_HOME}/uds.crt"
 export CPD_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
 export CPD_VERSION=cpd40
 export CPD_PRODUCT_VERSION=4.8.0
-export MAS_CHANNEL=9.0.x-dev
-export MAS_CATALOG_VERSION=v8-master-amd64
+export MAS_CHANNEL=8.11.x
+export MAS_CATALOG_VERSION=v8-231228-amd64
 if [[ $CLUSTER_TYPE == "aws" ]]; then
   export CPD_PRIMARY_STORAGE_CLASS="ocs-storagecluster-cephfs"
 elif [[ $CLUSTER_TYPE == "azure" ]]; then
@@ -257,8 +257,8 @@ export ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
 export DB2WH_NAMESPACE="cpd-services-${RANDOM_STR}"
 export DB2WH_JDBC_USERNAME="db2inst1"
 # MAS variables -uncomment
-#export MAS_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
-#export IBM_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
+export MAS_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
+export IBM_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
 export MAS_WORKSPACE_ID="wsmasocp"
 export MAS_WORKSPACE_NAME="wsmasocp"
 export MAS_CONFIG_SCOPE="wsapp"
@@ -266,8 +266,8 @@ export MAS_APP_ID=manage
 export MAS_APPWS_JDBC_BINDING="workspace-application"
 export MAS_JDBC_CERT_LOCAL_FILE=$GIT_REPO_HOME/db.crt
 export MAS_CLOUD_AUTOMATION_VERSION=1.0
-export MAS_DEVOPS_COLLECTION_VERSION=20.0.1
-export MAS_APP_CHANNEL=8.9.x
+export MAS_DEVOPS_COLLECTION_VERSION=18.3.4
+export MAS_APP_CHANNEL=8.7.x
 if [ -z "$EXISTING_NETWORK" ]; then
   export new_or_existing_vpc_subnet="new"
   export enable_permission_quota_check=true
