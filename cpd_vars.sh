@@ -24,6 +24,8 @@ export PROJECT_CPFS_OPS=ibm-common-services
 export PROJECT_CPD_OPS=ibm-cpd-operators-${RANDOM_STR}
 export PROJECT_CATSRC=openshift-marketplace
 export PROJECT_CPD_INSTANCE=ibm-cpd-${RANDOM_STR}
+export PROJECT_CPD_INST_OPERATORS=${PROJECT_CPD_OPS}
+export PROJECT_CPD_INST_OPERANDS=${PROJECT_CPD_INSTANCE}
 # export PROJECT_TETHERED=<enter the tethered project>
 
 
@@ -39,8 +41,18 @@ export IBM_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
 # ------------------------------------------------------------------------------
 
 export VERSION=$CPD_PRODUCT_VERSION
+# ------------------------------------------------------------------------------
+# Private container registry
+# ------------------------------------------------------------------------------
+# Set the following variables if you mirror images to a private container registry.
+#
+# To export these variables, you must uncomment each command in this section.
 
-
+export PRIVATE_REGISTRY_LOCATION=cp.icr.io/cp
+export PRIVATE_REGISTRY_PUSH_USER=cp
+export PRIVATE_REGISTRY_PUSH_PASSWORD=$IBM_ENTITLEMENT_KEY
+export PRIVATE_REGISTRY_PULL_USER=cp
+export PRIVATE_REGISTRY_PULL_PASSWORD=$IBM_ENTITLEMENT_KEY
 # ------------------------------------------------------------------------------
 # Components
 # ------------------------------------------------------------------------------

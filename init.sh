@@ -218,6 +218,8 @@ if [[ $CLUSTER_TYPE == "aws" ]]; then
   export UDS_STORAGE_CLASS="gp2"
 elif [[ $CLUSTER_TYPE == "azure" ]]; then
   export UDS_STORAGE_CLASS="managed-premium"
+  export DRO_STORAGE_CLASS="managed-premium"
+
 fi
 export UDS_CONTACT_EMAIL="uds.support@ibm.com"
 export UDS_CONTACT_FIRSTNAME=Uds
@@ -236,6 +238,7 @@ elif [[ $CLUSTER_TYPE == "azure" ]]; then
   export CPD_PRIMARY_STORAGE_CLASS="azurefiles-premium"
   export CPD_METADATA_STORAGE_CLASS="managed-premium"
 fi
+export DRO_STORAGE_CLASS=true
 # DB2WH variables
 export CPD_OPERATORS_NAMESPACE="ibm-cpd-operators-${RANDOM_STR}"
 export CPD_INSTANCE_NAMESPACE="ibm-cpd-${RANDOM_STR}"
