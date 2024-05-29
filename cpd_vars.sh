@@ -82,6 +82,8 @@ echo $VERSION
 if [[ -n $OCP_URL && -n $$OCP_USERNAME && -n $OCP_PASSWORD && -n $VERSION ]]; then
   log "Logging into the cluster,"
   cpd-cli manage login-to-ocp --username=${OCP_USERNAME}  --password=${OCP_PASSWORD} --server=${OCP_URL}
+
+  cpd-cli manage  add-icr-cred-to-global-pull-secret --entitled_registry_key=$IBM_ENTITLEMENT_KEY
    log "Creating  the OLM objects for Db2 Warehouse,"
   cpd-cli manage apply-olm --release=${VERSION} --cpd_operator_ns=${PROJECT_CPD_OPS} --components=db2wh
    log "custom resource for Db2 Warehouse & Installing the service,"
