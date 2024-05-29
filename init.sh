@@ -238,7 +238,7 @@ elif [[ $CLUSTER_TYPE == "azure" ]]; then
   export CPD_PRIMARY_STORAGE_CLASS="azurefiles-premium"
   export CPD_METADATA_STORAGE_CLASS="managed-premium"
 fi
-export DRO_STORAGE_CLASS=true
+#export DRO_STORAGE_CLASS=true
 # DB2WH variables
 export CPD_OPERATORS_NAMESPACE="ibm-cpd-operators-${RANDOM_STR}"
 export CPD_INSTANCE_NAMESPACE="ibm-cpd-${RANDOM_STR}"
