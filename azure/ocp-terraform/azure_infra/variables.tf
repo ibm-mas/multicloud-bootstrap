@@ -190,7 +190,7 @@ variable "cpd-external-username" {
   default     = "cp"
 }
 variable "ocp_version" {
-  default = "4.12.18"
+  default = "4.14.26"
 }
 
 

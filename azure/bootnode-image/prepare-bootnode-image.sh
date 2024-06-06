@@ -31,6 +31,9 @@ dnf -y remove polkit
 # Enable and disable repos to update certs
 #echo "Enable and disable repos to update certs"
 #dnf update -y --disablerepo=* --enablerepo='*microsoft*' rhui-azure-rhel8-eus
+rm /etc/dnf/vars/releasever
+dnf --disablerepo='*' -y remove 'rhui-azure-rhel9-eus'
+dnf --config='https://rhelimage.blob.core.windows.net/repositories/rhui-microsoft-azure-rhel9.config' install rhui-azure-rhel9 -y
 
 # Update all packages to latest
 dnf update -y
@@ -43,22 +46,22 @@ ln -s --force /usr/bin/pip3.9 /usr/bin/pip
 ln -s --force /usr/bin/python3.9 /usr/bin/python3
 ln -s --force /usr/bin/pip3.9 /usr/bin/pip3
 
-#Install openshift-install 4.12.18
-wget https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/4.12.18/openshift-client-linux-4.12.18.tar.gz
-tar -xvf openshift-client-linux-4.12.18.tar.gz
+#Install openshift-install 4.14.26
+wget "https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/4.14.26/openshift-client-linux.tar.gz"
+tar -xvf openshift-client-linux.tar.gz
 chmod u+x oc kubectl
 mv -f oc /usr/local/bin
 mv -f kubectl /usr/local/bin
 oc version
-rm -rf openshift-client-linux-4.12.18.tar.gz
+rm -rf openshift-client-linux.tar.gz
 
 ## Download the  Openshift CLI and move to /usr/local/bin
-wget "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.12.18/openshift-install-linux.tar.gz"
-tar -xvf openshift-install-linux.tar.gz
+wget "https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/4.14.26/openshift-install-linux-4.14.26.tar.gz"
+tar -xvf openshift-install-linux-4.14.26.tar.gz
 chmod u+x openshift-install
 mv -f openshift-install /usr/local/bin
 openshift-install version
-rm -rf openshift-install-linux.tar.gz
+rm -rf openshift-install-linux-4.14.26.tar.gz
 
 # Install Azure cli for rhel9
 rpm --import https://packages.microsoft.com/keys/microsoft.asc
@@ -140,11 +143,10 @@ find . -type f -name "*.sh" -exec chmod +x {} \;
 
 #Installig cpd-cli for db2wh
 
-wget https://github.com/IBM/cpd-cli/releases/download/v12.0.4/cpd-cli-linux-SE-12.0.4.tgz
-
-tar -zvxf cpd-cli-linux-SE-12.0.4.tgz
-rm -rf cpd-cli-linux-SE-12.0.4.tgz
-cd cpd-cli-linux-SE-12.0.4*
+wget https://github.com/IBM/cpd-cli/releases/download/v13.1.5/cpd-cli-linux-SE-13.1.5.tgz
+tar -zvxf cpd-cli-linux-SE-13.1.5.tgz
+rm -rf cpd-cli-linux-SE-13.1.5.tgz
+cd cpd-cli-linux-SE-13.1.5-176
 chmod +x cpd-cli
 mv * /usr/local/bin/
 

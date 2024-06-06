@@ -132,12 +132,25 @@ if [[ $CLUSTER_TYPE == "gcp" ]]; then
   cd -
 fi
 
+
+
 # Check for input parameters
 if [[ (-z $CLUSTER_TYPE) || (-z $DEPLOY_REGION) || (-z $RANDOM_STR) || (-z $CLUSTER_SIZE) || (-z $SLS_ENTITLEMENT_KEY) \
    || (-z $SSH_KEY_NAME) ]]; then
   log "ERROR: Required parameter not specified, please provide all the required inputs to the script."
   PRE_VALIDATION=fail
 fi
+#for dev release
+#export MAS_ICR_CP=docker-na-public.artifactory.swg-devops.com/wiotp-docker-local
+#export MAS_ICR_CPOPEN=docker-na-public.artifactory.swg-devops.com/wiotp-docker-local/cpopen
+#export MAS_ENTITLEMENT_USERNAME=`echo $SLS_ENTITLEMENT_KEY|cut -d "#" -f 2`
+#export MAS_ENTITLEMENT_KEY=`echo $SLS_ENTITLEMENT_KEY|cut -d "#" -f 3`
+#export SLS_ENTITLEMENT_KEY=`echo $SLS_ENTITLEMENT_KEY|cut -d "#" -f 1`
+#export IBM_ENTITLEMENT_KEY=$MAS_ENTITLEMENT_KEY
+#echo $SLS_ENTITLEMENT_KEY
+#echo $MAS_ENTITLEMENT_USERNAME
+#echo $MAS_ENTITLEMENT_KEY
+
 
 if [[ $OFFERING_TYPE == "MAS Core + Cloud Pak for Data" ]]; then
   export DEPLOY_CP4D="true"
@@ -160,7 +173,7 @@ export OPENSHIFT_PULL_SECRET_FILE_PATH=${GIT_REPO_HOME}/pull-secret.json
 export MASTER_NODE_COUNT="3"
 export WORKER_NODE_COUNT="3"
 export AZ_MODE="multi_zone"
-export OCP_VERSION="4.12.18"
+export OCP_VERSION="4.14.26"
 
 export MAS_IMAGE_TEST_DOWNLOAD="cp.icr.io/cp/mas/admin-dashboard:5.1.27"
 export BACKUP_FILE_NAME="deployment-backup-${CLUSTER_NAME}.zip"
@@ -205,6 +218,8 @@ if [[ $CLUSTER_TYPE == "aws" ]]; then
   export UDS_STORAGE_CLASS="gp2"
 elif [[ $CLUSTER_TYPE == "azure" ]]; then
   export UDS_STORAGE_CLASS="managed-premium"
+  export DRO_STORAGE_CLASS="managed-premium"
+
 fi
 export UDS_CONTACT_EMAIL="uds.support@ibm.com"
 export UDS_CONTACT_FIRSTNAME=Uds
@@ -213,9 +228,9 @@ export UDS_TLS_CERT_LOCAL_FILE_PATH="${GIT_REPO_HOME}/uds.crt"
 # CP4D variables
 export CPD_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
 export CPD_VERSION=cpd40
-export CPD_PRODUCT_VERSION=4.6.4
+export CPD_PRODUCT_VERSION=4.8.0
 export MAS_CHANNEL=8.11.x
-export MAS_CATALOG_VERSION=v8-231228-amd64
+export MAS_CATALOG_VERSION=v8-240430-amd64
 if [[ $CLUSTER_TYPE == "aws" ]]; then
   export CPD_PRIMARY_STORAGE_CLASS="ocs-storagecluster-cephfs"
 elif [[ $CLUSTER_TYPE == "azure" ]]; then
@@ -223,6 +238,7 @@ elif [[ $CLUSTER_TYPE == "azure" ]]; then
   export CPD_PRIMARY_STORAGE_CLASS="azurefiles-premium"
   export CPD_METADATA_STORAGE_CLASS="managed-premium"
 fi
+#export DRO_STORAGE_CLASS=true
 # DB2WH variables
 export CPD_OPERATORS_NAMESPACE="ibm-cpd-operators-${RANDOM_STR}"
 export CPD_INSTANCE_NAMESPACE="ibm-cpd-${RANDOM_STR}"
@@ -243,7 +259,7 @@ export ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
 # not reqd its hardcoded as db2_namespace: db2u
 export DB2WH_NAMESPACE="cpd-services-${RANDOM_STR}"
 export DB2WH_JDBC_USERNAME="db2inst1"
-# MAS variables
+# MAS variables -uncomment
 export MAS_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
 export IBM_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
 export MAS_WORKSPACE_ID="wsmasocp"

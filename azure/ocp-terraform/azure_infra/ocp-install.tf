@@ -7,7 +7,7 @@
                 machine-autoscaler-file        = "machine-autoscaler-${var.single-or-multi-zone}.tpl.yaml"
                 machine-health-check-file      = "machine-health-check-${var.single-or-multi-zone}.tpl.yaml"
                 ocptemplates                   = "${path.root}/ocpfourxtemplates"
-                openshift_installer_url        = "${var.openshift_installer_url_prefix}/${var.ocp_version}/"
+                openshift_installer_url        = "${var.openshift_installer_url_prefix}/${var.ocp_version}/openshift-install-linux-${var.ocp_version}.tar.gz"
         ocs-machineset-file            = var.single-or-multi-zone == "single" ? "ocs-machineset-singlezone.yaml" : "ocs-machineset-multizone.yaml"
         }
 
@@ -31,7 +31,7 @@
                 wget -r -l1 -np -nd -q ${local.openshift_installer_url} -P ${self.triggers.installer_workspace} -A 'openshift-install-linux-4*.tar.gz'
                 tar zxvf ${self.triggers.installer_workspace}/openshift-install-linux-4*.tar.gz -C ${self.triggers.installer_workspace}
                 wget -r -l1 -np -nd -q ${local.openshift_installer_url} -P ${self.triggers.installer_workspace} -A 'openshift-client-linux-4*.tar.gz'
-                tar zxvf ${self.triggers.installer_workspace}/openshift-client-linux-4*.tar.gz -C ${self.triggers.installer_workspace}
+                      tar zxvf ${self.triggers.installer_workspace}/openshift-client-linux-4*.tar.gz -C ${self.triggers.installer_workspace}
                 ;;
           *)
                 echo 'Supports only Linux and Mac OS at this time'

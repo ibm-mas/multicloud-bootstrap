@@ -266,7 +266,7 @@ fi
 # Deploy UDS
 if [[ (-z $UDS_API_KEY) || (-z $UDS_ENDPOINT_URL) || (-z $UDS_PUB_CERT_URL) ]]; then
   # Deploy UDS
-  log "==== UDS deployment started ===="
+  log "==== UDS/DRO deployment started ===="
   # uds and gencfg_uds are combined in common uds role
   export ROLE_NAME=uds && ansible-playbook ibm.mas_devops.run_role
   log "==== UDS deployment completed ===="

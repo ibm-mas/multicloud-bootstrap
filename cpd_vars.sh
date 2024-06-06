@@ -11,7 +11,11 @@ export OPENSHIFT_TYPE=self-managed
 export IMAGE_ARCH=amd64
 export OCP_USERNAME=$OCP_USERNAME
 export OCP_PASSWORD=$OCP_PASSWORD
-
+export SERVER_ARGUMENTS="--server=${OCP_URL}"
+export LOGIN_ARGUMENTS="--username=${OCP_USERNAME} --password=${OCP_PASSWORD}"
+# export LOGIN_ARGUMENTS="--token=${OCP_TOKEN}"
+export CPDM_OC_LOGIN="cpd-cli manage login-to-ocp ${SERVER_ARGUMENTS} ${LOGIN_ARGUMENTS}"
+export OC_LOGIN="oc login ${OCP_URL} ${LOGIN_ARGUMENTS}"
 # ------------------------------------------------------------------------------
 # Projects
 # ------------------------------------------------------------------------------
@@ -20,6 +24,8 @@ export PROJECT_CPFS_OPS=ibm-common-services
 export PROJECT_CPD_OPS=ibm-cpd-operators-${RANDOM_STR}
 export PROJECT_CATSRC=openshift-marketplace
 export PROJECT_CPD_INSTANCE=ibm-cpd-${RANDOM_STR}
+export PROJECT_CPD_INST_OPERATORS=${PROJECT_CPD_OPS}
+export PROJECT_CPD_INST_OPERANDS=${PROJECT_CPD_INSTANCE}
 # export PROJECT_TETHERED=<enter the tethered project>
 
 
@@ -35,8 +41,18 @@ export IBM_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
 # ------------------------------------------------------------------------------
 
 export VERSION=$CPD_PRODUCT_VERSION
+# ------------------------------------------------------------------------------
+# Private container registry
+# ------------------------------------------------------------------------------
+# Set the following variables if you mirror images to a private container registry.
+#
+# To export these variables, you must uncomment each command in this section.
 
-
+export PRIVATE_REGISTRY_LOCATION=cp.icr.io/cp
+export PRIVATE_REGISTRY_PUSH_USER=cp
+export PRIVATE_REGISTRY_PUSH_PASSWORD=$IBM_ENTITLEMENT_KEY
+export PRIVATE_REGISTRY_PULL_USER=cp
+export PRIVATE_REGISTRY_PULL_PASSWORD=$IBM_ENTITLEMENT_KEY
 # ------------------------------------------------------------------------------
 # Components
 # ------------------------------------------------------------------------------
@@ -66,6 +82,8 @@ echo $VERSION
 if [[ -n $OCP_URL && -n $$OCP_USERNAME && -n $OCP_PASSWORD && -n $VERSION ]]; then
   log "Logging into the cluster,"
   cpd-cli manage login-to-ocp --username=${OCP_USERNAME}  --password=${OCP_PASSWORD} --server=${OCP_URL}
+
+  cpd-cli manage  add-icr-cred-to-global-pull-secret --entitled_registry_key=$IBM_ENTITLEMENT_KEY
    log "Creating  the OLM objects for Db2 Warehouse,"
   cpd-cli manage apply-olm --release=${VERSION} --cpd_operator_ns=${PROJECT_CPD_OPS} --components=db2wh
    log "custom resource for Db2 Warehouse & Installing the service,"
