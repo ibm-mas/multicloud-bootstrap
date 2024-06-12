@@ -103,3 +103,32 @@ mountOptions:
 volumeBindingMode: Immediate
 EOF
 oc create -f azure-storageclass-azure-file.yaml
+
+oc delete sc/managed-premium
+
+cat << EOF >> azure-storageclass-azure-disc.yaml
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: managed-premium
+provisioner: kubernetes.io/azure-disk
+parameters:
+  location: $deployRegion
+  resourceGroup: $AZURE_FILES_RESOURCE_GROUP
+  secretNamespace: kube-system
+  skuName: Premium_LRS
+  storageAccount: $AZURE_STORAGE_ACCOUNT_NAME
+reclaimPolicy: Delete
+mountOptions:
+  - dir_mode=0600
+  - file_mode=0600
+  - uid=0
+  - gid=0
+  - mfsymlinks
+  - cache=strict
+  - actimeo=30
+  - noperm
+allowVolumeExpansion: true
+volumeBindingMode: WaitForFirstConsumer
+EOF
+oc create -f azure-storageclass-azure-disc.yaml
