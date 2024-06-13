@@ -237,7 +237,7 @@ fi
 set -e
 ## Deploy MongoDB
 log "==== MongoDB deployment started ===="
-export ROLE_NAME=mongodb && ansible-playbook ibm.mas_devops.run_role
+#export ROLE_NAME=mongodb && ansible-playbook ibm.mas_devops.run_role
 log "==== MongoDB deployment completed ===="
 
 ## Copying the entitlement.lic to MAS_CONFIG_DIR
@@ -253,13 +253,13 @@ if [[ (-z $SLS_URL) || (-z $SLS_REGISTRATION_KEY) || (-z $SLS_PUB_CERT_URL) ]]; 
   ## Deploy SLS
   log "==== SLS deployment started ===="
   # sls and gencfg_sls are combined in common sls role
-  export ROLE_NAME=sls && ansible-playbook ibm.mas_devops.run_role
+ # export ROLE_NAME=sls && ansible-playbook ibm.mas_devops.run_role
   log "==== SLS deployment completed ===="
 
 else
   log "=== Using Existing SLS Deployment ==="  #
   # works when SLS_URL is set, handled in same sls role
-  export ROLE_NAME=sls && ansible-playbook ibm.mas_devops.run_role
+  #export ROLE_NAME=sls && ansible-playbook ibm.mas_devops.run_role
   log "=== Generated SLS Config YAML ==="
 fi
 
@@ -268,13 +268,13 @@ if [[ (-z $UDS_API_KEY) || (-z $UDS_ENDPOINT_URL) || (-z $UDS_PUB_CERT_URL) ]]; 
   # Deploy UDS
   log "==== UDS/DRO deployment started ===="
   # uds and gencfg_uds are combined in common uds role
-  export ROLE_NAME=uds && ansible-playbook ibm.mas_devops.run_role
+  #export ROLE_NAME=uds && ansible-playbook ibm.mas_devops.run_role
   log "==== UDS deployment completed ===="
 
 else
   log "=== Using Existing UDS Deployment ==="
   # works when UDS_ENDPOINT_URL is set, handled in same uds role
-  export ROLE_NAME=uds && ansible-playbook ibm.mas_devops.run_role
+  #export ROLE_NAME=uds && ansible-playbook ibm.mas_devops.run_role
   log "=== Generated UDS Config YAML ==="
 fi
 
