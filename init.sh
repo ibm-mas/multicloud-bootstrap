@@ -236,7 +236,7 @@ if [[ $CLUSTER_TYPE == "aws" ]]; then
 elif [[ $CLUSTER_TYPE == "azure" ]]; then
   #export CPD_PRIMARY_STORAGE_CLASS="azurefile-premium-new"
   export CPD_PRIMARY_STORAGE_CLASS="azurefiles-premium"
-  export CPD_METADATA_STORAGE_CLASS="managed-premium"
+  export CPD_METADATA_STORAGE_CLASS="managed-csi"
 fi
 #export DRO_STORAGE_CLASS=true
 # DB2WH variables

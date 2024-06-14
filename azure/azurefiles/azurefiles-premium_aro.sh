@@ -14,7 +14,6 @@ export CLUSTER_NAME=$(az resource list --name  $resourceGroupName --query "[].{i
 echo "CLUSTER_NAME" $CLUSTER_NAME
 log "CLUSTER_NAME" $CLUSTER_NAME
 export AZURE_STORAGE_ACCOUNT_NAME=stg${resourceGroupName,,}
-export AZURE_STORAGE_BLOCK_ACCOUNT_NAME=stgblk${resourceGroupName,,}
 echo "AZURE_STORAGE_ACCOUNT_NAME" $AZURE_STORAGE_ACCOUNT_NAME
 export AZURE_FILES_RESOURCE_GROUP=$resourceGroupName
 echo "AZURE_FILES_RESOURCE_GROUP" $AZURE_FILES_RESOURCE_GROUP
@@ -44,19 +43,6 @@ if [[ $checkstoragename == "true" ]]; then
       --https-only false \
       --bypass AzureServices \
       --default-action Deny
-
-     #create a storage
-        az storage account create \
-          --name $AZURE_STORAGE_BLOCK_ACCOUNT_NAME \
-          --resource-group $AZURE_FILES_RESOURCE_GROUP \
-          --kind BlockBlobStorage \
-          --sku Premium_LRS \
-          --allow-shared-key-access true \
-          --min-tls-version TLS1_2 \
-          --location $deployRegion \
-          --https-only false \
-          --bypass AzureServices \
-          --default-action Deny
 fi
 ARO_SERVICE_PRINCIPAL_ID=$(az aro show -g $AZURE_FILES_RESOURCE_GROUP -n $CLUSTER_NAME --query servicePrincipalProfile.clientId -o tsv)
 ARO_API_SERVER=$(az aro list --query "[?contains(name,'$CLUSTER_NAME')].[apiserverProfile.url]" -o tsv)
@@ -76,7 +62,6 @@ oc adm policy add-cluster-role-to-user azure-secret-reader system:serviceaccount
 #Assign networks to the storage #https://learn.microsoft.com/en-us/azure/storage/common/storage-network-security?tabs=azure-cli
 
 az storage account update --resource-group $AZURE_FILES_RESOURCE_GROUP --name  $AZURE_STORAGE_ACCOUNT_NAME --default-action Deny
-az storage account update --resource-group $AZURE_FILES_RESOURCE_GROUP --name  $AZURE_STORAGE_BLOCK_ACCOUNT_NAME --default-action Deny
 export VNET=$(oc get machineset -n openshift-machine-api -o json|jq -r '.items[0].spec.template.spec.providerSpec.value.vnet')
 #export subnets=$(az network vnet subnet list -g  $AZURE_FILES_RESOURCE_GROUP --vnet-name $VNET|jq -r '.[].name')
 
@@ -87,7 +72,6 @@ for subnet in "${subnets[@]}"
   az network vnet subnet update --resource-group  $AZURE_FILES_RESOURCE_GROUP --vnet-name $VNET --name $subnet --service-endpoints "Microsoft.Storage.Global"
   subnetid=$(az network vnet subnet show --resource-group $AZURE_FILES_RESOURCE_GROUP --vnet-name $VNET --name $subnet --query id --output tsv)
   az storage account network-rule add --resource-group $AZURE_FILES_RESOURCE_GROUP --account-name $AZURE_STORAGE_ACCOUNT_NAME --subnet $subnetid
-  az storage account network-rule add --resource-group $AZURE_FILES_RESOURCE_GROUP --account-name $AZURE_STORAGE_BLOCK_ACCOUNT_NAME --subnet $subnetid
 done
 #delete the azurepremium and create a new premium
 log "Delete the azurepremium and create a new azurepremium for ARO"
@@ -99,7 +83,7 @@ apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   name: azurefiles-premium
-provisioner: file.csi.azure.com
+provisioner: kubernetes.io/azure-file
 parameters:
   location: $deployRegion
   resourceGroup: $AZURE_FILES_RESOURCE_GROUP
@@ -119,23 +103,4 @@ mountOptions:
 volumeBindingMode: Immediate
 EOF
 oc create -f azure-storageclass-azure-file.yaml
-
-oc delete sc/managed-premium
-
-cat << EOF >> azure-storageclass-azure-disc.yaml
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
-metadata:
-  name: managed-premium
-provisioner: kubernetes.io/azure-disk
-parameters:
-  location: $deployRegion
-  resourceGroup: $AZURE_FILES_RESOURCE_GROUP
-  secretNamespace: kube-system
-  skuName: Premium_LRS
-  storageAccount: $AZURE_STORAGE_BLOCK_ACCOUNT_NAME
-reclaimPolicy: Delete
-allowVolumeExpansion: true
-volumeBindingMode: WaitForFirstConsumer
-EOF
-oc create -f azure-storageclass-azure-disc.yaml
+oc apply -f persistent-volume-binder.yaml

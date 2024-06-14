@@ -15,7 +15,7 @@ export SLS_STORAGE_CLASS=managed-premium
 # UDS variables
 export UDS_STORAGE_CLASS=managed-premium
 # CP4D variables
-export CPD_METADATA_STORAGE_CLASS=managed-premium
+export CPD_METADATA_STORAGE_CLASS=managed-csi
 export CPD_SERVICE_STORAGE_CLASS=azurefiles-premium
 
 log "Below are Cloud specific deployment parameters,"
@@ -281,7 +281,7 @@ fi
 # Deploy CP4D
 if [[ $DEPLOY_CP4D == "true" ]]; then
   log "==== CP4D deployment started ===="
-  export ROLE_NAME=cp4d && ansible-playbook ibm.mas_devops.run_role
+  #export ROLE_NAME=cp4d && ansible-playbook ibm.mas_devops.run_role
   log "==== CP4D deployment completed ===="
 fi
 
@@ -299,7 +299,7 @@ fi
 
 ## Create MAS Workspace
 log "==== MAS Workspace generation started ===="
-export ROLE_NAME=gencfg_workspace && ansible-playbook ibm.mas_devops.run_role
+#export ROLE_NAME=gencfg_workspace && ansible-playbook ibm.mas_devops.run_role
 log "==== MAS Workspace generation completed ===="
 
 if [[ $DEPLOY_MANAGE == "true" && (-n $MAS_JDBC_USER) && (-n $MAS_JDBC_PASSWORD) && (-n $MAS_JDBC_URL) ]]; then
@@ -330,28 +330,28 @@ if [[ $DEPLOY_MANAGE == "true" && (-n $MAS_JDBC_USER) && (-n $MAS_JDBC_PASSWORD)
     export SSL_ENABLED=true
   fi
   log "==== Configure JDBC started for external DB2 ==== SSL_ENABLED = $SSL_ENABLED"
-  export ROLE_NAME=gencfg_jdbc && ansible-playbook ibm.mas_devops.run_role
+  #export ROLE_NAME=gencfg_jdbc && ansible-playbook ibm.mas_devops.run_role
   log "==== Configure JDBC completed for external DB2 ===="
 fi
 
 ## Deploy MAS
 log "==== MAS deployment started ===="
-export ROLE_NAME=suite_dns && ansible-playbook ibm.mas_devops.run_role
-export ROLE_NAME=suite_install && ansible-playbook ibm.mas_devops.run_role
-export ROLE_NAME=suite_config && ansible-playbook ibm.mas_devops.run_role
-export ROLE_NAME=suite_verify && ansible-playbook ibm.mas_devops.run_role
+#export ROLE_NAME=suite_dns && ansible-playbook ibm.mas_devops.run_role
+#export ROLE_NAME=suite_install && ansible-playbook ibm.mas_devops.run_role
+#export ROLE_NAME=suite_config && ansible-playbook ibm.mas_devops.run_role
+#export ROLE_NAME=suite_verify && ansible-playbook ibm.mas_devops.run_role
 log "==== MAS deployment completed ===="
 
 ## Deploy Manage
 if [[ $DEPLOY_MANAGE == "true" ]]; then
   # Deploy Manage
   log "==== MAS Manage deployment started ===="
-  export ROLE_NAME=suite_app_install && ansible-playbook ibm.mas_devops.run_role
+ # export ROLE_NAME=suite_app_install && ansible-playbook ibm.mas_devops.run_role
   log "==== MAS Manage deployment completed ===="
 
   # Configure app to use the DB
   log "==== MAS Manage configure app started ===="
-  export MAS_APPWS_BINDINGS_JDBC="workspace-application"
-  export ROLE_NAME=suite_app_config && ansible-playbook ibm.mas_devops.run_role
+  #export MAS_APPWS_BINDINGS_JDBC="workspace-application"
+  #export ROLE_NAME=suite_app_config && ansible-playbook ibm.mas_devops.run_role
   log "==== MAS Manage configure app completed ===="
 fi
