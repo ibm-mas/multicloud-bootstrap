@@ -229,8 +229,8 @@ export UDS_TLS_CERT_LOCAL_FILE_PATH="${GIT_REPO_HOME}/uds.crt"
 export CPD_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
 export CPD_VERSION=cpd40
 export CPD_PRODUCT_VERSION=4.8.0
-export MAS_CHANNEL=8.11.x
-export MAS_CATALOG_VERSION=v8-240430-amd64
+export MAS_CHANNEL=9.0.x
+export MAS_CATALOG_VERSION=v9-240625-amd64
 if [[ $CLUSTER_TYPE == "aws" ]]; then
   export CPD_PRIMARY_STORAGE_CLASS="ocs-storagecluster-cephfs"
 elif [[ $CLUSTER_TYPE == "azure" ]]; then
@@ -269,8 +269,8 @@ export MAS_APP_ID=manage
 export MAS_APPWS_JDBC_BINDING="workspace-application"
 export MAS_JDBC_CERT_LOCAL_FILE=$GIT_REPO_HOME/db.crt
 export MAS_CLOUD_AUTOMATION_VERSION=1.0
-export MAS_DEVOPS_COLLECTION_VERSION=18.3.4
-export MAS_APP_CHANNEL=8.7.x
+export MAS_DEVOPS_COLLECTION_VERSION=20.4.0
+export MAS_APP_CHANNEL=9.0.x
 if [ -z "$EXISTING_NETWORK" ]; then
   export new_or_existing_vpc_subnet="new"
   export enable_permission_quota_check=true
