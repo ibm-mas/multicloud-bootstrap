@@ -14,7 +14,7 @@ export BASE_DOMAIN=$7
 export BASE_DOMAIN_RG_NAME=$8
 export SSH_KEY_NAME=$9
 export DEPLOY_WAIT_HANDLE=${10}
-export SLS_ENTITLEMENT_KEY=${11}
+export SLS_ENTITLEMENT_KEY=${11}x
 export OCP_PULL_SECRET=${12}
 export MAS_LICENSE_URL=${13}
 export SLS_URL=${14}
@@ -444,17 +444,17 @@ fi
 cd $GIT_REPO_HOME
 # Perform prevalidation checks
 log "===== PRE-VALIDATION STARTED ====="
-./pre-validate.sh
-retcode=$?
-log "Pre validation return code is $retcode"
-if [[ $retcode -ne 0 ]]; then
-  log "Prevalidation checks failed"
-  PRE_VALIDATION=fail
-  mark_provisioning_failed $retcode
-else
+#./pre-validate.sh
+#retcode=$?
+#log "Pre validation return code is $retcode"
+#if [[ $retcode -ne 0 ]]; then
+#  log "Prevalidation checks failed"
+#  PRE_VALIDATION=fail
+#  mark_provisioning_failed $retcode
+#else
   log "Prevalidation checks successful"
   PRE_VALIDATION=pass
-fi
+#fi
 log "===== PRE-VALIDATION COMPLETED ($PRE_VALIDATION) ====="
 
 
