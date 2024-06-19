@@ -237,7 +237,7 @@ fi
 set -e
 ## Deploy MongoDB
 log "==== MongoDB deployment started ===="
-#export ROLE_NAME=mongodb && ansible-playbook ibm.mas_devops.run_role
+export ROLE_NAME=mongodb && ansible-playbook ibm.mas_devops.run_role
 log "==== MongoDB deployment completed ===="
 
 ## Copying the entitlement.lic to MAS_CONFIG_DIR
@@ -253,13 +253,13 @@ if [[ (-z $SLS_URL) || (-z $SLS_REGISTRATION_KEY) || (-z $SLS_PUB_CERT_URL) ]]; 
   ## Deploy SLS
   log "==== SLS deployment started ===="
   # sls and gencfg_sls are combined in common sls role
-  #export ROLE_NAME=sls && ansible-playbook ibm.mas_devops.run_role
+  export ROLE_NAME=sls && ansible-playbook ibm.mas_devops.run_role
   log "==== SLS deployment completed ===="
 
 else
   log "=== Using Existing SLS Deployment ==="  #
   # works when SLS_URL is set, handled in same sls role
-  #export ROLE_NAME=sls && ansible-playbook ibm.mas_devops.run_role
+  export ROLE_NAME=sls && ansible-playbook ibm.mas_devops.run_role
   log "=== Generated SLS Config YAML ==="
 fi
 
@@ -268,13 +268,13 @@ if [[ (-z $UDS_API_KEY) || (-z $UDS_ENDPOINT_URL) || (-z $UDS_PUB_CERT_URL) ]]; 
   # Deploy UDS
   log "==== UDS/DRO deployment started ===="
   # uds and gencfg_uds are combined in common uds role
-  #export ROLE_NAME=uds && ansible-playbook ibm.mas_devops.run_role
+  export ROLE_NAME=dro && ansible-playbook ibm.mas_devops.run_role
   log "==== UDS deployment completed ===="
 
 else
   log "=== Using Existing UDS Deployment ==="
   # works when UDS_ENDPOINT_URL is set, handled in same uds role
-  #export ROLE_NAME=uds && ansible-playbook ibm.mas_devops.run_role
+  export ROLE_NAME=uds && ansible-playbook ibm.mas_devops.run_role
   log "=== Generated UDS Config YAML ==="
 fi
 
@@ -299,7 +299,7 @@ fi
 
 ## Create MAS Workspace
 log "==== MAS Workspace generation started ===="
-#export ROLE_NAME=gencfg_workspace && ansible-playbook ibm.mas_devops.run_role
+export ROLE_NAME=gencfg_workspace && ansible-playbook ibm.mas_devops.run_role
 log "==== MAS Workspace generation completed ===="
 
 if [[ $DEPLOY_MANAGE == "true" && (-n $MAS_JDBC_USER) && (-n $MAS_JDBC_PASSWORD) && (-n $MAS_JDBC_URL) ]]; then
@@ -336,22 +336,22 @@ fi
 
 ## Deploy MAS
 log "==== MAS deployment started ===="
-#export ROLE_NAME=suite_dns && ansible-playbook ibm.mas_devops.run_role
-#export ROLE_NAME=suite_install && ansible-playbook ibm.mas_devops.run_role
-#export ROLE_NAME=suite_config && ansible-playbook ibm.mas_devops.run_role
-#export ROLE_NAME=suite_verify && ansible-playbook ibm.mas_devops.run_role
+  export ROLE_NAME=suite_dns && ansible-playbook ibm.mas_devops.run_role
+  export ROLE_NAME=suite_install && ansible-playbook ibm.mas_devops.run_role
+  export ROLE_NAME=suite_config && ansible-playbook ibm.mas_devops.run_role
+  export ROLE_NAME=suite_verify && ansible-playbook ibm.mas_devops.run_role
 log "==== MAS deployment completed ===="
 
 ## Deploy Manage
 if [[ $DEPLOY_MANAGE == "true" ]]; then
   # Deploy Manage
   log "==== MAS Manage deployment started ===="
-  #export ROLE_NAME=suite_app_install && ansible-playbook ibm.mas_devops.run_role
+  export ROLE_NAME=suite_app_install && ansible-playbook ibm.mas_devops.run_role
   log "==== MAS Manage deployment completed ===="
 
   # Configure app to use the DB
   log "==== MAS Manage configure app started ===="
   export MAS_APPWS_BINDINGS_JDBC="workspace-application"
-  #export ROLE_NAME=suite_app_config && ansible-playbook ibm.mas_devops.run_role
+  export ROLE_NAME=suite_app_config && ansible-playbook ibm.mas_devops.run_role
   log "==== MAS Manage configure app completed ===="
 fi
