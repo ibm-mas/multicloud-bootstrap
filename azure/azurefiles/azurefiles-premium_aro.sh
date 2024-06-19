@@ -83,8 +83,9 @@ apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   name: azurefiles-premium
-provisioner: file.csi.azure.com
+provisioner: kubernetes.io/azure-file
 parameters:
+  protocol: nfs
   location: $deployRegion
   resourceGroup: $AZURE_FILES_RESOURCE_GROUP
   secretNamespace: kube-system
@@ -92,8 +93,8 @@ parameters:
   storageAccount: $AZURE_STORAGE_ACCOUNT_NAME
 reclaimPolicy: Delete
 mountOptions:
-  - dir_mode=0640
-  - file_mode=0640
+  - dir_mode=0777
+  - file_mode=0777
   - uid=0
   - gid=0
   - mfsymlinks
