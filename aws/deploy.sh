@@ -557,15 +557,15 @@ fi
 
 ## Deploy UDS
 if [[ (-z $UDS_API_KEY) || (-z $UDS_ENDPOINT_URL) || (-z $UDS_PUB_CERT_URL) ]]; then
-  # Deploy UDS
-  log "==== UDS deployment started ===="
-  export ROLE_NAME=uds && ansible-playbook ibm.mas_devops.run_role
-  log "==== UDS deployment completed ===="
+  # Deploy DRO
+  log "==== DRO deployment started ===="
+  export ROLE_NAME=dro && ansible-playbook ibm.mas_devops.run_role
+  log "==== DRO deployment completed ===="
 
 else
-  log "=== Using Existing UDS Deployment ==="
-  export ROLE_NAME=uds && ansible-playbook ibm.mas_devops.run_role
-  log "=== Generated UDS Config YAML ==="
+  log "=== Using Existing DRO Deployment ==="
+  export ROLE_NAME=dro && ansible-playbook ibm.mas_devops.run_role
+  log "=== Generated DRO Config YAML ==="
 fi
 
 ## Deploy CP4D
