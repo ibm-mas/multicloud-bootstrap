@@ -221,16 +221,16 @@ elif [[ $CLUSTER_TYPE == "azure" ]]; then
   export DRO_STORAGE_CLASS="managed-premium"
 
 fi
-export UDS_CONTACT_EMAIL="uds.support@ibm.com"
-export UDS_CONTACT_FIRSTNAME=Uds
-export UDS_CONTACT_LASTNAME=Support
+export DRO_CONTACT_EMAIL="dro.support@ibm.com"
+export DRO_CONTACT_FIRSTNAME=dro
+export DRO_CONTACT_LASTNAME=Support
 export UDS_TLS_CERT_LOCAL_FILE_PATH="${GIT_REPO_HOME}/uds.crt"
 # CP4D variables
 export CPD_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
 export CPD_VERSION=cpd40
 export CPD_PRODUCT_VERSION=4.8.0
-export MAS_CHANNEL=8.11.x
-export MAS_CATALOG_VERSION=v8-240430-amd64
+export MAS_CHANNEL=9.0.x
+export MAS_CATALOG_VERSION=v9-240625-amd64
 if [[ $CLUSTER_TYPE == "aws" ]]; then
   export CPD_PRIMARY_STORAGE_CLASS="ocs-storagecluster-cephfs"
 elif [[ $CLUSTER_TYPE == "azure" ]]; then
@@ -245,7 +245,7 @@ export CPD_INSTANCE_NAMESPACE="ibm-cpd-${RANDOM_STR}"
 #CPD_SERVICES_NAMESPACE is used in roles - cp4d, cp4dv3_install, cp4dv3_install_services and suite_dns
 export CPD_SERVICES_NAMESPACE="cpd-services-${RANDOM_STR}"
 export DB2WH_INSTANCE_NAME="db2wh-cpd-${RANDOM_STR}"
-export DB2WH_VERSION="11.5.8.0-CN1"
+#export DB2WH_VERSION="11.5.8.0-CN1"
 export DB2_META_STORAGE_CLASS=$CPD_PRIMARY_STORAGE_CLASS
 export DB2_DATA_STORAGE_CLASS=$CPD_PRIMARY_STORAGE_CLASS
 export DB2_BACKUP_STORAGE_CLASS=$CPD_PRIMARY_STORAGE_CLASS
@@ -254,7 +254,7 @@ export DB2_TEMP_STORAGE_CLASS=$CPD_PRIMARY_STORAGE_CLASS
 export CPD_SERVICE_NAME="db2wh"
 
 export DB2_INSTANCE_NAME=db2wh-db01
-export DB2_VERSION=11.5.7.0-cn2
+#export DB2_VERSION=11.5.7.0-cn2
 export ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
 # not reqd its hardcoded as db2_namespace: db2u
 export DB2WH_NAMESPACE="cpd-services-${RANDOM_STR}"
@@ -269,8 +269,8 @@ export MAS_APP_ID=manage
 export MAS_APPWS_JDBC_BINDING="workspace-application"
 export MAS_JDBC_CERT_LOCAL_FILE=$GIT_REPO_HOME/db.crt
 export MAS_CLOUD_AUTOMATION_VERSION=1.0
-export MAS_DEVOPS_COLLECTION_VERSION=18.3.4
-export MAS_APP_CHANNEL=8.7.x
+export MAS_DEVOPS_COLLECTION_VERSION=20.4.0
+export MAS_APP_CHANNEL=9.0.x
 if [ -z "$EXISTING_NETWORK" ]; then
   export new_or_existing_vpc_subnet="new"
   export enable_permission_quota_check=true

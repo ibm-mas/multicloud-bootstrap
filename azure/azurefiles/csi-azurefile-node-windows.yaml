@@ -34,12 +34,15 @@ spec:
                     values:
                       - virtual-kubelet
       priorityClassName: system-node-critical
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: liveness-probe
           volumeMounts:
             - mountPath: C:\csi
               name: plugin-dir
-          image: mcr.microsoft.com/oss/kubernetes-csi/livenessprobe:v2.6.0
+          image: mcr.microsoft.com/oss/kubernetes-csi/livenessprobe:v2.12.0
           args:
             - --csi-address=$(CSI_ENDPOINT)
             - --probe-timeout=3s
@@ -50,12 +53,12 @@ spec:
               value: unix://C:\\csi\\csi.sock
           resources:
             limits:
-              memory: 100Mi
+              memory: 150Mi
             requests:
               cpu: 10m
               memory: 40Mi
         - name: node-driver-registrar
-          image: mcr.microsoft.com/oss/kubernetes-csi/csi-node-driver-registrar:v2.5.0
+          image: mcr.microsoft.com/oss/kubernetes-csi/csi-node-driver-registrar:v2.10.1
           args:
             - --v=2
             - --csi-address=$(CSI_ENDPOINT)
@@ -86,19 +89,18 @@ spec:
               mountPath: C:\registration
           resources:
             limits:
-              memory: 100Mi
+              memory: 150Mi
             requests:
-              cpu: 10m
+              cpu: 30m
               memory: 40Mi
         - name: azurefile
-          image: mcr.microsoft.com/k8s/csi/azurefile-csi:latest
+          image: mcr.microsoft.com/oss/kubernetes-csi/azurefile-csi:v1.30.2
           imagePullPolicy: IfNotPresent
           args:
             - --v=5
             - --endpoint=$(CSI_ENDPOINT)
             - --nodeid=$(KUBE_NODE_NAME)
-            - --kubeconfig=C:\\k\\config
-            - --metrics-address=0.0.0.0:29615
+            - --metrics-address="0.0.0.0:29615"
           ports:
             - containerPort: 29613
               name: healthz

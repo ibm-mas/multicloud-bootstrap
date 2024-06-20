@@ -90,12 +90,12 @@ fi
 # JDBC CFT inputs validation and connection test
 if [[ $DEPLOY_MANAGE == "true" ]]; then
     if [[ (-z $MAS_JDBC_USER) && (-z $MAS_JDBC_PASSWORD) && (-z $MAS_JDBC_URL) && (-z $MAS_JDBC_CERT_URL) ]]; then
-          if [[ ($EXISTING_CLUSTER == "ARO") ]]; then
-             log "ERROR: All database values are not specified"
-             SCRIPT_STATUS=14
-          else
+         # if [[ ($EXISTING_CLUSTER == "ARO") ]]; then
+          #   log "ERROR: All database values are not specified"
+           #  SCRIPT_STATUS=14
+          #else
         log "=== New internal DB2 database will be provisioned for MAS Manage deployment ==="
-         fi
+       #  fi
     else
         if [ -z "$MAS_JDBC_USER" ]; then
             log "ERROR: Database username is not specified"

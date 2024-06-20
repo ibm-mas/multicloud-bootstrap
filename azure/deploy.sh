@@ -268,13 +268,13 @@ if [[ (-z $UDS_API_KEY) || (-z $UDS_ENDPOINT_URL) || (-z $UDS_PUB_CERT_URL) ]]; 
   # Deploy UDS
   log "==== UDS/DRO deployment started ===="
   # uds and gencfg_uds are combined in common uds role
-  export ROLE_NAME=uds && ansible-playbook ibm.mas_devops.run_role
+  export ROLE_NAME=dro && ansible-playbook ibm.mas_devops.run_role
   log "==== UDS deployment completed ===="
 
 else
   log "=== Using Existing UDS Deployment ==="
   # works when UDS_ENDPOINT_URL is set, handled in same uds role
-  export ROLE_NAME=uds && ansible-playbook ibm.mas_devops.run_role
+  export ROLE_NAME=dro && ansible-playbook ibm.mas_devops.run_role
   log "=== Generated UDS Config YAML ==="
 fi
 
@@ -287,14 +287,14 @@ fi
 
 ## Deploy Manage
 if [[ $DEPLOY_MANAGE == "true" && (-z $MAS_JDBC_USER) && (-z $MAS_JDBC_PASSWORD) && (-z $MAS_JDBC_URL) && (-z $MAS_JDBC_CERT_URL) ]]; then
-    if [[ $EXISTING_CLUSTER == "ARO" ]]; then
-       log "==== Currently internal db2 is not supported for ARO  ===="
-    else
+  #  if [[ $EXISTING_CLUSTER == "ARO" ]]; then
+   #    log "==== Currently internal db2 is not supported for ARO  ===="
+    #else
       log "==== Configure internal db2 for manage started ===="
       export ROLE_NAME=db2 && ansible-playbook ibm.mas_devops.run_role
       export ROLE_NAME=suite_db2_setup_for_manage && ansible-playbook ibm.mas_devops.run_role
       log "==== Configuration of internal db2 for manage completed ===="
-   fi
+   #fi
 fi
 
 ## Create MAS Workspace
@@ -336,10 +336,10 @@ fi
 
 ## Deploy MAS
 log "==== MAS deployment started ===="
-export ROLE_NAME=suite_dns && ansible-playbook ibm.mas_devops.run_role
-export ROLE_NAME=suite_install && ansible-playbook ibm.mas_devops.run_role
-export ROLE_NAME=suite_config && ansible-playbook ibm.mas_devops.run_role
-export ROLE_NAME=suite_verify && ansible-playbook ibm.mas_devops.run_role
+  export ROLE_NAME=suite_dns && ansible-playbook ibm.mas_devops.run_role
+  export ROLE_NAME=suite_install && ansible-playbook ibm.mas_devops.run_role
+  export ROLE_NAME=suite_config && ansible-playbook ibm.mas_devops.run_role
+  export ROLE_NAME=suite_verify && ansible-playbook ibm.mas_devops.run_role
 log "==== MAS deployment completed ===="
 
 ## Deploy Manage

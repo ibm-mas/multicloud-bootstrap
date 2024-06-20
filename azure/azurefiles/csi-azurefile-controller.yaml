@@ -26,16 +26,22 @@ spec:
         - key: "node-role.kubernetes.io/controlplane"
           operator: "Exists"
           effect: "NoSchedule"
+        - key: "node-role.kubernetes.io/control-plane"
+          operator: "Exists"
+          effect: "NoSchedule"
       containers:
         - name: csi-provisioner
-          image: mcr.microsoft.com/oss/kubernetes-csi/csi-provisioner:v3.1.0
+          image: mcr.microsoft.com/oss/kubernetes-csi/csi-provisioner:v4.0.1
           args:
             - "-v=2"
             - "--csi-address=$(ADDRESS)"
             - "--leader-election"
             - "--leader-election-namespace=kube-system"
-            - "--timeout=300s"
+            - "--timeout=1200s"
             - "--extra-create-metadata=true"
+            - "--kube-api-qps=50"
+            - "--kube-api-burst=100"
+            - "--feature-gates=HonorPVReclaimPolicy=true"
           env:
             - name: ADDRESS
               value: /csi/csi.sock
@@ -48,28 +54,12 @@ spec:
             requests:
               cpu: 10m
               memory: 20Mi
-        - name: csi-attacher
-          image: mcr.microsoft.com/oss/kubernetes-csi/csi-attacher:v3.4.0
-          args:
-            - "-v=2"
-            - "-csi-address=$(ADDRESS)"
-            - "-timeout=120s"
-            - "--leader-election"
-            - "--leader-election-namespace=kube-system"
-          env:
-            - name: ADDRESS
-              value: /csi/csi.sock
-          volumeMounts:
-            - mountPath: /csi
-              name: socket-dir
-          resources:
-            limits:
-              memory: 500Mi
-            requests:
-              cpu: 10m
-              memory: 20Mi
+          securityContext:
+            capabilities:
+              drop:
+                - ALL
         - name: csi-snapshotter
-          image: mcr.microsoft.com/oss/kubernetes-csi/csi-snapshotter:v5.0.1
+          image: mcr.microsoft.com/oss/kubernetes-csi/csi-snapshotter:v7.0.2
           args:
             - "-v=2"
             - "-csi-address=$(ADDRESS)"
@@ -83,12 +73,16 @@ spec:
               mountPath: /csi
           resources:
             limits:
-              memory: 100Mi
+              memory: 200Mi
             requests:
               cpu: 10m
               memory: 20Mi
+          securityContext:
+            capabilities:
+              drop:
+                - ALL
         - name: csi-resizer
-          image: mcr.microsoft.com/oss/kubernetes-csi/csi-resizer:v1.4.0
+          image: mcr.microsoft.com/oss/kubernetes-csi/csi-resizer:v1.10.1
           args:
             - "-csi-address=$(ADDRESS)"
             - "-v=2"
@@ -109,12 +103,16 @@ spec:
             requests:
               cpu: 10m
               memory: 20Mi
+          securityContext:
+            capabilities:
+              drop:
+                - ALL
         - name: liveness-probe
-          image: mcr.microsoft.com/oss/kubernetes-csi/livenessprobe:v2.6.0
+          image: mcr.microsoft.com/oss/kubernetes-csi/livenessprobe:v2.12.0
           args:
             - --csi-address=/csi/csi.sock
             - --probe-timeout=3s
-            - --health-port=29612
+            - --http-endpoint=localhost:29612
             - --v=2
           volumeMounts:
             - name: socket-dir
@@ -125,8 +123,12 @@ spec:
             requests:
               cpu: 10m
               memory: 20Mi
+          securityContext:
+            capabilities:
+              drop:
+                - ALL
         - name: azurefile
-          image: mcr.microsoft.com/k8s/csi/azurefile-csi:latest
+          image: mcr.microsoft.com/oss/kubernetes-csi/azurefile-csi:v1.30.2
           imagePullPolicy: IfNotPresent
           args:
             - "--v=5"
@@ -134,17 +136,15 @@ spec:
             - "--metrics-address=0.0.0.0:29614"
             - "--user-agent-suffix=OSS-kubectl"
           ports:
-            - containerPort: 29612
-              name: healthz
-              protocol: TCP
             - containerPort: 29614
               name: metrics
               protocol: TCP
           livenessProbe:
             failureThreshold: 5
             httpGet:
+              host: localhost
               path: /healthz
-              port: healthz
+              port: 29612
             initialDelaySeconds: 30
             timeoutSeconds: 10
             periodSeconds: 30
@@ -160,6 +160,8 @@ spec:
           volumeMounts:
             - mountPath: /csi
               name: socket-dir
+            - mountPath: /root/.azcopy
+              name: azcopy-dir
             - mountPath: /etc/kubernetes/
               name: azure-cred
           resources:
@@ -168,8 +170,14 @@ spec:
             requests:
               cpu: 10m
               memory: 20Mi
+          securityContext:
+            capabilities:
+              drop:
+                - ALL
       volumes:
         - name: socket-dir
+          emptyDir: {}
+        - name: azcopy-dir
           emptyDir: {}
         - name: azure-cred
           hostPath:
