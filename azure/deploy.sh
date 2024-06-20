@@ -5,17 +5,17 @@ set -e
 
 ## Variables
 # Mongo variables
-export MONGODB_STORAGE_CLASS=managed-csi
+export MONGODB_STORAGE_CLASS=managed-premium
 # Amqstreams variables
-export KAFKA_STORAGE_CLASS=managed-csi
+export KAFKA_STORAGE_CLASS=managed-premium
 # Service principle variables
 SP_NAME="http://${CLUSTER_NAME}-sp"
 # SLS variables
-export SLS_STORAGE_CLASS=managed-csi
+export SLS_STORAGE_CLASS=managed-premium
 # UDS variables
-export UDS_STORAGE_CLASS=managed-csi
+export UDS_STORAGE_CLASS=managed-premium
 # CP4D variables
-export CPD_METADATA_STORAGE_CLASS=managed-csi
+export CPD_METADATA_STORAGE_CLASS=managed-premium
 export CPD_SERVICE_STORAGE_CLASS=azurefiles-premium
 
 log "Below are Cloud specific deployment parameters,"
@@ -191,7 +191,7 @@ envsubst </tmp/dockerconfig.json >/tmp/.dockerconfigjsonexport OCP_INGRESS_TLS_S
 oc set data secret/pull-secret -n openshift-config --from-file=/tmp/.dockerconfigjson
 
 # Run ansible playbook to create azurefiles storage class
-log "=== Creating azurefiles-premium Storage class , managed-csi Storage class on OCP cluster ==="
+log "=== Creating azurefiles-premium Storage class , managed-premium Storage class on OCP cluster ==="
 cd $GIT_REPO_HOME/azure/azurefiles
 ./azurefiles-premium.sh
 retcode=$?
