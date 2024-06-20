@@ -221,9 +221,9 @@ elif [[ $CLUSTER_TYPE == "azure" ]]; then
   export DRO_STORAGE_CLASS="managed-premium"
 
 fi
-export UDS_CONTACT_EMAIL="uds.support@ibm.com"
-export UDS_CONTACT_FIRSTNAME=Uds
-export UDS_CONTACT_LASTNAME=Support
+export DRO_CONTACT_EMAIL="dro.support@ibm.com"
+export DRO_CONTACT_FIRSTNAME=dro
+export DRO_CONTACT_LASTNAME=Support
 export UDS_TLS_CERT_LOCAL_FILE_PATH="${GIT_REPO_HOME}/uds.crt"
 # CP4D variables
 export CPD_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
