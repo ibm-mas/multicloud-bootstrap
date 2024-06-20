@@ -5,17 +5,17 @@ set -e
 
 ## Variables
 # Mongo variables
-export MONGODB_STORAGE_CLASS=managed-premium
+export MONGODB_STORAGE_CLASS=managed-csi
 # Amqstreams variables
-export KAFKA_STORAGE_CLASS=managed-premium
+export KAFKA_STORAGE_CLASS=managed-csi
 # Service principle variables
 SP_NAME="http://${CLUSTER_NAME}-sp"
 # SLS variables
-export SLS_STORAGE_CLASS=managed-premium
+export SLS_STORAGE_CLASS=managed-csi
 # UDS variables
-export UDS_STORAGE_CLASS=managed-premium
+export UDS_STORAGE_CLASS=managed-csi
 # CP4D variables
-export CPD_METADATA_STORAGE_CLASS=managed-premium
+export CPD_METADATA_STORAGE_CLASS=managed-csi
 export CPD_SERVICE_STORAGE_CLASS=azurefiles-premium
 
 log "Below are Cloud specific deployment parameters,"
@@ -191,7 +191,7 @@ envsubst </tmp/dockerconfig.json >/tmp/.dockerconfigjsonexport OCP_INGRESS_TLS_S
 oc set data secret/pull-secret -n openshift-config --from-file=/tmp/.dockerconfigjson
 
 # Run ansible playbook to create azurefiles storage class
-log "=== Creating azurefiles-premium Storage class , managed-premium Storage class on OCP cluster ==="
+log "=== Creating azurefiles-premium Storage class , managed-csi Storage class on OCP cluster ==="
 cd $GIT_REPO_HOME/azure/azurefiles
 ./azurefiles-premium.sh
 retcode=$?
@@ -268,7 +268,7 @@ if [[ (-z $UDS_API_KEY) || (-z $UDS_ENDPOINT_URL) || (-z $UDS_PUB_CERT_URL) ]]; 
   # Deploy UDS
   log "==== UDS/DRO deployment started ===="
   # uds and gencfg_uds are combined in common uds role
-  export ROLE_NAME=dro && ansible-playbook ibm.mas_devops.run_role
+  export ROLE_NAME=uds && ansible-playbook ibm.mas_devops.run_role
   log "==== UDS deployment completed ===="
 
 else
@@ -330,7 +330,7 @@ if [[ $DEPLOY_MANAGE == "true" && (-n $MAS_JDBC_USER) && (-n $MAS_JDBC_PASSWORD)
     export SSL_ENABLED=true
   fi
   log "==== Configure JDBC started for external DB2 ==== SSL_ENABLED = $SSL_ENABLED"
- # export ROLE_NAME=gencfg_jdbc && ansible-playbook ibm.mas_devops.run_role
+  export ROLE_NAME=gencfg_jdbc && ansible-playbook ibm.mas_devops.run_role
   log "==== Configure JDBC completed for external DB2 ===="
 fi
 
