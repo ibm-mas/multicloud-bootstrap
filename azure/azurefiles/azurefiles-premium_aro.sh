@@ -83,7 +83,7 @@ apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   name: azurefiles-premium
-provisioner: kubernetes.io/azure-file
+provisioner: file.csi.azure.com
 parameters:
   protocol: nfs
   location: $deployRegion
