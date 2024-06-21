@@ -39,7 +39,7 @@ if [[ $checkstoragename == "true" ]]; then
       --allow-shared-key-access true \
       --min-tls-version TLS1_2 \
       --location $deployRegion \
-      --allow-blob-public-access false \
+      --allow-blob-public-access true \
       --https-only false \
       --bypass AzureServices \
       --default-action Deny
