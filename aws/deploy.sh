@@ -185,13 +185,6 @@ master_subnet3_id               = "$EXISTING_PRIVATE_SUBNET3_ID"
 worker_subnet1_id               = "$EXISTING_PUBLIC_SUBNET1_ID"
 worker_subnet2_id               = "$EXISTING_PUBLIC_SUBNET2_ID"
 worker_subnet3_id               = "$EXISTING_PUBLIC_SUBNET3_ID"
-vpc_cidr                        = "$vpc_cidr"
-master_subnet_cidr1             = "$master_subnet_cidr1"
-master_subnet_cidr2             = "$master_subnet_cidr2"
-master_subnet_cidr3             = "$master_subnet_cidr3"
-worker_subnet_cidr1             = "$worker_subnet_cidr1"
-worker_subnet_cidr2             = "$worker_subnet_cidr2"
-worker_subnet_cidr3             = "$worker_subnet_cidr3"
 private_cluster                 = "$PRIVATE_CLUSTER"
 EOT
   if [[ -f terraform.tfvars ]]; then
