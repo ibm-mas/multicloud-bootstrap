@@ -139,6 +139,18 @@ if [[ $OPENSHIFT_USER_PROVIDE == "false" ]]; then
     AVAILABILITY_ZONE_3="${DEPLOY_REGION}c"
   fi
 
+# Reading custom cidr ranges for VPC & subnets which are in the range other than 10.0.x range
+export vpc_cidr=$(aws ec2 describe-vpcs  --vpc-ids $EXISTING_NETWORK --query "Vpcs[*].{VPC_CIDR_BLOCK:CidrBlock}" --output=text)
+
+export master_subnet_cidr1=$(aws ec2 describe-subnets --subnet-ids $EXISTING_PRIVATE_SUBNET1_ID --region $DEPLOY_REGION --filter Name=vpc-id,Values=$EXISTING_NETWORK --query "Subnets[*].{CIDR_BLOCKS:CidrBlock}" --output=text)
+export master_subnet_cidr2=$(aws ec2 describe-subnets --subnet-ids $EXISTING_PRIVATE_SUBNET2_ID --region $DEPLOY_REGION --filter Name=vpc-id,Values=$EXISTING_NETWORK --query "Subnets[*].{CIDR_BLOCKS:CidrBlock}" --output=text)
+export master_subnet_cidr3=$(aws ec2 describe-subnets --subnet-ids $EXISTING_PRIVATE_SUBNET3_ID --region $DEPLOY_REGION --filter Name=vpc-id,Values=$EXISTING_NETWORK --query "Subnets[*].{CIDR_BLOCKS:CidrBlock}" --output=text)
+
+export worker_subnet_cidr1=$(aws ec2 describe-subnets --subnet-ids $EXISTING_PUBLIC_SUBNET1_ID --region $DEPLOY_REGION --filter Name=vpc-id,Values=$EXISTING_NETWORK --query "Subnets[*].{CIDR_BLOCKS:CidrBlock}" --output=text)
+export worker_subnet_cidr2=$(aws ec2 describe-subnets --subnet-ids $EXISTING_PUBLIC_SUBNET2_ID --region $DEPLOY_REGION --filter Name=vpc-id,Values=$EXISTING_NETWORK --query "Subnets[*].{CIDR_BLOCKS:CidrBlock}" --output=text)
+export worker_subnet_cidr3=$(aws ec2 describe-subnets --subnet-ids $EXISTING_PUBLIC_SUBNET3_ID --region $DEPLOY_REGION --filter Name=vpc-id,Values=$EXISTING_NETWORK --query "Subnets[*].{CIDR_BLOCKS:CidrBlock}" --output=text)
+
+
   cat <<EOT >>terraform.tfvars
 cluster_name                    = "$CLUSTER_NAME"
 region                          = "$DEPLOY_REGION"
@@ -169,6 +181,13 @@ master_subnet3_id               = "$EXISTING_PRIVATE_SUBNET3_ID"
 worker_subnet1_id               = "$EXISTING_PUBLIC_SUBNET1_ID"
 worker_subnet2_id               = "$EXISTING_PUBLIC_SUBNET2_ID"
 worker_subnet3_id               = "$EXISTING_PUBLIC_SUBNET3_ID"
+vpc_cidr                        = "$vpc_cidr"
+master_subnet_cidr1             = "$master_subnet_cidr1"
+master_subnet_cidr2             = "$master_subnet_cidr2"
+master_subnet_cidr3             = "$master_subnet_cidr3"
+worker_subnet_cidr1             = "$worker_subnet_cidr1"
+worker_subnet_cidr2             = "$worker_subnet_cidr2"
+worker_subnet_cidr3             = "$worker_subnet_cidr3"
 private_cluster                 = "$PRIVATE_CLUSTER"
 EOT
   if [[ -f terraform.tfvars ]]; then
