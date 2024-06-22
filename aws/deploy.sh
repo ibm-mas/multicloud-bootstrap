@@ -139,6 +139,8 @@ if [[ $OPENSHIFT_USER_PROVIDE == "false" ]]; then
     AVAILABILITY_ZONE_3="${DEPLOY_REGION}c"
   fi
 
+if [[ $INSTALLATION_MODE == "UPI" ]]; then
+
 # Reading custom cidr ranges for VPC & subnets which are in the range other than 10.0.x range
 export vpc_cidr=$(aws ec2 describe-vpcs  --vpc-ids $EXISTING_NETWORK --query "Vpcs[*].{VPC_CIDR_BLOCK:CidrBlock}" --output=text)
 
@@ -149,6 +151,8 @@ export master_subnet_cidr3=$(aws ec2 describe-subnets --subnet-ids $EXISTING_PRI
 export worker_subnet_cidr1=$(aws ec2 describe-subnets --subnet-ids $EXISTING_PUBLIC_SUBNET1_ID --region $DEPLOY_REGION --filter Name=vpc-id,Values=$EXISTING_NETWORK --query "Subnets[*].{CIDR_BLOCKS:CidrBlock}" --output=text)
 export worker_subnet_cidr2=$(aws ec2 describe-subnets --subnet-ids $EXISTING_PUBLIC_SUBNET2_ID --region $DEPLOY_REGION --filter Name=vpc-id,Values=$EXISTING_NETWORK --query "Subnets[*].{CIDR_BLOCKS:CidrBlock}" --output=text)
 export worker_subnet_cidr3=$(aws ec2 describe-subnets --subnet-ids $EXISTING_PUBLIC_SUBNET3_ID --region $DEPLOY_REGION --filter Name=vpc-id,Values=$EXISTING_NETWORK --query "Subnets[*].{CIDR_BLOCKS:CidrBlock}" --output=text)
+
+fi
 
 
   cat <<EOT >>terraform.tfvars
