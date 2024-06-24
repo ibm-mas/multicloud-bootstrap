@@ -267,39 +267,40 @@
                         "visible": true
                     },
                     {
-                        "name": "udsEndpointUrl",
+                        "name": "",
+
                         "type": "Microsoft.Common.TextBox",
-                        "label": "UDS endpoint URL",
+                        "label": "DRO endpoint URL",
                         "defaultValue": "",
-                        "toolTip": "Enter the endpoint URL that you retrieved from the 'uds-endpoint' OpenShift route in the ibm-common-services namespace. URL should not have slash (/) at the end.",
+                        "toolTip": "Enter the endpoint URL that you retrieved from the 'dro-endpoint' OpenShift route in the ibm-common-services namespace. URL should not have slash (/) at the end.",
                         "constraints": {
-                            "required": "[or(not(empty(steps('ExistingInfrastructure').udsAPIKey)), not(empty(steps('ExistingInfrastructure').udsPublicCertificateUrl)))]",
+                            "required": "[or(not(empty(steps('ExistingInfrastructure').droAPIKey)), not(empty(steps('ExistingInfrastructure').droPublicCertificateUrl)))]",
                             "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
                             "validationMessage": "Contain letters, numbers and special characters only."
                         },
                         "visible": true
                     },
                     {
-                        "name": "udsAPIKey",
+                        "name": "droAPIKey",
                         "type": "Microsoft.Common.TextBox",
-                        "label": "UDS API key",
+                        "label": "DRO API key",
                         "defaultValue": "",
-                        "toolTip": "Enter the service's API key that you retrieved from the 'uds-api-key' secret in the ibm-common-services namespace.",
+                        "toolTip": "Enter the service's API key that you retrieved from the 'dro-api-key' secret in the ibm-common-services namespace.",
                         "constraints": {
-                            "required": "[or(not(empty(steps('ExistingInfrastructure').udsEndpointUrl)), not(empty(steps('ExistingInfrastructure').udsPublicCertificateUrl)))]",
+                            "required": "[or(not(empty(steps('ExistingInfrastructure').droEndpointUrl)), not(empty(steps('ExistingInfrastructure').droPublicCertificateUrl)))]",
                             "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
                             "validationMessage": "Contain letters, numbers and special characters only."
                         },
                         "visible": true
                     },
                     {
-                        "name": "udsPublicCertificateUrl",
+                        "name": "droPublicCertificateUrl",
                         "type": "Microsoft.Common.TextBox",
-                        "label": "UDS public certificate URL",
+                        "label": "DRO public certificate URL",
                         "defaultValue": "",
-                        "toolTip": "Enter the URL (preferebly with SAS token) of the service's public certificate that you retrieved from the 'ca-bundle.pem' file in the '<unique-string>-uds-cfg' route in the MAS core namespace.",
+                        "toolTip": "Enter the URL (preferebly with SAS token) of the service's public certificate that you retrieved from the 'ca-bundle.pem' file in the '<unique-string>-dro-cfg' route in the MAS core namespace.",
                         "constraints": {
-                            "required": "[or(not(empty(steps('ExistingInfrastructure').udsEndpointUrl)), not(empty(steps('ExistingInfrastructure').udsAPIKey)))]",
+                            "required": "[or(not(empty(steps('ExistingInfrastructure').droEndpointUrl)), not(empty(steps('ExistingInfrastructure').droAPIKey)))]",
                             "regex": "^[A-Za-z0-9-\\\\\\s!#@.:=?<>”$%&’()*+,/;[\\^_`{|}~\\]]*$",
                             "validationMessage": "Contain letters, numbers and special characters only."
                         },
@@ -526,9 +527,9 @@
             "slsEndpointUrl": "[steps('ExistingInfrastructure').slsEndpointUrl]",
             "slsRegistrationKey": "[steps('ExistingInfrastructure').slsRegistrationKey]",
             "slsPublicCertificateUrl": "[steps('ExistingInfrastructure').slsPublicCertificateUrl]",
-            "udsEndpointUrl": "[steps('ExistingInfrastructure').udsEndpointUrl]",
-            "udsAPIKey": "[steps('ExistingInfrastructure').udsAPIKey]",
-            "udsPublicCertificateUrl": "[steps('ExistingInfrastructure').udsPublicCertificateUrl]",
+            "droEndpointUrl": "[steps('ExistingInfrastructure').droEndpointUrl]",
+            "droAPIKey": "[steps('ExistingInfrastructure').droAPIKey]",
+            "droPublicCertificateUrl": "[steps('ExistingInfrastructure').droPublicCertificateUrl]",
 
 
             "masManageDBUser": "[steps('DatabaseSettings').masManageDBUser]",

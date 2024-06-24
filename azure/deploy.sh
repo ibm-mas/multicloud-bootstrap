@@ -12,8 +12,8 @@ export KAFKA_STORAGE_CLASS=managed-premium
 SP_NAME="http://${CLUSTER_NAME}-sp"
 # SLS variables
 export SLS_STORAGE_CLASS=managed-premium
-# UDS variables
-export UDS_STORAGE_CLASS=managed-premium
+# DRO variables
+export DRO_STORAGE_CLASS=managed-premium
 # CP4D variables
 export CPD_METADATA_STORAGE_CLASS=managed-premium
 export CPD_SERVICE_STORAGE_CLASS=azurefiles-premium
@@ -23,7 +23,7 @@ log " MONGODB_STORAGE_CLASS: $MONGODB_STORAGE_CLASS"
 log " KAFKA_STORAGE_CLASS: $KAFKA_STORAGE_CLASS"
 log " SP_NAME: $SP_NAME"
 log " SLS_STORAGE_CLASS: $SLS_STORAGE_CLASS"
-log " UDS_STORAGE_CLASS: $UDS_STORAGE_CLASS"
+log " DRO_STORAGE_CLASS: $DRO_STORAGE_CLASS"
 log " SSH_PUB_KEY: $SSH_PUB_KEY"
 ## Download files from S3 bucket
 # Download MAS license
@@ -42,9 +42,9 @@ if [[ ! -z ${SLS_PUB_CERT_URL} ]]; then
 fi
 # Download BAS certificate
 cd $GIT_REPO_HOME
-if [[ ! -z ${UDS_PUB_CERT_URL} ]]; then
-  azcopy copy "${UDS_PUB_CERT_URL}" "uds.crt"
-  chmod 600 uds.crt
+if [[ ! -z ${DRO_PUB_CERT_URL} ]]; then
+  azcopy copy "${DRO_PUB_CERT_URL}" "dro.crt"
+  chmod 600 dro.crt
 fi
 
 ## Read License File & Retrive SLS hostname and host id
@@ -263,19 +263,19 @@ else
   log "=== Generated SLS Config YAML ==="
 fi
 
-# Deploy UDS
-if [[ (-z $UDS_API_KEY) || (-z $UDS_ENDPOINT_URL) || (-z $UDS_PUB_CERT_URL) ]]; then
-  # Deploy UDS
-  log "==== UDS/DRO deployment started ===="
-  # uds and gencfg_uds are combined in common uds role
+# Deploy DRO
+if [[ (-z $DRO_API_KEY) || (-z $DRO_ENDPOINT_URL) || (-z $DRO_PUB_CERT_URL) ]]; then
+  # Deploy DRO
+  log "==== DRO/DRO deployment started ===="
+  # DRO and gencfg_DRO are combined in common DRO role
   export ROLE_NAME=dro && ansible-playbook ibm.mas_devops.run_role
-  log "==== UDS deployment completed ===="
+  log "==== DRO deployment completed ===="
 
 else
-  log "=== Using Existing UDS Deployment ==="
-  # works when UDS_ENDPOINT_URL is set, handled in same uds role
+  log "=== Using Existing DRO Deployment ==="
+  # works when DRO_ENDPOINT_URL is set, handled in same DRO role
   export ROLE_NAME=dro && ansible-playbook ibm.mas_devops.run_role
-  log "=== Generated UDS Config YAML ==="
+  log "=== Generated DRO Config YAML ==="
 fi
 
 # Deploy CP4D

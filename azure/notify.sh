@@ -17,9 +17,9 @@ if [[ $STATUS == "SUCCESS" ]]; then
     get_sls_endpoint_url $RANDOM_STR
     log " CALL_SLS_URL=$CALL_SLS_URL"
   fi
-  if [[ -z $UDS_ENDPOINT_URL ]]; then
-    get_uds_endpoint_url $RANDOM_STR
-    log " CALL_UDS_URL=$CALL_UDS_URL"
+  if [[ -z $DRO_ENDPOINT_URL ]]; then
+    get_dro_endpoint_url $RANDOM_STR
+    log " CALL_DRO_URL=$CALL_DRO_URL"
   fi
   get_mas_creds $RANDOM_STR
   log " MAS_USER=$MAS_USER"
