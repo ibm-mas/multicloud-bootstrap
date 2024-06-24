@@ -93,8 +93,8 @@ parameters:
   storageAccount: $AZURE_STORAGE_ACCOUNT_NAME
 reclaimPolicy: Delete
 mountOptions:
-  - dir_mode=0640
-  - file_mode=0640
+  - dir_mode=0777
+  - file_mode=0777
   - uid=0
   - gid=0
   - mfsymlinks
