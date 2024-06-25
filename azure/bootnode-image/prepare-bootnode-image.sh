@@ -42,8 +42,6 @@ dnf clean all
 ## Install pre-reqs
 dnf install git httpd-tools java  unzip wget zip pip  container-tools -y
 
-
-
 ln -s --force /usr/bin/python3.9 /usr/bin/python
 ln -s --force /usr/bin/pip3.9 /usr/bin/pip
 
