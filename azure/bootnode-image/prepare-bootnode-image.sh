@@ -37,8 +37,8 @@ dnf --config='https://rhelimage.blob.core.windows.net/repositories/rhui-microsof
 
 # Update all packages to latest
 dnf clean all
-#dnf update -y
- yum install python-unversioned-command -y
+dnf update -y
+# yum install python-unversioned-command -y
 ## Install pre-reqs
 #dnf install git httpd-tools java  unzip wget zip pip  container-tools -y --skip-broken
 #dnf update python39 python-unversioned-command -y
