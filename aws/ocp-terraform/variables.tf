@@ -331,7 +331,7 @@ variable "cloudctl_version" {
 
 variable "openshift_version" {
   description = "OCP Version"
-  default     = "4.12.18"
+  default     = "4.14.25"
 }
 
 variable "cpd_platform" {
