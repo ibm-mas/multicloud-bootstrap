@@ -40,7 +40,7 @@ dnf clean all
 #dnf update -y
  yum install python-unversioned-command -y
 ## Install pre-reqs
-dnf install git httpd-tools java  unzip wget zip pip  container-tools -y --skip-broken
+#dnf install git httpd-tools java  unzip wget zip pip  container-tools -y --skip-broken
 #dnf update python39 python-unversioned-command -y
 
 
