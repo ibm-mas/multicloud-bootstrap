@@ -39,7 +39,7 @@ dnf --config='https://rhelimage.blob.core.windows.net/repositories/rhui-microsof
 dnf update -y
 
 ## Install pre-reqs
-dnf install git httpd-tools java python39 unzip wget zip pip  container-tools -y
+dnf install git httpd-tools java python39 unzip wget zip pip  container-tools -y --nobest
 ln -s --force /usr/bin/python3.9 /usr/bin/python
 ln -s --force /usr/bin/pip3.9 /usr/bin/pip
 
