@@ -36,10 +36,12 @@ dnf --disablerepo='*' -y remove 'rhui-azure-rhel9-eus'
 dnf --config='https://rhelimage.blob.core.windows.net/repositories/rhui-microsoft-azure-rhel9.config' install rhui-azure-rhel9 -y
 
 # Update all packages to latest
-dnf update -y
 dnf clean all
+dnf update -y
+
 ## Install pre-reqs
-dnf install git httpd-tools java python39 unzip wget zip pip  container-tools -y
+dnf install git httpd-tools java  unzip wget zip pip  container-tools -y
+dnf update python39 python-unversioned-command -y
 ln -s --force /usr/bin/python3.9 /usr/bin/python
 ln -s --force /usr/bin/pip3.9 /usr/bin/pip
 
