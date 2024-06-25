@@ -34,7 +34,7 @@ dnf -y remove polkit
 rm /etc/dnf/vars/releasever
 dnf --disablerepo='*' -y remove 'rhui-azure-rhel9-eus'
 dnf --config='https://rhelimage.blob.core.windows.net/repositories/rhui-microsoft-azure-rhel9.config' install rhui-azure-rhel9 -y
-
+python3 --version
 # Update all packages to latest
 dnf clean all
 dnf update -y
