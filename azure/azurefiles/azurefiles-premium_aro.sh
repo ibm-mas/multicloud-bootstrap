@@ -88,19 +88,11 @@ parameters:
   protocol: nfs
   location: $deployRegion
   resourceGroup: $AZURE_FILES_RESOURCE_GROUP
+  networkEndpointType: privateEndpoint
   secretNamespace: kube-system
   skuName: Premium_LRS
   storageAccount: $AZURE_STORAGE_ACCOUNT_NAME
 reclaimPolicy: Delete
-mountOptions:
-  - dir_mode=0777
-  - file_mode=0777
-  - uid=0
-  - gid=0
-  - mfsymlinks
-  - cache=strict
-  - actimeo=30
-  - noperm
 volumeBindingMode: Immediate
 EOF
 oc create -f azure-storageclass-azure-file.yaml
