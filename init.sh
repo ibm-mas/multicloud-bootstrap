@@ -257,7 +257,7 @@ export DB2_BACKUP_STORAGE_CLASS=$CPD_PRIMARY_STORAGE_CLASS
 export CPD_SERVICE_NAME="db2wh"
 
 export DB2_INSTANCE_NAME=db2wh-db01
-#export DB2_VERSION=11.5.8.0-cn6
+#export DB2_VERSION=11.5.7.0-cn2
 export ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
 # not reqd its hardcoded as db2_namespace: db2u
 export DB2WH_NAMESPACE="cpd-services-${RANDOM_STR}"

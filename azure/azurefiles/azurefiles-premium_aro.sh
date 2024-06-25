@@ -83,7 +83,7 @@ apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   name: azurefiles-premium
-provisioner: kubernetes.io/azure-file
+provisioner: file.csi.azure.com
 parameters:
   location: $deployRegion
   resourceGroup: $AZURE_FILES_RESOURCE_GROUP
@@ -92,8 +92,8 @@ parameters:
   storageAccount: $AZURE_STORAGE_ACCOUNT_NAME
 reclaimPolicy: Delete
 mountOptions:
-  - dir_mode=0777
-  - file_mode=0777
+  - dir_mode=0600
+  - file_mode=0600
   - uid=0
   - gid=0
   - mfsymlinks
@@ -103,4 +103,3 @@ mountOptions:
 volumeBindingMode: Immediate
 EOF
 oc create -f azure-storageclass-azure-file.yaml
-oc apply -f persistent-volume-binder.yaml
