@@ -39,7 +39,7 @@ if [[ $checkstoragename == "true" ]]; then
       --allow-shared-key-access true \
       --min-tls-version TLS1_2 \
       --location $deployRegion \
-      --allow-blob-public-access true \
+      --allow-blob-public-access false \
       --https-only false \
       --bypass AzureServices \
       --default-action Deny
@@ -83,16 +83,24 @@ apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   name: azurefiles-premium
-provisioner: file.csi.azure.com
+provisioner: kubernetes.io/azure-file
 parameters:
-  protocol: nfs
   location: $deployRegion
   resourceGroup: $AZURE_FILES_RESOURCE_GROUP
-  networkEndpointType: privateEndpoint
   secretNamespace: kube-system
   skuName: Premium_LRS
   storageAccount: $AZURE_STORAGE_ACCOUNT_NAME
 reclaimPolicy: Delete
+mountOptions:
+  - dir_mode=0777
+  - file_mode=0777
+  - uid=0
+  - gid=0
+  - mfsymlinks
+  - cache=strict
+  - actimeo=30
+  - noperm
 volumeBindingMode: Immediate
 EOF
 oc create -f azure-storageclass-azure-file.yaml
+oc apply -f persistent-volume-binder.yaml
