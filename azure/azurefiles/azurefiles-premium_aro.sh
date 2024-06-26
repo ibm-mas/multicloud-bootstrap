@@ -14,6 +14,7 @@ export CLUSTER_NAME=$(az resource list --name  $resourceGroupName --query "[].{i
 echo "CLUSTER_NAME" $CLUSTER_NAME
 log "CLUSTER_NAME" $CLUSTER_NAME
 export AZURE_STORAGE_ACCOUNT_NAME=stg${resourceGroupName,,}
+export AZURE_STORAGE_BLOCK_ACCOUNT_NAME=blk${resourceGroupName,,}
 echo "AZURE_STORAGE_ACCOUNT_NAME" $AZURE_STORAGE_ACCOUNT_NAME
 export AZURE_FILES_RESOURCE_GROUP=$resourceGroupName
 echo "AZURE_FILES_RESOURCE_GROUP" $AZURE_FILES_RESOURCE_GROUP
@@ -25,9 +26,14 @@ az provider register -n Microsoft.Compute --wait
 az provider register -n Microsoft.Storage --wait
 az provider register -n Microsoft.Authorization --wait
 export checkstoragename=$(az storage account check-name --name $AZURE_STORAGE_ACCOUNT_NAME --query nameAvailable)
+export checkstorageblockname=$(az storage account check-name --name $AZURE_STORAGE_BLOCK_ACCOUNT_NAME --query nameAvailable)
 echo "Check if the storage name is available : $checkstoragename"
 log "Check if the storage name is available : $checkstoragename"
 #zcheck if the storage name exists
+if [[ checkstorageblockname == "true" ]]; then
+    az storage account create --name ${AZURE_STORAGE_BLOCK_ACCOUNT_NAME} --resource-group ${AZURE_FILES_RESOURCE_GROUP} --location ${deployRegion} --sku Premium_LRS --kind BlockBlobStorage
+fi
+
 if [[ $checkstoragename == "true" ]]; then
    echo "no storage class"
     #create a storage
@@ -69,13 +75,16 @@ export subnets=(worker-subnet master-subnet)
 for subnet in "${subnets[@]}"
   do
   echo "{subnet}"
-  az network vnet subnet update --resource-group  $AZURE_FILES_RESOURCE_GROUP --vnet-name $VNET --name $subnet --service-endpoints "Microsoft.Storage.Global"
+  #az network vnet subnet update --resource-group  $AZURE_FILES_RESOURCE_GROUP --vnet-name $VNET --name $subnet --service-endpoints "Microsoft.Storage.Global"
   subnetid=$(az network vnet subnet show --resource-group $AZURE_FILES_RESOURCE_GROUP --vnet-name $VNET --name $subnet --query id --output tsv)
   az storage account network-rule add --resource-group $AZURE_FILES_RESOURCE_GROUP --account-name $AZURE_STORAGE_ACCOUNT_NAME --subnet $subnetid
+  az storage account network-rule add --resource-group $AZURE_FILES_RESOURCE_GROUP --account-name AZURE_STORAGE_BLOCK_ACCOUNT_NAME --subnet $subnetid
+
 done
 #delete the azurepremium and create a new premium
 log "Delete the azurepremium and create a new azurepremium for ARO"
 oc delete sc/azurefiles-premium
+oc delete sc/azuredisk-premium
 
 #Deploy premium Storage Class for aro
 cat << EOF >> azure-storageclass-azure-file.yaml
@@ -89,17 +98,26 @@ parameters:
   resourceGroup: $AZURE_FILES_RESOURCE_GROUP
   secretNamespace: kube-system
   skuName: Premium_LRS
+  protocol: nfs
   storageAccount: $AZURE_STORAGE_ACCOUNT_NAME
 reclaimPolicy: Delete
-mountOptions:
-  - dir_mode=0600
-  - file_mode=0600
-  - uid=0
-  - gid=0
-  - mfsymlinks
-  - cache=strict
-  - actimeo=30
-  - noperm
 volumeBindingMode: Immediate
+allowVolumeExpansion: true
 EOF
 oc create -f azure-storageclass-azure-file.yaml
+
+cat << EOF >> azure-storageclass-azure-disk.yaml
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: azuredisk-premium
+provisioner: disk.csi.azure.com
+parameters:
+  location: $deployRegion
+  resourceGroup: $AZURE_FILES_RESOURCE_GROUP
+  secretNamespace: kube-system
+  skuName: Premium_LRS
+  storageAccount: $AZURE_STORAGE_BLOCK_ACCOUNT_NAME
+EOF
+oc create -f azure-storageclass-azure-file.yaml
+oc create -f azure-storageclass-azure-disk.yaml
