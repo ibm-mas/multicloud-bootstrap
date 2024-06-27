@@ -22,8 +22,8 @@ oc create configmap azure-cred-file --from-literal=path="/etc/kubernetes/cloud.c
 
 export driver_version=v1.30.2
 echo "Driver version " $driver_version
-./install-driver.sh $driver_version
-oc patch storageclass managed-csi -p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "false"}}}'
+#./install-driver.sh $driver_version
+#oc patch storageclass managed-csi -p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "false"}}}'
 #Deploy premium Storage Class
 envsubst < azurefiles-premium.yaml | tee azurefiles-premium.yaml
 oc apply -f azurefiles-premium.yaml

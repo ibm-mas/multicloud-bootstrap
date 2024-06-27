@@ -5,17 +5,17 @@ set -e
 
 ## Variables
 # Mongo variables
-export MONGODB_STORAGE_CLASS=managed-premium
+export MONGODB_STORAGE_CLASS=managed-csi
 # Amqstreams variables
-export KAFKA_STORAGE_CLASS=managed-premium
+export KAFKA_STORAGE_CLASS=managed-csi
 # Service principle variables
 SP_NAME="http://${CLUSTER_NAME}-sp"
 # SLS variables
-export SLS_STORAGE_CLASS=managed-premium
+export SLS_STORAGE_CLASS=managed-csi
 # DRO variables
-export DRO_STORAGE_CLASS=managed-premium
+export DRO_STORAGE_CLASS=managed-csi
 # CP4D variables
-export CPD_METADATA_STORAGE_CLASS=managed-premium
+export CPD_METADATA_STORAGE_CLASS=managed-csi
 export CPD_SERVICE_STORAGE_CLASS=azurefiles-premium
 
 log "Below are Cloud specific deployment parameters,"

@@ -236,7 +236,7 @@ if [[ $CLUSTER_TYPE == "aws" ]]; then
 elif [[ $CLUSTER_TYPE == "azure" ]]; then
   #export CPD_PRIMARY_STORAGE_CLASS="azurefile-premium-new"
   export CPD_PRIMARY_STORAGE_CLASS="azurefiles-premium"
-  export CPD_METADATA_STORAGE_CLASS="azuredisk-premium"
+  export CPD_METADATA_STORAGE_CLASS="managed-csi"
 fi
 #export DRO_STORAGE_CLASS=true
 # DB2WH variables
@@ -248,10 +248,10 @@ export DB2WH_INSTANCE_NAME="db2wh-cpd-${RANDOM_STR}"
 export DB2WH_VERSION="11.5.8.0-cn6"
 
 
-export DB2_LOGS_STORAGE_CLASS="azuredisk-premium"
-export DB2_TEMP_STORAGE_CLASS="azuredisk-premium"
+export DB2_LOGS_STORAGE_CLASS="managed-csi"
+export DB2_TEMP_STORAGE_CLASS="managed-csi"
 export DB2_META_STORAGE_CLASS="azurefiles-premium"
-export DB2_DATA_STORAGE_CLASS="azuredisk-premium"
+export DB2_DATA_STORAGE_CLASS="managed-csi"
 export DB2_BACKUP_STORAGE_CLASS="azurefiles-premium"
 
 export CPD_SERVICE_NAME="db2wh"
