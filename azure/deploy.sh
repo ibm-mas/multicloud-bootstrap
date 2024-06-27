@@ -191,14 +191,14 @@ envsubst </tmp/dockerconfig.json >/tmp/.dockerconfigjsonexport OCP_INGRESS_TLS_S
 oc set data secret/pull-secret -n openshift-config --from-file=/tmp/.dockerconfigjson
 
 # Run ansible playbook to create azurefiles storage class
-log "=== Creating azurefiles-premium Storage class , managed-premium Storage class on OCP cluster ==="
-cd $GIT_REPO_HOME/azure/azurefiles
-./azurefiles-premium.sh
-retcode=$?
-if [[ $retcode -ne 0 ]]; then
-  log "Failed to create azurefiles-premium storageclass"
+#log "=== Creating azurefiles-premium Storage class , managed-premium Storage class on OCP cluster ==="
+#cd $GIT_REPO_HOME/azure/azurefiles
+#./azurefiles-premium.sh
+#retcode=$?
+#if [[ $retcode -ne 0 ]]; then
+ # log "Failed to create azurefiles-premium storageclass"
   #exit 27
-fi
+#fi
 
 ## Configure OCP cluster
 log "==== OCP cluster configuration (Cert Manager) started ===="
