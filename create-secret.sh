@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # This script creates the secret in the appropriate Cloud service based on the Cloud type
-# Currently supported Clouds are
+# Currently supported Clodro are
 #  AWS - Secrets Manager
 #  Azure - Key Vault
 #

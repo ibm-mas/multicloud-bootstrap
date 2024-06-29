@@ -13,7 +13,7 @@ log " Foundational services version is $cpfs_version"
 # CP4D (if installed)
 # Cert Manager
 # SLS
-# UDS
+# DRO
 VersionsArray=( ibm-cert-manager-operator user-data-services-operator cpd-platform-operator ibm-sls )
 
  for val in ${VersionsArray[@]}; do
