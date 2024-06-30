@@ -174,7 +174,7 @@ EOT
 
 log "INSTALLATION_MODE is: $INSTALLATION_MODE"
 
-  if [[ $INSTALLATION_MODE == "UPI" ]]; then
+  if [ -n "$EXISTING_NETWORK" ]; then
 
   log "Reached here and INSTALLATION_MODE is: $INSTALLATION_MODE"
 
