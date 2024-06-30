@@ -172,7 +172,11 @@ worker_subnet3_id               = "$EXISTING_PUBLIC_SUBNET3_ID"
 private_cluster                 = "$PRIVATE_CLUSTER"
 EOT
 
+log "INSTALLATION_MODE is: $INSTALLATION_MODE"
+
   if [[ $INSTALLATION_MODE == "UPI" ]]; then
+
+  log "Reached here and INSTALLATION_MODE is: $INSTALLATION_MODE"
 
 # Reading custom cidr ranges for VPC & subnets which are in the range other than 10.0.x range
 export vpc_cidr=$(aws ec2 describe-vpcs  --vpc-ids $EXISTING_NETWORK --query "Vpcs[*].{VPC_CIDR_BLOCK:CidrBlock}" --output=text)
