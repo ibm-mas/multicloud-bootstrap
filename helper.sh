@@ -69,12 +69,12 @@ get_sls_registration_key() {
 
 }
 
-get_uds_endpoint_url() {
+get_dro_endpoint_url() {
   uniqstr=$1
-  export CALL_UDS_URL="https:\/\/$(oc get route uds-endpoint -n ibm-common-services | grep "uds" | awk {'print $2'})"
+  export CALL_DRO_URL="https:\/\/$(oc get route dro-endpoint -n ibm-common-services | grep "dro" | awk {'print $2'})"
 }
 
-get_uds_api_key() {
+get_dro_api_key() {
   uniqstr=$1
 
 }
@@ -100,7 +100,7 @@ mark_provisioning_failed() {
   elif [[ $retcode -eq 15 ]]; then
     export STATUS_MSG="Please provide all the inputs to use existing SLS."
   elif [[ $retcode -eq 16 ]]; then
-    export STATUS_MSG="Please provide all the inputs to use existing UDS."
+    export STATUS_MSG="Please provide all the inputs to use existing DRO."
   elif [[ $retcode -eq 17 ]]; then
     export STATUS_MSG="Please provide OCP pull secret."
   elif [[ $retcode -eq 18 ]]; then

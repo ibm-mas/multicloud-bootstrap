@@ -169,21 +169,21 @@ else
     fi
 fi
 
-# Check if all the existing UDS inputs are provided
-if [[ (-z $UDS_API_KEY) && (-z $UDS_ENDPOINT_URL) && (-z $UDS_PUB_CERT_URL) ]]; then
-    log "=== New UDS Will be deployed ==="
+# Check if all the existing DRO inputs are provided
+if [[ (-z $DRO_API_KEY) && (-z $DRO_ENDPOINT_URL) && (-z $DRO_PUB_CERT_URL) ]]; then
+    log "=== New DRO Will be deployed ==="
 else
-    if [ -z "$UDS_API_KEY" ]; then
-        log "ERROR: UDS API Key is not specified"
+    if [ -z "$DRO_API_KEY" ]; then
+        log "ERROR: DRO API Key is not specified"
         SCRIPT_STATUS=16
-    elif [ -z "$UDS_ENDPOINT_URL" ]; then
-        log "ERROR: UDS Endpoint URL is not specified"
+    elif [ -z "$DRO_ENDPOINT_URL" ]; then
+        log "ERROR: DRO Endpoint URL is not specified"
         SCRIPT_STATUS=16
-    elif [ -z "$UDS_PUB_CERT_URL" ]; then
-        log "ERROR: UDS Public Cerificate URL is not specified"
+    elif [ -z "$DRO_PUB_CERT_URL" ]; then
+        log "ERROR: DRO Public Cerificate URL is not specified"
         SCRIPT_STATUS=16
     else
-        log "=== Using existing UDS deployment inputs ==="
+        log "=== Using existing DRO deployment inputs ==="
     fi
 fi
 

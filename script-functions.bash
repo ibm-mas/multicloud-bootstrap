@@ -250,7 +250,7 @@ function getOPNamespace() {
         log " $1 Instance Name : $INSTANCE_NAME"
         if [[  $INSTANCE_NAME != "null" ]]; then
           if [[  ${instance_names[${1}]} && (${instance_names[${1}]} = "$INSTANCE_NAME") ]]; then
-            log " UDS Instance Present"
+            log " DRO Instance Present"
           else
             log " Instance Name for ${1} is not matching."
             SCRIPT_STATUS=29

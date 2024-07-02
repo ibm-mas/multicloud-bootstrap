@@ -193,24 +193,24 @@
       },
       "defaultValue": ""
     },
-    "udsEndpointUrl": {
+    "droEndpointUrl": {
       "type": "string",
       "metadata": {
-        "description": "Enter the endpoint URL that you retrieved from the 'uds-endpoint' OpenShift route in the ibm-common-services namespace. URL should not have slash (/) at the end."
+        "description": "Enter the endpoint URL that you retrieved from the 'dro-endpoint' OpenShift route in the ibm-common-services namespace. URL should not have slash (/) at the end."
       },
       "defaultValue": ""
     },
-    "udsAPIKey": {
+    "droAPIKey": {
       "type": "string",
       "metadata": {
-        "description": "Enter the service's API key that you retrieved from the 'uds-api-key' secret in the ibm-common-services namespace."
+        "description": "Enter the service's API key that you retrieved from the 'dro-api-key' secret in the ibm-common-services namespace."
       },
       "defaultValue": ""
     },
-    "udsPublicCertificateUrl": {
+    "droPublicCertificateUrl": {
       "type": "string",
       "metadata": {
-        "description": "Enter the URL (preferebly with SAS token) of the service's public certificate that you retrieved from the 'ca-bundle.pem' file in the '<unique-string>-uds-cfg' route in the MAS core namespace."
+        "description": "Enter the URL (preferebly with SAS token) of the service's public certificate that you retrieved from the 'ca-bundle.pem' file in the '<unique-string>-dro-cfg' route in the MAS core namespace."
       },
       "defaultValue": ""
     },
@@ -579,7 +579,7 @@
             "typeHandlerVersion": "2.0",
             "autoUpgradeMinorVersion": true,
             "protectedSettings": {
-              "commandToExecute": "[concat('sleep 120;', 'cd /root/ansible-devops/multicloud-bootstrap;', './init-async.sh azure ''', parameters('offeringType'), ''' ''', parameters('location'), ''' null ''', parameters('clusterSize'), ''' ''', variables('projectName'), ''' ''', parameters('HostedDomain'), ''' null ''', parameters('sshPublicKey'), ''' null ''', parameters('entitledRegistryKey'), ''' ''', parameters('openShiftPullSecret'), ''' ''', parameters('masLicenseUrl'), ''' ''', parameters('slsEndpointUrl'), ''' ''', parameters('slsRegistrationKey'), ''' ''', parameters('slsPublicCertificateUrl'), ''' ''', parameters('udsEndpointUrl'), ''' ''', parameters('udsAPIKey'), ''' ''', parameters('udsPublicCertificateUrl'), ''' ''', parameters('masManageDBUser'), ''' ''', parameters('masManageDBPassword'), ''' ''', parameters('masManageDBJdbcUrl'), ''' ''', parameters('masManageDBCertificateUrl'), ''' ''', parameters('importDemoData'), ''' '''' '''' '''' ''', variables('rgName'), ''' ''', parameters('emailNotification'), ''' ''', parameters('notificattionEmailAddress'), ''' ''', parameters('smtpHost'), ''' ''', parameters('smtpPort'), ''' ''', parameters('smtpUsername'), ''' ''', parameters('smtpPassword'), ''' ''', parameters('azureServicePrincipalClientId'), ''' ''', parameters('azureServicePrincipalClientSecret'), ''' ''', parameters('subscriptionId'), ''' ''', parameters('azureServicePrincipalTenantId'), ''' null null null null ''', parameters('openShiftClustervnetId'), ''' '''' null null null null null null ''', parameters('privateCluster'),''' ''' ,parameters('operationalMode'), ''' '''' '''' '''' '''' '''' '''' '''' '''' ''' ,parameters('DBProvisionedVPCId'),''' '''' '''' ''',parameters('masManageTablespace'),''' dev ''', ''' > mas-provisioning.log 2>&1;')]"
+              "commandToExecute": "[concat('sleep 120;', 'cd /root/ansible-devops/multicloud-bootstrap;', './init-async.sh azure ''', parameters('offeringType'), ''' ''', parameters('location'), ''' null ''', parameters('clusterSize'), ''' ''', variables('projectName'), ''' ''', parameters('HostedDomain'), ''' null ''', parameters('sshPublicKey'), ''' null ''', parameters('entitledRegistryKey'), ''' ''', parameters('openShiftPullSecret'), ''' ''', parameters('masLicenseUrl'), ''' ''', parameters('slsEndpointUrl'), ''' ''', parameters('slsRegistrationKey'), ''' ''', parameters('slsPublicCertificateUrl'), ''' ''', parameters('droEndpointUrl'), ''' ''', parameters('droAPIKey'), ''' ''', parameters('droPublicCertificateUrl'), ''' ''', parameters('masManageDBUser'), ''' ''', parameters('masManageDBPassword'), ''' ''', parameters('masManageDBJdbcUrl'), ''' ''', parameters('masManageDBCertificateUrl'), ''' ''', parameters('importDemoData'), ''' '''' '''' '''' ''', variables('rgName'), ''' ''', parameters('emailNotification'), ''' ''', parameters('notificattionEmailAddress'), ''' ''', parameters('smtpHost'), ''' ''', parameters('smtpPort'), ''' ''', parameters('smtpUsername'), ''' ''', parameters('smtpPassword'), ''' ''', parameters('azureServicePrincipalClientId'), ''' ''', parameters('azureServicePrincipalClientSecret'), ''' ''', parameters('subscriptionId'), ''' ''', parameters('azureServicePrincipalTenantId'), ''' null null null null ''', parameters('openShiftClustervnetId'), ''' '''' null null null null null null ''', parameters('privateCluster'),''' ''' ,parameters('operationalMode'), ''' '''' '''' '''' '''' '''' '''' '''' '''' ''' ,parameters('DBProvisionedVPCId'),''' '''' '''' ''',parameters('masManageTablespace'),''' dev ''', ''' > mas-provisioning.log 2>&1;')]"
             }
           }
         }
