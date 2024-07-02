@@ -83,15 +83,15 @@ fi
 export SLS_MONGODB_CFG_FILE="${MAS_CONFIG_DIR}/mongo-${MONGODB_NAMESPACE}.yml"
 log " SLS_MONGODB_CFG_FILE: $SLS_MONGODB_CFG_FILE"
 
-# Skip UDS check in case of external UDS details are provided
-if [[ (-z $UDS_API_KEY) || (-z $UDS_ENDPOINT_URL) || (-z $UDS_PUB_CERT_URL) ]]; then
+# Skip DRO check in case of external DRO details are provided
+if [[ (-z $DRO_API_KEY) || (-z $DRO_ENDPOINT_URL) || (-z $DRO_PUB_CERT_URL) ]]; then
 	getOPNamespace user-data-services-operator
 	retcode=$?
 	if [[ $retcode -eq 29 ]]; then
     	return $retcode
 	fi
 else
-  log "=== Using External UDS Deployment ==="
+  log "=== Using External DRO Deployment ==="
 fi
 
 arr=(ibm-cert-manager-operator)

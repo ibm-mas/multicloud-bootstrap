@@ -20,9 +20,9 @@ export MAS_LICENSE_URL=${13}
 export SLS_URL=${14}
 export SLS_REGISTRATION_KEY=${15}
 export SLS_PUB_CERT_URL=${16}
-export UDS_ENDPOINT_URL=${17}
-export UDS_API_KEY=${18}
-export UDS_PUB_CERT_URL=${19}
+export DRO_ENDPOINT_URL=${17}
+export DRO_API_KEY=${18}
+export DRO_PUB_CERT_URL=${19}
 export MAS_JDBC_USER=${20}
 export MAS_JDBC_PASSWORD=${21}
 export MAS_JDBC_URL=${22}
@@ -80,8 +80,8 @@ export -f retrieve_mas_ca_cert
 export -f mark_provisioning_failed
 export -f get_sls_endpoint_url
 export -f get_sls_registration_key
-export -f get_uds_endpoint_url
-export -f get_uds_api_key
+export -f get_dro_endpoint_url
+export -f get_dro_api_key
 export -f validate_prouduct_type
 
 export GIT_REPO_HOME=$(pwd)
@@ -213,30 +213,30 @@ fi
 
 export SLS_TLS_CERT_LOCAL_FILE_PATH="${GIT_REPO_HOME}/sls.crt"
 export SLS_INSTANCE_NAME="masocp-${RANDOM_STR}"
-# UDS variables
+# DRO variables
 if [[ $CLUSTER_TYPE == "aws" ]]; then
-  export UDS_STORAGE_CLASS="gp2"
+  export DRO_STORAGE_CLASS="gp2"
 elif [[ $CLUSTER_TYPE == "azure" ]]; then
-  export UDS_STORAGE_CLASS="managed-premium"
+  export DRO_STORAGE_CLASS="managed-premium"
   export DRO_STORAGE_CLASS="managed-premium"
 
 fi
-export UDS_CONTACT_EMAIL="uds.support@ibm.com"
-export UDS_CONTACT_FIRSTNAME=Uds
-export UDS_CONTACT_LASTNAME=Support
-export UDS_TLS_CERT_LOCAL_FILE_PATH="${GIT_REPO_HOME}/uds.crt"
+export DRO_CONTACT_EMAIL="dro.support@ibm.com"
+export DRO_CONTACT_FIRSTNAME=dro
+export DRO_CONTACT_LASTNAME=Support
+export DRO_TLS_CERT_LOCAL_FILE_PATH="${GIT_REPO_HOME}/dro.crt"
 # CP4D variables
 export CPD_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
 export CPD_VERSION=cpd40
 export CPD_PRODUCT_VERSION=4.8.0
-export MAS_CHANNEL=8.11.x
-export MAS_CATALOG_VERSION=v8-240430-amd64
+export MAS_CHANNEL=9.0.x
+export MAS_CATALOG_VERSION=v9-240625-amd64
 if [[ $CLUSTER_TYPE == "aws" ]]; then
   export CPD_PRIMARY_STORAGE_CLASS="ocs-storagecluster-cephfs"
 elif [[ $CLUSTER_TYPE == "azure" ]]; then
   #export CPD_PRIMARY_STORAGE_CLASS="azurefile-premium-new"
   export CPD_PRIMARY_STORAGE_CLASS="azurefiles-premium"
-  export CPD_METADATA_STORAGE_CLASS="managed-premium"
+  export CPD_METADATA_STORAGE_CLASS="managed-csi"
 fi
 #export DRO_STORAGE_CLASS=true
 # DB2WH variables
@@ -269,8 +269,8 @@ export MAS_APP_ID=manage
 export MAS_APPWS_JDBC_BINDING="workspace-application"
 export MAS_JDBC_CERT_LOCAL_FILE=$GIT_REPO_HOME/db.crt
 export MAS_CLOUD_AUTOMATION_VERSION=1.0
-export MAS_DEVOPS_COLLECTION_VERSION=18.3.4
-export MAS_APP_CHANNEL=8.7.x
+export MAS_DEVOPS_COLLECTION_VERSION=20.4.0
+export MAS_APP_CHANNEL=9.0.x
 if [ -z "$EXISTING_NETWORK" ]; then
   export new_or_existing_vpc_subnet="new"
   export enable_permission_quota_check=true
@@ -349,9 +349,9 @@ log " MAS_LICENSE_URL: $MAS_LICENSE_URL"
 log " SLS_URL: $SLS_URL"
 log " SLS_REGISTRATION_KEY: $SLS_REGISTRATION_KEY"
 log " SLS_PUB_CERT_URL: $SLS_PUB_CERT_URL"
-log " UDS_ENDPOINT_URL: $UDS_ENDPOINT_URL"
-log " UDS_API_KEY: $UDS_API_KEY"
-log " UDS_PUB_CERT_URL: $UDS_PUB_CERT_URL"
+log " DRO_ENDPOINT_URL: $DRO_ENDPOINT_URL"
+log " DRO_API_KEY: $DRO_API_KEY"
+log " DRO_PUB_CERT_URL: $DRO_PUB_CERT_URL"
 log " MAS_JDBC_USER: $MAS_JDBC_USER"
 log " MAS_JDBC_URL: $MAS_JDBC_URL"
 log " MAS_JDBC_CERT_URL: $MAS_JDBC_CERT_URL"
@@ -410,10 +410,10 @@ log " KAFKA_NAMESPACE: $KAFKA_NAMESPACE"
 log " KAFKA_CLUSTER_NAME: $KAFKA_CLUSTER_NAME"
 log " KAFKA_CLUSTER_SIZE: $KAFKA_CLUSTER_SIZE"
 log " KAFKA_USER_NAME: $KAFKA_USER_NAME"
-log " UDS_STORAGE_CLASS: $UDS_STORAGE_CLASS"
-log " UDS_CONTACT_EMAIL: $UDS_CONTACT_EMAIL"
-log " UDS_CONTACT_FIRSTNAME: $UDS_CONTACT_FIRSTNAME"
-log " UDS_CONTACT_LASTNAME: $UDS_CONTACT_LASTNAME"
+log " DRO_STORAGE_CLASS: $DRO_STORAGE_CLASS"
+log " DRO_CONTACT_EMAIL: $DRO_CONTACT_EMAIL"
+log " DRO_CONTACT_FIRSTNAME: $DRO_CONTACT_FIRSTNAME"
+log " DRO_CONTACT_LASTNAME: $DRO_CONTACT_LASTNAME"
 log " CPD_PRIMARY_STORAGE_CLASS: $CPD_PRIMARY_STORAGE_CLASS"
 log " CPD_PRODUCT_VERSION: $CPD_PRODUCT_VERSION"
 log " MAS_APP_ID: $MAS_APP_ID"
