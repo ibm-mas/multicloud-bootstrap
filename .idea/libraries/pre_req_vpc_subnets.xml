@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="pre-req-vpc-subnets">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/aws/utils/upi-resources/pre-req-vpc-subnets.zip!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>
