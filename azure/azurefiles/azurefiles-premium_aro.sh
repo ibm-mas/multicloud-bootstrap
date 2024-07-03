@@ -44,6 +44,7 @@ if [[ $checkstoragename == "true" ]]; then
       --bypass AzureServices \
       --default-action Deny
 fi
+az storage account update -g  $AZURE_FILES_RESOURCE_GROUP -n $AZURE_STORAGE_ACCOUNT_NAME --https-only false
 ARO_SERVICE_PRINCIPAL_ID=$(az aro show -g $AZURE_FILES_RESOURCE_GROUP -n $CLUSTER_NAME --query servicePrincipalProfile.clientId -o tsv)
 ARO_API_SERVER=$(az aro list --query "[?contains(name,'$CLUSTER_NAME')].[apiserverProfile.url]" -o tsv)
 echo "ARO_API_SERVER"  $ARO_API_SERVER
@@ -64,12 +65,12 @@ oc adm policy add-cluster-role-to-user azure-secret-reader system:serviceaccount
 az storage account update --resource-group $AZURE_FILES_RESOURCE_GROUP --name  $AZURE_STORAGE_ACCOUNT_NAME --default-action Deny
 export VNET=$(oc get machineset -n openshift-machine-api -o json|jq -r '.items[0].spec.template.spec.providerSpec.value.vnet')
 #export subnets=$(az network vnet subnet list -g  $AZURE_FILES_RESOURCE_GROUP --vnet-name $VNET|jq -r '.[].name')
-
+if [[ $DEPLOY_MANAGE == "true" && (-z $MAS_JDBC_USER) && (-z $MAS_JDBC_PASSWORD) && (-z $MAS_JDBC_URL) && (-z $MAS_JDBC_CERT_URL) ]]; then
 export subnets=(worker-subnet master-subnet)
 for subnet in "${subnets[@]}"
   do
   echo "{subnet}"
-  az network vnet subnet update --resource-group  $AZURE_FILES_RESOURCE_GROUP --vnet-name $VNET --name $subnet --service-endpoints "Microsoft.Storage.Global"
+  az network vnet subnet update --resource-group  $AZURE_FILES_RESOURCE_GROUP --vnet-name $VNET --name $subnet --service-endpoints "Microsoft.Storage"
   subnetid=$(az network vnet subnet show --resource-group $AZURE_FILES_RESOURCE_GROUP --vnet-name $VNET --name $subnet --query id --output tsv)
   az storage account network-rule add --resource-group $AZURE_FILES_RESOURCE_GROUP --account-name $AZURE_STORAGE_ACCOUNT_NAME --subnet $subnetid
 done
@@ -85,6 +86,7 @@ metadata:
   name: azurefiles-premium
 provisioner: file.csi.azure.com
 parameters:
+  protocol: nfs
   location: $deployRegion
   resourceGroup: $AZURE_FILES_RESOURCE_GROUP
   secretNamespace: kube-system
@@ -92,14 +94,9 @@ parameters:
   storageAccount: $AZURE_STORAGE_ACCOUNT_NAME
 reclaimPolicy: Delete
 mountOptions:
-  - dir_mode=0600
-  - file_mode=0600
-  - uid=0
-  - gid=0
-  - mfsymlinks
-  - cache=strict
+  - nconnect=4
+  - noresvport
   - actimeo=30
-  - noperm
 volumeBindingMode: Immediate
 EOF
 oc create -f azure-storageclass-azure-file.yaml

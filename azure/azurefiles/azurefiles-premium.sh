@@ -21,8 +21,8 @@ oc adm policy add-scc-to-user privileged system:serviceaccount:kube-system:csi-a
 oc create configmap azure-cred-file --from-literal=path="/etc/kubernetes/cloud.conf" -n kube-system
 
 export driver_version=v1.12.0
-echo "Driver version " $driver_version
-./install-driver.sh $driver_version
+#echo "Driver version " $driver_version
+#./install-driver.sh $driver_version
 oc patch storageclass managed-csi -p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "false"}}}'
 #Deploy premium Storage Class
 envsubst < azurefiles-premium.yaml | tee azurefiles-premium.yaml
