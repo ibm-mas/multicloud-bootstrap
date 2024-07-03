@@ -215,7 +215,7 @@ export SLS_TLS_CERT_LOCAL_FILE_PATH="${GIT_REPO_HOME}/sls.crt"
 export SLS_INSTANCE_NAME="masocp-${RANDOM_STR}"
 # DRO variables
 if [[ $CLUSTER_TYPE == "aws" ]]; then
-  export DRO_STORAGE_CLASS="gp2"
+  export DRO_STORAGE_CLASS="ibm-spectrum-fusion-mgmt-sc"
 elif [[ $CLUSTER_TYPE == "azure" ]]; then
   export DRO_STORAGE_CLASS="managed-premium"
   export DRO_STORAGE_CLASS="managed-premium"
@@ -232,7 +232,7 @@ export CPD_PRODUCT_VERSION=4.8.0
 export MAS_CHANNEL=9.0.x
 export MAS_CATALOG_VERSION=v9-240625-amd64
 if [[ $CLUSTER_TYPE == "aws" ]]; then
-  export CPD_PRIMARY_STORAGE_CLASS="ocs-storagecluster-cephfs"
+  export CPD_PRIMARY_STORAGE_CLASS="ibm-spectrum-fusion-mgmt-sc"
 elif [[ $CLUSTER_TYPE == "azure" ]]; then
   #export CPD_PRIMARY_STORAGE_CLASS="azurefile-premium-new"
   export CPD_PRIMARY_STORAGE_CLASS="azurefiles-premium"

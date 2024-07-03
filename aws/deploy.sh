@@ -11,19 +11,19 @@ export AWS_DEFAULT_REGION=$DEPLOY_REGION
 MASTER_INSTANCE_TYPE="m5.2xlarge"
 WORKER_INSTANCE_TYPE="m5.4xlarge"
 # Mongo variables
-export MONGODB_STORAGE_CLASS=gp2
+export MONGODB_STORAGE_CLASS=ibm-spectrum-fusion-mgmt-sc
 # Amqstreams variables
-export KAFKA_STORAGE_CLASS=gp2
+export KAFKA_STORAGE_CLASS=ibm-spectrum-fusion-mgmt-sc
 # IAM variables
 IAM_POLICY_NAME="masocp-policy-${RANDOM_STR}"
 IAM_USER_NAME="masocp-user-${RANDOM_STR}"
 # SLS variables
-export SLS_STORAGE_CLASS=gp2
+export SLS_STORAGE_CLASS=ibm-spectrum-fusion-mgmt-sc
 # DRO variables
-export DRO_STORAGE_CLASS=gp2
+export DRO_STORAGE_CLASS=ibm-spectrum-fusion-mgmt-sc
 # CP4D variables
-export CPD_METADATA_STORAGE_CLASS=gp2
-export CPD_SERVICE_STORAGE_CLASS="ocs-storagecluster-cephfs"
+export CPD_METADATA_STORAGE_CLASS=ibm-spectrum-fusion-mgmt-sc
+export CPD_SERVICE_STORAGE_CLASS=ibm-spectrum-fusion-mgmt-sc
 
 # Retrieve SSH public key
 TOKEN=$(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")

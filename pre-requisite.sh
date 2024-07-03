@@ -33,7 +33,7 @@ fi
 
 if [[ ($DEPLOY_CP4D == "true") && ($ROSA != "true") ]]; then
 	if [[ $CLUSTER_TYPE == "aws" ]]; then
-		getOCS ocs-operator
+		#getOCS ocs-operator
 	elif [[ $CLUSTER_TYPE == "azure" ]]; then
 	     log "In prereq - EXISTING_CLUSTER is $EXISTING_CLUSTER"
 	    if [[ $EXISTING_CLUSTER != "ARO"  ]]; then
