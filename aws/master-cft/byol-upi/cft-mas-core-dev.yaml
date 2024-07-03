@@ -161,21 +161,21 @@ Parameters:
       retrieved from the 'ca.crt' file in the 'mas-*-sls-cfg' secret in the MAS
       core namespace.
     Type: String
-  UDSEndpointUrl:
+  DROEndpointUrl:
     Description: >-
-      Enter the endpoint URL that you retrieved from the 'uds-endpoint'
+      Enter the endpoint URL that you retrieved from the 'dro-endpoint'
       OpenShift route in the ibm-common-services namespace. URL should not have
       slash (/) at the end.
     Type: String
-  UDSAPIKey:
+  DROAPIKey:
     Description: >-
-      Enter the service's API key that you retrieved from the 'uds-api-key'
+      Enter the service's API key that you retrieved from the 'dro-api-key'
       secret in the ibm-common-services namespace.
     Type: String
-  UDSPublicCertificateUrl:
+  DROPublicCertificateUrl:
     Description: >-
       Enter the HTTP or S3 location of the service's public certificate that you
-      retrieved from the 'ca-bundle.pem' file in the 'mas-*-uds-cfg' secret in
+      retrieved from the 'ca-bundle.pem' file in the 'mas-*-dro-cfg' secret in
       the MAS core namespace.
     Type: String
   EmailNotification:
@@ -329,12 +329,12 @@ Metadata:
           - SLSPublicCertificateUrl
       - Label:
           default: >-
-            Existing User Data Services connection details (leave this section
-            empty to create a new UDS instance)
+            Existing Data Reporter Operator connection details (leave this section
+            empty to create a new DRO instance)
         Parameters:
-          - UDSEndpointUrl
-          - UDSAPIKey
-          - UDSPublicCertificateUrl
+          - DROEndpointUrl
+          - DROAPIKey
+          - DROPublicCertificateUrl
       - Label:
           default: Email notification
         Parameters:
@@ -549,7 +549,7 @@ Resources:
       Role: !GetAtt
         - LambdaRole
         - Arn
-      Runtime: python3.9
+      Runtime: python3.11
       Tags:
         - Key: Name
           Value: RandomizerLambda
@@ -588,7 +588,7 @@ Resources:
       Role: !GetAtt
         - LambdaRole
         - Arn
-      Runtime: python3.9
+      Runtime: python3.11
       Code:
         ZipFile: |
           import boto3
@@ -715,11 +715,11 @@ Resources:
             - ''' '''
             - !Ref SLSPublicCertificateUrl
             - ''' '''
-            - !Ref UDSEndpointUrl
+            - !Ref DROEndpointUrl
             - ''' '''
-            - !Ref UDSAPIKey
+            - !Ref DROAPIKey
             - ''' '''
-            - !Ref UDSPublicCertificateUrl
+            - !Ref DROPublicCertificateUrl
             - ''' '''
             - !Ref MASManageDBUser
             - ''' '''

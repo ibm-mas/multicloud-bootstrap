@@ -20,9 +20,9 @@ if [[ $STATUS == "SUCCESS" ]]; then
     get_sls_endpoint_url $RANDOM_STR
     log " CALL_SLS_URL=$CALL_SLS_URL"
   fi
-  if [[ -z $UDS_ENDPOINT_URL ]]; then
+  if [[ -z $DRO_ENDPOINT_URL ]]; then
     get_bas_endpoint_url $RANDOM_STR
-    log " CALL_UDS_URL=$CALL_BAS_URL"
+    log " CALL_DRO_URL=$CALL_BAS_URL"
   fi
   get_mas_creds $RANDOM_STR
   log " MAS_USER=$MAS_USER"
@@ -62,7 +62,7 @@ else
     sed -i "s/\[MAS-USER\]/$MAS_USER/g" $MSG_FILE
     sed -i "s/\[MAS-PASSWORD\]/$MAS_PASSWORD/g" $MSG_FILE
     sed -i "s/\[SLS-ENDPOINT-URL\]/$CALL_SLS_URL/g" $MSG_FILE
-    sed -i "s/\[UDS-ENDPOINT-URL\]/$CALL_UDS_URL/g" $MSG_FILE
+    sed -i "s/\[DRO-ENDPOINT-URL\]/$CALL_DRO_URL/g" $MSG_FILE
     sed -i "s/\[CA-CERT\]/$certcontents/g" $MSG_FILE
     log "Sending email using below file ..."
     cat $MSG_FILE

@@ -19,8 +19,8 @@ IAM_POLICY_NAME="masocp-policy-${RANDOM_STR}"
 IAM_USER_NAME="masocp-user-${RANDOM_STR}"
 # SLS variables
 export SLS_STORAGE_CLASS=gp2
-# UDS variables
-export UDS_STORAGE_CLASS=gp2
+# DRO variables
+export DRO_STORAGE_CLASS=gp2
 # CP4D variables
 export CPD_METADATA_STORAGE_CLASS=gp2
 export CPD_SERVICE_STORAGE_CLASS="ocs-storagecluster-cephfs"
@@ -62,25 +62,25 @@ fi
 if [[ -f sls.crt ]]; then
   chmod 600 sls.crt
 fi
-# Download UDS certificate
+# Download DRO certificate
 cd $GIT_REPO_HOME
-if [[ ${UDS_PUB_CERT_URL,,} =~ ^https? ]]; then
-  log "Downloading UDS certificate from HTTP URL"
-  wget "$UDS_PUB_CERT_URL" -O uds.crt
-elif [[ ${UDS_PUB_CERT_URL,,} =~ ^s3 ]]; then
-  log "Downloading UDS certificate from S3 URL"
-  aws s3 cp "$UDS_PUB_CERT_URL" uds.crt --region $DEPLOY_REGION
+if [[ ${DRO_PUB_CERT_URL,,} =~ ^https? ]]; then
+  log "Downloading DRO certificate from HTTP URL"
+  wget "$DRO_PUB_CERT_URL" -O dro.crt
+elif [[ ${DRO_PUB_CERT_URL,,} =~ ^s3 ]]; then
+  log "Downloading DRO certificate from S3 URL"
+  aws s3 cp "$DRO_PUB_CERT_URL" dro.crt --region $DEPLOY_REGION
   ret=$?
         if [ $ret -ne 0 ]; then
-        aws s3 cp "$UDS_PUB_CERT_URL" uds.crt --region us-east-1
+        aws s3 cp "$DRO_PUB_CERT_URL" dro.crt --region us-east-1
         ret=$?
         if [ $ret -ne 0 ]; then
-            log "Invalid UDS License URL"
+            log "Invalid DRO License URL"
         fi
         fi
 fi
-if [[ -f uds.crt ]]; then
-  chmod 600 uds.crt
+if [[ -f dro.crt ]]; then
+  chmod 600 dro.crt
 fi
 
 ### Read License File & Retrive SLS hostname and host id
@@ -171,6 +171,33 @@ worker_subnet2_id               = "$EXISTING_PUBLIC_SUBNET2_ID"
 worker_subnet3_id               = "$EXISTING_PUBLIC_SUBNET3_ID"
 private_cluster                 = "$PRIVATE_CLUSTER"
 EOT
+
+  if [ -n "$EXISTING_NETWORK" ]; then
+
+# Reading custom cidr ranges for VPC & subnets (both private & public subnets)
+log "==== Reading of custom cidr range of VPC & subnets started ===="
+export vpc_cidr=$(aws ec2 describe-vpcs  --vpc-ids $EXISTING_NETWORK --query "Vpcs[*].{VPC_CIDR_BLOCK:CidrBlock}" --output=text)
+
+export master_subnet_cidr1=$(aws ec2 describe-subnets --subnet-ids $EXISTING_PRIVATE_SUBNET1_ID --region $DEPLOY_REGION --filter Name=vpc-id,Values=$EXISTING_NETWORK --query "Subnets[*].{CIDR_BLOCKS:CidrBlock}" --output=text)
+export master_subnet_cidr2=$(aws ec2 describe-subnets --subnet-ids $EXISTING_PRIVATE_SUBNET2_ID --region $DEPLOY_REGION --filter Name=vpc-id,Values=$EXISTING_NETWORK --query "Subnets[*].{CIDR_BLOCKS:CidrBlock}" --output=text)
+export master_subnet_cidr3=$(aws ec2 describe-subnets --subnet-ids $EXISTING_PRIVATE_SUBNET3_ID --region $DEPLOY_REGION --filter Name=vpc-id,Values=$EXISTING_NETWORK --query "Subnets[*].{CIDR_BLOCKS:CidrBlock}" --output=text)
+
+export worker_subnet_cidr1=$(aws ec2 describe-subnets --subnet-ids $EXISTING_PUBLIC_SUBNET1_ID --region $DEPLOY_REGION --filter Name=vpc-id,Values=$EXISTING_NETWORK --query "Subnets[*].{CIDR_BLOCKS:CidrBlock}" --output=text)
+export worker_subnet_cidr2=$(aws ec2 describe-subnets --subnet-ids $EXISTING_PUBLIC_SUBNET2_ID --region $DEPLOY_REGION --filter Name=vpc-id,Values=$EXISTING_NETWORK --query "Subnets[*].{CIDR_BLOCKS:CidrBlock}" --output=text)
+export worker_subnet_cidr3=$(aws ec2 describe-subnets --subnet-ids $EXISTING_PUBLIC_SUBNET3_ID --region $DEPLOY_REGION --filter Name=vpc-id,Values=$EXISTING_NETWORK --query "Subnets[*].{CIDR_BLOCKS:CidrBlock}" --output=text)
+
+cat <<EOT >>terraform.tfvars
+vpc_cidr                        = "$vpc_cidr"
+master_subnet_cidr1             = "$master_subnet_cidr1"
+master_subnet_cidr2             = "$master_subnet_cidr2"
+master_subnet_cidr3             = "$master_subnet_cidr3"
+worker_subnet_cidr1             = "$worker_subnet_cidr1"
+worker_subnet_cidr2             = "$worker_subnet_cidr2"
+worker_subnet_cidr3             = "$worker_subnet_cidr3"
+EOT
+
+  fi
+
   if [[ -f terraform.tfvars ]]; then
     chmod 600 terraform.tfvars
   fi
@@ -555,17 +582,17 @@ else
   log "=== Generated SLS Config YAML ==="
 fi
 
-## Deploy UDS
-if [[ (-z $UDS_API_KEY) || (-z $UDS_ENDPOINT_URL) || (-z $UDS_PUB_CERT_URL) ]]; then
-  # Deploy UDS
-  log "==== UDS deployment started ===="
-  export ROLE_NAME=uds && ansible-playbook ibm.mas_devops.run_role
-  log "==== UDS deployment completed ===="
+## Deploy DRO
+if [[ (-z $DRO_API_KEY) || (-z $DRO_ENDPOINT_URL) || (-z $DRO_PUB_CERT_URL) ]]; then
+  # Deploy DRO
+  log "==== DRO deployment started ===="
+  export ROLE_NAME=dro && ansible-playbook ibm.mas_devops.run_role
+  log "==== DRO deployment completed ===="
 
 else
-  log "=== Using Existing UDS Deployment ==="
-  export ROLE_NAME=uds && ansible-playbook ibm.mas_devops.run_role
-  log "=== Generated UDS Config YAML ==="
+  log "=== Using Existing DRO Deployment ==="
+  export ROLE_NAME=dro && ansible-playbook ibm.mas_devops.run_role
+  log "=== Generated DRO Config YAML ==="
 fi
 
 ## Deploy CP4D
