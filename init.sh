@@ -434,9 +434,12 @@ if [[ (! -z $EXS_OCP_URL) && (! -z $EXS_OCP_USER) && (! -z $EXS_OCP_PWD) ]]; the
     export OCP_USERNAME=${EXS_OCP_USER}
     export OCP_PASSWORD=${EXS_OCP_PWD}
     if [[ ${EXS_OCP_URL} = *'aroapp'* ]]; then
-      log "EXISTING_CLUSTER is ARO"
       export EXISTING_CLUSTER="ARO"
       log "EXISTING_CLUSTER -  $EXISTING_CLUSTER"
+    else
+       log "EXISTING_CLUSTER is Self managed"
+       export EXISTING_CLUSTER="SELFMANAGED"
+       log "EXISTING_CLUSTER -  $EXISTING_CLUSTER"
     fi
 fi
 
