@@ -65,7 +65,6 @@ oc adm policy add-cluster-role-to-user azure-secret-reader system:serviceaccount
 az storage account update --resource-group $AZURE_FILES_RESOURCE_GROUP --name  $AZURE_STORAGE_ACCOUNT_NAME --default-action Deny
 export VNET=$(oc get machineset -n openshift-machine-api -o json|jq -r '.items[0].spec.template.spec.providerSpec.value.vnet')
 #export subnets=$(az network vnet subnet list -g  $AZURE_FILES_RESOURCE_GROUP --vnet-name $VNET|jq -r '.[].name')
-if [[ $DEPLOY_MANAGE == "true" && (-z $MAS_JDBC_USER) && (-z $MAS_JDBC_PASSWORD) && (-z $MAS_JDBC_URL) && (-z $MAS_JDBC_CERT_URL) ]]; then
 export subnets=(worker-subnet master-subnet)
 for subnet in "${subnets[@]}"
   do
