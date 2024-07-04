@@ -36,7 +36,9 @@ if [[ ($DEPLOY_CP4D == "true") && ($ROSA != "true") ]]; then
 		getOCS ocs-operator
 	elif [[ $CLUSTER_TYPE == "azure" ]]; then
 	     log "In prereq - EXISTING_CLUSTER is $EXISTING_CLUSTER"
-		    getazurefile
+        if [[ $EXISTING_CLUSTER != "ARO"  ]]; then
+		        getazurefile
+		    fi
 	fi
 
 	retcode=$?
