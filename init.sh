@@ -183,12 +183,12 @@ export SLS_TLS_CERT_LOCAL_FILE_PATH="${GIT_REPO_HOME}/sls.crt"
 export SLS_INSTANCE_NAME="masocp-${RANDOM_STR}"
 # UDS variables
 if [[ $CLUSTER_TYPE == "aws" ]]; then
-  export UDS_STORAGE_CLASS="gp2"
+  export DRO_STORAGE_CLASS="gp2"
 fi
-export UDS_CONTACT_EMAIL="uds.support@ibm.com"
-export UDS_CONTACT_FIRSTNAME=Uds
-export UDS_CONTACT_LASTNAME=Support
-export UDS_TLS_CERT_LOCAL_FILE_PATH="${GIT_REPO_HOME}/uds.crt"
+export DRO_CONTACT_EMAIL="dro.support@ibm.com"
+export DRO_CONTACT_FIRSTNAME=dro
+export DRO_CONTACT_LASTNAME=Support
+export DRO_TLS_CERT_LOCAL_FILE_PATH="${GIT_REPO_HOME}/dro.crt"
 # CP4D variables
 export CPD_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
 export CPD_VERSION=cpd40

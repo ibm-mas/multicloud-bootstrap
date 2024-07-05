@@ -41,15 +41,15 @@ mv -f jq /usr/local/bin
 #dnf module install -y container-tools
 
 ## Download Openshift CLI and move to /usr/local/bin
-wget "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.12.18/openshift-client-linux-4.12.18.tar.gz"
-tar -xvf openshift-client-linux-4.12.18.tar.gz
+
+#Install openshift-install 4.14.26
+wget "https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/4.14.26/openshift-client-linux.tar.gz"
+tar -xvf openshift-client-linux.tar.gz
 chmod u+x oc kubectl
 mv -f oc /usr/local/bin
 mv -f kubectl /usr/local/bin
 oc version
-rm -rf openshift-client-linux-4.12.18.tar.gz
-
-
+rm -rf openshift-client-linux.tar.gz
 
 ## Install terraform
 TERRAFORM_VER=`curl -s https://api.github.com/repos/hashicorp/terraform/releases/latest |  grep tag_name | cut -d: -f2 | tr -d \"\,\v | awk '{$1=$1};1'`
