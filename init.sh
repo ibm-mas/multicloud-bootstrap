@@ -20,9 +20,9 @@ export MAS_LICENSE_URL=${13}
 export SLS_URL=${14}
 export SLS_REGISTRATION_KEY=${15}
 export SLS_PUB_CERT_URL=${16}
-export UDS_ENDPOINT_URL=${17}
-export UDS_API_KEY=${18}
-export UDS_PUB_CERT_URL=${19}
+export DRO_ENDPOINT_URL=${17}
+export DRO_API_KEY=${18}
+export DRO_PUB_CERT_URL=${19}
 export MAS_JDBC_USER=${20}
 export MAS_JDBC_PASSWORD=${21}
 export MAS_JDBC_URL=${22}
@@ -80,8 +80,8 @@ export -f retrieve_mas_ca_cert
 export -f mark_provisioning_failed
 export -f get_sls_endpoint_url
 export -f get_sls_registration_key
-export -f get_uds_endpoint_url
-export -f get_uds_api_key
+export -f get_dro_endpoint_url
+export -f get_dro_api_key
 export -f validate_prouduct_type
 
 export GIT_REPO_HOME=$(pwd)
@@ -154,7 +154,7 @@ export OPENSHIFT_PULL_SECRET_FILE_PATH=${GIT_REPO_HOME}/pull-secret.json
 export MASTER_NODE_COUNT="3"
 export WORKER_NODE_COUNT="3"
 export AZ_MODE="multi_zone"
-export OCP_VERSION="4.12.18"
+export OCP_VERSION="4.14.26"
 
 export MAS_IMAGE_TEST_DOWNLOAD="cp.icr.io/cp/mas/admin-dashboard:5.1.27"
 export BACKUP_FILE_NAME="deployment-backup-${CLUSTER_NAME}.zip"
@@ -192,11 +192,9 @@ export UDS_TLS_CERT_LOCAL_FILE_PATH="${GIT_REPO_HOME}/uds.crt"
 # CP4D variables
 export CPD_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
 export CPD_VERSION=cpd40
-export CPD_PRODUCT_VERSION=4.6.3
-export MAS_CHANNEL=8.11.x
-export MAS_CATALOG_VERSION=v8-231004-amd64
-export MONGO_FLAVOR=MongoDB
-
+export CPD_PRODUCT_VERSION=4.8.0
+export MAS_CHANNEL=9.0.x
+export MAS_CATALOG_VERSION=v9-240625-amd64
 if [[ $CLUSTER_TYPE == "aws" ]]; then
   export CPD_PRIMARY_STORAGE_CLASS="ocs-storagecluster-cephfs"
 fi
@@ -217,8 +215,8 @@ export MAS_APP_ID=manage
 export MAS_APPWS_JDBC_BINDING="workspace-application"
 export MAS_JDBC_CERT_LOCAL_FILE=$GIT_REPO_HOME/db.crt
 export MAS_CLOUD_AUTOMATION_VERSION=1.0
-export MAS_DEVOPS_COLLECTION_VERSION=18.3.4
-export MAS_APP_CHANNEL=8.7.x
+export MAS_DEVOPS_COLLECTION_VERSION=20.4.0
+export MAS_APP_CHANNEL=9.0.x
 if [ -z "$EXISTING_NETWORK" ]; then
   export new_or_existing_vpc_subnet="new"
   export enable_permission_quota_check=true
@@ -287,9 +285,9 @@ log " MAS_LICENSE_URL: $MAS_LICENSE_URL"
 log " SLS_URL: $SLS_URL"
 log " SLS_REGISTRATION_KEY: $SLS_REGISTRATION_KEY"
 log " SLS_PUB_CERT_URL: $SLS_PUB_CERT_URL"
-log " UDS_ENDPOINT_URL: $UDS_ENDPOINT_URL"
-log " UDS_API_KEY: $UDS_API_KEY"
-log " UDS_PUB_CERT_URL: $UDS_PUB_CERT_URL"
+log " DRO_ENDPOINT_URL: $DRO_ENDPOINT_URL"
+log " DRO_API_KEY: $DRO_API_KEY"
+log " DRO_PUB_CERT_URL: $DRO_PUB_CERT_URL"
 log " MAS_JDBC_USER: $MAS_JDBC_USER"
 log " MAS_JDBC_URL: $MAS_JDBC_URL"
 log " MAS_JDBC_CERT_URL: $MAS_JDBC_CERT_URL"

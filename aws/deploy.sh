@@ -17,6 +17,8 @@ IAM_POLICY_NAME="masocp-policy-${RANDOM_STR}"
 IAM_USER_NAME="masocp-user-${RANDOM_STR}"
 # SLS variables
 export SLS_STORAGE_CLASS=gp2
+# DRO variables
+export DRO_STORAGE_CLASS=gp2
 # CP4D variables
 export CPD_METADATA_STORAGE_CLASS=gp2
 export CPD_SERVICE_STORAGE_CLASS="ocs-storagecluster-cephfs"
@@ -56,6 +58,26 @@ elif [[ ${SLS_PUB_CERT_URL,,} =~ ^s3 ]]; then
 fi
 if [[ -f sls.crt ]]; then
   chmod 600 sls.crt
+fi
+# Download DRO certificate
+cd $GIT_REPO_HOME
+if [[ ${DRO_PUB_CERT_URL,,} =~ ^https? ]]; then
+  log "Downloading DRO certificate from HTTP URL"
+  wget "$DRO_PUB_CERT_URL" -O dro.crt
+elif [[ ${DRO_PUB_CERT_URL,,} =~ ^s3 ]]; then
+  log "Downloading DRO certificate from S3 URL"
+  aws s3 cp "$DRO_PUB_CERT_URL" dro.crt --region $DEPLOY_REGION
+  ret=$?
+        if [ $ret -ne 0 ]; then
+        aws s3 cp "$DRO_PUB_CERT_URL" dro.crt --region us-east-1
+        ret=$?
+        if [ $ret -ne 0 ]; then
+            log "Invalid DRO License URL"
+        fi
+        fi
+fi
+if [[ -f dro.crt ]]; then
+  chmod 600 dro.crt
 fi
 ### Read License File & Retrive SLS hostname and host id
 if [[ -n "$MAS_LICENSE_URL" ]]; then
