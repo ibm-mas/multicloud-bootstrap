@@ -289,6 +289,11 @@ envsubst </tmp/dockerconfig.json >/tmp/.dockerconfigjson
 oc set data secret/pull-secret -n openshift-config --from-file=/tmp/.dockerconfigjson
 chmod 600 /tmp/.dockerconfigjson /tmp/dockerconfig.json
 
+if [[ $CLUSTER_TYPE == "aws" ]]; then
+SCRIPT_STATUS=47
+exit $SCRIPT_STATUS
+fi
+
 ## Configure OCP cluster
 log "==== OCP cluster configuration (Cert Manager) started ===="
 cd $GIT_REPO_HOME/../ibm/mas_devops/playbooks
