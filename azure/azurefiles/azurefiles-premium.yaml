@@ -5,7 +5,6 @@ metadata:
 provisioner: file.csi.azure.com
 parameters:
   protocol: nfs
-  networkEndpointType: privateEndpoint
   location: $deployRegion
   resourceGroup: $resourceGroupName
   skuName: Premium_LRS
