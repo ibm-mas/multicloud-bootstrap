@@ -9,6 +9,20 @@ metadata:
   name: openshift-storage
 spec: {}
 ---
+apiVersion: operators.coreos.com/v1alpha1
+kind: CatalogSource
+metadata:
+  name: ibm-operator-catalog
+  namespace: openshift-marketplace
+spec:
+  displayName: IBM Operator Catalog
+  publisher: IBM
+  sourceType: grpc
+  image: icr.io/cpopen/ibm-maximo-operator-catalog:v9-240625-amd64
+  updateStrategy:
+    registryPoll:
+      interval: 45m
+---
 apiVersion: operators.coreos.com/v1
 kind: OperatorGroup
 metadata:
