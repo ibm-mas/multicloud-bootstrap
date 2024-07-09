@@ -8,6 +8,7 @@ metadata:
     openshift.io/cluster-monitoring: "true"
   name: openshift-storage
 spec: {}
+
 ---
 apiVersion: operators.coreos.com/v1alpha1
 kind: CatalogSource
@@ -22,6 +23,7 @@ spec:
   updateStrategy:
     registryPoll:
       interval: 45m
+
 ---
 apiVersion: operators.coreos.com/v1
 kind: OperatorGroup
@@ -32,6 +34,7 @@ spec:
   targetNamespaces:
   - openshift-storage
   upgradeStrategy: Default
+
 ---
 apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
@@ -46,7 +49,7 @@ spec:
   name: isf-operator
   source: ibm-operator-catalog
   sourceNamespace: openshift-marketplace
-  startingCSV: isf-operator.v2.7.2
+
 ---
 apiVersion: prereq.isf.ibm.com/v1
 kind: SpectrumFusion
@@ -64,6 +67,7 @@ spec:
     Enable: true
   license:
     accept: true
+
 ---
 apiVersion: odf.openshift.io/v1alpha1
 kind: StorageSystem
