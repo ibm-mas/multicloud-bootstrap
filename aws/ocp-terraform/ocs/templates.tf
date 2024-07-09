@@ -8,29 +8,47 @@ metadata:
     openshift.io/cluster-monitoring: "true"
   name: openshift-storage
 spec: {}
----
 apiVersion: operators.coreos.com/v1
 kind: OperatorGroup
 metadata:
-  name: openshift-storage-operatorgroup
+  name: ibm-spectrum-fusion-ns-opgroup
   namespace: openshift-storage
 spec:
   targetNamespaces:
   - openshift-storage
+  upgradeStrategy: Default
 ---
 apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
 metadata:
-  name: odf-operator
-  namespace: openshift-storage
   labels:
-    operators.coreos.com/odf-operator.openshift-storage: ''
+    operators.coreos.com/isf-operator.openshift-storage: ''
+  name: isf-operator
+  namespace: openshift-storage
 spec:
-  channel: "stable-4.14"
+  channel: v2.0
   installPlanApproval: Automatic
-  name: odf-operator
-  source: redhat-operators
+  name: isf-operator
+  source: ibm-operator-catalog
   sourceNamespace: openshift-marketplace
+  startingCSV: isf-operator.v2.7.2
+---
+apiVersion: prereq.isf.ibm.com/v1
+kind: SpectrumFusion
+metadata:
+  name: spectrumfusion
+  namespace: openshift-storage
+spec:
+  DataProtection:
+    Enable: false
+  GlobalDataPlatform:
+    Enable: false
+  OpenShiftDataFoundation:
+    AutoUpgrade: true
+    BackingStorageType: Dynamic
+    Enable: true
+  license:
+    accept: true
 ---
 apiVersion: odf.openshift.io/v1alpha1
 kind: StorageSystem
@@ -50,6 +68,7 @@ apiVersion: ocs.openshift.io/v1
 kind: StorageCluster
 metadata:
   annotations:
+    cluster.ocs.openshift.io/local-devices: 'true'
     uninstall.ocs.openshift.io/cleanup-policy: delete
     uninstall.ocs.openshift.io/mode: graceful
   name: ocs-storagecluster
@@ -57,35 +76,24 @@ metadata:
   finalizers:
     - storagecluster.ocs.openshift.io
 spec:
-  encryption:
-    enable: true
-  externalStorage: {}
-  managedResources:
-    cephBlockPools: {}
-    cephFilesystems: {}
-    cephObjectStoreUsers: {}
-    cephObjectStores: {}
-  storageDeviceSets:
-    - config: {}
-      count: 1
-      dataPVCTemplate:
-        metadata:
-          creationTimestamp: null
-        spec:
-          accessModes:
-            - ReadWriteOnce
-          resources:
-            requests:
-              storage: 1Ti
-          storageClassName: gp2
-          volumeMode: Block
-        status: {}
-      name: ocs-deviceset-gp2
-      placement: {}
-      portable: true
-      replica: 3
-      resources: {}
-  version: 4.14.0
+    arbiter: {}
+    encryption:
+      kms: {}
+    externalStorage: {}
+    managedResources:
+      cephBlockPools: {}
+      cephCluster: {}
+      cephConfig: {}
+      cephDashboard: {}
+      cephFilesystems: {}
+      cephNonResilientPools: {}
+      cephObjectStoreUsers: {}
+      cephObjectStores: {}
+      cephToolbox: {}
+    mirroring: {}
+    multiCloudGateway:
+      dbStorageClassName: gp2
+      reconcileStrategy: standalone
 EOF
 }
 
