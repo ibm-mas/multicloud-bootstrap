@@ -8,6 +8,7 @@ metadata:
     openshift.io/cluster-monitoring: "true"
   name: openshift-storage
 spec: {}
+---
 apiVersion: operators.coreos.com/v1
 kind: OperatorGroup
 metadata:
