@@ -1,14 +1,5 @@
-data "template_file" "ocs_olm" {
+data "template_file" "ibm_catalog" {
   template = <<EOF
----
-apiVersion: v1
-kind: Namespace
-metadata:
-  labels:
-    openshift.io/cluster-monitoring: "true"
-  name: openshift-storage
-spec: {}
-
 ---
 apiVersion: operators.coreos.com/v1alpha1
 kind: CatalogSource
@@ -23,51 +14,42 @@ spec:
   updateStrategy:
     registryPoll:
       interval: 45m
+EOF
+}
 
+data "template_file" "ocs_olm" {
+  template = <<EOF
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    openshift.io/cluster-monitoring: "true"
+  name: openshift-storage
+spec: {}
 ---
 apiVersion: operators.coreos.com/v1
 kind: OperatorGroup
 metadata:
-  name: ibm-spectrum-fusion-ns-opgroup
+  name: openshift-storage-operatorgroup
   namespace: openshift-storage
 spec:
   targetNamespaces:
   - openshift-storage
-  upgradeStrategy: Default
-
 ---
 apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
 metadata:
+  name: odf-operator
+  namespace: openshift-storage
   labels:
-    operators.coreos.com/isf-operator.openshift-storage: ''
-  name: isf-operator
-  namespace: openshift-storage
+    operators.coreos.com/odf-operator.openshift-storage: ''
 spec:
-  channel: v2.0
+  channel: "stable-4.14"
   installPlanApproval: Automatic
-  name: isf-operator
-  source: ibm-operator-catalog
+  name: odf-operator
+  source: redhat-operators
   sourceNamespace: openshift-marketplace
-
----
-apiVersion: prereq.isf.ibm.com/v1
-kind: SpectrumFusion
-metadata:
-  name: spectrumfusion
-  namespace: openshift-storage
-spec:
-  DataProtection:
-    Enable: false
-  GlobalDataPlatform:
-    Enable: false
-  OpenShiftDataFoundation:
-    AutoUpgrade: true
-    BackingStorageType: Dynamic
-    Enable: true
-  license:
-    accept: true
-
 ---
 apiVersion: odf.openshift.io/v1alpha1
 kind: StorageSystem
@@ -78,6 +60,43 @@ spec:
   kind: storagecluster.ocs.openshift.io/v1
   name: ocs-storagecluster
   namespace: openshift-storage
+EOF
+}
+
+data "template_file" "ibm_spectrum_olm" {
+  template = <<EOF
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    openshift.io/cluster-monitoring: "true"
+  name: ibm-spectrum-fusion-ns
+spec: {}
+---
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  name: ibm-spectrum-fusion-ns-opgroup
+  namespace: ibm-spectrum-fusion-ns
+spec:
+  targetNamespaces:
+  - ibm-spectrum-fusion-ns
+  upgradeStrategy: Default
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  labels:
+    operators.coreos.com/isf-operator.ibm-spectrum-fusion-ns: ''
+  name: isf-operator
+  namespace: ibm-spectrum-fusion-ns
+spec:
+  channel: v2.0
+  installPlanApproval: Automatic
+  name: isf-operator
+  source: ibm-operator-catalog
+  sourceNamespace: openshift-marketplace
 EOF
 }
 
