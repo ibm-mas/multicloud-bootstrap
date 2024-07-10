@@ -6,9 +6,19 @@ resource "aws_kms_key" "ocs_key" {
   description = "Key used to encrypt OCS PVCs"
 }
 
+resource "local_file" "ocs_ibm_catalog_yaml" {
+  content  = data.template_file.ocs_ibm_catalog.rendered
+  filename = "${var.installer_workspace}/ocs_ibm_catalog.yaml"
+}
+
 resource "local_file" "ocs_olm_yaml" {
   content  = data.template_file.ocs_olm.rendered
   filename = "${var.installer_workspace}/ocs_olm.yaml"
+}
+
+resource "local_file" "ocs_ibm_spectrum_olm_yaml" {
+  content  = data.template_file.ocs_ibm_spectrum_olm.rendered
+  filename = "${var.installer_workspace}/ocs_ibm_spectrum_olm.yaml"
 }
 
 resource "local_file" "ocs_storagecluster_yaml" {
@@ -91,10 +101,22 @@ resource "null_resource" "install_ocs" {
     command = <<EOF
 echo "Attempting login.."
 oc login ${self.triggers.openshift_api} -u '${self.triggers.openshift_username}' -p '${self.triggers.openshift_password}' --insecure-skip-tls-verify=true || oc login --server='${self.triggers.openshift_api}' --token='${self.triggers.openshift_token}'
-echo "Creating namespace, operator group and subscription"
+
+echo "Creating IBM Catalog Source"
+oc create -f ${self.triggers.installer_workspace}/ocs_ibm_catalog.yaml
+echo "Sleeping for 5mins"
+sleep 300
+
+echo "Creating namespace, operator group and subscription for ODF"
 oc create -f ${self.triggers.installer_workspace}/ocs_olm.yaml
 echo "Sleeping for 5mins"
 sleep 300
+
+echo "Creating namespace, operator group and subscription for IBM Spectrum"
+oc create -f ${self.triggers.installer_workspace}/ocs_ibm_spectrum_olm.yaml
+echo "Sleeping for 5mins"
+sleep 300
+
 echo "Creating storagecluster"
 oc create -f ${self.triggers.installer_workspace}/ocs_storagecluster.yaml
 echo "Creating OCS toolbox"
@@ -117,7 +139,9 @@ oc delete -f ${self.triggers.installer_workspace}/ocs_olm.yaml
 EOF
   } */
   depends_on = [
+    local_file.ocs_ibm_catalog_yaml,
     local_file.ocs_olm_yaml,
+    local_file.ocs_ibm_spectrum_olm_yaml,
     local_file.ocs_storagecluster_yaml,
     local_file.ocs_toolbox_yaml,
     null_resource.label_nodes,
