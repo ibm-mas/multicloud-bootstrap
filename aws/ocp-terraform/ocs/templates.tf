@@ -1,4 +1,4 @@
-data "template_file" "ibm_catalog" {
+data "template_file" "ocs_ibm_catalog" {
   template = <<EOF
 ---
 apiVersion: operators.coreos.com/v1alpha1
@@ -63,7 +63,7 @@ spec:
 EOF
 }
 
-data "template_file" "ibm_spectrum_olm" {
+data "template_file" "ocs_ibm_spectrum_olm" {
   template = <<EOF
 ---
 apiVersion: v1
