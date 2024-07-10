@@ -21,6 +21,11 @@ resource "local_file" "ocs_ibm_spectrum_olm_yaml" {
   filename = "${var.installer_workspace}/ocs_ibm_spectrum_olm.yaml"
 }
 
+resource "local_file" "ocs_gp2_storage_class_yaml" {
+  content  = data.template_file.ocs_gp2_storage_class.rendered
+  filename = "${var.installer_workspace}/ocs_gp2_storage_class.yaml"
+}
+
 resource "local_file" "ocs_storagecluster_yaml" {
   content  = data.template_file.ocs_storagecluster.rendered
   filename = "${var.installer_workspace}/ocs_storagecluster.yaml"
@@ -117,6 +122,11 @@ oc create -f ${self.triggers.installer_workspace}/ocs_ibm_spectrum_olm.yaml
 echo "Sleeping for 5mins"
 sleep 300
 
+echo "Creating storage class gp2"
+oc create -f ${self.triggers.installer_workspace}/ocs_gp2_storage_class.yaml
+echo "Sleeping for 2mins"
+sleep 120
+
 echo "Creating storagecluster"
 oc create -f ${self.triggers.installer_workspace}/ocs_storagecluster.yaml
 echo "Creating OCS toolbox"
@@ -142,6 +152,7 @@ EOF
     local_file.ocs_ibm_catalog_yaml,
     local_file.ocs_olm_yaml,
     local_file.ocs_ibm_spectrum_olm_yaml,
+    local_file.ocs_gp2_storage_class_yaml,
     local_file.ocs_storagecluster_yaml,
     local_file.ocs_toolbox_yaml,
     null_resource.label_nodes,

@@ -69,8 +69,6 @@ data "template_file" "ocs_ibm_spectrum_olm" {
 apiVersion: v1
 kind: Namespace
 metadata:
-  labels:
-    openshift.io/cluster-monitoring: "true"
   name: ibm-spectrum-fusion-ns
 spec: {}
 ---
@@ -97,6 +95,25 @@ spec:
   name: isf-operator
   source: ibm-operator-catalog
   sourceNamespace: openshift-marketplace
+EOF
+}
+
+data "template_file" "ocs_gp2_storage_class" {
+  template = <<EOF
+---
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: gp2
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "true"
+provisioner: kubernetes.io/aws-ebs
+parameters:
+  encrypted: "true"
+  type: gp2
+reclaimPolicy: Delete
+allowVolumeExpansion: true
+volumeBindingMode: WaitForFirstConsumer
 EOF
 }
 
