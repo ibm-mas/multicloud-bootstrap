@@ -208,7 +208,7 @@ split_ocp_api_url() {
   export BASE_DOMAIN=$BASE_DOMAIN
 }
 #creating a function to pre-validate
-validate_prouduct_type() {
+validate_product_type() {
   product_code_metadata="$(curl http://169.254.169.254/latest/meta-data/product-codes)"
   # Hardcoding product_code_metadata for testing purpose until ami gets created for paid product.
   # product_code_metadata="1905n4jwbijcylk3xm02poizl"

@@ -82,7 +82,7 @@ export -f get_sls_endpoint_url
 export -f get_sls_registration_key
 export -f get_dro_endpoint_url
 export -f get_dro_api_key
-export -f validate_prouduct_type
+export -f validate_product_type
 
 export GIT_REPO_HOME=$(pwd)
 
@@ -201,7 +201,7 @@ export SLS_MONGODB_CFG_FILE="${MAS_CONFIG_DIR}/mongo-${MONGODB_NAMESPACE}.yml"
 # Exporting SLS_LICENSE_FILE only when product type is different than privatepublic(i.e. Paid offering)
 # Paid offering does not require entitlement.lic i.e. MAS license file.
 if [[ $CLUSTER_TYPE == "aws" ]]; then
-  validate_prouduct_type
+  validate_product_type
 fi
 if [[ ($PRODUCT_TYPE == "privatepublic") && ($CLUSTER_TYPE == "aws") ]];then
   log "Product type is privatepublic hence not exporting SLS_LICENSE_FILE variable"
