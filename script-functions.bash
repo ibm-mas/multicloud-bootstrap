@@ -69,8 +69,8 @@ function getOCPVersion() {
     #fi
 
     else
-      log " Unsupported Openshift version $currentOpenshiftVersion. Supported OpenShift version is 4.12.x"
-    export SERVICE_NAME=" Unsupported Openshift version $currentOpenshiftVersion. Supported OpenShift versions is 4.12.x"
+      log " Unsupported Openshift version $currentOpenshiftVersion. Supported OpenShift version is 4.14.x"
+    export SERVICE_NAME=" Unsupported Openshift version $currentOpenshiftVersion. Supported OpenShift versions is 4.14.x"
     SCRIPT_STATUS=29
     return $SCRIPT_STATUS
    fi

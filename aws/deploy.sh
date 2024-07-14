@@ -167,6 +167,33 @@ worker_subnet2_id               = "$EXISTING_PUBLIC_SUBNET2_ID"
 worker_subnet3_id               = "$EXISTING_PUBLIC_SUBNET3_ID"
 private_cluster                 = "$PRIVATE_CLUSTER"
 EOT
+
+  if [ -n "$EXISTING_NETWORK" ]; then
+
+# Reading custom cidr ranges for VPC & subnets (both private & public subnets)
+log "==== Reading of custom cidr range of VPC & subnets started ===="
+export vpc_cidr=$(aws ec2 describe-vpcs  --vpc-ids $EXISTING_NETWORK --query "Vpcs[*].{VPC_CIDR_BLOCK:CidrBlock}" --output=text)
+
+export master_subnet_cidr1=$(aws ec2 describe-subnets --subnet-ids $EXISTING_PRIVATE_SUBNET1_ID --region $DEPLOY_REGION --filter Name=vpc-id,Values=$EXISTING_NETWORK --query "Subnets[*].{CIDR_BLOCKS:CidrBlock}" --output=text)
+export master_subnet_cidr2=$(aws ec2 describe-subnets --subnet-ids $EXISTING_PRIVATE_SUBNET2_ID --region $DEPLOY_REGION --filter Name=vpc-id,Values=$EXISTING_NETWORK --query "Subnets[*].{CIDR_BLOCKS:CidrBlock}" --output=text)
+export master_subnet_cidr3=$(aws ec2 describe-subnets --subnet-ids $EXISTING_PRIVATE_SUBNET3_ID --region $DEPLOY_REGION --filter Name=vpc-id,Values=$EXISTING_NETWORK --query "Subnets[*].{CIDR_BLOCKS:CidrBlock}" --output=text)
+
+export worker_subnet_cidr1=$(aws ec2 describe-subnets --subnet-ids $EXISTING_PUBLIC_SUBNET1_ID --region $DEPLOY_REGION --filter Name=vpc-id,Values=$EXISTING_NETWORK --query "Subnets[*].{CIDR_BLOCKS:CidrBlock}" --output=text)
+export worker_subnet_cidr2=$(aws ec2 describe-subnets --subnet-ids $EXISTING_PUBLIC_SUBNET2_ID --region $DEPLOY_REGION --filter Name=vpc-id,Values=$EXISTING_NETWORK --query "Subnets[*].{CIDR_BLOCKS:CidrBlock}" --output=text)
+export worker_subnet_cidr3=$(aws ec2 describe-subnets --subnet-ids $EXISTING_PUBLIC_SUBNET3_ID --region $DEPLOY_REGION --filter Name=vpc-id,Values=$EXISTING_NETWORK --query "Subnets[*].{CIDR_BLOCKS:CidrBlock}" --output=text)
+
+cat <<EOT >>terraform.tfvars
+vpc_cidr                        = "$vpc_cidr"
+master_subnet_cidr1             = "$master_subnet_cidr1"
+master_subnet_cidr2             = "$master_subnet_cidr2"
+master_subnet_cidr3             = "$master_subnet_cidr3"
+worker_subnet_cidr1             = "$worker_subnet_cidr1"
+worker_subnet_cidr2             = "$worker_subnet_cidr2"
+worker_subnet_cidr3             = "$worker_subnet_cidr3"
+EOT
+
+  fi
+
   if [[ -f terraform.tfvars ]]; then
     chmod 600 terraform.tfvars
   fi
