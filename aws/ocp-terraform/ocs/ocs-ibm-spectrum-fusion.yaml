@@ -1,0 +1,17 @@
+---
+apiVersion: prereq.isf.ibm.com/v1
+kind: SpectrumFusion
+metadata:
+  name: spectrumfusion
+  namespace: ibm-spectrum-fusion-ns
+spec:
+  DataProtection:
+    Enable: false
+  GlobalDataPlatform:
+    Enable: false
+  OpenShiftDataFoundation:
+    AutoUpgrade: true
+    BackingStorageType: Dynamic
+    Enable: true
+  license:
+    accept: true

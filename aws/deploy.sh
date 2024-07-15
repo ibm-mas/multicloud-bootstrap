@@ -2,7 +2,7 @@
 set -e
 
 #validating product type for helper.sh
-validate_prouduct_type
+validate_product_type
 
 # This script will initiate the provisioning process of MAS. It will perform following steps,
 
@@ -315,6 +315,14 @@ jq '.auths |= . + {"cp.icr.io": { "auth" : "$encodedEntitlementKey", "email" : "
 envsubst </tmp/dockerconfig.json >/tmp/.dockerconfigjson
 oc set data secret/pull-secret -n openshift-config --from-file=/tmp/.dockerconfigjson
 chmod 600 /tmp/.dockerconfigjson /tmp/dockerconfig.json
+
+echo "Sleeping for 10mins"
+sleep 600
+echo "create spectrum fusion cr"
+oc apply -f $GIT_REPO_HOME/aws/ocp-terraform/ocs/ocs-ibm-spectrum-fusion.yaml
+
+echo "Sleeping for 5mins"
+sleep 300
 
 ## Configure OCP cluster
 log "==== OCP cluster configuration (Cert Manager) started ===="
