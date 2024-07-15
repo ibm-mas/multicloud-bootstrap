@@ -1,0 +1,21 @@
+﻿{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {        
+        "testBoolean": {
+            "type": "bool",
+            "defaultValue": false,
+            "metadata":{
+                "description": "A Boolean Parameter"
+            }
+        },
+        "location": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]",
+            "metadata": {
+               "description": "Location for all resources."
+            }
+         }
+    },
+    "resources": []
+}

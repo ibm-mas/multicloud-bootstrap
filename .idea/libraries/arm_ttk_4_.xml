@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="arm-ttk(4)">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/arm-ttk(4).zip!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
