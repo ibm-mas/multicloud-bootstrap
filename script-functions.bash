@@ -24,7 +24,7 @@ op_namespaces['MongoDBCommunity']='MONGODB_NAMESPACE'
 op_namespaces['kafkas.kafka.strimzi.io']='KAFKA_NAMESPACE'
 
 declare -A instance_names=~
-instance_names['cpd-platform-operator']='ibmcpd'
+instance_names['cpd-platform-operator']='ibmcpd-cr'
 instance_names['user-data-services-operator']='analyticsproxy'
 instance_names['MongoDBCommunity']='mas-mongo-ce'
 instance_names['kafkas.kafka.strimzi.io']='maskafka'
