@@ -292,7 +292,7 @@ chmod 600 /tmp/.dockerconfigjson /tmp/dockerconfig.json
 echo "Sleeping for 10mins"
 sleep 600
 echo "create spectrum fusion cr"
-LOGFILE=/tmp/mas-multicloud/ocs-ibm-spectrum-fusion.log
+LOGFILE=/tmp/ocs-ibm-spectrum-fusion.log
 oc apply -f $GIT_REPO_HOME/aws/ocp-terraform/ocs/ocs-ibm-spectrum-fusion.yaml &>> $LOGFILE
 
 echo "Sleeping for 5mins"
