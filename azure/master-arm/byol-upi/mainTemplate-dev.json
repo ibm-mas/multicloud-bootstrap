@@ -662,4 +662,4 @@
       "value": "[uri(concat('https://wsmasocp.home.', variables('projectName'), '.apps.masocp-', variables('projectName'), '.', parameters('HostedDomain')), '')]"
     }
   }
-}x`
+}

@@ -293,7 +293,7 @@
   "resources": [
     {
       "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2023-07-01",
+      "apiVersion": "2022-09-01",
       "name": "pid-5a1e8d63-79c9-418d-b3af-b2a21a557aac-partnercenter",
       "properties": {
         "mode": "Incremental",
