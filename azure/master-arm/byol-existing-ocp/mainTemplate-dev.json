@@ -325,8 +325,8 @@
   },
   "variables": {
 
-    "seller_compute_gallery_name": "masbyolimagegallery20230912151928",
-    "seller_image_definition": "masocp-image-def-20230912151928",
+    "seller_compute_gallery_name": "masbyolimagegallery20240709221615",
+    "seller_image_definition": "masocp-image-def-20240709221615",
     "projectName": "[concat('e',substring(uniqueString(resourceGroup().id, deployment().name), 0, 5))]",
     "rgName": "[resourceGroup().name]",
     "vNetSubnetName": "[concat('masocp-', variables('projectName'), '-bootnodeSubnet')]",
@@ -354,7 +354,7 @@
     },
     {
       "type": "Microsoft.Network/networkSecurityGroups",
-      "apiVersion": "2022-07-01",
+      "apiVersion": "2023-06-01",
       "name": "[variables('networkSecurityGroupName')]",
       "location": "[parameters('location')]",
       "properties": {
@@ -378,7 +378,7 @@
     },
     {
       "type": "Microsoft.Network/publicIPAddresses",
-      "apiVersion": "2022-07-01",
+      "apiVersion": "2023-06-01",
       "name": "[variables('publicIPAddressName')]",
       "location": "[parameters('location')]",
       "properties": {
@@ -404,7 +404,7 @@
           "resources": [
             {
               "type": "Microsoft.Network/networkSecurityGroups",
-              "apiVersion": "2022-07-01",
+              "apiVersion": "2023-11-01",
               "name": "[variables('networkSecurityGroupName2')]",
               "location": "[parameters('location')]",
               "properties": {
@@ -427,7 +427,7 @@
             },
             {
               "type": "Microsoft.Network/virtualNetworks/subnets",
-              "apiVersion": "2022-07-01",
+              "apiVersion": "2023-04-01",
               "name": "[format('{0}/{1}', parameters('BootNodeVnetId'), variables('vNetSubnetName'))]",
               "location": "[parameters('location')]",
               "dependsOn": [
@@ -446,7 +446,7 @@
     },
     {
       "type": "Microsoft.Network/networkInterfaces",
-      "apiVersion": "2022-07-01",
+      "apiVersion": "2023-06-01",
       "name": "[variables('networkInterfaceName')]",
       "location": "[parameters('location')]",
       "dependsOn": [
@@ -535,7 +535,7 @@
     },
     {
       "type": "Microsoft.Compute/virtualMachines",
-      "apiVersion": "2022-08-01",
+      "apiVersion": "2023-09-01",
       "name": "[variables('vmName')]",
       "location": "[parameters('location')]",
       "dependsOn": [
@@ -602,7 +602,7 @@
     },
     {
       "type": "Microsoft.Compute/virtualMachines/extensions",
-      "apiVersion": "2021-11-01",
+      "apiVersion": "2023-09-01",
       "name": "[format('{0}/AzureMonitorLinuxAgent', variables('vmName'))]",
       "location": "[parameters('location')]",
       "dependsOn": [
@@ -619,7 +619,7 @@
     },
     {
       "type": "Microsoft.Storage/storageAccounts",
-      "apiVersion": "2022-05-01",
+      "apiVersion": "2023-04-01",
       "name": "[variables('storageaccountName')]",
       "location": "[parameters('location')]",
       "sku": {
@@ -632,7 +632,7 @@
     },
     {
       "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
-      "apiVersion": "2022-05-01",
+      "apiVersion": "2023-04-01",
       "name": "[concat(variables('storageaccountName'), '/default/masocpcontainer')]",
       "dependsOn": [
         "[resourceId('Microsoft.Storage/storageAccounts', variables('storageaccountName'))]"
