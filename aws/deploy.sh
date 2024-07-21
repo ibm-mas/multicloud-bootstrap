@@ -271,6 +271,10 @@ EOT
   # Create a secret in the Cloud to keep OCP access credentials
   cd $GIT_REPO_HOME
   ./create-secret.sh ocp
+  if [[ $CLUSTER_TYPE == "aws" ]]; then
+	SCRIPT_STATUS=47
+	exit $SCRIPT_STATUS
+  fi
 else
   log "==== Existing OCP cluster provided, skipping the cluster creation, Bastion host creation and S3 upload of deployment context ===="
 fi
@@ -291,7 +295,7 @@ chmod 600 /tmp/.dockerconfigjson /tmp/dockerconfig.json
 
 echo "Sleeping for 10mins"
 sleep 600
-echo "create spectrum fusion cr"  
+echo "create spectrum fusion cr"
 oc apply -f $GIT_REPO_HOME/aws/ocp-terraform/ocs/ocs-ibm-spectrum-fusion.yaml
 
 echo "Sleeping for 5mins"
