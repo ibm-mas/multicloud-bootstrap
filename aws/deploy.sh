@@ -289,13 +289,15 @@ envsubst </tmp/dockerconfig.json >/tmp/.dockerconfigjson
 oc set data secret/pull-secret -n openshift-config --from-file=/tmp/.dockerconfigjson
 chmod 600 /tmp/.dockerconfigjson /tmp/dockerconfig.json
 
+if [[ $ROSA == "false" ]]; then
 echo "Sleeping for 10mins"
 sleep 600
-echo "create spectrum fusion cr"  
-oc apply -f $GIT_REPO_HOME/aws/ocp-terraform/ocs/ocs-ibm-spectrum-fusion.yaml
-
+echo "create spectrum fusion cr"
+LOGFILE=/tmp/ocs-ibm-spectrum-fusion.log
+oc apply -f $GIT_REPO_HOME/aws/ocp-terraform/ocs/ocs-ibm-spectrum-fusion.yaml &>> $LOGFILE
 echo "Sleeping for 5mins"
 sleep 300
+fi
 
 ## Configure OCP cluster
 log "==== OCP cluster configuration (Cert Manager) started ===="
@@ -303,9 +305,6 @@ cd $GIT_REPO_HOME/../ibm/mas_devops/playbooks
 set +e
 
 if [[ $ROSA == "true" ]]; then
-    # Use the latest catalog version to support ROSA 4.14.x cluster
-    export MAS_DEVOPS_COLLECTION_VERSION=18.17.0
-    export MAS_CATALOG_VERSION=v8-240405-amd64
     # Below environment variable settings are required to point to EFS storage to make internal DB2 & Manage offering to work on ROSA cluster
     export CLUSTER_NAME=$(echo $EXS_OCP_URL | cut -d '.' -f 2)
 	export CPD_PRIMARY_STORAGE_CLASS="efs$CLUSTER_NAME"
