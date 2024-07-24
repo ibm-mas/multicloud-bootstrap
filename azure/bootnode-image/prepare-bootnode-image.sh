@@ -42,8 +42,8 @@ dnf clean all
 ## Install pre-reqs
 
 dnf update -y
-dnf install vsftpd -y
-dnf upgrade bind -y
+dnf install vsftpd bind -y
+#dnf upgrade bind -y
 
 dnf install git httpd-tools java  unzip wget zip pip  container-tools -y
 
