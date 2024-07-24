@@ -41,9 +41,9 @@ dnf clean all
 # yum install python-unversioned-command -y
 ## Install pre-reqs
 
-dnf update
-dnf install vsftpd
-dnf upgrade bind
+dnf update -y
+dnf install vsftpd -y
+dnf upgrade bind -y
 
 dnf install git httpd-tools java  unzip wget zip pip  container-tools -y
 
