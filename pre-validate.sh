@@ -3,7 +3,7 @@ SCRIPT_STATUS=0
 
 # Check if region is supported
 if [[ $CLUSTER_TYPE == "aws" ]]; then
-    SUPPORTED_REGIONS="us-gov-west-1;us-gov-east-1"
+    SUPPORTED_REGIONS="us-gov-west-1;us-gov-east-1;eu-west-1"
 else
     SUPPORTED_REGIONS=$DEPLOY_REGION
 fi

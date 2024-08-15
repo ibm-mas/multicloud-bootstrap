@@ -16,6 +16,14 @@ if [[ $ROSA = ""  ]]; then
 	fi
 fi
 
+if [[ $ROSA == "true" ]]; then
+	log " Checking for EFS Storage"
+	getEFS
+	retcode=$?
+	if [[ $retcode -eq 29 ]]; then
+	return $retcode
+	fi
+fi
 
 getWorkerNodeDetails
 retcode=$?
@@ -23,10 +31,14 @@ if [[ $retcode -eq 29 ]]; then
 	return $retcode
 fi
 
-if [[ $DEPLOY_CP4D == "true" ]]; then
-
+if [[ ($DEPLOY_CP4D == "true") && ($ROSA != "true") ]]; then
 	if [[ $CLUSTER_TYPE == "aws" ]]; then
 		getOCS ocs-operator
+	elif [[ $CLUSTER_TYPE == "azure" ]]; then
+	     #log "In prereq - EXISTING_CLUSTER is $EXISTING_CLUSTER"
+        if [[ -z $EXISTING_CLUSTER  ]]; then
+		        getazurefile
+		    fi
 	fi
 
 	retcode=$?
@@ -39,6 +51,12 @@ if [[ $DEPLOY_CP4D == "true" ]]; then
 	if [[ $retcode -eq 29 ]]; then
 	return $retcode
 	fi
+#commenting this as we dont use db2u cluster ,instead we are using cp4d db2wh
+	#getVersion Db2uCluster
+	#retcode=$?
+	#if [[ $retcode -eq 29 ]]; then
+	#return $retcode
+	#fi
 fi
 
 
@@ -65,15 +83,15 @@ fi
 export SLS_MONGODB_CFG_FILE="${MAS_CONFIG_DIR}/mongo-${MONGODB_NAMESPACE}.yml"
 log " SLS_MONGODB_CFG_FILE: $SLS_MONGODB_CFG_FILE"
 
-# Skip UDS check in case of external UDS details are provided
-if [[ (-z $UDS_API_KEY) || (-z $UDS_ENDPOINT_URL) || (-z $UDS_PUB_CERT_URL) ]]; then
+# Skip DRO check in case of external DRO details are provided
+if [[ (-z $DRO_API_KEY) || (-z $DRO_ENDPOINT_URL) || (-z $DRO_PUB_CERT_URL) ]]; then
 	getOPNamespace user-data-services-operator
 	retcode=$?
 	if [[ $retcode -eq 29 ]]; then
     	return $retcode
 	fi
 else
-  log "=== Using External UDS Deployment ==="
+  log "=== Using External DRO Deployment ==="
 fi
 
 arr=(ibm-cert-manager-operator)
@@ -89,7 +107,19 @@ do
 	i=`expr $i + 1`
 done
 
+# # getSBOVersion
+# # retcode=$?
+# # if [[ $retcode -eq 29 ]]; then
+# # 	return $retcode
+# # fi
 
+getKafkaVersion
+retcode=$?
+if [[ $retcode -eq 29 ]]; then
+	return $retcode
+fi
+
+log " KAFKA_NAMESPACE: $KAFKA_NAMESPACE"
 log " CPD_OPERATORS_NAMESPACE: $CPD_OPERATORS_NAMESPACE"
 log " CPD_INSTANCE_NAMESPACE: $CPD_INSTANCE_NAMESPACE"
 log " SLS_NAMESPACE: $SLS_NAMESPACE"

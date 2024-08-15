@@ -316,6 +316,7 @@ envsubst </tmp/dockerconfig.json >/tmp/.dockerconfigjson
 oc set data secret/pull-secret -n openshift-config --from-file=/tmp/.dockerconfigjson
 chmod 600 /tmp/.dockerconfigjson /tmp/dockerconfig.json
 
+if [[ $ROSA == "false" ]]; then
 echo "Sleeping for 10mins"
 sleep 600
 echo "create spectrum fusion cr"
@@ -323,11 +324,30 @@ LOGFILE=/tmp/ocs-ibm-spectrum-fusion.log
 oc apply -f $GIT_REPO_HOME/aws/ocp-terraform/ocs/ocs-ibm-spectrum-fusion.yaml &>> $LOGFILE
 echo "Sleeping for 5mins"
 sleep 300
+fi
 
 ## Configure OCP cluster
 log "==== OCP cluster configuration (Cert Manager) started ===="
 cd $GIT_REPO_HOME/../ibm/mas_devops/playbooks
 set +e
+
+if [[ $ROSA == "true" ]]; then
+    # Below environment variable settings are required to point to EFS storage to make internal DB2 & Manage offering to work on ROSA cluster
+    export CLUSTER_NAME=$(echo $EXS_OCP_URL | cut -d '.' -f 2)
+	export CPD_PRIMARY_STORAGE_CLASS="efs$CLUSTER_NAME"
+	export CPD_METADATA_STORAGE_CLASS="efs$CLUSTER_NAME"
+	export CPD_SERVICE_STORAGE_CLASS="efs$CLUSTER_NAME"
+	export DB2_META_STORAGE_CLASS=$CPD_PRIMARY_STORAGE_CLASS
+	export DB2_DATA_STORAGE_CLASS=$CPD_PRIMARY_STORAGE_CLASS
+	export DB2_BACKUP_STORAGE_CLASS=$CPD_PRIMARY_STORAGE_CLASS
+	export DB2_LOGS_STORAGE_CLASS=$CPD_PRIMARY_STORAGE_CLASS
+	export DB2_TEMP_STORAGE_CLASS=$CPD_PRIMARY_STORAGE_CLASS
+	log " Patch EFS storage class as default storage class"
+	oc patch storageclass gp3-csi -p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "false"}}}'
+  	oc patch storageclass gp2 -p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "false"}}}'
+  	oc patch storageclass gp3 -p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "false"}}}'
+  	oc patch storageclass $CPD_PRIMARY_STORAGE_CLASS -p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "true"}}}'
+fi
 
 export ROLE_NAME=ibm_catalogs && ansible-playbook ibm.mas_devops.run_role
 export ROLE_NAME=common_services && ansible-playbook ibm.mas_devops.run_role
