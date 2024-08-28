@@ -25,7 +25,7 @@ if [[ $ROSA == "true" ]]; then
 	fi
 fi
 
-getWorkerNodeDetails
+#getWorkerNodeDetails
 retcode=$?
 if [[ $retcode -eq 29 ]]; then
 	return $retcode
