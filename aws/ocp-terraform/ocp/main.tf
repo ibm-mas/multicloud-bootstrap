@@ -164,7 +164,7 @@ resource "null_resource" "configure_image_registry" {
   }
   provisioner "local-exec" {
     command =<<EOF
-oc patch configs.imageregistry.operator.openshift.io/cluster --type merge -p '{"spec":{"defaultRoute":true,"replicas":3}}' -n openshift-image-registry --kubeconfig ${self.triggers.installer_workspace}/auth/kubeconfig
+oc patch configs.imageregistry.operator.openshift.io/cluster --type merge -p '{"spec":{"defaultRoute":true,"replicas":1}}' -n openshift-image-registry --kubeconfig ${self.triggers.installer_workspace}/auth/kubeconfig
 oc patch svc/image-registry -p '{"spec":{"sessionAffinity": "ClientIP"}}' -n openshift-image-registry --kubeconfig ${self.triggers.installer_workspace}/auth/kubeconfig
 oc patch configs.imageregistry.operator.openshift.io/cluster --type merge -p '{"spec":{"managementState":"Unmanaged"}}' --kubeconfig ${self.triggers.installer_workspace}/auth/kubeconfig
 echo 'Sleeping for 3m'

@@ -151,8 +151,8 @@ if [[ (! -z $EXS_OCP_URL) && (! -z $EXS_OCP_USER) && (! -z $EXS_OCP_PWD) ]]; the
     export OCP_PASSWORD=${EXS_OCP_PWD}
 fi
 export OPENSHIFT_PULL_SECRET_FILE_PATH=${GIT_REPO_HOME}/pull-secret.json
-export MASTER_NODE_COUNT="3"
-export WORKER_NODE_COUNT="3"
+export MASTER_NODE_COUNT="1"
+export WORKER_NODE_COUNT="1"
 export AZ_MODE="multi_zone"
 export OCP_VERSION="4.14.26"
 
@@ -255,8 +255,8 @@ case $CLUSTER_SIZE in
     ;;
   *)
     log "Using default small size cluster"
-    export MASTER_NODE_COUNT="3"
-    export WORKER_NODE_COUNT="3"
+    export MASTER_NODE_COUNT="1"
+    export WORKER_NODE_COUNT="1"
     ;;
 esac
 

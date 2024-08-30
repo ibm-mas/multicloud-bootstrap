@@ -177,7 +177,7 @@ variable "worker_instance_volume_type" {
 
 variable "worker_replica_count" {
   type    = number
-  default = 3
+  default = 1
 }
 
 variable "master_instance_type" {
@@ -202,7 +202,7 @@ variable "master_instance_volume_type" {
 
 variable "master_replica_count" {
   type    = number
-  default = 3
+  default = 1
 }
 
 variable "cluster_network_cidr" {
