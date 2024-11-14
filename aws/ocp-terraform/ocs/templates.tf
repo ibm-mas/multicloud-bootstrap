@@ -45,7 +45,7 @@ metadata:
   labels:
     operators.coreos.com/odf-operator.openshift-storage: ''
 spec:
-  channel: "stable-4.14"
+  channel: "stable-4.15"
   installPlanApproval: Automatic
   name: odf-operator
   source: redhat-operators
