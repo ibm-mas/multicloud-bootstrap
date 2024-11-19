@@ -74,9 +74,11 @@ def resource_validation_check(service_quotas, service_code, quota_code,
     #     since Buckets are tied to the Account
     if service_code == 's3' and quota_code == 'L-DC2B2D3D':
         quota_value = service_quotas[service_code][quota_code]['Value']
+        print("1. quota_value is ")
         print(quota_value)
     else:
         quota_value = service_quotas[service_code][quota_code]['RegionValue']
+        print("2. quota_value is ")
         print(quota_value)
     resources_available = quota_value - resources_used
     service_quotas[service_code][quota_code]['ResourcesAvailable'] = resources_available
