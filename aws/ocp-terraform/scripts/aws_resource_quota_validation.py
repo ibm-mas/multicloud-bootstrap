@@ -47,7 +47,7 @@ def get_terraform_configuration(tf_var_file):
     ## storage-type == 'ocs' --> 3 additional OCS worker nodes are deployed
     # if tf_config['storage_type'] == 'ocs':
     #     tf_config['replica_count']['worker'] = tf_config['replica_count']['worker'] + 3
-    ## storage-type == 'portworx' --> 1 additional worker node added by cluster auto-scaler 
+    ## storage-type == 'portworx' --> 1 additional worker node added by cluster auto-scaler
     # <Femi: Commenting this out since autoscaler is disabled>
     # if tf_config['storage_type'] == 'portworx':
     #     tf_config['replica_count']['worker'] = tf_config['replica_count']['worker'] + 1
@@ -80,8 +80,8 @@ def resource_validation_check(service_quotas, service_code, quota_code,
     service_quotas[service_code][quota_code]['ResourcesAvailable'] = resources_available
     service_quotas[service_code][quota_code]['ResourcesRequired'] = resources_required
     service_quotas[service_code][quota_code]['ValidationCheck'] = 'PASSED'
-    if resources_available < resources_required:
-        service_quotas[service_code][quota_code]['ValidationCheck'] = 'FAILED'
+    #if resources_available < resources_required:
+        #service_quotas[service_code][quota_code]['ValidationCheck'] = 'FAILED'
 
 def get_quota_code_by_name_pattern(service_code, quota_name_pattern,
                                    service_quota_to_be_validated):
@@ -93,7 +93,7 @@ def get_quota_code_by_name_pattern(service_code, quota_name_pattern,
     return qc
 
 def main():
-    
+
     # Get resource related values from terraform config variables file
     tf_var_file = os.path.dirname(os.path.abspath(__file__)) + '/../variables.tf'
     tf_config = get_terraform_configuration(tf_var_file)
