@@ -80,8 +80,8 @@ def resource_validation_check(service_quotas, service_code, quota_code,
     service_quotas[service_code][quota_code]['ResourcesAvailable'] = resources_available
     service_quotas[service_code][quota_code]['ResourcesRequired'] = resources_required
     service_quotas[service_code][quota_code]['ValidationCheck'] = 'PASSED'
-    #if resources_available < resources_required:
-        #service_quotas[service_code][quota_code]['ValidationCheck'] = 'FAILED'
+    if resources_available < resources_required:
+        service_quotas[service_code][quota_code]['ValidationCheck'] = 'FAILED'
 
 def get_quota_code_by_name_pattern(service_code, quota_name_pattern,
                                    service_quota_to_be_validated):
