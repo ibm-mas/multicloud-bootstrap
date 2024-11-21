@@ -232,7 +232,7 @@ export CPD_PRODUCT_VERSION=4.8.0
 export MAS_CHANNEL=9.0.x
 export MAS_CATALOG_VERSION=v9-240625-amd64
 if [[ $CLUSTER_TYPE == "aws" ]]; then
-  export CPD_PRIMARY_STORAGE_CLASS="ocs-storagecluster-cephfs"
+  export CPD_PRIMARY_STORAGE_CLASS="gp2"
 elif [[ $CLUSTER_TYPE == "azure" ]]; then
   #export CPD_PRIMARY_STORAGE_CLASS="azurefile-premium-new"
   export CPD_PRIMARY_STORAGE_CLASS="azurefiles-premium"
