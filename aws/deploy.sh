@@ -233,7 +233,7 @@ EOT
   # Ensure only gp2 is set as default storage class
   oc patch storageclass gp3-csi -p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "false"}}}'
   oc patch storageclass ocs-storagecluster-cephfs -p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "true"}}}'
-  oc patch storageclass gp2 '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "false"}}}'
+  #oc patch storageclass gp2 '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "false"}}}'
   ## Create bastion host
   cd $GIT_REPO_HOME/aws
   set +e
