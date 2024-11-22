@@ -23,7 +23,7 @@ export SLS_STORAGE_CLASS=gp2
 export DRO_STORAGE_CLASS=gp2
 # CP4D variables
 export CPD_METADATA_STORAGE_CLASS=gp2
-export CPD_SERVICE_STORAGE_CLASS="gp2"
+export CPD_SERVICE_STORAGE_CLASS="ocs-storagecluster-cephfs"
 
 # Retrieve SSH public key
 TOKEN=$(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")

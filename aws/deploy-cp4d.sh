@@ -152,7 +152,7 @@ export MAS_WORKSPACE_ID="wsmasocp"
 export CPD_ENTITLEMENT_KEY=${ER_KEY}
 export CPD_VERSION=cpd40
 export MAS_CHANNEL=8.7.x
-export CPD_PRIMARY_STORAGE_CLASS="gp2"
+export CPD_PRIMARY_STORAGE_CLASS="ocs-storagecluster-cephfs"
 export CPD_OPERATORS_NAMESPACE="ibm-cpd-operators-${UNIQ_STR}"
 export CPD_INSTANCE_NAMESPACE="ibm-cpd-${UNIQ_STR}"
 export CPD_SERVICES_NAMESPACE="cpd-services-${UNIQ_STR}"
@@ -172,7 +172,7 @@ export HOME=/root
 
 
 export CPD_METADATA_STORAGE_CLASS=gp2
-export CPD_SERVICE_STORAGE_CLASS=gp2
+export CPD_SERVICE_STORAGE_CLASS=ocs-storagecluster-cephfs
 
 echo
 echoBlue "==== Installing Ansible Collection ===="
