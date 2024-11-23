@@ -173,7 +173,7 @@ export OPENSHIFT_PULL_SECRET_FILE_PATH=${GIT_REPO_HOME}/pull-secret.json
 export MASTER_NODE_COUNT="3"
 export WORKER_NODE_COUNT="3"
 export AZ_MODE="multi_zone"
-export OCP_VERSION="4.15.35"
+export OCP_VERSION="4.15.39"
 
 export MAS_IMAGE_TEST_DOWNLOAD="cp.icr.io/cp/mas/admin-dashboard:5.1.27"
 export BACKUP_FILE_NAME="deployment-backup-${CLUSTER_NAME}.zip"
@@ -227,10 +227,10 @@ export DRO_CONTACT_LASTNAME=Support
 export DRO_TLS_CERT_LOCAL_FILE_PATH="${GIT_REPO_HOME}/dro.crt"
 # CP4D variables
 export CPD_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
-export CPD_VERSION=cpd40
-export CPD_PRODUCT_VERSION=4.8.0
+export CPD_VERSION=cpd50
+export CPD_PRODUCT_VERSION=5.0.1
 export MAS_CHANNEL=9.0.x
-export MAS_CATALOG_VERSION=v9-240625-amd64
+export MAS_CATALOG_VERSION=v9-241107-amd64
 if [[ $CLUSTER_TYPE == "aws" ]]; then
   export CPD_PRIMARY_STORAGE_CLASS="ocs-storagecluster-cephfs"
 elif [[ $CLUSTER_TYPE == "azure" ]]; then
@@ -245,7 +245,7 @@ export CPD_INSTANCE_NAMESPACE="ibm-cpd-${RANDOM_STR}"
 #CPD_SERVICES_NAMESPACE is used in roles - cp4d, cp4dv3_install, cp4dv3_install_services and suite_dns
 export CPD_SERVICES_NAMESPACE="cpd-services-${RANDOM_STR}"
 export DB2WH_INSTANCE_NAME="db2wh-cpd-${RANDOM_STR}"
-export DB2WH_VERSION="11.5.8.0-CN1"
+export DB2WH_VERSION="11.5.9.0-CN1"
 export DB2_META_STORAGE_CLASS=$CPD_PRIMARY_STORAGE_CLASS
 export DB2_DATA_STORAGE_CLASS=$CPD_PRIMARY_STORAGE_CLASS
 export DB2_BACKUP_STORAGE_CLASS=$CPD_PRIMARY_STORAGE_CLASS
@@ -269,7 +269,7 @@ export MAS_APP_ID=manage
 export MAS_APPWS_JDBC_BINDING="workspace-application"
 export MAS_JDBC_CERT_LOCAL_FILE=$GIT_REPO_HOME/db.crt
 export MAS_CLOUD_AUTOMATION_VERSION=1.0
-export MAS_DEVOPS_COLLECTION_VERSION=20.4.0
+export MAS_DEVOPS_COLLECTION_VERSION=24.0.0
 export MAS_APP_CHANNEL=9.0.x
 if [ -z "$EXISTING_NETWORK" ]; then
   export new_or_existing_vpc_subnet="new"
