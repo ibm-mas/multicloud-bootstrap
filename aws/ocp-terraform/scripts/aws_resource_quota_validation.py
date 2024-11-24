@@ -156,16 +156,7 @@ def main():
         sq['elasticloadbalancing'][quota_code]['Scope'] = 'Region'
         sq['elasticloadbalancing'][quota_code]['DisplayServiceCode'] = 'ELB'
 
-    # enrich S3 service quotas
-    s3_quota_code_buckets = get_quota_code_by_name_pattern(
-                                            's3',
-                                            'Buckets',
-                                            service_quotas_to_be_validated)
-    sq['s3'][s3_quota_code_buckets]['Scope'] = 'Account'
-    # Since Buckets are tied to the Account - need to unset 'RegionValue'
-    sq['s3'][s3_quota_code_buckets]['RegionValue'] = ''
-    for quota_code in  sq['s3']:
-        sq['s3'][quota_code]['DisplayServiceCode'] = 'S3'
+
 
     # VPC Gateway - service quotas
     ## To be done
