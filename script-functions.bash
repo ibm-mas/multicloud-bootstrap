@@ -65,9 +65,9 @@ function getOCPVersion() {
       log " OCP Supported Version"
     #log " DEPLOY_CP4D: $DEPLOY_CP4D"
     #if [[ $DEPLOY_CP4D == "true" ]]; then
-      SCRIPT_STATUS=29
-      export SERVICE_NAME=" MAS+CP4D offering is not supported on OCP 4.11.x"
-      return $SCRIPT_STATUS
+      #SCRIPT_STATUS=29
+      #export SERVICE_NAME=" MAS+CP4D offering is not supported on OCP 4.11.x"
+      #return $SCRIPT_STATUS
     #fi
 
     else
