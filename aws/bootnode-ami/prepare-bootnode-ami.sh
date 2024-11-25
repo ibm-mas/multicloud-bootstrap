@@ -61,7 +61,7 @@ terraform version
 rm -rf terraform_${TERRAFORM_VER}_linux_amd64.zip
 
 ## Install Ansible
-pip3 install ansible==4.9.0
+pip3 install ansible==5.7.1
 pip3 install openshift
 ansible-galaxy collection install community.kubernetes
 
