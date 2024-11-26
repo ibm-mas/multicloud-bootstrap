@@ -289,15 +289,15 @@ envsubst </tmp/dockerconfig.json >/tmp/.dockerconfigjson
 oc set data secret/pull-secret -n openshift-config --from-file=/tmp/.dockerconfigjson
 chmod 600 /tmp/.dockerconfigjson /tmp/dockerconfig.json
 
-if [[ $ROSA == "false" ]]; then
-echo "Sleeping for 10mins"
-sleep 600
-echo "create spectrum fusion cr"
-LOGFILE=/tmp/ocs-ibm-spectrum-fusion.log
-oc apply -f $GIT_REPO_HOME/aws/ocp-terraform/ocs/ocs-ibm-spectrum-fusion.yaml &>> $LOGFILE
-echo "Sleeping for 5mins"
-sleep 300
-fi
+#if [[ $ROSA == "false" ]]; then
+#echo "Sleeping for 10mins"
+#sleep 600
+#echo "create spectrum fusion cr"
+#LOGFILE=/tmp/ocs-ibm-spectrum-fusion.log
+#oc apply -f $GIT_REPO_HOME/aws/ocp-terraform/ocs/ocs-ibm-spectrum-fusion.yaml &>> $LOGFILE
+#echo "Sleeping for 5mins"
+#sleep 300
+#fi
 
 ## Configure OCP cluster
 log "==== OCP cluster configuration (Cert Manager) started ===="
