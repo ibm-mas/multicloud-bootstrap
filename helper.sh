@@ -158,7 +158,10 @@ mark_provisioning_failed() {
   elif [[ $retcode -eq 45 ]]; then
     export STATUS_MSG="$DBProvisionedVPCId is not found in region $DEPLOY_REGION"
   elif [[ $retcode -eq 46 ]]; then
-      export STATUS_MSG="Subscription Id invalid"
+    export STATUS_MSG="Subscription Id invalid"
+  fi
+  elif [[ $retcode -eq 47 ]]; then
+    export STATUS_MSG="OCP Creation successful and exited."
   fi
   export MESSAGE_TEXT=NA
   export OPENSHIFT_CLUSTER_CONSOLE_URL=NA
