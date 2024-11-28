@@ -289,11 +289,6 @@ envsubst </tmp/dockerconfig.json >/tmp/.dockerconfigjson
 oc set data secret/pull-secret -n openshift-config --from-file=/tmp/.dockerconfigjson
 chmod 600 /tmp/.dockerconfigjson /tmp/dockerconfig.json
 
-if [[ $CLUSTER_TYPE == "aws" ]]; then
-SCRIPT_STATUS=47
-exit $SCRIPT_STATUS
-fi
-
 #if [[ $ROSA == "false" ]]; then
 #echo "Sleeping for 10mins"
 #sleep 600
