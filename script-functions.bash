@@ -8,9 +8,9 @@ declare -A op_versions
 op_versions['MongoDBCommunity']=4.1.9
 op_versions['Db2uCluster']=11.4
 op_versions['kafkas.kafka.strimzi.io']=2.4.9
-op_versions['ocpVersion412']='^4\.([1][2])?(\.[0-9][0-9]+.*)*$'
-op_versions['rosaVersion412']='^4\.([1][2])?(\.[0-9]+.*)*$'
+op_versions['ocpVersion414']='^4\.([1][4])?(\.[0-9][0-9]+.*)*$'
 op_versions['rosaVersion414']='^4\.([1][4])?(\.[0-9]+.*)*$'
+op_versions['rosaVersion415']='^4\.([1][5])?(\.[0-9]+.*)*$'
 op_versions['cpd-platform-operator']=2.0.7
 op_versions['user-data-services-operator']=2.0.6
 op_versions['ibm-cert-manager-operator']=3.19.9
@@ -63,7 +63,7 @@ function version_gt() {
 function getOCPVersion() {
   currentOpenshiftVersion=$(oc get clusterversion | awk  'NR==2 {print $2 }')
   log " OCP version is $currentOpenshiftVersion"
-    if [[ ${currentOpenshiftVersion} =~ ${op_versions[ocpVersion412]} ]]; then
+    if [[ ${currentOpenshiftVersion} =~ ${op_versions[ocpVersion414]} ]]; then
       log " OCP Supported Version"
   elif [[ ${currentOpenshiftVersion} =~ ${op_versions[ocpVersion411]} ]]; then
     log " OCP Version Not Supported"
