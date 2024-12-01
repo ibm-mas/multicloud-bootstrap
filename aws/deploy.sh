@@ -288,7 +288,7 @@ if [[ $ROSA == "true" ]]; then
   	oc patch storageclass $CPD_PRIMARY_STORAGE_CLASS -p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "true"}}}'
 fi
 
-#export ROLE_NAME=ibm_catalogs && ansible-playbook ibm.mas_devops.run_role
+export ROLE_NAME=ibm_catalogs && ansible-playbook ibm.mas_devops.run_role
 export ROLE_NAME=common_services && ansible-playbook ibm.mas_devops.run_role
 export ROLE_NAME=cert_manager && ansible-playbook ibm.mas_devops.run_role
 if [[ $? -ne 0 ]]; then
@@ -300,7 +300,7 @@ if [[ $? -ne 0 ]]; then
   oc delete pod $podname -n openshift-operator-lifecycle-manager
   sleep 10
   # Retry the step
-  #export ROLE_NAME=ibm_catalogs && ansible-playbook ibm.mas_devops.run_role
+  export ROLE_NAME=ibm_catalogs && ansible-playbook ibm.mas_devops.run_role
   export ROLE_NAME=common_services && ansible-playbook ibm.mas_devops.run_role
   export ROLE_NAME=cert_manager && ansible-playbook ibm.mas_devops.run_role
   retcode=$?
