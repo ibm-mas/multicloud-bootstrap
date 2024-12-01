@@ -20,9 +20,9 @@ export MAS_LICENSE_URL=${13}
 export SLS_URL=${14}
 export SLS_REGISTRATION_KEY=${15}
 export SLS_PUB_CERT_URL=${16}
-export UDS_ENDPOINT_URL=${17}
-export UDS_API_KEY=${18}
-export UDS_PUB_CERT_URL=${19}
+export DRO_ENDPOINT_URL=${17}
+export DRO_API_KEY=${18}
+export DRO_PUB_CERT_URL=${19}
 export MAS_JDBC_USER=${20}
 export MAS_JDBC_PASSWORD=${21}
 export MAS_JDBC_URL=${22}
@@ -80,9 +80,9 @@ export -f retrieve_mas_ca_cert
 export -f mark_provisioning_failed
 export -f get_sls_endpoint_url
 export -f get_sls_registration_key
-export -f get_uds_endpoint_url
-export -f get_uds_api_key
-export -f validate_prouduct_type
+export -f get_dro_endpoint_url
+export -f get_dro_api_key
+export -f validate_product_type
 
 export GIT_REPO_HOME=$(pwd)
 
@@ -132,12 +132,25 @@ if [[ $CLUSTER_TYPE == "gcp" ]]; then
   cd -
 fi
 
+
+
 # Check for input parameters
 if [[ (-z $CLUSTER_TYPE) || (-z $DEPLOY_REGION) || (-z $RANDOM_STR) || (-z $CLUSTER_SIZE) || (-z $SLS_ENTITLEMENT_KEY) \
    || (-z $SSH_KEY_NAME) ]]; then
   log "ERROR: Required parameter not specified, please provide all the required inputs to the script."
   PRE_VALIDATION=fail
 fi
+#for dev release
+#export MAS_ICR_CP=docker-na-public.artifactory.swg-devops.com/wiotp-docker-local
+#export MAS_ICR_CPOPEN=docker-na-public.artifactory.swg-devops.com/wiotp-docker-local/cpopen
+#export MAS_ENTITLEMENT_USERNAME=`echo $SLS_ENTITLEMENT_KEY|cut -d "#" -f 2`
+#export MAS_ENTITLEMENT_KEY=`echo $SLS_ENTITLEMENT_KEY|cut -d "#" -f 3`
+#export SLS_ENTITLEMENT_KEY=`echo $SLS_ENTITLEMENT_KEY|cut -d "#" -f 1`
+#export IBM_ENTITLEMENT_KEY=$MAS_ENTITLEMENT_KEY
+#echo $SLS_ENTITLEMENT_KEY
+#echo $MAS_ENTITLEMENT_USERNAME
+#echo $MAS_ENTITLEMENT_KEY
+
 
 if [[ $OFFERING_TYPE == "MAS Core + Cloud Pak for Data" ]]; then
   export DEPLOY_CP4D="true"
@@ -160,7 +173,7 @@ export OPENSHIFT_PULL_SECRET_FILE_PATH=${GIT_REPO_HOME}/pull-secret.json
 export MASTER_NODE_COUNT="3"
 export WORKER_NODE_COUNT="3"
 export AZ_MODE="multi_zone"
-export OCP_VERSION="4.12.18"
+export OCP_VERSION="4.14.26"
 
 export MAS_IMAGE_TEST_DOWNLOAD="cp.icr.io/cp/mas/admin-dashboard:5.1.27"
 export BACKUP_FILE_NAME="deployment-backup-${CLUSTER_NAME}.zip"
@@ -188,7 +201,7 @@ export SLS_MONGODB_CFG_FILE="${MAS_CONFIG_DIR}/mongo-${MONGODB_NAMESPACE}.yml"
 # Exporting SLS_LICENSE_FILE only when product type is different than privatepublic(i.e. Paid offering)
 # Paid offering does not require entitlement.lic i.e. MAS license file.
 if [[ $CLUSTER_TYPE == "aws" ]]; then
-  validate_prouduct_type
+  validate_product_type
 fi
 if [[ ($PRODUCT_TYPE == "privatepublic") && ($CLUSTER_TYPE == "aws") ]];then
   log "Product type is privatepublic hence not exporting SLS_LICENSE_FILE variable"
@@ -200,29 +213,32 @@ fi
 
 export SLS_TLS_CERT_LOCAL_FILE_PATH="${GIT_REPO_HOME}/sls.crt"
 export SLS_INSTANCE_NAME="masocp-${RANDOM_STR}"
-# UDS variables
+# DRO variables
 if [[ $CLUSTER_TYPE == "aws" ]]; then
-  export UDS_STORAGE_CLASS="gp2"
+  export DRO_STORAGE_CLASS="gp2"
 elif [[ $CLUSTER_TYPE == "azure" ]]; then
-  export UDS_STORAGE_CLASS="managed-premium"
+  export DRO_STORAGE_CLASS="managed-premium"
+  export DRO_STORAGE_CLASS="managed-premium"
+
 fi
-export UDS_CONTACT_EMAIL="uds.support@ibm.com"
-export UDS_CONTACT_FIRSTNAME=Uds
-export UDS_CONTACT_LASTNAME=Support
-export UDS_TLS_CERT_LOCAL_FILE_PATH="${GIT_REPO_HOME}/uds.crt"
+export DRO_CONTACT_EMAIL="dro.support@ibm.com"
+export DRO_CONTACT_FIRSTNAME=dro
+export DRO_CONTACT_LASTNAME=Support
+export DRO_TLS_CERT_LOCAL_FILE_PATH="${GIT_REPO_HOME}/dro.crt"
 # CP4D variables
 export CPD_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
 export CPD_VERSION=cpd40
-export CPD_PRODUCT_VERSION=4.6.4
-export MAS_CHANNEL=8.11.x
-export MAS_CATALOG_VERSION=v8-231228-amd64
+export CPD_PRODUCT_VERSION=4.8.0
+export MAS_CHANNEL=9.0.x
+export MAS_CATALOG_VERSION=v9-240625-amd64
 if [[ $CLUSTER_TYPE == "aws" ]]; then
   export CPD_PRIMARY_STORAGE_CLASS="ocs-storagecluster-cephfs"
 elif [[ $CLUSTER_TYPE == "azure" ]]; then
   #export CPD_PRIMARY_STORAGE_CLASS="azurefile-premium-new"
   export CPD_PRIMARY_STORAGE_CLASS="azurefiles-premium"
-  export CPD_METADATA_STORAGE_CLASS="managed-premium"
+  export CPD_METADATA_STORAGE_CLASS="managed-csi"
 fi
+#export DRO_STORAGE_CLASS=true
 # DB2WH variables
 export CPD_OPERATORS_NAMESPACE="ibm-cpd-operators-${RANDOM_STR}"
 export CPD_INSTANCE_NAMESPACE="ibm-cpd-${RANDOM_STR}"
@@ -238,12 +254,12 @@ export DB2_TEMP_STORAGE_CLASS=$CPD_PRIMARY_STORAGE_CLASS
 export CPD_SERVICE_NAME="db2wh"
 
 export DB2_INSTANCE_NAME=db2wh-db01
-export DB2_VERSION=11.5.7.0-cn2
+#export DB2_VERSION=11.5.7.0-cn2
 export ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
 # not reqd its hardcoded as db2_namespace: db2u
 export DB2WH_NAMESPACE="cpd-services-${RANDOM_STR}"
 export DB2WH_JDBC_USERNAME="db2inst1"
-# MAS variables
+# MAS variables -uncomment
 export MAS_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
 export IBM_ENTITLEMENT_KEY=$SLS_ENTITLEMENT_KEY
 export MAS_WORKSPACE_ID="wsmasocp"
@@ -253,8 +269,8 @@ export MAS_APP_ID=manage
 export MAS_APPWS_JDBC_BINDING="workspace-application"
 export MAS_JDBC_CERT_LOCAL_FILE=$GIT_REPO_HOME/db.crt
 export MAS_CLOUD_AUTOMATION_VERSION=1.0
-export MAS_DEVOPS_COLLECTION_VERSION=18.3.4
-export MAS_APP_CHANNEL=8.7.x
+export MAS_DEVOPS_COLLECTION_VERSION=20.4.0
+export MAS_APP_CHANNEL=9.0.x
 if [ -z "$EXISTING_NETWORK" ]; then
   export new_or_existing_vpc_subnet="new"
   export enable_permission_quota_check=true
@@ -276,7 +292,7 @@ if [[ -z "$EXISTING_NETWORK" && $CLUSTER_TYPE == "azure" ]]; then
 else
   export INSTALLATION_MODE="UPI"
 fi
-log "==== INSTALLATION MODE: ${INSTALLATION_MODE}"
+
 
 RESP_CODE=0
 
@@ -333,9 +349,9 @@ log " MAS_LICENSE_URL: $MAS_LICENSE_URL"
 log " SLS_URL: $SLS_URL"
 log " SLS_REGISTRATION_KEY: $SLS_REGISTRATION_KEY"
 log " SLS_PUB_CERT_URL: $SLS_PUB_CERT_URL"
-log " UDS_ENDPOINT_URL: $UDS_ENDPOINT_URL"
-log " UDS_API_KEY: $UDS_API_KEY"
-log " UDS_PUB_CERT_URL: $UDS_PUB_CERT_URL"
+log " DRO_ENDPOINT_URL: $DRO_ENDPOINT_URL"
+log " DRO_API_KEY: $DRO_API_KEY"
+log " DRO_PUB_CERT_URL: $DRO_PUB_CERT_URL"
 log " MAS_JDBC_USER: $MAS_JDBC_USER"
 log " MAS_JDBC_URL: $MAS_JDBC_URL"
 log " MAS_JDBC_CERT_URL: $MAS_JDBC_CERT_URL"
@@ -394,10 +410,10 @@ log " KAFKA_NAMESPACE: $KAFKA_NAMESPACE"
 log " KAFKA_CLUSTER_NAME: $KAFKA_CLUSTER_NAME"
 log " KAFKA_CLUSTER_SIZE: $KAFKA_CLUSTER_SIZE"
 log " KAFKA_USER_NAME: $KAFKA_USER_NAME"
-log " UDS_STORAGE_CLASS: $UDS_STORAGE_CLASS"
-log " UDS_CONTACT_EMAIL: $UDS_CONTACT_EMAIL"
-log " UDS_CONTACT_FIRSTNAME: $UDS_CONTACT_FIRSTNAME"
-log " UDS_CONTACT_LASTNAME: $UDS_CONTACT_LASTNAME"
+log " DRO_STORAGE_CLASS: $DRO_STORAGE_CLASS"
+log " DRO_CONTACT_EMAIL: $DRO_CONTACT_EMAIL"
+log " DRO_CONTACT_FIRSTNAME: $DRO_CONTACT_FIRSTNAME"
+log " DRO_CONTACT_LASTNAME: $DRO_CONTACT_LASTNAME"
 log " CPD_PRIMARY_STORAGE_CLASS: $CPD_PRIMARY_STORAGE_CLASS"
 log " CPD_PRODUCT_VERSION: $CPD_PRODUCT_VERSION"
 log " MAS_APP_ID: $MAS_APP_ID"
@@ -418,9 +434,12 @@ if [[ (! -z $EXS_OCP_URL) && (! -z $EXS_OCP_USER) && (! -z $EXS_OCP_PWD) ]]; the
     export OCP_USERNAME=${EXS_OCP_USER}
     export OCP_PASSWORD=${EXS_OCP_PWD}
     if [[ ${EXS_OCP_URL} = *'aroapp'* ]]; then
-      log "EXISTING_CLUSTER is ARO"
       export EXISTING_CLUSTER="ARO"
       log "EXISTING_CLUSTER -  $EXISTING_CLUSTER"
+    else
+       log "EXISTING_CLUSTER is Self managed"
+       export EXISTING_CLUSTER="SELFMANAGED"
+       log "EXISTING_CLUSTER -  $EXISTING_CLUSTER"
     fi
 fi
 

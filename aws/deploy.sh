@@ -2,7 +2,7 @@
 set -e
 
 #validating product type for helper.sh
-validate_prouduct_type
+validate_product_type
 
 # This script will initiate the provisioning process of MAS. It will perform following steps,
 

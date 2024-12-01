@@ -215,7 +215,7 @@ fi
 
 if [[ $CLUSTER_TYPE == "aws" ]]; then
     # Validating product type for helper.sh
-    validate_prouduct_type
+    validate_product_type
 fi
 # Check if MAS license is provided
 if [[ -z $MAS_LICENSE_URL ]]; then

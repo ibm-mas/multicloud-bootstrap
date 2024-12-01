@@ -16,7 +16,7 @@ if [[ ! -n "$VIRTUAL_ENV" ]]; then
 fi
 
 # Check if required python modules are already installed in virtual env
-while IFS= read -r line; do 
+while IFS= read -r line; do
     pip freeze | grep $line
 done < $DEPLOY_HOME/libs_aws/requirements.txt >/dev/null
 
