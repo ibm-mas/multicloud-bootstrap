@@ -380,7 +380,6 @@ log "==== aws/deploy.sh : Invoke db-create-vpc-peer.sh starts ===="
     log "==== aws/deploy.sh : Invoke db-create-vpc-peer.sh ends ===="
 fi
 
-
 log "==== MONGO_USE_EXISTING_INSTANCE = ${MONGO_USE_EXISTING_INSTANCE}"
 if [[ $MONGO_USE_EXISTING_INSTANCE == "true" ]]; then
   if [[ $MONGO_FLAVOR == "Amazon DocumentDB" ]]; then

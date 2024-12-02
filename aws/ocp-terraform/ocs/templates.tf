@@ -45,7 +45,7 @@ metadata:
   labels:
     operators.coreos.com/odf-operator.openshift-storage: ''
 spec:
-  channel: "stable-4.14"
+  channel: "stable-4.12"
   installPlanApproval: Automatic
   name: odf-operator
   source: redhat-operators
@@ -98,24 +98,6 @@ spec:
 EOF
 }
 
-data "template_file" "ocs_gp2_storage_class" {
-  template = <<EOF
----
-kind: StorageClass
-apiVersion: storage.k8s.io/v1
-metadata:
-  name: gp2
-  annotations:
-    storageclass.kubernetes.io/is-default-class: "true"
-provisioner: kubernetes.io/aws-ebs
-parameters:
-  encrypted: "true"
-  type: gp2
-reclaimPolicy: Delete
-allowVolumeExpansion: true
-volumeBindingMode: WaitForFirstConsumer
-EOF
-}
 
 data "template_file" "ocs_storagecluster" {
   template = <<EOF
@@ -123,7 +105,6 @@ apiVersion: ocs.openshift.io/v1
 kind: StorageCluster
 metadata:
   annotations:
-    cluster.ocs.openshift.io/local-devices: 'true'
     uninstall.ocs.openshift.io/cleanup-policy: delete
     uninstall.ocs.openshift.io/mode: graceful
   name: ocs-storagecluster
@@ -131,24 +112,35 @@ metadata:
   finalizers:
     - storagecluster.ocs.openshift.io
 spec:
-    arbiter: {}
-    encryption:
-      kms: {}
-    externalStorage: {}
-    managedResources:
-      cephBlockPools: {}
-      cephCluster: {}
-      cephConfig: {}
-      cephDashboard: {}
-      cephFilesystems: {}
-      cephNonResilientPools: {}
-      cephObjectStoreUsers: {}
-      cephObjectStores: {}
-      cephToolbox: {}
-    mirroring: {}
-    multiCloudGateway:
-      dbStorageClassName: gp2
-      reconcileStrategy: standalone
+  encryption:
+    enable: true
+  externalStorage: {}
+  managedResources:
+    cephBlockPools: {}
+    cephFilesystems: {}
+    cephObjectStoreUsers: {}
+    cephObjectStores: {}
+  storageDeviceSets:
+    - config: {}
+      count: 1
+      dataPVCTemplate:
+        metadata:
+          creationTimestamp: null
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 1Ti
+          storageClassName: gp2
+          volumeMode: Block
+        status: {}
+      name: ocs-deviceset-gp2
+      placement: {}
+      portable: true
+      replica: 3
+      resources: {}
+  version: 4.12.0
 EOF
 }
 
