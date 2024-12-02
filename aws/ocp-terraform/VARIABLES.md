@@ -45,12 +45,12 @@
 | `worker_instance_volume_iops` | Requires input | Volume iops value for worker instance. |
 | `worker_instance_volume_size` | Requires input | Volume size for worker instance. |
 | `worker_instance_volume_type` | Requires input | Volume type for worker instance. |
-| `worker_replica_count` | 3 | The desired capacity for the OpenShift worker node instances. Minimum of `3` nodes required. To decide on the number of worker nodes needed check `Resource Requirements for each service` section in [here](../README.md) |
+| `worker_replica_count` | 1 | The desired capacity for the OpenShift worker node instances. Minimum of `3` nodes required. To decide on the number of worker nodes needed check `Resource Requirements for each service` section in [here](../README.md) |
 | `master_instance_type` | m5.2xlarge | The EC2 instance type for the OpenShift master instances. Make sure your region supports the selected instance type.  Supported worker instance types [here](./INSTANCE-TYPES.md) |
 | `master_instance_volume_iops` | Requires input | Volume iops value for master instance. |
 | `master_instance_volume_size` | Requires input | Volume size for master instance. |
 | `master_instance_volume_type` | Requires input | Volume type for master instance. |
-| `master_replica_count` | 3 | The desired capacity for the OpenShift master node instances. Minimum of `3` nodes required. To decide on the number of master nodes needed check `Resource Requirements for each service` section in [here](../README.md) |
+| `master_replica_count` | 1 | The desired capacity for the OpenShift master node instances. Minimum of `3` nodes required. To decide on the number of master nodes needed check `Resource Requirements for each service` section in [here](../README.md) |
 | `cluster_network_cidr` | 10.128.0.0/14 | The CIDR block for the Openshift cluster overlay network cidr to be created. |
 | `cluster_network_host_prefix` | 23 | Host prefix for the cluster network. |
 | `service_network_cidr` | 172.30.0.0/16 | The CIDR cidr block for Openshift cluster  services |
