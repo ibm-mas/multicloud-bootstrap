@@ -1,0 +1,117 @@
+apiVersion: prereq.isf.ibm.com/v1
+kind: SpectrumFusion
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"prereq.isf.ibm.com/v1","kind":"SpectrumFusion","metadata":{"annotations":{},"creationTimestamp":"2024-12-03T03:23:43Z","generation":1,"managedFields":[{"apiVersion":"prereq.isf.ibm.com/v1","fieldsType":"FieldsV1","fieldsV1":{"f:spec":{".":{},"f:license":{".":{},"f:accept":{}}}},"manager":"Mozilla","operation":"Update","time":"2024-12-03T03:23:43Z"},{"apiVersion":"prereq.isf.ibm.com/v1","fieldsType":"FieldsV1","fieldsV1":{"f:status":{".":{},"f:DataProtectionStatus":{".":{},"f:ServiceEnabled":{},"f:isDeployable":{},"f:isSupported":{},"f:isUpgradeFailed":{},"f:isUpgradeInProgress":{},"f:upgradeAvailable":{}},"f:GlobalDataPlatformStatus":{".":{},"f:ServiceEnabled":{},"f:isCRCRendered":{},"f:isDeployable":{},"f:isMachineConfigRendered":{},"f:isSupported":{},"f:isUpgradeFailed":{},"f:isUpgradeInProgress":{},"f:upgradeAvailable":{}},"f:OpenShiftDataFoundationStatus":{".":{},"f:ServiceEnabled":{},"f:isDeployable":{},"f:isSupported":{},"f:isUpgradeFailed":{},"f:isUpgradeInProgress":{},"f:upgradeAvailable":{}},"f:isfVersion":{},"f:platform":{},"f:status":{}}},"manager":"manager","operation":"Update","subresource":"status","time":"2024-12-03T03:23:45Z"}],"name":"tesspectrumfusion2","namespace":"ibm-spectrum-fusion-ns","resourceVersion":"98711","uid":"315e94dd-3c41-45d4-b80c-8b1a3d299884"},"spec":{"DataProtection":{"Enable":false},"GlobalDataPlatform":{"Enable":false},"OpenShiftDataFoundation":{"AutoUpgrade":false,"Enable":false},"configuration":{"services":{}},"license":{"accept":true}},"status":{"DataProtectionStatus":{"ServiceEnabled":false,"isDeployable":false,"isSupported":false,"isUpgradeFailed":false,"isUpgradeInProgress":false,"upgradeAvailable":false},"GlobalDataPlatformStatus":{"ServiceEnabled":false,"isCRCRendered":false,"isDeployable":false,"isMachineConfigRendered":false,"isSupported":false,"isUpgradeFailed":false,"isUpgradeInProgress":false,"upgradeAvailable":false},"OpenShiftDataFoundationStatus":{"ServiceEnabled":false,"isDeployable":false,"isSupported":false,"isUpgradeFailed":false,"isUpgradeInProgress":false,"upgradeAvailable":false},"isfVersion":"2.7.2","platform":"AWS","status":"Completed"}}
+  creationTimestamp: '2024-12-03T04:13:28Z'
+  generation: 1
+  managedFields:
+    - apiVersion: prereq.isf.ibm.com/v1
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:metadata':
+          'f:annotations':
+            .: {}
+            'f:kubectl.kubernetes.io/last-applied-configuration': {}
+        'f:spec':
+          .: {}
+          'f:DataProtection':
+            .: {}
+            'f:Enable': {}
+          'f:GlobalDataPlatform':
+            .: {}
+            'f:Enable': {}
+          'f:OpenShiftDataFoundation':
+            .: {}
+            'f:AutoUpgrade': {}
+            'f:Enable': {}
+          'f:configuration':
+            .: {}
+            'f:services': {}
+          'f:license':
+            .: {}
+            'f:accept': {}
+      manager: kubectl-client-side-apply
+      operation: Update
+      time: '2024-12-03T04:13:28Z'
+    - apiVersion: prereq.isf.ibm.com/v1
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:status':
+          .: {}
+          'f:DataProtectionStatus':
+            .: {}
+            'f:ServiceEnabled': {}
+            'f:isDeployable': {}
+            'f:isSupported': {}
+            'f:isUpgradeFailed': {}
+            'f:isUpgradeInProgress': {}
+            'f:upgradeAvailable': {}
+          'f:GlobalDataPlatformStatus':
+            'f:isMachineConfigRendered': {}
+            'f:ServiceEnabled': {}
+            'f:upgradeAvailable': {}
+            'f:isCRCRendered': {}
+            .: {}
+            'f:isUpgradeInProgress': {}
+            'f:isSupported': {}
+            'f:isUpgradeFailed': {}
+            'f:isDeployable': {}
+          'f:OpenShiftDataFoundationStatus':
+            .: {}
+            'f:ServiceEnabled': {}
+            'f:isDeployable': {}
+            'f:isSupported': {}
+            'f:isUpgradeFailed': {}
+            'f:isUpgradeInProgress': {}
+            'f:upgradeAvailable': {}
+          'f:isfVersion': {}
+          'f:platform': {}
+          'f:status': {}
+      manager: manager
+      operation: Update
+      subresource: status
+      time: '2024-12-03T04:13:28Z'
+  name: spectrumfusioninst
+  namespace: ibm-spectrum-fusion-ns
+  resourceVersion: '139095'
+  uid: 92089e81-670a-4e29-9574-5e5a744635d4
+spec:
+  DataProtection:
+    Enable: false
+  GlobalDataPlatform:
+    Enable: false
+  OpenShiftDataFoundation:
+    AutoUpgrade: false
+    Enable: false
+  configuration:
+    services: {}
+  license:
+    accept: true
+status:
+  DataProtectionStatus:
+    ServiceEnabled: false
+    isDeployable: false
+    isSupported: false
+    isUpgradeFailed: false
+    isUpgradeInProgress: false
+    upgradeAvailable: false
+  GlobalDataPlatformStatus:
+    ServiceEnabled: false
+    isCRCRendered: false
+    isDeployable: false
+    isMachineConfigRendered: false
+    isSupported: false
+    isUpgradeFailed: false
+    isUpgradeInProgress: false
+    upgradeAvailable: false
+  OpenShiftDataFoundationStatus:
+    ServiceEnabled: false
+    isDeployable: false
+    isSupported: false
+    isUpgradeFailed: false
+    isUpgradeInProgress: false
+    upgradeAvailable: false
+  platform: AWS
+  status: Completed

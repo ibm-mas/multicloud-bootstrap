@@ -299,6 +299,8 @@ echo "Sleeping for 5mins"
 sleep 300
 fi
 
+oc apply -f $GIT_REPO_HOME/aws/ocp-terraform/ocs/CreateSpectrumFusion.yaml
+
 ## Configure OCP cluster
 log "==== OCP cluster configuration (Cert Manager) started ===="
 cd $GIT_REPO_HOME/../ibm/mas_devops/playbooks
