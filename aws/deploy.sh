@@ -299,6 +299,8 @@ echo "Sleeping for 5mins"
 sleep 300
 fi
 
+echo "Create spectrum fusion instance"
+LOGFILE=/tmp/CreateSpectrumFusion.log
 oc apply -f $GIT_REPO_HOME/aws/ocp-terraform/ocs/CreateSpectrumFusion.yaml
 
 ## Configure OCP cluster
