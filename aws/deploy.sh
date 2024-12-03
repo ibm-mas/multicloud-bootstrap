@@ -300,8 +300,8 @@ sleep 300
 fi
 
 echo "Create spectrum fusion instance"
-LOGFILE=/tmp/CreateSpectrumFusion.log
-oc apply -f $GIT_REPO_HOME/aws/ocp-terraform/ocs/CreateSpectrumFusion.yaml
+#LOGFILE=/tmp/CreateSpectrumFusion.log
+#oc apply -f $GIT_REPO_HOME/aws/ocp-terraform/ocs/CreateSpectrumFusion.yaml
 
 ## Configure OCP cluster
 log "==== OCP cluster configuration (Cert Manager) started ===="
