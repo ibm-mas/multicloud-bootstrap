@@ -65,6 +65,8 @@ pip3 install ansible==5.7.1
 pip3 install openshift
 ansible-galaxy collection install community.kubernetes
 
+pip install mas-devops
+
 # Install CloudWatch agent
 cd /tmp
 wget https://s3.amazonaws.com/amazoncloudwatch-agent/redhat/amd64/latest/amazon-cloudwatch-agent.rpm
