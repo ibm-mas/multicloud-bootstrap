@@ -65,6 +65,8 @@ pip3 install ansible==5.7.1
 pip3 install openshift
 ansible-galaxy collection install community.kubernetes
 
+# Python for Maximo Application Suite Dev/Ops
+echo "Installing Python for Maximo Application Suite Dev/Ops"
 pip install mas-devops
 
 # Install CloudWatch agent
