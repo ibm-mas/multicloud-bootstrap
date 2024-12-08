@@ -70,14 +70,8 @@ def resource_validation_check(service_quotas, service_code, quota_code,
                               resources_used, resources_required):
 
     quota_value = 0.0
-    # --> S3 Service Quoata: "L-DC2B2D3D" - "Buckets"
-    #     since Buckets are tied to the Account
-    if service_code == 's3' and quota_code == 'L-DC2B2D3D':
-        quota_value = service_quotas[service_code][quota_code]['Value']
-        print(f"  quota_value in IF condition : {quota_value}")
-    else:
-        quota_value = service_quotas[service_code][quota_code]['RegionValue']
-        print(f"  quota_value in ELSE condition : {quota_value}")
+
+    quota_value = service_quotas[service_code][quota_code]['RegionValue']
     resources_available = quota_value - resources_used
     service_quotas[service_code][quota_code]['ResourcesAvailable'] = resources_available
     service_quotas[service_code][quota_code]['ResourcesRequired'] = resources_required
@@ -310,12 +304,6 @@ def main():
                               elb_quota_code_classic_load_balancers,
                               elb_used, elb_required)
 
-    ## S3 resouces usage counts
-    ### S3 buckets
-    s3_buckets_used = s3_helper.get_num_buckets()
-    s3_required = ocp['s3-buckets']
-    resource_validation_check(sq, 's3', s3_quota_code_buckets,
-                              s3_buckets_used, s3_required)
 
     print('\nService quotas + currently used resources:')
     print('==========================================\n')
