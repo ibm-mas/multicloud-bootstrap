@@ -70,8 +70,12 @@ def resource_validation_check(service_quotas, service_code, quota_code,
                               resources_used, resources_required):
 
     quota_value = 0.0
-
-    quota_value = service_quotas[service_code][quota_code]['RegionValue']
+    # --> S3 Service Quoata: "L-DC2B2D3D" - "Buckets"
+    #     since Buckets are tied to the Account
+    if service_code == 's3' and quota_code == 'L-DC2B2D3D':
+        quota_value = service_quotas[service_code][quota_code]['Value']
+    else:
+        quota_value = service_quotas[service_code][quota_code]['RegionValue']
     resources_available = quota_value - resources_used
     service_quotas[service_code][quota_code]['ResourcesAvailable'] = resources_available
     service_quotas[service_code][quota_code]['ResourcesRequired'] = resources_required
@@ -157,6 +161,16 @@ def main():
         sq['elasticloadbalancing'][quota_code]['Scope'] = 'Region'
         sq['elasticloadbalancing'][quota_code]['DisplayServiceCode'] = 'ELB'
 
+    # enrich S3 service quotas
+    s3_quota_code_buckets = get_quota_code_by_name_pattern(
+                                            's3',
+                                            'Buckets',
+                                            service_quotas_to_be_validated)
+    sq['s3'][s3_quota_code_buckets]['Scope'] = 'Account'
+    # Since Buckets are tied to the Account - need to unset 'RegionValue'
+    sq['s3'][s3_quota_code_buckets]['RegionValue'] = ''
+    for quota_code in  sq['s3']:
+        sq['s3'][quota_code]['DisplayServiceCode'] = 'S3'
 
     # VPC Gateway - service quotas
     ## To be done
@@ -294,6 +308,12 @@ def main():
                               elb_quota_code_classic_load_balancers,
                               elb_used, elb_required)
 
+    ## S3 resouces usage counts
+    ### S3 buckets
+    s3_buckets_used = s3_helper.get_num_buckets()
+    s3_required = ocp['s3-buckets']
+    resource_validation_check(sq, 's3', s3_quota_code_buckets,
+                              s3_buckets_used, s3_required)
 
     print('\nService quotas + currently used resources:')
     print('==========================================\n')
