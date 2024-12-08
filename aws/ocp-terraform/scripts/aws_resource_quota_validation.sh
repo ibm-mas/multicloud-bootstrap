@@ -33,4 +33,4 @@ else
 fi
 
 # Run the python program itself
-#python $DEPLOY_HOME/aws_resource_quota_validation.py
+python $DEPLOY_HOME/aws_resource_quota_validation.py
