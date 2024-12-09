@@ -91,6 +91,7 @@ metadata:
   namespace: ibm-spectrum-fusion-ns
 spec:
   channel: v2.0
+  version: 2.8.1
   installPlanApproval: Automatic
   name: isf-operator
   source: ibm-operator-catalog
