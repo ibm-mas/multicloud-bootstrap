@@ -95,6 +95,7 @@ spec:
   name: isf-operator
   source: ibm-operator-catalog
   sourceNamespace: openshift-marketplace
+  startingCSV: isf-operator.v2.8.1
 EOF
 }
 
