@@ -38,7 +38,7 @@ s3bucket_used=$(aws s3api list-buckets --query "Buckets | length(@)" --output te
 # Echo the number of s3 buckets used
 echo "Number of S3 buckets used: $s3bucket_used"
 
-if [ "$s3bucket_used" -gt 30 ]; then
+if [ "$s3bucket_used" -gt 10000 ]; then
     echo "Number of s3 buckets exceeds 10000. Exiting..."
     exit 1
 fi
