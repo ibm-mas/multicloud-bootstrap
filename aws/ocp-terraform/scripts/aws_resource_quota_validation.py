@@ -297,12 +297,6 @@ def main():
                               elb_quota_code_classic_load_balancers,
                               elb_used, elb_required)
 
-    ## S3 resouces usage counts
-    ### S3 buckets
-    s3_buckets_used = s3_helper.get_num_buckets()
-    s3_required = ocp['s3-buckets']
-    resource_validation_check(sq, 's3', s3_quota_code_buckets,
-                              s3_buckets_used, s3_required)
 
     print('\nService quotas + currently used resources:')
     print('==========================================\n')
