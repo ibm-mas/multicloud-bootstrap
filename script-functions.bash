@@ -38,13 +38,13 @@ checkROSA(){
       log " ROSA Cluster "
       currentOpenshiftVersion=$(oc get clusterversion | awk  'NR==2 {print $2 }')
       log " OCP version is $currentOpenshiftVersion"
-      if [[ $currentOpenshiftVersion =~ ${op_versions[rosaVersion412]} ]]; then
+      if [[ $currentOpenshiftVersion =~ ${op_versions[rosaVersion414]} ]]; then
           log " ROSA Cluster Supported Version"
-        elif [[ $currentOpenshiftVersion =~ ${op_versions[rosaVersion414]} ]]; then
+        elif [[ $currentOpenshiftVersion =~ ${op_versions[rosaVersion415]} ]]; then
           log " ROSA Cluster Supported Version"
         else
-          log " Unsupported ROSA version $currentOpenshiftVersion. Supported ROSA versions are 4.12.x and 4.14.x"
-        export SERVICE_NAME=" Unsupported ROSA version $currentOpenshiftVersion. Supported ROSA versions are 4.12.x and 4.14.x"
+          log " Unsupported ROSA version $currentOpenshiftVersion. Supported ROSA versions are 4.14.x and 4.15.x"
+        export SERVICE_NAME=" Unsupported ROSA version $currentOpenshiftVersion. Supported ROSA versions are 4.14.x and 4.15.x"
         SCRIPT_STATUS=29
         return $SCRIPT_STATUS
        fi
