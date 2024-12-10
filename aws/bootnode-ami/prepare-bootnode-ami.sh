@@ -1,8 +1,9 @@
 #!/bin/bash
 set -e
 
-# This script should be executed on the Red Hat 8 instance before creating AMI from it.
-# The created AMI will be used to create Bootnode instance for MAS provisioning.# Remove unnecessary packages# Update all packages to latest
+# This script should be executed on the Red Hat Enterprise Linux 9 (HVM) EC2 instance before creating AMI from it.
+# Once this script runs successfully, stop the EC2 instance & then create the AMI out of it.
+# The created AMI will be used in CFT file to create Bootnode instance for MAS provisioning.
 # Remove unnecessary packages
 dnf -y remove polkit
 
