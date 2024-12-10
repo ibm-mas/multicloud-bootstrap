@@ -9,8 +9,9 @@ op_versions['MongoDBCommunity']=4.1.9
 op_versions['Db2uCluster']=11.4
 op_versions['kafkas.kafka.strimzi.io']=2.4.9
 op_versions['ocpVersion414']='^4\.([1][4])?(\.[0-9][0-9]+.*)*$'
-op_versions['rosaVersion412']='^4\.([1][2])?(\.[0-9]+.*)*$'
+op_versions['ocpVersion415']='^4\.([1][5])?(\.[0-9][0-9]+.*)*$'
 op_versions['rosaVersion414']='^4\.([1][4])?(\.[0-9]+.*)*$'
+op_versions['rosaVersion415']='^4\.([1][5])?(\.[0-9]+.*)*$'
 op_versions['cpd-platform-operator']=2.0.7
 op_versions['user-data-services-operator']=2.0.6
 op_versions['ibm-cert-manager-operator']=3.19.9
@@ -37,13 +38,13 @@ checkROSA(){
       log " ROSA Cluster "
       currentOpenshiftVersion=$(oc get clusterversion | awk  'NR==2 {print $2 }')
       log " OCP version is $currentOpenshiftVersion"
-      if [[ $currentOpenshiftVersion =~ ${op_versions[rosaVersion412]} ]]; then
+      if [[ $currentOpenshiftVersion =~ ${op_versions[rosaVersion414]} ]]; then
           log " ROSA Cluster Supported Version"
-        elif [[ $currentOpenshiftVersion =~ ${op_versions[rosaVersion414]} ]]; then
+        elif [[ $currentOpenshiftVersion =~ ${op_versions[rosaVersion415]} ]]; then
           log " ROSA Cluster Supported Version"
         else
-          log " Unsupported ROSA version $currentOpenshiftVersion. Supported ROSA versions are 4.12.x and 4.14.x"
-        export SERVICE_NAME=" Unsupported ROSA version $currentOpenshiftVersion. Supported ROSA versions are 4.12.x and 4.14.x"
+          log " Unsupported ROSA version $currentOpenshiftVersion. Supported ROSA versions are 4.14.x and 4.15.x"
+        export SERVICE_NAME=" Unsupported ROSA version $currentOpenshiftVersion. Supported ROSA versions are 4.14.x and 4.15.x"
         SCRIPT_STATUS=29
         return $SCRIPT_STATUS
        fi
@@ -65,21 +66,14 @@ function getOCPVersion() {
   log " OCP version is $currentOpenshiftVersion"
     if [[ ${currentOpenshiftVersion} =~ ${op_versions[ocpVersion414]} ]]; then
       log " OCP Supported Version"
-  elif [[ ${currentOpenshiftVersion} =~ ${op_versions[ocpVersion411]} ]]; then
-    log " OCP Version Not Supported"
-    #log " DEPLOY_CP4D: $DEPLOY_CP4D"
-    #if [[ $DEPLOY_CP4D == "true" ]]; then
-      SCRIPT_STATUS=29
-      export SERVICE_NAME=" MAS+CP4D offering is not supported on OCP 4.11.x"
-      return $SCRIPT_STATUS
-    #fi
-
+    elif [[ ${currentOpenshiftVersion} =~ ${op_versions[ocpVersion415]} ]]; then
+      log " OCP Supported Version"
     else
-      log " Unsupported Openshift version $currentOpenshiftVersion. Supported OpenShift version is 4.12.x"
-    export SERVICE_NAME=" Unsupported Openshift version $currentOpenshiftVersion. Supported OpenShift versions is 4.12.x"
+      log " Unsupported OCP version $currentOpenshiftVersion. Supported OCP versions are 4.14.x and 4.15.x"
+    export SERVICE_NAME=" Unsupported OCP version $currentOpenshiftVersion. Supported OCP versions are 4.14.x and 4.15.x"
     SCRIPT_STATUS=29
     return $SCRIPT_STATUS
-   fi
+    fi
 }
 
 function getWorkerNodeDetails(){
