@@ -66,21 +66,14 @@ function getOCPVersion() {
   log " OCP version is $currentOpenshiftVersion"
     if [[ ${currentOpenshiftVersion} =~ ${op_versions[ocpVersion414]} ]]; then
       log " OCP Supported Version"
-  elif [[ ${currentOpenshiftVersion} =~ ${op_versions[ocpVersion411]} ]]; then
-    log " OCP Version Not Supported"
-    #log " DEPLOY_CP4D: $DEPLOY_CP4D"
-    #if [[ $DEPLOY_CP4D == "true" ]]; then
-      SCRIPT_STATUS=29
-      export SERVICE_NAME=" MAS+CP4D offering is not supported on OCP 4.11.x"
-      return $SCRIPT_STATUS
-    #fi
-
+    elif [[ ${currentOpenshiftVersion} =~ ${op_versions[ocpVersion415]} ]]; then
+      log " OCP Supported Version"
     else
-      log " Unsupported Openshift version $currentOpenshiftVersion. Supported OpenShift version is 4.12.x"
-    export SERVICE_NAME=" Unsupported Openshift version $currentOpenshiftVersion. Supported OpenShift versions is 4.12.x"
+      log " Unsupported OCP version $currentOpenshiftVersion. Supported OCP versions are 4.14.x and 4.15.x"
+    export SERVICE_NAME=" Unsupported OCP version $currentOpenshiftVersion. Supported OCP versions are 4.12.x and 4.15.x"
     SCRIPT_STATUS=29
     return $SCRIPT_STATUS
-   fi
+    fi
 }
 
 function getWorkerNodeDetails(){
