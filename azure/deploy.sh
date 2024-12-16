@@ -205,7 +205,6 @@ log "==== OCP cluster configuration (Cert Manager) started ===="
 cd $GIT_REPO_HOME
 set +e
 export ROLE_NAME=ibm_catalogs && ansible-playbook ibm.mas_devops.run_role
-export ROLE_NAME=common_services && ansible-playbook ibm.mas_devops.run_role
 export ROLE_NAME=cert_manager && ansible-playbook ibm.mas_devops.run_role
 if [[ $? -ne 0 ]]; then
   # One reason for this failure is catalog sources not having required state information, so recreate the catalog-operator pod
@@ -217,7 +216,6 @@ if [[ $? -ne 0 ]]; then
   sleep 10
   # Retry the step
   export ROLE_NAME=ibm_catalogs && ansible-playbook ibm.mas_devops.run_role
-  export ROLE_NAME=common_services && ansible-playbook ibm.mas_devops.run_role
   export ROLE_NAME=cert_manager && ansible-playbook ibm.mas_devops.run_role
   retcode=$?
   if [[ $retcode -ne 0 ]]; then
