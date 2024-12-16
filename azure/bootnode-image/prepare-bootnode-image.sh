@@ -49,7 +49,7 @@ ln -s --force /usr/bin/python3.9 /usr/bin/python3
 ln -s --force /usr/bin/pip3.9 /usr/bin/pip3
 
 #Install openshift-install 4.14.26
-wget "https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/4.14.26/openshift-client-linux.tar.gz"
+wget "https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/4.15.39/openshift-client-linux.tar.gz"
 tar -xvf openshift-client-linux.tar.gz
 chmod u+x oc kubectl
 mv -f oc /usr/local/bin
@@ -58,12 +58,12 @@ oc version
 rm -rf openshift-client-linux.tar.gz
 
 ## Download the  Openshift CLI and move to /usr/local/bin
-wget "https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/4.14.26/openshift-install-linux-4.14.26.tar.gz"
-tar -xvf openshift-install-linux-4.14.26.tar.gz
+wget "https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/4.15.39/openshift-install-linux-4.15.39.tar.gz"
+tar -xvf openshift-install-linux-4.15.39.tar.gz
 chmod u+x openshift-install
 mv -f openshift-install /usr/local/bin
 openshift-install version
-rm -rf openshift-install-linux-4.14.26.tar.gz
+rm -rf openshift-install-linux-4.15.39.tar.gz
 
 # Install Azure cli for rhel9
 rpm --import https://packages.microsoft.com/keys/microsoft.asc
