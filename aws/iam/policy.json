@@ -24,6 +24,7 @@
                 "ec2:DetachInternetGateway",
                 "ec2:DisassociateRouteTable",
                 "ec2:GetEbsDefaultKmsKeyId",
+                "ec2:GetConsoleOutput",
                 "ec2:Modify*",
                 "ec2:ReleaseAddress",
                 "ec2:ReplaceRouteTableAssociation",
