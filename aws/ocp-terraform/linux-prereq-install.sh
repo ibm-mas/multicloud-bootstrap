@@ -20,8 +20,8 @@ mv jq /usr/local/bin
 
 ## Download Openshift CLI and move to /usr/local/bin
 
-#Install openshift-install 4.14.26
-wget "https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/4.14.26/openshift-client-linux.tar.gz"
+#Install openshift-install 4.15.39
+wget "https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/4.15.39/openshift-client-linux.tar.gz"
 tar -xvf openshift-client-linux.tar.gz
 chmod u+x oc kubectl
 mv -f oc /usr/local/bin
