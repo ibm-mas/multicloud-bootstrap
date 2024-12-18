@@ -47,7 +47,7 @@ def get_terraform_configuration(tf_var_file):
     ## storage-type == 'ocs' --> 3 additional OCS worker nodes are deployed
     # if tf_config['storage_type'] == 'ocs':
     #     tf_config['replica_count']['worker'] = tf_config['replica_count']['worker'] + 3
-    ## storage-type == 'portworx' --> 1 additional worker node added by cluster auto-scaler 
+    ## storage-type == 'portworx' --> 1 additional worker node added by cluster auto-scaler
     # <Femi: Commenting this out since autoscaler is disabled>
     # if tf_config['storage_type'] == 'portworx':
     #     tf_config['replica_count']['worker'] = tf_config['replica_count']['worker'] + 1
@@ -93,7 +93,7 @@ def get_quota_code_by_name_pattern(service_code, quota_name_pattern,
     return qc
 
 def main():
-    
+
     # Get resource related values from terraform config variables file
     tf_var_file = os.path.dirname(os.path.abspath(__file__)) + '/../variables.tf'
     tf_config = get_terraform_configuration(tf_var_file)
@@ -160,17 +160,6 @@ def main():
     for quota_code in sq['elasticloadbalancing']:
         sq['elasticloadbalancing'][quota_code]['Scope'] = 'Region'
         sq['elasticloadbalancing'][quota_code]['DisplayServiceCode'] = 'ELB'
-
-    # enrich S3 service quotas
-    s3_quota_code_buckets = get_quota_code_by_name_pattern(
-                                            's3',
-                                            'Buckets',
-                                            service_quotas_to_be_validated)
-    sq['s3'][s3_quota_code_buckets]['Scope'] = 'Account'
-    # Since Buckets are tied to the Account - need to unset 'RegionValue'
-    sq['s3'][s3_quota_code_buckets]['RegionValue'] = ''
-    for quota_code in  sq['s3']:
-        sq['s3'][quota_code]['DisplayServiceCode'] = 'S3'
 
     # VPC Gateway - service quotas
     ## To be done
@@ -308,12 +297,6 @@ def main():
                               elb_quota_code_classic_load_balancers,
                               elb_used, elb_required)
 
-    ## S3 resouces usage counts
-    ### S3 buckets
-    s3_buckets_used = s3_helper.get_num_buckets()
-    s3_required = ocp['s3-buckets']
-    resource_validation_check(sq, 's3', s3_quota_code_buckets,
-                              s3_buckets_used, s3_required)
 
     print('\nService quotas + currently used resources:')
     print('==========================================\n')

@@ -1,8 +1,9 @@
 #!/bin/bash
 set -e
 
-# This script should be executed on the Red Hat 8 instance before creating AMI from it.
-# The created AMI will be used to create Bootnode instance for MAS provisioning.# Remove unnecessary packages# Update all packages to latest
+# This script should be executed on the Red Hat Enterprise Linux 9 (HVM) EC2 instance before creating AMI from it.
+# Once this script runs successfully, stop the EC2 instance & then create the AMI out of it.
+# The created AMI will be used in CFT file to create Bootnode instance for MAS provisioning.
 # Remove unnecessary packages
 dnf -y remove polkit
 
@@ -42,8 +43,8 @@ mv -f jq /usr/local/bin
 
 ## Download Openshift CLI and move to /usr/local/bin
 
-#Install openshift-install 4.14.26
-wget "https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/4.14.26/openshift-client-linux.tar.gz"
+#Install openshift-install 4.15.39
+wget "https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/4.15.39/openshift-client-linux.tar.gz"
 tar -xvf openshift-client-linux.tar.gz
 chmod u+x oc kubectl
 mv -f oc /usr/local/bin
@@ -61,9 +62,13 @@ terraform version
 rm -rf terraform_${TERRAFORM_VER}_linux_amd64.zip
 
 ## Install Ansible
-pip3 install ansible==4.9.0
+pip3 install ansible==5.7.1
 pip3 install openshift
 ansible-galaxy collection install community.kubernetes
+
+# Python for Maximo Application Suite Dev/Ops
+echo "Installing Python for Maximo Application Suite Dev/Ops"
+pip install mas-devops
 
 # Install CloudWatch agent
 cd /tmp
