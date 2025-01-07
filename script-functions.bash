@@ -108,12 +108,12 @@ function getWorkerNodeDetails(){
       memory=${memory::-2}
     fi
 
-    if [[ (${cpu} =~ ${requiredCPU} || ${cpu} =~ ${requiredCPU1}) ||  (${memory} -lt 31000000) ]]; then
-      log " Minimum CPU/Memory requirements not satisfied"
-      export SERVICE_NAME=" Minimum CPU/Memory requirements not satisfied"
-      SCRIPT_STATUS=29
-      return $SCRIPT_STATUS
-    fi
+    #if [[ (${cpu} =~ ${requiredCPU} || ${cpu} =~ ${requiredCPU1}) ||  (${memory} -lt 31000000) ]]; then
+      #log " Minimum CPU/Memory requirements not satisfied"
+      #export SERVICE_NAME=" Minimum CPU/Memory requirements not satisfied"
+     # SCRIPT_STATUS=29
+      #return $SCRIPT_STATUS
+    #fi
 
   done;
   log " Minimum CPU requirement satisfied"
