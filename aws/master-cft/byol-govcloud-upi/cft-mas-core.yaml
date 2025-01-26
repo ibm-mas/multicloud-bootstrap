@@ -272,8 +272,6 @@ Mappings:
       HVM64: ami-0ee5b1f249fc72e4a
     us-gov-east-1:
       HVM64: ami-0a1fc6fd9b7b87dbc
-    us-east-1:
-      HVM64: ami-01a919f8300daf0ac
 Resources:
   DeployWaitConditionHandle:
     Type: AWS::CloudFormation::WaitConditionHandle
