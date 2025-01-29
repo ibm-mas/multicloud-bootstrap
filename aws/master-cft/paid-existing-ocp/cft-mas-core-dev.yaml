@@ -288,46 +288,41 @@ Metadata:
 Mappings:
   RegionMap:
     us-east-1:
-      HVM64: ami-028c3019ed25237a4
+      HVM64: ami-0372dc998983a093b
+    us-gov-west-1:
+      HVM64: ami-09d9219d40b1ad007
+    us-gov-east-1:
+      HVM64: ami-097a63521225bdda8
     us-east-2:
-      HVM64: ami-0da4f91ded4bac1bd
+      HVM64: ami-068172d7e4abfb483
     us-west-2:
-      HVM64: ami-0d6ac2d0246b8f646
-    ap-east-1:
-      HVM64: ami-05b4d16ec6412d429
-    ap-southeast-1:
-      HVM64: ami-0e084c2cc29ec1720
-    ap-southeast-2:
-      HVM64: ami-093254aff333dcfe3
-    ap-northeast-1:
-      HVM64: ami-0786a7bec0e143591
-    eu-central-1:
-      HVM64: ami-09fbeb232efd55c04
-    ap-south-1:
-      HVM64: ami-09ee06d85c3bf30f9
-    ap-northeast-2:
-      HVM64: ami-0b5a78be9ec85d01b
-    ap-northeast-3:
-      HVM64: ami-0d96abb825f3fc970
+      HVM64: ami-0ef935a2983784124
     ca-central-1:
-      HVM64: ami-05de5e08f0f2ebd49
-    eu-south-1:
-      HVM64: ami-045e0d5842edd2162
+      HVM64: ami-0502c1e757967bbc9
+    eu-central-1:
+      HVM64: ami-07c59f25dcc0ea8b8
     eu-west-1:
-      HVM64: ami-0eead16d37ab73f41
+      HVM64: ami-0ebe38e355ec6bb04
     eu-west-2:
-      HVM64: ami-0b91a33eb29e0b111
+      HVM64: ami-01506b73347d815ef
     eu-west-3:
-      HVM64: ami-07701973de476bf5c
-    eu-north-1:
-      HVM64: ami-0a58f0bb290790019
-    af-south-1:
-      HVM64: ami-051f9c6d45b88f721
-    me-south-1:
-      HVM64: ami-0872ea1a62d5925b8
+      HVM64: ami-0ca75a1e19ae0e5e6
+    ap-southeast-1:
+      HVM64: ami-04d62aa6f9531a6a6
+    ap-southeast-2:
+      HVM64: ami-01af574d71cd862ee
+    ap-south-1:
+      HVM64: ami-0e00c82a163cd1b5e
+    ap-northeast-1:
+      HVM64: ami-0c4e974285a7447e9
+    ap-northeast-2:
+      HVM64: ami-039c78d18aec69424
+    ap-northeast-3:
+      HVM64: ami-00fafb94ceb9ef0fa
     sa-east-1:
-      HVM64: ami-02db20519b43317bb
-
+      HVM64: ami-042347b9430b6c2de
+    eu-north-1:
+      HVM64: ami-03f69beb98217dbd6
 Resources:
   DeployWaitConditionHandle:
     Type: 'AWS::CloudFormation::WaitConditionHandle'
