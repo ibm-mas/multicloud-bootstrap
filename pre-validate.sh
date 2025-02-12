@@ -28,6 +28,7 @@ if [[ $found == true ]]; then
 else
     log "ERROR: Supported region = FAIL"
     SCRIPT_STATUS=11
+    exit $SCRIPT_STATUS
 fi
 
 # Check if ER key is valid
