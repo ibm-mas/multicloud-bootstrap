@@ -92,7 +92,7 @@ mark_provisioning_failed() {
   elif [[ $retcode -eq 11 ]]; then
     export STATUS_MSG="This region is not supported for MAS deployment. Please try deployment in the supported regions."
   elif [[ $retcode -eq 12 ]]; then
-    export STATUS_MSG="The provided ER key is not valid. It does not have access to download the MAS images. Exiting the deployment"
+    export STATUS_MSG="The provided ER key is not valid. It does not have access to download the MAS images. Exiting the deployment."
   elif [[ $retcode -eq 13 ]]; then
     export STATUS_MSG="The provided Hosted zone is not a public hosted zone. Please provide a public hosted zone."
   elif [[ $retcode -eq 14 ]]; then
