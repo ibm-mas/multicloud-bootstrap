@@ -39,6 +39,7 @@ if [ $? -eq 0 ]; then
 else
     log "ERROR: ER key verification = FAIL"
     SCRIPT_STATUS=12
+    exit $SCRIPT_STATUS
 fi
 
 # Check if provided hosted zone is public
