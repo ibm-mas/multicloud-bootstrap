@@ -76,8 +76,8 @@ done
 #delete the azurepremium and create a new premium
 log "Delete the azurepremium and create a new azurepremium for ARO"
 oc delete sc/azurefiles-premium
+#The azurefiles-premium storage class is required for ARO deployment
 
-#Deploy premium Storage Class for aro
 cat << EOF >> azure-storageclass-azure-file.yaml
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
