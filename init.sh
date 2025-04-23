@@ -170,8 +170,8 @@ fi
 # OCP variables
 
 export OPENSHIFT_PULL_SECRET_FILE_PATH=${GIT_REPO_HOME}/pull-secret.json
-export MASTER_NODE_COUNT="3"
-export WORKER_NODE_COUNT="3"
+export MASTER_NODE_COUNT="1"
+export WORKER_NODE_COUNT="1"
 export AZ_MODE="multi_zone"
 export OCP_VERSION="4.15.39"
 
@@ -303,23 +303,23 @@ export HOME=/root
 case $CLUSTER_SIZE in
   small)
     log "Using small size cluster"
-    export MASTER_NODE_COUNT="3"
-    export WORKER_NODE_COUNT="3"
+    export MASTER_NODE_COUNT="1"
+    export WORKER_NODE_COUNT="1"
     ;;
   medium)
     log "Using medium size cluster"
-    export MASTER_NODE_COUNT="3"
-    export WORKER_NODE_COUNT="5"
+    export MASTER_NODE_COUNT="1"
+    export WORKER_NODE_COUNT="1"
     ;;
   large)
     log "Using large size cluster"
-    export MASTER_NODE_COUNT="5"
-    export WORKER_NODE_COUNT="7"
+    export MASTER_NODE_COUNT="1"
+    export WORKER_NODE_COUNT="1"
     ;;
   *)
     log "Using default small size cluster"
-    export MASTER_NODE_COUNT="3"
-    export WORKER_NODE_COUNT="3"
+    export MASTER_NODE_COUNT="1"
+    export WORKER_NODE_COUNT="1"
     ;;
 esac
 

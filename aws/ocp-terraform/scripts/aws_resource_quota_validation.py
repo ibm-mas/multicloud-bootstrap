@@ -41,7 +41,7 @@ def get_terraform_configuration(tf_var_file):
     tf_config['instance_type']['worker'] = tf_config_json['variable']['worker_instance_type']['default']
     if tf_config['storage_type'] == 'ocs':
         tf_config['instance_type']['ocs'] = tf_config_json['variable']['ocs']['default']['dedicated_node_instance_type']
-        tf_config['replica_count']['ocs'] = 3
+        tf_config['replica_count']['ocs'] = 1
 
     # storage-type dependend adaptions
     ## storage-type == 'ocs' --> 3 additional OCS worker nodes are deployed
