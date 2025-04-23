@@ -97,7 +97,7 @@ module "ocp" {
   count                           = var.existing_cluster ? 0 : 1
   source                          = "./ocp"
   openshift_installer_url         = "https://mirror.openshift.com/pub/openshift-v4/clients/ocp"
-  multi_zone                      = var.az == "multi_zone" ? true : false
+  multi_zone                      = false
   cluster_name                    = var.cluster_name
   base_domain                     = var.base_domain
   region                          = var.region
@@ -155,8 +155,8 @@ module "ocs" {
     dedicated_nodes              = true
     ami_id                       = var.ocs.ami_id
     dedicated_node_instance_type = var.ocs.dedicated_node_instance_type
-    dedicated_node_zones         = var.az == "single_zone" ? [local.availability_zone1] : [local.availability_zone1, local.availability_zone2, local.availability_zone3]
-    dedicated_node_subnet_ids    = var.az == "single_zone" ? local.single_zone_subnets : local.multi_zone_subnets
+    dedicated_node_zones         = [local.availability_zone1]
+	dedicated_node_subnet_ids = local.single_zone_subnets
   }
   region = var.region
 
