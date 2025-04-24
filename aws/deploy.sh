@@ -325,6 +325,7 @@ fi
 if [[ $CLUSTER_TYPE == "aws" ]]; then
 log "OCP cluster creation completed."
     exit 47
+fi
 
 export ROLE_NAME=ibm_catalogs && ansible-playbook ibm.mas_devops.run_role
 export ROLE_NAME=common_services && ansible-playbook ibm.mas_devops.run_role
