@@ -322,11 +322,6 @@ if [[ $ROSA == "true" ]]; then
   	oc patch storageclass $CPD_PRIMARY_STORAGE_CLASS -p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "true"}}}'
 fi
 
-if [[ $CLUSTER_TYPE == "aws" ]]; then
-log "OCP cluster creation completed."
-    exit 47
-fi
-
 export ROLE_NAME=ibm_catalogs && ansible-playbook ibm.mas_devops.run_role
 export ROLE_NAME=common_services && ansible-playbook ibm.mas_devops.run_role
 export ROLE_NAME=cert_manager && ansible-playbook ibm.mas_devops.run_role
