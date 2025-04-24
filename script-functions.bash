@@ -81,7 +81,7 @@ function getWorkerNodeDetails(){
 
   nodes=${#x[@]}
 
-  if [ $nodes -ge 3 ]; then
+  if [ $nodes -ge 1 ]; then
     log " Minimum Worker Node requirement satisfied : $nodes worker nodes"
   else
     log " Minimum Worker Node requirement not satisfied"
