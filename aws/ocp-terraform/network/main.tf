@@ -72,7 +72,7 @@ resource "aws_route_table_association" "master3" {
 }
 
 resource "aws_eip" "eip1" {
-  vpc = true
+  domain = "vpc"
 
   depends_on = [
     aws_vpc.cpdvpc,
@@ -80,7 +80,7 @@ resource "aws_eip" "eip1" {
 }
 resource "aws_eip" "eip2" {
   count = var.az == "multi_zone" ? 1 : 0
-  vpc   = true
+  domain = "vpc"
 
   depends_on = [
     aws_vpc.cpdvpc,
@@ -88,7 +88,7 @@ resource "aws_eip" "eip2" {
 }
 resource "aws_eip" "eip3" {
   count = var.az == "multi_zone" ? 1 : 0
-  vpc   = true
+  domain = "vpc"
 
   depends_on = [
     aws_vpc.cpdvpc,
